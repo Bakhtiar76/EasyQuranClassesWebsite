@@ -99,12 +99,28 @@ function isDangerousTarget(arg, cwd) {
 const SECRET_PATTERN =
   /(^|[\\/])(\.env(\.\w+)?|wp-config\.php|id_rsa\w*|[^\\/]*\.(pem|key|ppk|crt)|\.credentials\.json)$/i;
 
+// Any file inside a .ssh directory is treated as a private key unless it's a
+// recognized non-secret (public key, known_hosts, client config) — catches
+// arbitrarily-named keys (e.g. "eqc_prod") that SECRET_PATTERN's id_rsa*/
+// *.pem/*.key naming convention would otherwise miss.
+function isUnderSshDir(p) {
+  const norm = p.replace(/\\/g, '/');
+  return /(^|\/)\.ssh\//i.test(norm);
+}
+
 // .env.example is a committed template with no real values — never a secret.
 function isSecretArg(raw) {
   const a = raw.replace(/^["']|["']$/g, '');
   const base = a.split(/[\\/]/).pop() || '';
   if (base === '.env.example') return false;
-  return SECRET_PATTERN.test(a);
+  if (SECRET_PATTERN.test(a)) return true;
+  if (isUnderSshDir(a)) {
+    if (base.endsWith('.pub')) return false;
+    if (/^known_hosts(\.old)?$/i.test(base)) return false;
+    if (base === 'config') return false;
+    return true;
+  }
+  return false;
 }
 
 let input;
