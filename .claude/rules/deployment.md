@@ -1,9 +1,12 @@
 # Deployment Rules
 
-- Git represents custom code, not the complete mutable WordPress site.
-- Do not production-deploy without a verified rollback and current DB/filesystem backup.
-- Prefer staging verification before production.
-- Review `git status` and the relevant diff before a checkpoint/release.
-- Never force-push unless the user explicitly requests it and risk is explained.
-- Do not use `rsync --delete`, mass file deletion, DB import or search/replace as an implicit deployment shortcut.
-- Production release is a separate approved operation, never an automatic follow-up to staging work.
+- Hosting has no Shell/SSH access. cPanel deployment is manual and approval-gated.
+- Read `CPANEL-WORKFLOW.md` before release work.
+- Never assume `public_html`; confirm document root.
+- Back up production filesystem + DB before replacement/import.
+- Generate production URL SQL locally using serialization-safe WP-CLI search-replace export; do not mutate production with raw SQL replacement.
+- Keep release archives/SQL outside Git.
+- User controls cPanel login and sensitive UI actions by default.
+- File Manager + phpMyAdmin are deployment tools, not source-editing workflow.
+- After deployment verify HTTPS, URLs, permalinks, Elementor CSS/data, forms, images, SEO/indexing and caches.
+- Remove public deployment archives/installers after successful release.

@@ -1,26 +1,18 @@
 ---
-description: Verifies that usable WordPress filesystem and database backups exist and that a rollback plan is understood before risky work. Use before major upgrades, migrations, search-replace, deployment or production changes.
+name: backup-verify
+description: Verify local and cPanel rollback readiness before major milestones or deployment.
 ---
+# Backup Verify
 
-# Backup Verification
+Local:
+- confirm DB export/snapshot;
+- confirm required files/uploads backup;
+- record timestamp/location outside Git;
+- prove restore path is understood.
 
-Do not restore anything in this skill.
+Production/cPanel:
+- require filesystem backup and DB backup before replacement/import;
+- record timestamp/mechanism/restore route;
+- never overwrite/delete the last known-good backup.
 
-First determine the environment and backup mechanism.
-
-Verify, without exposing sensitive contents:
-
-- database backup exists
-- filesystem/site backup exists
-- timestamp is recent enough for the planned operation
-- file sizes are non-zero and plausible
-- storage location is known
-- backup is not unintentionally public
-- restore method is known
-- required access for restore is available
-
-If no adequate backup exists, report the gap.
-
-Creating a new production backup may consume storage and change server state, so show the proposed backup method/command and ask for approval first.
-
-Output a GO / NO-GO recommendation for the planned operation.
+A backup file existing is not enough; verify it is recent and non-empty.

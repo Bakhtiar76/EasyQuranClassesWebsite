@@ -4,7 +4,7 @@
 
 This file is the visual source of truth for the Easy Quran Classes website.
 
-The client screenshots are the primary design reference at Assets Folder. Riwaq Al Quran (https://riwaqalquran.com) may inform UX, information architecture, trust-building and conversion flow, but must not be copied visually or structurally one-to-one.
+The client screenshots are the primary design reference. Riwaq Al Quran may inform UX, information architecture, trust-building and conversion flow, but must not be copied visually or structurally one-to-one.
 
 The finished website should feel:
 
@@ -14,6 +14,18 @@ The finished website should feel:
 - modern enough for an online education service
 - conversion-focused without looking aggressive or sales-heavy
 - intentionally designed on mobile, not merely stacked
+
+
+## Local Implementation Environment
+
+All design and Elementor implementation is developed and verified on the approved **local WordPress installation**. The production cPanel site is not used as the design workspace because hosting has no shell access and production changes are release-gated.
+
+For design work:
+- Elementor changes happen locally;
+- Playwright/browser QA targets localhost;
+- screenshots should be captured from the local site during implementation;
+- production-specific URL/content facts must remain configurable and must not be hardcoded into reusable theme code;
+- final visual QA must be repeated after cPanel deployment because hosting fonts/cache/image delivery can differ from local.
 
 ## 2. Design Priority
 

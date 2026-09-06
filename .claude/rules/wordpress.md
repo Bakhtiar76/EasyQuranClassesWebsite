@@ -1,11 +1,12 @@
 # WordPress Rules
 
-- Never modify WordPress core.
-- Never permanently edit third-party plugin source or the Hello Elementor parent theme.
-- Prefer native WordPress and Elementor Free before adding plugins.
-- Keep business functionality out of the presentation theme when it should survive a theme change.
-- Sanitize input, validate boundaries, escape output, use nonces/capability checks where relevant.
-- Use WP-CLI read commands for discovery when available.
-- Do not directly rewrite Elementor `_elementor_data` during normal development.
-- The blog uses native WordPress Posts.
-- Do not create fabricated business facts, testimonials, prices or teacher credentials.
+- WordPress and Elementor development happens on the approved local site.
+- Prefer native WordPress + Elementor Free before custom code/plugins.
+- Never modify WordPress core or Hello Elementor parent theme.
+- Put presentation code in the child theme and persistent business functionality in a site plugin only when needed.
+- Do not directly edit `_elementor_data` during normal implementation.
+- Use local WP-CLI for inspection, plugin/theme operations, backups and safe exports.
+- Validate/sanitize input, escape output, use nonces/capability checks and enqueue assets properly.
+- Blog content uses native WordPress Posts.
+- Do not invent business facts/testimonials/pricing/teacher claims.
+- Full site state includes DB + uploads; Git alone is not a WordPress backup.

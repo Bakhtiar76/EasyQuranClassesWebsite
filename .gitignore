@@ -3,20 +3,14 @@
 .env.*
 !.env.example
 CLAUDE.local.md
+.claude/settings.local.json
 wp-config.php
+wp-config-local.php
 *.pem
 *.key
 *.ppk
-*.crt
-id_rsa*
-*.pub
-
-# Claude Code local/machine-specific config
-.claude/settings.local.json
-.mcp.local.json
-
-# Session memory (Remember plugin) — local history, not project source
-.remember/
+*.p12
+*.pfx
 
 # WordPress mutable/generated data
 wp-content/uploads/
@@ -27,30 +21,44 @@ wp-content/ai1wm-backups/
 wp-content/updraft/
 wp-content/wflogs/
 
-# Database / archives
+# Database / local snapshots / release packages
 *.sql
 *.sql.gz
+*.dump
 *.tar
 *.tar.gz
+*.tgz
 *.zip
+release/
+releases/
+backups/
+local-backups/
+
+# Do not ignore deliberately documented tiny sample archives under docs if ever needed
 !docs/**/*.zip
 
-# Logs
+# Logs / debug
 *.log
+debug.log
+
+# Browser automation auth/state/results
+node_modules/
+.playwright/
+.playwright-cli/
+playwright-report/
+test-results/
+auth.json
+storage-state*.json
+*.har
+
+# Local runtime data
+.tmp/
+tmp/
+.local/
+.docker-data/
 
 # OS/editor
 .DS_Store
 Thumbs.db
 .vscode/
 .idea/
-
-# Node tooling if used for QA
-node_modules/
-.playwright/
-.playwright-cli/
-playwright-report/
-test-results/
-
-# Local scratch
-.tmp/
-tmp/

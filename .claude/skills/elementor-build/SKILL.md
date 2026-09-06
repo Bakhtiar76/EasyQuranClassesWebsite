@@ -1,45 +1,13 @@
 ---
-description: Converts an approved page brief and DESIGN.md into a clean Elementor Free implementation plan and supports the custom CSS/PHP/JS needed around Elementor without brittle database manipulation. Use when building or revising an Elementor page or reusable section.
+name: elementor-build
+description: Build Easy Quran Classes pages in Elementor Free on the approved local WordPress site using DESIGN.md.
 ---
+# Elementor Build
 
-# Elementor Build Workflow
-
-Read `DESIGN.md` first.
-
-## Inspect
-
-Before implementation, identify:
-
-- page purpose and primary CTA
-- existing Elementor containers/widgets/classes
-- global colors/typography already configured
-- child-theme CSS already present
-- responsive issues in the current page
-- factual content still awaiting client confirmation
-
-## Build Strategy
-
-Prefer in this order:
-
-1. Elementor Free containers/widgets
-2. Elementor global styles
-3. reusable semantic CSS classes in the child theme
-4. small JS enhancement only if interaction genuinely requires it
-5. small PHP/theme change only if the template cannot be solved cleanly in Elementor Free
-
-Do not install an addon pack just to solve a small visual issue.
-
-Do not directly write `_elementor_data` or serialized Elementor DB values during normal work.
-
-## Output
-
-For each section provide:
-
-- container structure
-- desktop/tablet/mobile behavior
-- widgets required
-- global tokens/classes used
-- content state: verified vs placeholder
-- any custom-code requirement
-
-After implementation, run visual QA or provide an exact manual Elementor verification checklist.
+1. Read `DESIGN.md` and inspect the existing page/global styles first.
+2. Reuse global colors, typography, containers/classes and existing sections.
+3. Prefer native Elementor Free widgets/containers before custom CSS/JS/PHP.
+4. Do not directly edit `_elementor_data` or raw serialized DB values.
+5. Use browser automation against localhost only when stable; if brittle, give the user a concise manual Elementor step.
+6. Verify desktop/tablet/mobile and browser console after each section milestone.
+7. Do not publish placeholder facts as real business claims.

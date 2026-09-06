@@ -1,31 +1,19 @@
 ---
-description: Reviews a WordPress page or site for on-page SEO, indexability, metadata, headings, canonicals, sitemap/robots, internal links, image alt text and valid schema without inventing facts. Use before publishing or during SEO milestones.
+name: seo-review
+description: Review Easy Quran Classes WordPress SEO structure locally before launch.
 ---
-
 # SEO Review
 
-Audit first; do not change configuration unless the task explicitly asks for fixes.
+Check local implementation for:
+- one appropriate H1;
+- logical H2/H3 hierarchy;
+- clean slugs;
+- title/meta plan;
+- internal links;
+- image names/alt text;
+- canonical behavior;
+- sitemap/robots configuration;
+- factual schema only;
+- blog archive/single-post structure.
 
-Check:
-
-- indexability and robots directives
-- page title
-- meta description
-- canonical
-- exactly one appropriate H1
-- logical H2/H3 structure
-- URL/permalink quality
-- internal links
-- image alt text and filenames where visible
-- Open Graph basics
-- XML sitemap availability
-- robots.txt behavior
-- breadcrumb strategy where applicable
-- schema output and factual validity
-- duplicate/conflicting SEO plugin output
-
-For Blog, also check archive and single-post structure.
-
-Never generate fake ratings, reviews, teacher credentials, prices, organization details or FAQ answers just to populate schema.
-
-Report quick wins separately from changes that require client/business information.
+Do not install a second competing SEO plugin. Final production URLs/indexing must be rechecked after deployment.

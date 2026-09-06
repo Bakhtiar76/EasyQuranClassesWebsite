@@ -1,33 +1,16 @@
 ---
-description: Runs a pre-release checklist for Easy Quran Classes without deploying, checking Git state, backups, staging QA, SEO, forms, responsive behavior and rollback readiness. Use immediately before a production release.
+name: release-check
+description: Prepare and validate a manual cPanel-ready WordPress release package without deploying it automatically.
 ---
+# Release Check
 
-# Release Readiness Check
-
-This skill NEVER performs the production deployment.
-
-Check:
-
-- target release scope
-- clean/reviewed Git state
-- relevant diff
-- staging implementation verified
-- no secrets in tracked files
-- no staging placeholders or test content intended for production
-- responsive QA complete
-- forms/email path tested
-- key links tested
-- SEO/indexability settings appropriate for production
-- cache/CDN implications understood
-- filesystem and DB backups confirmed
-- rollback procedure documented
-
-Return:
-
-- GO / NO-GO
-- blockers
-- warnings
-- exact proposed deployment steps
-- exact rollback steps
-
-Wait for separate explicit production approval.
+1. Confirm local QA complete and Git diff reviewed.
+2. Confirm exact production URL and target state.
+3. Create local DB/files backup.
+4. Clean caches/temp/debug artifacts.
+5. Generate production-URL SQL with serialization-safe WP-CLI export after dry-run.
+6. Package required site files without secrets/backups/local auth state.
+7. Produce a manifest: archive name/size, SQL name/size, source commit, production URL, deployment mode, rollback prerequisites.
+8. Verify archive structure locally.
+9. Do not upload/deploy automatically.
+10. Give user cPanel File Manager/phpMyAdmin steps from `CPANEL-WORKFLOW.md`.

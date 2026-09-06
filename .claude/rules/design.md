@@ -1,9 +1,10 @@
 # Design Rules
 
-- Read `DESIGN.md` before frontend or Elementor-related work.
+- Read `DESIGN.md` before frontend/Elementor work.
 - Client screenshots outrank external inspiration.
-- Maintain the defined green / cream / gold / bronze hierarchy.
-- Use global typography/spacing rather than arbitrary widget-level values.
-- Mobile must be intentionally composed and manually checked.
-- Avoid plugin-driven visual bloat and unnecessary animation libraries.
-- Never publish layout-reference claims as factual business content without verification.
+- Build/verify designs locally; do not use production as the design workspace.
+- Use Elementor Free containers, global colors/typography and reusable styles.
+- Avoid spacer-heavy layouts, arbitrary negative margins and addon-pack bloat.
+- Check desktop, laptop, tablet and mobile intentionally.
+- Preserve accessible contrast, focus, labels, tap targets and semantic structure.
+- Re-run visual QA after final cPanel deployment because hosting/cache/font behavior can differ.

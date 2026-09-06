@@ -1,20 +1,21 @@
 ---
-description: Enforces the Easy Quran Classes implementation workflow: TODO first, reuse scan, minimal code, correct file ownership, edge-case testing, dead-code cleanup, docs updates and diff review. Use for every feature, fix, refactor or setup implementation.
+name: implementation-workflow
+description: Enforce reuse-first, minimal-code, TODO, testing, cleanup and documentation workflow on every implementation task.
 ---
-
 # Implementation Workflow
 
-Before editing, create the task TODO defined in `.claude/rules/implementation.md`.
+Start with the mandatory TODO from `.claude/rules/implementation.md`.
 
-1. Scan the relevant repository/project state.
-2. Identify reusable code, styles, helpers, libraries, WordPress/Elementor features or configuration.
-3. Reuse suitable existing implementation. If none fits, state why new code/config is necessary.
-4. Define the smallest maintainable solution and correct file ownership.
-5. Define relevant normal and edge-case checks before implementation.
-6. Implement only the focused change.
-7. Run targeted verification as you work; do not wait until the end to discover basic failures.
-8. Remove temporary/debug/duplicate/dead code made obsolete by the task.
-9. Update affected docs/checklists and durable `CLAUDE.md` knowledge.
-10. Review Git status/diff, secrets/generated files and final verification.
-
-Do not create empty/unnecessary files or speculative abstractions.
+Order:
+1. inspect;
+2. find reusable implementation;
+3. state why new code is needed if applicable;
+4. choose smallest maintainable approach;
+5. identify correct file/location;
+6. define edge cases;
+7. implement focused change;
+8. test normal + relevant edge cases;
+9. remove temporary/dead/duplicate code within scope;
+10. update docs/checklists/CLAUDE durable state;
+11. review Git diff;
+12. report verification/manual checks.

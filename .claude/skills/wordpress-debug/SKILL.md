@@ -1,16 +1,17 @@
 ---
-description: Diagnoses WordPress/Elementor/PHP/frontend issues using a smallest-cause-first workflow without exposing secrets or enabling unsafe production debugging. Use when something is broken or behaving unexpectedly.
+name: wordpress-debug
+description: Debug local WordPress/Elementor issues safely and minimally.
 ---
+# WordPress Debug
 
-# WordPress Debugging
+1. Reproduce on local site.
+2. Check browser console/network for frontend issues.
+3. Check local WordPress/PHP logs without exposing secrets.
+4. Inspect plugin/theme conflict evidence; do not randomly disable production plugins.
+5. Isolate smallest root cause.
+6. Implement smallest fix in correct file.
+7. Test relevant edge cases.
+8. Remove temporary logs/debug code.
+9. Re-run visual/functional check.
 
-1. Confirm local/staging/production and reproduce the issue.
-2. Inspect the smallest relevant surface first: browser console/network for frontend, WordPress/PHP logs for backend, WP-CLI read checks for state.
-3. Do not expose credentials or enable `WP_DEBUG_DISPLAY` on production.
-4. Check evidence for plugin/theme conflicts before disabling anything.
-5. Identify the smallest root cause; avoid speculative bulk changes.
-6. Reuse/fix existing implementation when possible.
-7. Implement the smallest fix in the correct ownership layer.
-8. Test normal behavior and relevant edge cases.
-9. Remove temporary logging/debug code.
-10. Review diff and report verification/manual checks.
+Never enable production error display as a debugging shortcut.

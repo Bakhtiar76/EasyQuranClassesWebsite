@@ -3,76 +3,115 @@
 ## Project
 Easy Quran Classes is an English WordPress marketing/enrollment website for online Quran education.
 
-Client-provided screenshots are the primary visual reference at "Assets" Folder.
-Riwaq Al Quran (https://riwaqalquran.com) is UX/content inspiration only and must not be cloned.
-
-
 Target stack:
 - WordPress
 - Elementor Free
 - Hello Elementor parent theme
-- small Easy Quran Classes child theme for presentation code
+- small Easy Quran Classes child theme for presentation code when needed
 - site-specific plugin only if business functionality genuinely requires one
 - native WordPress Posts for the blog
 
 Client screenshots are the primary visual reference. Riwaq Al Quran is UX/content inspiration only and must not be cloned. Before frontend or Elementor work, read `DESIGN.md`.
 
+## Known Hosting Constraint
+The client's cPanel account **does not provide Shell/SSH access**.
+
+Therefore the approved architecture is **local-first development**:
+
+`Claude Code + local WordPress + local WP-CLI + browser QA -> verified release package -> manual cPanel deployment`
+
+Do not waste time probing SSH, remote WP-CLI, rsync, cPanel Terminal, or remote shell workflows unless the user later confirms the hosting plan changed.
+
+cPanel is the final hosting/deployment target, not the development environment.
+
 ## Core Method
-Inspect first. Change second. Verify third.
+Inspect first. Reuse second. Change third. Verify fourth.
 
-Prefer the simplest native WordPress/Elementor solution that satisfies the requirement. Do not over-engineer or refactor unrelated code. Never guess environment, paths, WordPress state, plugin/theme state, database state or hosting capabilities when they can be safely inspected.
+Prefer the simplest native WordPress/Elementor solution that satisfies the requirement. Do not over-engineer or refactor unrelated code. Never guess project state, WordPress state, plugin/theme state, database state, local environment, or cPanel capabilities when they can be safely inspected.
 
-## Environment Safety
-Treat every unknown remote target as production until explicitly confirmed.
+## Local Development Ownership
+Claude may work against the approved **local WordPress installation** using:
+- local filesystem/project files
+- local WP-CLI
+- local PHP/Composer/Node tooling where justified
+- browser automation against the local WordPress site
+- WordPress Admin / Elementor on localhost
+- local database commands only through the approved development workflow
 
-Before any remote write, report:
-- hostname/domain
-- WordPress root/current directory
-- environment: local, staging or production
-- intended change
-- rollback method
+Before local WordPress writes, identify the local target and confirm it is not production.
 
-Do not connect to unknown SSH hosts, read credentials from unrelated files, or use bypass-permissions mode.
+Never point local automation at the production domain by accident.
+
+## cPanel / Production Boundary
+Because no shell access exists, Claude must not assume it can remotely modify production through terminal commands.
+
+Production deployment is a separate, approval-gated milestone using cPanel UI capabilities such as:
+- File Manager upload/extract
+- phpMyAdmin import
+- MySQL/Manage My Databases
+- MultiPHP Manager / PHP selector if needed
+- SSL/TLS Status
+- Backup/JetBackup if available
+
+By default, the user performs cPanel login and sensitive UI actions. Claude prepares exact deployment packages, checklists, transformed database exports, and step-by-step instructions.
+
+Do not automate cPanel login, capture browser credentials, or use a third-party cPanel MCP unless the user explicitly asks and the security model is reviewed first.
 
 ## Production Gate
-Do not make production changes unless the target is identified, filesystem/site backup and DB backup are confirmed, rollback is understood, staging testing was completed when practical, and the user explicitly approves the production operation.
+Do not prepare a release as "ready to upload" until:
+- local site QA is complete;
+- local backup/snapshot exists;
+- release files are reviewed;
+- a production database export is generated safely;
+- the production domain is confirmed;
+- existing production filesystem/database backups are confirmed;
+- rollback is documented;
+- user explicitly approves deployment.
+
+Do not overwrite an existing production site unless the deployment plan explicitly says to do so.
 
 ## Stop and Ask
 Request approval before:
-- production database writes or `wp search-replace`
-- DB import/reset or destructive repair
-- deleting WP content/plugins/themes/uploads
+- production file replacement/import
+- production database import or replacement
+- deleting production files/content/plugins/themes/uploads
 - DNS, SSL/TLS, email-routing or cron changes
-- broad permission/ownership changes
-- production deployment or destructive shell commands
+- broad production permission changes
+- changing PHP version/extensions on production
 - force push or overwriting backups
+- installing a migration/security/cache plugin on production
 
-Show the exact proposed command/change, impact and rollback first.
+Show the exact intended action, impact, and rollback first.
 
 ## Never Do
 Never:
-- modify WordPress core
+- modify WordPress core as a customization
 - edit Hello Elementor parent theme
 - permanently patch third-party plugin source
 - directly rewrite Elementor `_elementor_data` during normal development
-- drop/truncate/reset database tables
-- hardcode/log credentials or read SSH private-key contents
+- use raw SQL search/replace on Elementor/serialized WordPress data
+- drop/truncate/reset production database tables
+- hardcode/log credentials
 - commit `wp-config.php`, `.env`, keys, DB dumps or backups
 - install nulled software or execute downloaded scripts blindly
 - disable SSL/security controls merely to make something work
-- modify unrelated files outside project scope
+- create unnecessary files/folders or parallel implementations
 
 ## Architecture
 Expected custom-code locations:
 - `wp-content/themes/easy-quran-classes-child/`
 - `wp-content/plugins/easy-quran-classes-core/` only if required
 
-If the audited site uses a different safe architecture, report it before changing anything. Theme owns presentation. A site plugin owns business functionality that should survive a theme change. Elementor owns page content/composition, containers, responsive layout and supported global styles.
+Theme owns presentation. A site plugin owns business functionality that should survive a theme change. Elementor owns page content/composition, containers, responsive layout and supported global styles.
+
+The full local WordPress site/database is **not** represented by Git alone. Elementor data, WordPress settings, posts, media and plugin settings require local backups/export packages.
 
 ## Elementor
 Use Elementor Free containers/flexbox. Prefer global colors/typography, reusable classes, native widgets and child-theme CSS for reusable styling Elementor Free cannot express cleanly.
 
-Avoid spacer-based layouts, arbitrary margins, excessive negative margins, addon-pack bloat and direct Elementor DB manipulation.
+Avoid spacer-based layouts, arbitrary margins, excessive negative margins, addon-pack bloat and direct Elementor database manipulation.
+
+For repetitive Elementor/admin work, browser automation against the local site is allowed when reliable. Always visually verify the result in the browser.
 
 ## WordPress Code
 For custom PHP where relevant:
@@ -88,66 +127,99 @@ For custom PHP where relevant:
 Do not build abstractions for hypothetical future requirements.
 
 ## Content Integrity
-Do not invent student/review counts, testimonials, teacher identities, qualifications, certifications, experience, ratings, prices, guarantees, accreditation or business statistics. Use clearly marked staging placeholders when verified information is unavailable. Never knowingly publish placeholders as facts.
+Do not invent student/review counts, testimonials, teacher identities, qualifications, certifications, experience, ratings, prices, guarantees, accreditation or business statistics. Use clearly marked local placeholders when verified information is unavailable. Never knowingly publish placeholders as facts.
 
 ## SEO / Accessibility / Performance
 Maintain one appropriate H1, logical H2/H3 hierarchy, clean permalinks, useful internal links, valid canonicals/meta and factual schema only. Do not run competing SEO plugins.
 
 Preserve semantic HTML, keyboard navigation, focus states, labels, contrast, alt text and reduced-motion behavior where custom motion exists.
 
-Before adding performance plugins, inspect server caching/CDN, images, fonts, Elementor DOM and third-party scripts. Prefer properly sized AVIF/WebP, limited font weights and minimal JS.
+Before adding performance plugins, inspect hosting cache/CDN and local frontend weight. Prefer properly sized AVIF/WebP, limited font weights and minimal JS.
 
-## Git
-Git tracks custom code/project configuration, not the full mutable WordPress site. Never commit uploads, caches, `wp-config.php`, `.env`, keys, database dumps or backups.
+## Git / GitHub
+Git tracks custom code, Claude configuration, docs and reproducible local tooling — not the mutable WordPress database/media state.
 
 Before commits:
 - inspect `git status`
+- run `git diff --check`
 - review relevant diff
-- verify no secret/generated files were added
+- verify no secret/generated/release files were added
 - run applicable checks
+- stage only intended files
 
-Do not push unless the user asks or the milestone explicitly includes it.
+Commit messages must be clean, clear, concise and brief. Prefer one line such as `feat: add homepage course grid` or `fix: correct mobile header spacing`.
 
-## cPanel / SSH
-Prefer professional workflows over cPanel File Manager. Use, when available, WP Toolkit for WordPress/staging management, cPanel Git Version Control for custom-code deployment, SSH for controlled CLI access, and WP-CLI for inspection/approved changes.
+Do not use long AI-style commit messages. Do not add `Generated by Claude`, `Generated with AI`, `Co-Authored-By: Claude`, or similar AI attribution.
 
-cPanel SSH may expose the full hosting account. Use least privilege and keep keys/passwords outside the repository. Do not assume `wp-toolkit` CLI is available to a shared-hosting account.
+Do not push unless explicitly authorized. Do not force-push, rewrite shared history, merge PRs, alter GitHub repository settings, or change branch protection without approval.
 
 ## WP-CLI
-Prefer read-only WP-CLI during discovery. Never reveal DB credentials from `wp-config.php` merely to prove access.
+WP-CLI is a **local development tool** for this project unless hosting capabilities later change.
 
-Before a WP-CLI write:
-- confirm environment
-- state affected data
-- define rollback
-- request approval when production/high-impact
-- use `--dry-run` when supported
+Use it for local inspection, plugin/theme management, cache operations, database exports and safe URL transformation.
+
+For production release export, prefer serialization-safe WP-CLI search/replace export instead of raw SQL replacement, for example after the production URL is confirmed:
+
+`wp search-replace '<local-url>' '<production-url>' --all-tables-with-prefix --skip-columns=guid --export='<release-file>.sql'`
+
+Run a dry-run first where applicable. The export form must not mutate the working local database.
+
+## Deployment Model
+Default release process:
+1. complete local WordPress/Elementor build;
+2. local functional/responsive/SEO/performance QA;
+3. create local filesystem + database backup;
+4. identify exact production URL and cPanel document root;
+5. prepare release archive(s);
+6. generate production-URL database SQL export safely from local WP-CLI;
+7. back up existing production files/database through cPanel;
+8. upload/extract files through cPanel File Manager;
+9. create/select DB and import SQL through phpMyAdmin;
+10. configure production `wp-config.php` manually without committing secrets;
+11. verify HTTPS/site URLs/permalinks/forms;
+12. regenerate Elementor CSS/data and clear caches;
+13. run production smoke test;
+14. remove temporary installers/archives from public web root.
+
+The exact deployment variant depends on whether production is empty, a new WordPress install, or an existing live site. Read `CPANEL-WORKFLOW.md` before any release.
 
 ## Verification
-A file change is not completion. Verify with the relevant combination of browser, WordPress admin, Elementor, WP-CLI read checks, PHP lint, browser console/network, Playwright, Lighthouse and responsive screenshots. If verification was not possible, say so.
+A file change is not completion. Verify with the relevant combination of:
+- local browser
+- WordPress Admin
+- Elementor
+- local WP-CLI
+- PHP lint
+- browser console/network
+- Playwright
+- Lighthouse
+- responsive screenshots
+
+If verification was not possible, say so.
+
+## Implementation Workflow
+Every implementation task begins with a TODO list. Before editing, scan the repository/relevant WordPress state, identify reusable code/features/libraries, and reuse them when suitable. If a new implementation is necessary, state why.
+
+Prefer the smallest maintainable implementation, use native WordPress/Elementor capabilities before adding dependencies, place logic in the correct existing file, test modified code including relevant edge cases, remove temporary/dead code made obsolete by the change, and update affected docs/checklists. Do not create empty or unnecessary files/folders.
+
+Keep `CLAUDE.md` current with durable architecture/workflow knowledge after meaningful iterations. Do not use it as a task log and never allow it to exceed 1000 lines.
 
 ## Task Workflow
-1. State goal.
-2. Inspect current state.
-3. Identify files/data affected.
-4. State risk level.
-5. Implement the smallest correct change.
-6. Review diff/state.
-7. Test and verify.
-8. Report manual checks still required.
-9. Suggest a Git commit message when appropriate.
-
-## Tooling
-Primary environment: Windows 11, Git Bash (no WSL/PowerShell Core installed). Node.js is available and runs the project's Claude Code hooks; PHP, Composer and WP-CLI are not yet installed locally — install them when the child theme/site plugin work actually begins.
-
-Browser QA and performance auditing use the chrome-devtools MCP exclusively (screenshots, console/network, accessibility, `lighthouse_audit`, performance traces) — no separate Playwright CLI or Lighthouse install for this project, to avoid duplicate browser stacks.
-
-Permission rules and safety hooks live in `.claude/settings.json` and `.claude/hooks/` (`guard-bash.mjs`, `post-edit-validate.mjs`); see `README-SETUP.md` for the full tool inventory and `.claude/skills/plugin-evaluation/SKILL.md` for recorded verdicts on external WordPress AI tools (Novamira, WPVibe, WordPress.com connector).
+1. Create the mandatory TODO/reuse/test checklist.
+2. State goal and inspect current state.
+3. Identify reusable implementation and files/data affected.
+4. State risk level and smallest correct approach.
+5. Implement only the focused local change.
+6. Remove obsolete temporary/dead code within scope.
+7. Review diff/state.
+8. Test normal and relevant edge cases.
+9. Update docs/checklists and durable `CLAUDE.md` knowledge.
+10. Report manual checks still required and suggest a concise Git commit message when appropriate.
 
 ## Final Report
 Always report:
 - summary
-- environment affected
+- environment affected (`local` or `production-package`; never imply remote shell access)
 - files/data changed
 - commands executed
 - verification performed

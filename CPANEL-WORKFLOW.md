@@ -1,150 +1,278 @@
-# Easy Quran Classes — cPanel / Hosting Workflow
+# Easy Quran Classes — Local Development to cPanel Deployment Workflow
 
-## Goal
+## 1. Confirmed Constraint
 
-Use cPanel as hosting infrastructure, not as the primary code editor.
+The client's cPanel account **does not have Shell/SSH/Terminal access enabled**.
 
-Preferred model:
+This changes the project workflow permanently unless hosting access changes later.
 
-Local Git + Claude Code
-→ protected staging WordPress
-→ verified production release
+Claude Code will develop and test the website **locally**. cPanel is used only for hosting, backup, database management and final deployment through the web UI.
 
-Elementor content/database changes and custom-code deployment are treated separately.
+Do not plan around:
+- remote SSH
+- remote WP-CLI
+- rsync
+- SCP
+- cPanel Terminal
+- remote shell deployment scripts
+- server-side Git commands that require shell access
 
-## Preferred cPanel Capabilities
+## 2. Approved Architecture
 
-Audit whether the account exposes:
-
-- WP Toolkit
-- Git Version Control
-- SSH Access / Terminal
-- MultiPHP Manager
-- SSL/TLS Status
-- Backup / JetBackup or host backup product
-- Cron Jobs
-- Zone Editor
-- Email Routing / Email Accounts
-- Metrics / Errors
-
-Do not change anything during the first audit.
-
-## Staging
-
-Preferred options, in order:
-
-1. WP Toolkit staging/clone if the host provides it and it is reliable
-2. Host-provided staging tool
-3. Dedicated staging subdomain and cloned WordPress installation
-
-Staging must be protected from accidental indexing using appropriate WordPress/search-engine settings and, ideally, authentication at the web-server/cPanel layer.
-
-## Code Deployment
-
-Git is for custom code only:
-
-- child theme
-- site-specific plugin
-- scripts/config/docs
-
-Do not use Git as the backup mechanism for:
-
-- Elementor layouts stored in the database
-- posts/pages
-- WordPress settings
-- plugin settings
-- media uploads
-
-If cPanel Git Version Control is available, it may be used for a controlled custom-code deployment workflow.
-
-Do not deploy the entire WordPress root from Git unless the architecture has intentionally been designed for that model.
-
-## SSH
-
-Use SSH keys, not passwords, when the host permits it.
-
-Important:
-
-- a cPanel account SSH key may grant broad access to the hosting account
-- keep the private key outside the repository
-- use a dedicated key for this client/project when practical
-- protect the key with a passphrase
-- do not let Claude print or read private-key contents
-
-## WP-CLI
-
-Use WP-CLI for repeatable WordPress inspection and approved changes.
-
-Useful read-only checks include:
-
-```bash
-wp core version
-wp core verify-checksums
-wp plugin list
-wp theme list
-wp option get home
-wp option get siteurl
-wp rewrite structure
-wp cron event list
+```text
+Local machine
+  ├─ Claude Code
+  ├─ Git
+  ├─ Local WordPress
+  ├─ Elementor Free
+  ├─ Local WP-CLI
+  ├─ Playwright / browser QA
+  └─ Local database + media
+          │
+          ▼
+Verified release package
+  ├─ site files/archive
+  └─ serialization-safe production SQL export
+          │
+          ▼
+Manual cPanel deployment
+  ├─ File Manager
+  ├─ Manage My Databases / MySQL Databases
+  ├─ phpMyAdmin
+  ├─ MultiPHP Manager if needed
+  ├─ SSL/TLS Status
+  └─ Backup / JetBackup if available
+          │
+          ▼
+Production smoke test + rollback readiness
 ```
 
-Do not run commands that reveal DB credentials.
+## 3. Local Environment Preference
 
-High-impact commands such as search/replace, imports, deletes or mass updates require backup + dry-run where available + explicit approval.
+Choose the local environment after auditing the machine.
 
-## Backups
+Preferred order:
+1. an existing healthy local WordPress environment already used for the project;
+2. Docker Desktop + Docker Compose when available and reliable, because Claude can reproduce services and use WP-CLI predictably;
+3. LocalWP when Docker is unavailable or a GUI-managed environment is preferable;
+4. XAMPP/WAMP only as a fallback when the above options are impractical.
 
-Before major changes confirm both:
+Do not install multiple local stacks for the same project without a concrete reason.
 
-- filesystem/site backup
-- database backup
+Match the production PHP major/minor version as closely as practical once cPanel's PHP version is known.
 
-Record:
+## 4. Local Development Rules
 
-- backup mechanism
-- timestamp
-- storage location
-- whether the backup is outside the public web root
-- restore method
+Development happens only on the local site until release approval.
 
-Do not assume a backup is useful merely because a file exists. Verify it is recent and non-empty, and know how it would be restored.
+Claude may:
+- install/activate approved WordPress plugins locally;
+- configure Elementor locally;
+- create pages/posts locally;
+- use local WP-CLI;
+- automate local WordPress Admin with Playwright when reliable;
+- inspect local DB state through WordPress/WP-CLI;
+- create local backups and release exports.
 
-## Production Release
+Claude must not:
+- point local write commands at production;
+- assume localhost credentials are safe to commit;
+- directly manipulate Elementor serialized data with raw SQL;
+- treat Git as a replacement for the local database/media backup.
 
-Before production:
+## 5. What Git Tracks
 
-- staging QA complete
-- Git diff reviewed
-- no secrets in repository
-- DB/site backup confirmed
-- maintenance window considered if needed
-- form/email path tested
-- rollback defined
+Track only reproducible project assets such as:
+- child theme custom code;
+- site-specific plugin custom code;
+- Claude configuration/rules/skills;
+- project docs;
+- optional Docker/local tooling definitions when intentionally used.
 
-Deploy custom code first when possible, then make controlled database/content changes.
+Do not track:
+- `wp-config.php`;
+- DB dumps;
+- generated release SQL;
+- deployment ZIPs;
+- uploads/media;
+- cache directories;
+- local secrets;
+- browser auth state.
 
-Avoid blind whole-site overwrite workflows.
+## 6. cPanel Audit — Manual / Read-Only First
 
-## cPanel Areas Claude Must Not Change Without Explicit Approval
+Because Claude cannot use remote shell, the user should inspect cPanel and provide values/screenshots when needed.
 
+Collect:
+- production domain;
+- document root (often `public_html`, but do not assume);
+- current WordPress/site state: empty, new install, or existing live site;
+- PHP version;
+- MariaDB/MySQL availability;
+- database name/user state;
+- File Manager upload limits;
+- phpMyAdmin import limits;
+- SSL status;
+- current backups / JetBackup availability;
+- server-side cache/LiteSpeed/CDN;
+- free disk space;
+- email/form delivery requirements.
+
+Do not change anything during the first cPanel audit.
+
+## 7. Deployment Modes
+
+### Mode A — Empty/new hosting target
+
+Preferred when there is no production content to preserve.
+
+Typical flow:
+1. confirm cPanel backup/rollback baseline;
+2. create the production database/user in cPanel;
+3. prepare production-ready site files locally;
+4. create a serialization-safe SQL export with the production URL;
+5. upload a ZIP through File Manager and extract into the confirmed document root;
+6. create production `wp-config.php` using cPanel DB credentials, never from Git;
+7. import SQL through phpMyAdmin;
+8. verify site URL, HTTPS, permalinks, Elementor CSS and forms;
+9. remove uploaded archives from the public web root after verification.
+
+### Mode B — Existing production WordPress/site
+
+Do **not** overwrite blindly.
+
+Required before any change:
+- full filesystem backup;
+- full DB backup;
+- inventory of current pages/plugins/theme/uploads;
+- explicit decision whether production content must be preserved;
+- rollback procedure;
+- approved maintenance window if downtime is possible.
+
+If replacement/migration is still appropriate, use a controlled migration plan. A reputable migration plugin may be considered only after `/plugin-evaluation`, but is not mandatory.
+
+## 8. Database URL Migration — Critical Rule
+
+Elementor and WordPress can store serialized data. Do **not** perform broad raw SQL text replacement in phpMyAdmin.
+
+Preferred local release method after the final domain is confirmed:
+
+1. Dry run locally:
+
+```bash
+wp search-replace 'http://local.example' 'https://example.com' \
+  --all-tables-with-prefix --skip-columns=guid --dry-run
+```
+
+2. Generate transformed SQL without mutating the local working database:
+
+```bash
+wp search-replace 'http://local.example' 'https://example.com' \
+  --all-tables-with-prefix --skip-columns=guid \
+  --export='release-production.sql'
+```
+
+3. Keep the SQL export outside Git.
+
+Adjust command syntax/path for the actual local environment and URL. Never run this with placeholder URLs.
+
+## 9. File Packaging
+
+Before packaging:
+- remove caches;
+- remove local-only debug files;
+- remove temporary exports/installers;
+- ensure no `.env`, local DB credentials or machine paths are included;
+- confirm plugin/theme licenses permit deployment;
+- preserve uploads required by Elementor/content;
+- verify file names/case sensitivity.
+
+Release archives belong in a local `release/` or external staging folder that is ignored by Git.
+
+Do not include old backups inside deployment archives.
+
+## 10. cPanel File Manager
+
+Use File Manager for final transfer because shell access is unavailable.
+
+Preferred method for many files:
+1. upload one reviewed ZIP archive;
+2. verify the archive name/size;
+3. extract it into the exact confirmed document root;
+4. inspect extracted structure before deleting/replacing anything;
+5. remove the archive after successful deployment.
+
+Do not edit project source code directly in File Manager except for a tiny emergency production fix that has been explicitly approved and then back-ported to Git/local source immediately.
+
+## 11. Database Import
+
+Use cPanel database management + phpMyAdmin.
+
+Before import:
+- verify target DB name;
+- confirm DB backup if an existing DB is being replaced;
+- confirm the SQL file was generated for the production URL;
+- check import size limits.
+
+If phpMyAdmin cannot import the release because of hosting limits, stop and choose a safer supported alternative with the host/user. Do not split or manipulate serialized SQL blindly.
+
+## 12. Production `wp-config.php`
+
+Never upload the local `wp-config.php` unchanged.
+
+Production configuration must use cPanel's production DB credentials and production-specific constants.
+
+Do not expose credentials in Claude output or Git.
+
+## 13. Post-Deployment WordPress Checks
+
+After import and file deployment, verify in the browser/wp-admin:
+- homepage loads over HTTPS;
+- `/wp-admin/` works;
+- `home` and `siteurl` are correct;
+- Settings > Permalinks can be saved once if rewrite rules need refreshing;
+- Elementor > Tools: regenerate CSS/data when needed;
+- no mixed-content warnings;
+- menus/header/footer load;
+- responsive layout matches local QA;
+- images load;
+- forms submit;
+- transactional email path works;
+- no PHP/JS console errors;
+- SEO plugin canonical/sitemap uses production URL;
+- robots/indexing setting is correct for production;
+- caches are cleared and then enabled appropriately.
+
+## 14. Backup & Rollback
+
+Before deployment record:
+- filesystem backup method and timestamp;
+- database backup method and timestamp;
+- where each backup is stored;
+- how to restore them through cPanel;
+- what files/database would be restored if verification fails.
+
+Never delete the last known-good backup during the release.
+
+## 15. cPanel Areas Requiring Explicit Approval
+
+- production File Manager replacement/deletion
+- phpMyAdmin import into an existing database
+- database/user deletion
 - DNS / Zone Editor
 - SSL certificates
 - Email Routing / MX
-- email account passwords
 - cron jobs
-- PHP version/extensions on production
-- directory ownership/permissions broadly
+- PHP version/extensions
+- broad file permissions
 - redirects affecting the whole site
-- backup retention settings
 - domain/document-root mapping
+- backup retention changes
 
-## Recommended Access Pattern
+## 16. MCP / Automation Policy
 
-For normal development:
+Do not install a generic cPanel, SSH, filesystem or database MCP server for this hosting account.
 
-- browser: WordPress/Elementor on staging
-- terminal: SSH/WP-CLI on staging
-- source control: Git locally + remote repository
-- cPanel UI: hosting administration and verified deployment/staging features
+No remote shell exists, so such tools do not improve the approved workflow and may unnecessarily expose account-wide resources.
 
-Do not use cPanel File Manager as the normal code-editing workflow.
+Do not automate cPanel login/session capture by default. Claude prepares instructions and release artifacts; the user controls sensitive cPanel actions.
