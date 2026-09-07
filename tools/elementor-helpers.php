@@ -25,6 +25,16 @@ function eqc_el_id() {
 /**
  * A top-level Container (Elementor Free's flexbox section replacement).
  *
+ * Defaults `content_width` to 'full' unless the caller overrides it: when
+ * left unset, Elementor treats the container as "boxed" and wraps the
+ * real children one level deeper in an `.e-con-inner` div, so our own
+ * `css_classes` (e.g. `.eqc-grid--courses { display: grid }`) land on an
+ * element whose only child IS that wrapper — the actual card children
+ * never become grid/flex items, and things silently degrade to
+ * Elementor's own unconstrained flex-wrap (no minmax() floor), which lets
+ * too many columns crowd into one row and clip long card titles. No call
+ * site in this project ever wants the boxed wrapper.
+ *
  * @param array $settings Container settings (background, padding, custom classes...).
  * @param array $children Child elements (containers or widgets).
  */
@@ -32,7 +42,7 @@ function eqc_container( $settings, $children = array() ) {
 	return array(
 		'id'       => eqc_el_id(),
 		'elType'   => 'container',
-		'settings' => $settings,
+		'settings' => array_merge( array( 'content_width' => 'full' ), $settings ),
 		'elements' => $children,
 	);
 }
