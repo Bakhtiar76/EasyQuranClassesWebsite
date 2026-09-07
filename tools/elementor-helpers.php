@@ -257,6 +257,30 @@ function eqc_teacher_card( $attachment_id, $name, $role, $facts ) {
 }
 
 /**
+ * A clearly-marked placeholder teacher slot — used to round out the
+ * roster to a fuller-feeling team page without fabricating a real
+ * person's photo, name or credentials (CLAUDE.md Content Integrity: never
+ * publish placeholders as facts). Dashed border + generic icon avatar +
+ * an explicit "to be added" note make it unmistakable as a stub, and the
+ * admin fills in a real photo/name/facts later via the normal Elementor
+ * panel — no code involved.
+ */
+function eqc_teacher_card_stub( $slot_label = 'Teacher Name' ) {
+	return eqc_container(
+		array(
+			'css_classes'    => 'eqc-card eqc-card--teacher eqc-card--teacher-stub',
+			'flex_direction' => 'column',
+		),
+		array(
+			eqc_html( '<div class="eqc-teacher-stub-avatar">' . eqc_icon_str( 'person' ) . '</div>' ),
+			eqc_heading( $slot_label, 'h3' ),
+			eqc_html( '<p class="eqc-teacher-role">Quran Teacher</p>' ),
+			eqc_html( '<p class="eqc-teacher-stub-note">Photo, name and credentials to be added.</p>' ),
+		)
+	);
+}
+
+/**
  * Pricing card (DESIGN.md §16 Pricing Card).
  *
  * @param array $features Plain-text feature list.

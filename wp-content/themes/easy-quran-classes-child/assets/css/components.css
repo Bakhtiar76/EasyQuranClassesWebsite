@@ -337,17 +337,49 @@ img { display: block; max-width: 100%; height: auto; }
 	font-weight: 600;
 	margin-bottom: 0.8em;
 }
+/* Boxed "stat strip" treatment (inspired by common instructor-directory
+   patterns: a distinct tinted panel separating quick facts from the rest
+   of the card) — content stays our own verified fields (experience,
+   certification, specialty), just given clearer visual hierarchy. */
 .eqc-teacher-facts {
 	list-style: none;
 	margin: 0 0 1em;
-	padding: 0;
+	padding: 0.85em 1em;
 	display: flex;
 	flex-direction: column;
-	gap: 0.5em;
+	gap: 0.55em;
 	font-size: var(--eqc-fs-small);
 	text-align: left;
+	background: var(--eqc-cream-50);
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-control);
 }
 .eqc-teacher-facts li { display: flex; gap: 0.6em; align-items: flex-start; }
+.eqc-teacher-facts .eqc-icon { color: var(--eqc-bronze-600); }
+
+/* Placeholder ("stub") teacher card — visually distinct so it is never
+   mistaken for a real profile: dashed border, muted avatar, no facts box. */
+.eqc-card--teacher-stub { border-style: dashed; border-color: var(--eqc-border-strong); box-shadow: none; }
+.eqc-teacher-stub-avatar {
+	width: clamp(120px, 30%, 160px);
+	aspect-ratio: 1;
+	margin-inline: auto;
+	border-radius: 50%;
+	border: 3px dashed var(--eqc-border-strong);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--eqc-muted);
+	background: var(--eqc-cream-50);
+}
+.eqc-teacher-stub-avatar .eqc-icon { width: 2.4em; height: 2.4em; }
+.eqc-card--teacher-stub .eqc-teacher-role { color: var(--eqc-muted); }
+.eqc-teacher-stub-note {
+	font-size: var(--eqc-fs-small);
+	color: var(--eqc-muted);
+	font-style: italic;
+	margin: 0 0 1em;
+}
 
 /* Pricing card */
 .eqc-card--pricing { text-align: center; position: relative; }

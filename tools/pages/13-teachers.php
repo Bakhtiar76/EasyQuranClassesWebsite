@@ -34,6 +34,12 @@ foreach ( $teacher_data as $i => $t ) {
 	}
 	$teacher_cards[] = eqc_teacher_card( $teacher_ids[ $i ], $t[0], $t[1], $t[2] );
 }
+// Two clearly-marked placeholder slots round out the team page — the
+// client mentioned more teachers than the four confirmed profiles we
+// have; these are stubs an admin fills in via Elementor, never presented
+// as real people (see eqc_teacher_card_stub() for why).
+$teacher_cards[] = eqc_teacher_card_stub( 'Add a Teacher' );
+$teacher_cards[] = eqc_teacher_card_stub( 'Add a Teacher' );
 $grid = eqc_section(
 	'eqc-section eqc-section--surface',
 	array(
