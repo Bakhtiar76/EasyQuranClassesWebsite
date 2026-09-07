@@ -175,7 +175,7 @@ function eqc_seed_image( $slug_fragment ) {
 	if ( isset( $cache[ $slug_fragment ] ) ) {
 		return $cache[ $slug_fragment ];
 	}
-	$id     = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value LIKE %s LIMIT 1", '%' . $wpdb->esc_like( $slug_fragment ) . '%' ) );
+	$id     = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value LIKE %s ORDER BY post_id DESC LIMIT 1", '%' . $wpdb->esc_like( $slug_fragment ) . '%' ) );
 	$result = array( '', '' );
 	if ( $id ) {
 		$result = array( wp_get_attachment_url( (int) $id ), get_post_meta( (int) $id, '_wp_attachment_image_alt', true ) );

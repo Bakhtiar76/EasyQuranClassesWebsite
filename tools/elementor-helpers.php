@@ -174,12 +174,17 @@ function eqc_button( $text, $url, $classes = '' ) {
  * Matches on the attached file path (_wp_attached_file), not post_name —
  * `wp media import --title="..."` derives post_name from the given title,
  * not the source filename, so a post_name match would silently miss.
+ *
+ * Ordered by post_id DESC: if a fragment matches more than one attachment
+ * (e.g. a legacy 'foo.jpg' and its re-imported 'foo.webp' replacement both
+ * contain the fragment 'foo'), the most recently imported match wins
+ * instead of an undefined LIMIT-1-with-no-ORDER-BY pick.
  */
 function eqc_media_id( $slug_fragment ) {
 	global $wpdb;
 	$id = $wpdb->get_var(
 		$wpdb->prepare(
-			"SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value LIKE %s LIMIT 1",
+			"SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value LIKE %s ORDER BY post_id DESC LIMIT 1",
 			'%' . $wpdb->esc_like( $slug_fragment ) . '%'
 		)
 	);

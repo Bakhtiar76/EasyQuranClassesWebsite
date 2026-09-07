@@ -136,8 +136,17 @@ function eqc_ensure_menu( $name, $items ) {
 	return $menu_id;
 }
 
-// 7. Custom logo (attachment #8 = eqc-logo.png, imported this session).
-set_theme_mod( 'custom_logo', 8 );
+// 7. Custom logo. Resolved by filename fragment (not a hardcoded attachment
+// ID) via the same eqc_media_id() helper the page-building scripts use, so
+// re-importing the logo under a new attachment ID (e.g. after a WebP
+// conversion) does not require editing this file. Fragment includes the
+// extension ("eqc-logo.webp", not "eqc-logo") because eqc_media_id() does a
+// substring LIKE match and "eqc-logo-mark.webp" also contains "eqc-logo".
+require_once __DIR__ . '/elementor-helpers.php';
+$eqc_logo_id = eqc_media_id( 'eqc-logo.webp' );
+if ( $eqc_logo_id ) {
+	set_theme_mod( 'custom_logo', $eqc_logo_id );
+}
 
 // 8. Seed the contact/social theme mods with real (placeholder) values.
 // get_theme_mod( $name, $default ) ignores the Customizer setting's own
