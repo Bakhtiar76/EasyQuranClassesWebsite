@@ -1,7 +1,26 @@
+# main = production-ready code only (wp-content/themes/easy-quran-classes-child/
+# and, if ever added, wp-content/plugins/easy-quran-classes-core/). Local
+# tooling, Claude/AI configuration, project docs and reference assets live
+# on the development branch, never here.
+.claude/
+local/
+tools/
+tests/
+Assests/
+ref_website/
+.mcp.json
+AGENTS.md
+CLAUDE.md
+CPANEL-WORKFLOW.md
+DESIGN.md
+README-SETUP.md
+TASK.md
+TASK-*.md
+TOOL-INVENTORY.md
+
 # Secrets / environment
 .env
 .env.*
-!.env.example
 CLAUDE.local.md
 .claude/settings.local.json
 wp-config.php
