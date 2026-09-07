@@ -7,13 +7,13 @@
 // matched by the repo's existing `test-results/` .gitignore pattern.
 //
 // Usage: node sweep.mjs [url] [path...]
-//   node sweep.mjs                              -> sweeps http://localhost:8080/
-//   node sweep.mjs http://localhost:8080 /about  -> sweeps one or more paths
+//   node sweep.mjs                          -> sweeps http://localhost/
+//   node sweep.mjs http://localhost /about  -> sweeps one or more paths
 //
 // From Git Bash on Windows, a leading "/" argument gets silently rewritten
 // to a Windows path (MSYS path conversion) — prefix the command with
 // MSYS_NO_PATHCONV=1 when passing route arguments, e.g.:
-//   MSYS_NO_PATHCONV=1 node sweep.mjs http://localhost:8080 / /about
+//   MSYS_NO_PATHCONV=1 node sweep.mjs http://localhost / /about
 
 import { chromium } from 'playwright';
 import { mkdirSync } from 'node:fs';
@@ -30,7 +30,7 @@ const VIEWPORTS = [
   { name: 'mobile-sm-360x800', width: 360, height: 800 },
 ];
 
-const baseUrl = process.argv[2] || 'http://localhost:8080';
+const baseUrl = process.argv[2] || 'http://localhost';
 const routes = process.argv.slice(3).length ? process.argv.slice(3) : ['/'];
 
 const stamp = new Date().toISOString().replace(/[:.]/g, '-');
