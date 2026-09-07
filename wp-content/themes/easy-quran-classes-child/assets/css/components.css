@@ -296,6 +296,36 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	align-items: center;
 }
 
+/* Full-width card-footer button (course cards, etc.) — an explicit
+   deviation from the reference's arrow-only card CTA per direct user
+   request ("make the course panels complete as a button"). Overrides the
+   base .eqc-btn widget-wrapper rule above, which centers/shrink-wraps by
+   default.
+   The base .eqc-btn / .eqc-btn--variant rules apply full pill chrome
+   (border, background, fixed height) to BOTH the outer widget wrapper
+   (bare class match) and the nested .elementor-button anchor (compound
+   selector) — normally invisible because the wrapper's width:auto makes
+   it hug the anchor exactly, so the two pills coincide pixel-for-pixel.
+   Stretching only the wrapper to 100% breaks that coincidence and exposes
+   two different-sized nested pills, so the wrapper's own copy of the
+   chrome must be neutralized here, leaving only the (now 100%-wide)
+   inner anchor visible. */
+.elementor-widget-button.eqc-btn--block {
+	display: block;
+	align-self: stretch;
+	width: 100%;
+	height: auto;
+	border: none;
+	background: none;
+	padding-inline: 0;
+	margin-top: auto;
+	padding-top: 1.25rem;
+}
+.eqc-btn--block,
+.elementor-widget-button.eqc-btn--block .elementor-button {
+	width: 100%;
+}
+
 /* ---------- Cards ---------- */
 
 .eqc-card {
@@ -391,9 +421,9 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 .eqc-card--course > * { position: relative; z-index: 1; }
 .eqc-card--course h3 { margin-block: 0.6em 0.1em; }
 .eqc-card--course .eqc-card-level {
-	color: var(--eqc-muted);
+	color: var(--eqc-bronze-700);
 	font-size: var(--eqc-fs-small);
-	font-weight: 600;
+	font-weight: 700;
 }
 .eqc-card--course p { margin-block: 0.8em; }
 
@@ -517,6 +547,18 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	border-color: var(--eqc-gold-500);
 	box-shadow: 0 18px 40px rgba(169, 130, 53, 0.18);
 }
+/* Grow the recommended card in all directions, not just via the floating
+   badge — matches the reference's visibly wider/taller highlighted plan.
+   Scale (not padding) so the grid track itself doesn't reflow; guarded to
+   widths where siblings sit side-by-side so a single-column mobile stack
+   never scales past the viewport edge. */
+@media (min-width: 40rem) {
+	.eqc-card--pricing--featured {
+		transform: scale(1.07);
+		z-index: 2;
+	}
+	.eqc-card--pricing--featured:hover { transform: scale(1.07) translateY(-3px); }
+}
 /* Gold scalloped icon badge above the frequency pill, matching the
    reference pricing cards (Assests/) — same masked-rosette technique as
    the course-card index badge above. */
@@ -590,6 +632,67 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 }
 .eqc-pricing-price small { font-family: var(--eqc-font-body); font-size: var(--eqc-fs-small); color: var(--eqc-muted); font-weight: 600; }
 
+/* Pricing inclusion strip — a circular icon badge per item with thin
+   dividers between them, matching the reference's "icon | icon | icon"
+   treatment (Assests/) rather than bare small inline icons. */
+.eqc-inclusion-strip {
+	background: var(--eqc-surface);
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-panel);
+	box-shadow: var(--eqc-shadow-card);
+	padding: 1.5rem clamp(1.25rem, 1rem + 1.5vw, 2.5rem);
+	display: flex;
+	flex-wrap: wrap;
+	justify-content: center;
+	align-items: center;
+}
+.eqc-inclusion-item {
+	display: flex;
+	align-items: center;
+	gap: 0.75em;
+	font-weight: 700;
+	color: var(--eqc-heading);
+	padding-inline: clamp(0.75rem, 0.5rem + 1vw, 1.75rem);
+	border-inline-start: 1px solid var(--eqc-border);
+}
+.eqc-inclusion-item:first-child { border-inline-start: none; padding-inline-start: 0; }
+.eqc-inclusion-item:last-child { padding-inline-end: 0; }
+.eqc-inclusion-icon {
+	position: relative;
+	display: inline-flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 2.6em;
+	height: 2.6em;
+	color: var(--eqc-green-800);
+}
+.eqc-inclusion-icon::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background-color: var(--eqc-gold-500);
+	opacity: 0.16;
+	-webkit-mask-image: url('../svg/rosette.svg');
+	mask-image: url('../svg/rosette.svg');
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	z-index: 0;
+}
+.eqc-inclusion-icon .eqc-icon { position: relative; z-index: 1; width: 1.2em; height: 1.2em; }
+/* Below this width items stack one per row (auto-fit wrapping would leave
+   a stray border-inline-start on whichever item starts a new row), so the
+   side dividers become unreliable — switch to a top rule instead. */
+@media (max-width: 43.75rem) {
+	.eqc-inclusion-strip { flex-direction: column; align-items: stretch; }
+	.eqc-inclusion-item {
+		border-inline-start: none;
+		border-top: 1px solid var(--eqc-border);
+		padding: 0.85em 0;
+	}
+	.eqc-inclusion-item:first-child { border-top: none; padding-top: 0; }
+}
+
 /* Testimonial card */
 .eqc-card--testimonial { position: relative; padding-top: 3.5rem; }
 .eqc-testimonial-photo {
@@ -636,6 +739,54 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	color: var(--eqc-muted);
 }
 .eqc-testimonial-tags span { display: inline-flex; align-items: center; gap: 0.4em; }
+
+/* Testimonial slider — 3 slides of 3 cards, dot-navigated (see
+   initTestimonialSlider() in eqc.js). No autoplay: user-controlled,
+   avoids the accessibility/motion-sensitivity issues of an auto-advancing
+   carousel. */
+.eqc-testimonial-slider { overflow: hidden; }
+.eqc-testimonial-track {
+	transition: transform var(--eqc-motion-slow) var(--eqc-ease-standard);
+	will-change: transform;
+}
+/* Sizing only — .eqc-grid/.eqc-grid--testimonials (already on this same
+   element, see 10-home.php) supply display:grid, gap and columns. */
+.eqc-testimonial-slide {
+	flex: 0 0 100%;
+	min-width: 100%;
+}
+.eqc-slider-dots { display: flex; justify-content: center; gap: 0.6rem; margin-top: clamp(1.5rem, 1.2rem + 1vw, 2.25rem); }
+.eqc-slider-dot {
+	width: 10px;
+	height: 10px;
+	border-radius: 50%;
+	border: none;
+	padding: 0;
+	background: var(--eqc-border-strong);
+	cursor: pointer;
+	transition: background-color var(--eqc-motion-base) var(--eqc-ease-standard), transform var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+.eqc-slider-dot.is-active { background: var(--eqc-bronze-600); transform: scale(1.35); }
+.eqc-slider-dot:focus-visible { outline: 3px solid var(--eqc-gold-500); outline-offset: 3px; }
+
+/* Placeholder testimonial slide — mirrors .eqc-card--teacher-stub's visual
+   language (dashed border, muted, italic note) so it is never mistaken for
+   a genuine review. */
+.eqc-card--testimonial-stub { border-style: dashed; box-shadow: none; text-align: center; padding-top: clamp(1.25rem, 1rem + 1vw, 2rem); }
+.eqc-testimonial-stub-avatar {
+	width: 64px;
+	height: 64px;
+	margin-inline: auto;
+	border-radius: 50%;
+	border: 2px dashed var(--eqc-border-strong);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	color: var(--eqc-muted);
+	background: var(--eqc-cream-50);
+}
+.eqc-card--testimonial-stub h3 { margin-top: 0.9em; }
+.eqc-testimonial-stub-note { font-size: var(--eqc-fs-small); color: var(--eqc-muted); font-style: italic; }
 
 /* Blog card */
 /* .eqc-card--blog is a grid item (`.eqc-grid--blog { display: grid }`),
@@ -871,9 +1022,14 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
  * section carrying `eqc-section--ornamented` gets them positioned and
  * layered correctly regardless of what else it contains. */
 
+/* 8-point star tile (same family as assets/svg/divider-flower.svg and
+   lattice-corner.svg — a real Rub el Hizb / Andalusian star-lattice motif,
+   not a placeholder diamond grid). Adjacent tiles' star points nearly
+   meet, the classic interlocking look of this pattern family. */
 .eqc-section--textured {
-	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23B9974C' stroke-opacity='0.14' stroke-width='1'%3E%3Cpath d='M36 2 L70 36 L36 70 L2 36 Z'/%3E%3Ccircle cx='36' cy='36' r='2.5'/%3E%3C/g%3E%3C/svg%3E");
+	background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='100'%20height='100'%20viewBox='0%200%20100%20100'%3E%3Cpolygon%20fill='none'%20stroke='%23B9974C'%20stroke-opacity='0.16'%20stroke-width='1'%20points='50,4%2057.27,32.45%2082.53,17.47%2067.55,42.73%2096,50%2067.55,57.27%2082.53,82.53%2057.27,67.55%2050,96%2042.73,67.55%2017.47,82.53%2032.45,57.27%204,50%2032.45,42.73%2017.47,17.47%2042.73,32.45'/%3E%3C/svg%3E");
 	background-repeat: repeat;
+	background-size: 100px 100px;
 }
 
 .eqc-section--ornamented { position: relative; overflow: hidden; }
@@ -887,19 +1043,27 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	width: clamp(130px, 15vw, 240px);
 	height: clamp(130px, 15vw, 240px);
 	background-color: var(--eqc-gold-600);
-	-webkit-mask-image: url('../svg/corner-motif.svg');
-	mask-image: url('../svg/corner-motif.svg');
+	-webkit-mask-image: url('../svg/lattice-corner.svg');
+	mask-image: url('../svg/lattice-corner.svg');
 	-webkit-mask-size: 100% 100%;
 	mask-size: 100% 100%;
 	-webkit-mask-repeat: no-repeat;
 	mask-repeat: no-repeat;
-	opacity: 0.1;
+	opacity: 0.22;
 	pointer-events: none;
 	z-index: 0;
 }
+/* lattice-corner.svg is drawn dense at its own top-right corner (see the
+   asset's own comment), so .eqc-corner-motif--tr needs no transform and
+   --bl's 180deg rotation naturally maps that dense corner to bottom-left.
+   The asset already bakes in a per-star opacity fade (0.95 down to 0.1),
+   so this element-level opacity is a second, smaller multiplier on top —
+   deliberately higher than DESIGN.md §9's 3-10% baseline per explicit user
+   feedback that the previous motif read as "boring and dull" at that
+   strength; the fade keeps the far corner still light. */
 .eqc-corner-motif--tr { top: 0; right: 0; }
 .eqc-corner-motif--bl { bottom: 0; left: 0; transform: rotate(180deg); }
-.eqc-section--dark .eqc-corner-motif { background-color: var(--eqc-gold-300); opacity: 0.12; }
+.eqc-section--dark .eqc-corner-motif { background-color: var(--eqc-gold-300); opacity: 0.5; }
 /* Slow ambient drift (reuses the CTA drift keyframe from motion.css) so the
    ornament reads as gently alive rather than a static watermark. */
 html.eqc-js .eqc-corner-motif { animation: eqc-drift 24s var(--eqc-ease-soft) infinite alternate; }

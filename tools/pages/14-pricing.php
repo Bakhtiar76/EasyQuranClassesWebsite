@@ -32,9 +32,9 @@ $inclusions = array(
 	array( 'clock', 'Flexible Schedule' ),
 	array( 'shield', 'Safe & Supportive Environment' ),
 );
-$inclusion_html = '<div class="eqc-card" style="display:flex;flex-wrap:wrap;gap:1.5rem 2rem;justify-content:center;padding:1.5rem 2rem;">';
+$inclusion_html = '<div class="eqc-inclusion-strip">';
 foreach ( $inclusions as $inc ) {
-	$inclusion_html .= '<span style="display:flex;align-items:center;gap:0.6em;font-weight:600;color:var(--eqc-heading);">' . eqc_icon_str( $inc[0] ) . esc_html( $inc[1] ) . '</span>';
+	$inclusion_html .= '<span class="eqc-inclusion-item"><span class="eqc-inclusion-icon">' . eqc_icon_str( $inc[0] ) . '</span>' . esc_html( $inc[1] ) . '</span>';
 }
 $inclusion_html .= '</div>';
 

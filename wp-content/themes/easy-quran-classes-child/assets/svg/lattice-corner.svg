@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" fill="none" aria-hidden="true" focusable="false">
+	<defs>
+		<polygon id="eqc-star8" stroke="currentColor" stroke-width="1.1"
+			points="50,4 57.27,32.45 82.53,17.47 67.55,42.73 96,50 67.55,57.27 82.53,82.53 57.27,67.55 50,96 42.73,67.55 17.47,82.53 32.45,57.27 4,50 32.45,42.73 17.47,17.47 42.73,32.45" />
+	</defs>
+	<!-- 8-point star cluster (same motif family as divider-flower.svg), densest at the
+	     top-right corner and fading toward the opposite corner so the placed element
+	     (see .eqc-corner-motif, components.css) reads as one soft corner ornament
+	     rather than a hard rectangular tile. -->
+	<use href="#eqc-star8" transform="translate(148,-16) scale(0.92)" opacity="0.95" />
+	<use href="#eqc-star8" transform="translate(58,-4) scale(0.62)" opacity="0.55" />
+	<use href="#eqc-star8" transform="translate(178,60) scale(0.62)" opacity="0.55" />
+	<use href="#eqc-star8" transform="translate(96,42) scale(0.5)" opacity="0.4" />
+	<use href="#eqc-star8" transform="translate(4,-24) scale(0.44)" opacity="0.3" />
+	<use href="#eqc-star8" transform="translate(150,140) scale(0.44)" opacity="0.3" />
+	<use href="#eqc-star8" transform="translate(30,64) scale(0.34)" opacity="0.2" />
+	<use href="#eqc-star8" transform="translate(70,120) scale(0.3)" opacity="0.15" />
+	<use href="#eqc-star8" transform="translate(0,140) scale(0.26)" opacity="0.1" />
+</svg>

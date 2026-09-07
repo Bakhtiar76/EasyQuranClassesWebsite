@@ -18,6 +18,27 @@ defined( 'ABSPATH' ) || exit;
 				<p><?php esc_html_e( "Tell us the student's age, level, and the times that suit you. We'll match a teacher and confirm your trial.", 'easy-quran-classes' ); ?></p>
 			</div>
 			<div class="eqc-footer-cta-actions">
+				<?php
+				// Floating avatar-stack + student-count pill, matching the
+				// reference (Assests/WhatsApp Image 2026-09-04 at 4.23.27 PM (1).jpeg)
+				// — reuses the already-verified "5,000+" figure (see the
+				// homepage About section) rather than the reference's own
+				// conflicting "+1.5K", per the earlier statistics normalization.
+				$eqc_footer_avatars = array( 'teacher-hafiz-usman-ali', 'teacher-abdullah-hafeez', 'teacher-sana-fatima', 'teacher-maryam-zahra' );
+				?>
+				<div class="eqc-footer-stat-pill">
+					<div class="eqc-avatar-stack">
+						<?php foreach ( $eqc_footer_avatars as $eqc_avatar_slug ) :
+							list( $eqc_avatar_url, $eqc_avatar_alt ) = eqc_seed_image( $eqc_avatar_slug );
+							if ( ! $eqc_avatar_url ) {
+								continue;
+							}
+							?>
+							<img src="<?php echo esc_url( $eqc_avatar_url ); ?>" alt="" loading="lazy" />
+						<?php endforeach; ?>
+					</div>
+					<span class="eqc-footer-stat-text"><strong>5,000+</strong> <?php esc_html_e( 'Happy Students', 'easy-quran-classes' ); ?></span>
+				</div>
 				<a class="eqc-btn eqc-btn--bronze" href="<?php echo esc_url( home_url( '/free-trial/' ) ); ?>">
 					<?php eqc_icon( 'calendar' ); ?> <?php esc_html_e( 'Book My Free Trial Class', 'easy-quran-classes' ); ?>
 				</a>

@@ -248,7 +248,7 @@ function eqc_course_card( $number, $title, $level, $description, $link, $reveal_
 			eqc_heading( $title, 'h3' ),
 			eqc_html( '<p class="eqc-card-level">' . esc_html( $level ) . '</p>' ),
 			eqc_text( '<p>' . wp_kses_post( $description ) . '</p>' ),
-			eqc_icon_link( 'arrow-right', $link, sprintf( __( 'Book a free trial for %s', 'easy-quran-classes' ), $title ) ),
+			eqc_button( __( 'Learn More', 'easy-quran-classes' ), $link, 'eqc-btn--secondary eqc-btn--block' ),
 		)
 	);
 }
@@ -377,6 +377,28 @@ function eqc_testimonial_card( $attachment_id, $name, $location, $quote, $tags =
 			eqc_html( '<p class="eqc-testimonial-location">' . eqc_icon_str( 'map-pin' ) . ' ' . esc_html( $location ) . '</p>' ),
 			eqc_text( '<p>' . esc_html( $quote ) . '</p>' ),
 			eqc_html( $tags_html ),
+		)
+	);
+}
+
+/**
+ * Placeholder ("stub") testimonial slide — fills out the sliding carousel
+ * to a full 3x3 grid without inventing fake reviewer names/quotes, which
+ * CLAUDE.md's Content Integrity rule forbids. Mirrors
+ * eqc_teacher_card_stub()'s dashed-border/muted treatment so it reads the
+ * same way: clearly an editable empty slot, never mistaken for a real
+ * review.
+ */
+function eqc_testimonial_card_stub() {
+	return eqc_container(
+		array(
+			'css_classes'    => 'eqc-card eqc-card--testimonial eqc-card--testimonial-stub',
+			'flex_direction' => 'column',
+		),
+		array(
+			eqc_html( '<div class="eqc-testimonial-stub-avatar">' . eqc_icon_str( 'quote' ) . '</div>' ),
+			eqc_heading( __( 'Add a Testimonial', 'easy-quran-classes' ), 'h3' ),
+			eqc_html( '<p class="eqc-testimonial-stub-note">' . esc_html__( 'A real family review will go here once received.', 'easy-quran-classes' ) . '</p>' ),
 		)
 	);
 }

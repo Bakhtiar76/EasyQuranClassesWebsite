@@ -176,7 +176,33 @@
 .eqc-footer-cta h2 { color: var(--eqc-white); margin-block: 0.3em 0.4em; font-size: var(--eqc-fs-h2); }
 .eqc-footer-cta p { max-width: 40ch; color: var(--eqc-cream-100); opacity: 0.85; }
 .eqc-footer-cta-text { flex: 1 1 340px; }
-.eqc-footer-cta-actions { display: flex; flex-wrap: wrap; gap: 0.85rem; }
+.eqc-footer-cta-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.85rem; }
+
+/* Floating avatar-stack + student-count pill overlapping the dark CTA
+   panel, matching the reference (Assests/WhatsApp Image 2026-09-04 at
+   4.23.27 PM (1).jpeg) instead of a bare pair of buttons. */
+.eqc-footer-stat-pill {
+	display: flex;
+	align-items: center;
+	gap: 0.7em;
+	background: var(--eqc-surface);
+	color: var(--eqc-heading);
+	border-radius: var(--eqc-radius-pill);
+	padding: 0.55em 1.1em 0.55em 0.55em;
+	box-shadow: var(--eqc-shadow-card);
+}
+.eqc-avatar-stack { display: flex; }
+.eqc-avatar-stack img {
+	width: 34px;
+	height: 34px;
+	border-radius: 50%;
+	object-fit: cover;
+	border: 2px solid var(--eqc-surface);
+	margin-inline-start: -10px;
+}
+.eqc-avatar-stack img:first-child { margin-inline-start: 0; }
+.eqc-footer-stat-text { font-size: var(--eqc-fs-small); font-weight: 600; white-space: nowrap; }
+.eqc-footer-stat-text strong { font-family: var(--eqc-font-display); font-weight: 400; color: var(--eqc-bronze-700); }
 
 .eqc-footer-grid {
 	display: grid;

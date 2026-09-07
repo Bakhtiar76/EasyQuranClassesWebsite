@@ -183,6 +183,38 @@
 		} );
 	}
 
+	/* ---------- Testimonial slider ----------
+	 * Dot-navigated, no autoplay (user-controlled — avoids the
+	 * accessibility/motion-sensitivity issues of an auto-advancing
+	 * carousel). Structure: .eqc-testimonial-slider > .eqc-testimonial-track
+	 * (the sliding element) containing .eqc-testimonial-slide children,
+	 * plus a sibling .eqc-slider-dots row of buttons.
+	 */
+	function initTestimonialSlider() {
+		document.querySelectorAll( '.eqc-testimonial-slider' ).forEach( function ( slider ) {
+			var track = slider.querySelector( '.eqc-testimonial-track' );
+			var dots = slider.querySelectorAll( '.eqc-slider-dot' );
+			if ( ! track || ! dots.length ) {
+				return;
+			}
+
+			function goTo( index ) {
+				track.style.transform = 'translateX(-' + ( index * 100 ) + '%)';
+				dots.forEach( function ( dot, i ) {
+					var isActive = i === index;
+					dot.classList.toggle( 'is-active', isActive );
+					dot.setAttribute( 'aria-selected', isActive ? 'true' : 'false' );
+				} );
+			}
+
+			dots.forEach( function ( dot, i ) {
+				dot.addEventListener( 'click', function () {
+					goTo( i );
+				} );
+			} );
+		} );
+	}
+
 	/* ---------- FAQ accordion ---------- */
 	function initFaqAccordion() {
 		var items = document.querySelectorAll( '.eqc-faq-item' );
@@ -218,6 +250,7 @@
 		initHeaderScrollState();
 		initScrollReveal();
 		initCountUp();
+		initTestimonialSlider();
 		initFaqAccordion();
 	}
 

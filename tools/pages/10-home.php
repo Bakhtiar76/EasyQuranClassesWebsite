@@ -284,15 +284,38 @@ foreach ( $testi_data as $i => $t ) {
 	}
 	$testi_cards[] = eqc_testimonial_card( $testi_ids[ $i ], $t[0], $t[1], $t[2], array( 'certificate' => 'Expert Tutors', 'chart-up' => 'Progress Tracking' ) );
 }
+// 3x3 sliding carousel: slide 1 holds the 3 real, client-verified reviews;
+// slides 2-3 are clearly-marked placeholder stubs (never fabricated
+// quotes/names — see eqc_testimonial_card_stub()) so the carousel reads as
+// a real, filled-out feature rather than 6 invented reviews.
+$testi_slide_1 = eqc_container( array( 'css_classes' => 'eqc-testimonial-slide eqc-grid eqc-grid--testimonials', 'flex_direction' => 'row' ), $testi_cards );
+$testi_slide_2 = eqc_container(
+	array( 'css_classes' => 'eqc-testimonial-slide eqc-grid eqc-grid--testimonials', 'flex_direction' => 'row' ),
+	array( eqc_testimonial_card_stub(), eqc_testimonial_card_stub(), eqc_testimonial_card_stub() )
+);
+$testi_slide_3 = eqc_container(
+	array( 'css_classes' => 'eqc-testimonial-slide eqc-grid eqc-grid--testimonials', 'flex_direction' => 'row' ),
+	array( eqc_testimonial_card_stub(), eqc_testimonial_card_stub(), eqc_testimonial_card_stub() )
+);
+$testi_track = eqc_container( array( 'css_classes' => 'eqc-testimonial-track', 'flex_direction' => 'row' ), array( $testi_slide_1, $testi_slide_2, $testi_slide_3 ) );
+$testi_dots  = eqc_html(
+	'<div class="eqc-slider-dots" role="tablist" aria-label="' . esc_attr__( 'Testimonial slides', 'easy-quran-classes' ) . '">'
+	. '<button type="button" class="eqc-slider-dot is-active" data-slide-index="0" role="tab" aria-selected="true" aria-label="' . esc_attr__( 'Show testimonials 1 to 3', 'easy-quran-classes' ) . '"></button>'
+	. '<button type="button" class="eqc-slider-dot" data-slide-index="1" role="tab" aria-selected="false" aria-label="' . esc_attr__( 'Show testimonials 4 to 6', 'easy-quran-classes' ) . '"></button>'
+	. '<button type="button" class="eqc-slider-dot" data-slide-index="2" role="tab" aria-selected="false" aria-label="' . esc_attr__( 'Show testimonials 7 to 9', 'easy-quran-classes' ) . '"></button>'
+	. '</div>'
+);
+$testi_slider = eqc_container( array( 'css_classes' => 'eqc-testimonial-slider', 'flex_direction' => 'column' ), array( $testi_track, $testi_dots ) );
+
 $testimonials = eqc_section(
 	'eqc-section eqc-section--surface eqc-section--ornamented',
 	array(
 		eqc_section_ornaments(),
 		eqc_inner(
 			'',
-			array_merge(
-				array( eqc_section_heading_el( 'What Our Families Say', 'Trusted by families, <span style="color:var(--eqc-gold-600)">loved by students</span>', true ) ),
-				array( eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--testimonials', 'flex_direction' => 'row' ), $testi_cards ) )
+			array(
+				eqc_section_heading_el( 'What Our Families Say', 'Trusted by families, <span style="color:var(--eqc-gold-600)">loved by students</span>', true ),
+				$testi_slider,
 			)
 		),
 	)

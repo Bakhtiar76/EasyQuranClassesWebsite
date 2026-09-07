@@ -159,28 +159,27 @@ add_shortcode( 'eqc_latest_posts', 'eqc_latest_posts_shortcode' );
  * an empty string (never a hardcoded absolute path) if not found, so
  * templates degrade gracefully if media is re-imported with new IDs.
  *
+ * Matches the `_wp_attached_file` postmeta (the real source filename), not
+ * `post_name` — `wp media import --title="..."` derives post_name from the
+ * given title, not the filename, so a post_name match silently misses (see
+ * eqc_media_id() in tools/elementor-helpers.php, which hit the exact same
+ * bug; this function went uncalled until the footer avatar-stack needed
+ * it, so it was never caught until now).
+ *
  * @param string $slug_fragment e.g. 'hero-online-quran-class'.
  * @return array{0:string,1:string} [url, alt]
  */
 function eqc_seed_image( $slug_fragment ) {
+	global $wpdb;
 	static $cache = array();
 	if ( isset( $cache[ $slug_fragment ] ) ) {
 		return $cache[ $slug_fragment ];
 	}
-	$query = new WP_Query(
-		array(
-			'post_type'      => 'attachment',
-			'post_status'    => 'inherit',
-			'name'           => $slug_fragment,
-			'posts_per_page' => 1,
-		)
-	);
+	$id     = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value LIKE %s LIMIT 1", '%' . $wpdb->esc_like( $slug_fragment ) . '%' ) );
 	$result = array( '', '' );
-	if ( $query->have_posts() ) {
-		$id     = $query->posts[0]->ID;
-		$result = array( wp_get_attachment_url( $id ), get_post_meta( $id, '_wp_attachment_image_alt', true ) );
+	if ( $id ) {
+		$result = array( wp_get_attachment_url( (int) $id ), get_post_meta( (int) $id, '_wp_attachment_image_alt', true ) );
 	}
-	wp_reset_postdata();
 	$cache[ $slug_fragment ] = $result;
 	return $result;
 }
