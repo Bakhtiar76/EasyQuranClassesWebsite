@@ -385,14 +385,32 @@ PHASE 4 — CLEAN GIT / MAIN
 
 Deeply audit Git before deployment.
 
-IMPORTANT:
+IMPORTANT — branch policy update (2026-09-07, explicit client decision,
+supersedes this phase's original wording below):
 
-Do NOT interpret "production-ready main" as:
-"delete all documentation and Claude files."
+`main` is production-deployment-only. It contains ONLY
+`wp-content/themes/easy-quran-classes-child/` (and
+`wp-content/plugins/easy-quran-classes-core/` if ever added) plus its own
+`.gitignore`. No documentation, no `.claude/` configuration, no local
+tooling, no reference assets, no tests — `main`'s `.gitignore` lists these
+paths so they cannot be re-added by accident. All of that lives on
+`feature/*` branches instead (currently `feature/setup`), which keep the
+full development tree.
 
-Git may contain development/documentation files.
+Do NOT `git merge` a feature branch into `main` — a full-branch merge
+reintroduces every dev-only path `main` was deliberately pruned of. Release
+by copying only the production paths across instead:
 
-The DEPLOYMENT WORKFLOW must transfer only production-required paths.
+```
+git checkout main
+git checkout feature/setup -- wp-content/themes/easy-quran-classes-child
+git commit -m "feat: <describe the change>"
+```
+
+(The original phrasing below — "Git may contain development/documentation
+files... transfer only production-required paths [via the deploy workflow,
+not Git itself]" — described an earlier, since-superseded approach. Do not
+follow it; follow the branch policy above instead.)
 
 Review:
 

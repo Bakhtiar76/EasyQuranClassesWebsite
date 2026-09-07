@@ -82,6 +82,15 @@ Claude must not:
 
 ## 5. What Git Tracks
 
+**Branch split (confirmed 2026-09-07):** the list below describes the
+project's `feature/*` development branches (currently `feature/setup`).
+`main` is production-deployment-only and holds nothing but
+`wp-content/themes/easy-quran-classes-child/` (and
+`wp-content/plugins/easy-quran-classes-core/` if ever added) plus its own
+`.gitignore` — no docs, no `.claude/`, no local tooling. Never merge a
+feature branch into `main`; copy only the production paths across instead
+(see `.claude/rules/git.md`).
+
 Track only reproducible project assets such as:
 - child theme custom code;
 - site-specific plugin custom code;

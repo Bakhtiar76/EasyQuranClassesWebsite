@@ -197,6 +197,17 @@ Before adding performance plugins, inspect hosting cache/CDN and local frontend 
 ## Git / GitHub
 Git tracks custom code, Claude configuration, docs and reproducible local tooling — not the mutable WordPress database/media state.
 
+**Branch policy (confirmed 2026-09-07):** `main` is production-deployment-only —
+it holds nothing but `wp-content/themes/easy-quran-classes-child/` (and
+`wp-content/plugins/easy-quran-classes-core/` if ever added) plus its own
+`.gitignore`, which lists every dev-only path so they can't be re-added by
+accident. All development, docs, `.claude/` configuration, local tooling,
+reference assets and tests live on `feature/*` branches (currently
+`feature/setup`). Never `git merge` a feature branch into `main` — that
+reintroduces the dev-only tree. Release by copying only the production
+paths across (`git checkout feature/setup -- wp-content/themes/easy-quran-classes-child`
+on `main`, then commit) — see `.claude/rules/git.md` for the exact flow.
+
 Before commits:
 - inspect `git status`
 - run `git diff --check`
