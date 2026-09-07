@@ -756,17 +756,30 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	min-width: 100%;
 }
 .eqc-slider-dots { display: flex; justify-content: center; gap: 0.6rem; margin-top: clamp(1.5rem, 1.2rem + 1vw, 2.25rem); }
+/* Button itself is a 24px tap target (Lighthouse/axe target-size minimum;
+   DESIGN.md's 44px guidance would make the visible dot look oversized) —
+   the small 10px dot users actually see is a ::before centered inside it,
+   so appearance is unchanged while the clickable area grows. */
 .eqc-slider-dot {
+	width: 24px;
+	height: 24px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border: none;
+	padding: 0;
+	background: transparent;
+	cursor: pointer;
+}
+.eqc-slider-dot::before {
+	content: '';
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
-	border: none;
-	padding: 0;
 	background: var(--eqc-border-strong);
-	cursor: pointer;
 	transition: background-color var(--eqc-motion-base) var(--eqc-ease-standard), transform var(--eqc-motion-base) var(--eqc-ease-standard);
 }
-.eqc-slider-dot.is-active { background: var(--eqc-bronze-600); transform: scale(1.35); }
+.eqc-slider-dot.is-active::before { background: var(--eqc-bronze-600); transform: scale(1.35); }
 .eqc-slider-dot:focus-visible { outline: 3px solid var(--eqc-gold-500); outline-offset: 3px; }
 
 /* Placeholder testimonial slide — mirrors .eqc-card--teacher-stub's visual
