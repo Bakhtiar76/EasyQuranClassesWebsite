@@ -30,6 +30,26 @@ a { color: inherit; }
 
 img { display: block; max-width: 100%; height: auto; }
 
+/*
+ * Hello Elementor's own reset.css hardcodes a bright pink (#cc3366)
+ * button:hover/:focus background/border as its "unstyled button" default.
+ * Every plain <button> we write (FAQ toggle, nav toggle, form buttons
+ * added later) inherits it unless explicitly reset, since we never touch
+ * the parent theme itself. Neutralize once, here, rather than re-fixing
+ * it on each new button component.
+ */
+button:hover,
+button:focus,
+[type="button"]:hover,
+[type="button"]:focus {
+	background-color: transparent;
+	border-color: transparent;
+	/* Hello's same rule also sets color:#fff (meant to read against its
+	   pink background); reset to inherit or it leaves white-on-transparent
+	   text once the pink is removed. */
+	color: inherit;
+}
+
 /* Decorative SVG must never be announced to assistive tech. */
 .eqc-ornament,
 [data-eqc-decorative="true"] {
