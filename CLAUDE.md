@@ -42,6 +42,26 @@ Stack: **Docker Desktop**. Compose file: `local/docker-compose.yml`. Services: `
 - **WPVibe** (`vibe-ai` plugin) was installed by the user directly, then **deactivated** — it's a hosted cloud relay (`mcp.wpvibe.ai`) that cannot reach `localhost` and has no working path here without publicly tunnelling the dev machine. Left installed-but-inactive rather than deleted; `release-check` also asserts its absence from any release archive.
 - Production confirmed: `https://easyquranclasses.com` is empty (Mode A, no existing content to preserve) — see `CPANEL-WORKFLOW.md`.
 
+### Codex parity (added 2026-09-07)
+
+The **Codex CLI** works this repo with the same capabilities as Claude Code. Full teammate
+setup + the known-issues catalogue: `README-SETUP.md` (§5 Codex, §7 issues).
+
+- **`AGENTS.md`** (repo root) — thin: points Codex at `CLAUDE.md` + `.claude/rules/*.md` +
+  `DESIGN.md` + `CPANEL-WORKFLOW.md` as mandatory reading, plus Codex-specific operating notes.
+  `CLAUDE.md` stays the single source of truth.
+- **`tools/codex/setup-codex.ps1`** (idempotent, `-Verify`) — registers three MCP servers
+  **globally** in `~/.codex/config.toml` (`novamira-localhost`, `chrome-devtools`, `context7`),
+  syncs the 14 `.claude/skills/` as `~/.codex/skills/eqc-*` (junction; copy fallback), trusts the repo.
+- **`tools/codex/novamira-mcp.cmd`** — Novamira launcher. Reads `NOVAMIRA_APP_PASSWORD` from
+  `local/.env` (Codex strips `*PASSWORD*` env vars before spawning MCP servers, and has no
+  `${VAR}` substitution in config) — the secret never touches `~/.codex/config.toml` or Git.
+- Codex gotchas (all handled by the script/wrapper, documented in `AGENTS.md`): Docker is
+  unreachable inside both Codex sandbox modes → Docker/WP-CLI commands must be approved out of
+  the sandbox; `npx.ps1` is execution-policy blocked → MCP servers run as `cmd /c npx …`;
+  Codex can't spawn `.cmd` directly with working stdio → the `cmd /c` wrapper; MCP tools are
+  deferred behind tool-search → the model must search, not list.
+
 ## Core Method
 Inspect first. Reuse second. Change third. Verify fourth.
 

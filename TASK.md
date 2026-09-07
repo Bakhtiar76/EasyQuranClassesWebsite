@@ -305,6 +305,11 @@ Only if the repo is actually hosted on GitHub and PR/issue operations are useful
 
 Initial required MCP set: **none**.
 
+> **Superseded (2026-09-07).** Three local-only MCP servers are now configured for Claude Code
+> (`novamira-localhost`) and Codex (`novamira-localhost`, `chrome-devtools`, `context7`).
+> See `TOOL-INVENTORY.md`, `README-SETUP.md` §4–§5, and §19 below. The bans in the list that
+> follows still stand.
+
 Do not install:
 - cPanel MCP;
 - SSH MCP;
@@ -413,7 +418,7 @@ Do not push unless explicitly authorized.
 
 - [x] repository/toolchain audit complete;
 - [x] one primary local WordPress stack selected (Docker Desktop);
-- [x] local WordPress runs successfully (WP 7.1 at `http://localhost:8080`, HTTP 200, pretty permalinks verified end-to-end);
+- [x] local WordPress runs successfully (WP 7.1 at `http://localhost`, HTTP 200, pretty permalinks verified end-to-end) — port mapping is `80:80`; an earlier `8080:80` mapping broke WordPress self-loopback (`cURL error 7`) and was corrected, see §19;
 - [x] Elementor Free/Hello available locally (Elementor 4.2.4 active, Hello Elementor 3.5.1 parent, child theme active);
 - [x] local WP-CLI strategy works (containerized `wpcli` service, verified via install/config/export/import);
 - [x] project rules/skills reflect local-first/no-shell deployment;
@@ -464,3 +469,38 @@ State what still must be manually confirmed in cPanel.
 
 ## Suggested Git Commit
 One short natural commit message, no AI attribution.
+
+---
+
+# 19. Setup Outcomes — Issues Encountered & Fixes
+
+Recorded after the fact. This is the historical log; the **reproducible procedure and the full
+symptom → cause → fix detail live in `README-SETUP.md` §7**. Both cross-reference.
+
+| Area | Issue | Resolution | Detail |
+|---|---|---|---|
+| Docker | `8080:80` port mapping broke WordPress self-loopback, Novamira REST self-check (`cURL error 7`), WP-Cron | Mapping changed to `80:80`; host port must equal Apache's internal port | README-SETUP §7, CLAUDE.md "Local Environment" |
+| Docker | Containerized `wp-cli` (Alpine `www-data`=82) couldn't write to the volume owned by the Apache image (Debian `www-data`=33) | `wpcli` service pinned to `user: "33:33"` | README-SETUP §7 |
+| WordPress | App Passwords / OAuth refused over plain HTTP | `WP_ENVIRONMENT_TYPE=local` via `WORDPRESS_CONFIG_EXTRA` | README-SETUP §7 |
+| Git Bash | `/`-leading args rewritten to Windows paths by MSYS | Prefix commands with `MSYS_NO_PATHCONV=1` | README-SETUP §7 |
+| Novamira MCP | `.mcp.json` `${NOVAMIRA_APP_PASSWORD}` resolves from OS env, not `local/.env` | Set as Windows **User** env var; restart Claude Code | README-SETUP §2.3, §7 |
+| Novamira CLI | Windows Credential Manager backend fails (not sandbox-specific) | `NOVAMIRA_CREDENTIAL_BACKEND=file` (User env var) | README-SETUP §7 |
+| Novamira CLI | File backend's "exactly one ACL entry" check failed (inherited `CodexSandboxUsers` ACE) | `icacls <dir> /inheritance:r /grant:r "<user>:(OI)(CI)F"` on `%LOCALAPPDATA%\Novamira\{Credentials,Cache}` | README-SETUP §7 |
+| Novamira CLI | `Too many registrations` (OAuth client cap transient) | Delete `_transient_novamira_oauth_dcr_0_<hash>` pair | README-SETUP §7 |
+| Claude Code | Auto-mode classifier intermittently denied "novamira" commands and the plugin install | Retry / reword; Novamira installed manually via wp-admin | Completion criteria §17 |
+| Codex | Docker unreachable from both Codex sandbox modes | Docker/WP-CLI commands approved out of sandbox; documented in `AGENTS.md` | README-SETUP §5.4, §7 |
+| Codex | `npx.ps1` blocked by PowerShell execution policy; Codex can't spawn `.cmd` with working stdio | MCP servers registered as `cmd /c npx -y <pkg>` by `tools/codex/setup-codex.ps1` | README-SETUP §7 |
+| Codex | Strips `*PASSWORD*` env vars before spawning MCP servers | `tools/codex/novamira-mcp.cmd` reads the password from `local/.env` | README-SETUP §5.3, §7 |
+| Codex | MCP tools deferred behind tool-search — look "missing" | Expected; the model must search its tools. Not a bug. | README-SETUP §7 |
+| Tooling | WPVibe can't reach `localhost`; `greptile` MCP 403 | WPVibe deactivated; `greptile` disabled | TOOL-INVENTORY.md |
+
+## Codex parity (added 2026-09-07)
+
+Codex now has the same working environment as Claude Code on this repo:
+
+- `AGENTS.md` (repo root) — thin pointer to `CLAUDE.md` + `.claude/rules/*.md` + Codex-specific notes.
+- `tools/codex/setup-codex.ps1` — idempotent, with `-Verify`. Registers `novamira-localhost`,
+  `chrome-devtools`, `context7`; syncs the 14 project skills to `~/.codex/skills/eqc-*`; trusts the repo.
+- `tools/codex/novamira-mcp.cmd` — credential-safe Novamira launcher (no secret in `~/.codex/config.toml`).
+- Verified end-to-end: Codex called `mcp-adapter-discover-abilities` (36 abilities) and
+  `context7/resolve-library-id`.

@@ -278,3 +278,10 @@ Do not install a generic cPanel, SSH, filesystem or database MCP server for this
 No remote shell exists, so such tools do not improve the approved workflow and may unnecessarily expose account-wide resources.
 
 Do not automate cPanel login/session capture by default. Claude prepares instructions and release artifacts; the user controls sensitive cPanel actions.
+
+**Scope of the approved MCP servers.** The project's configured MCP servers — `novamira-localhost`
+(Claude Code and Codex), `chrome-devtools`, `context7` — are **local-development only**. They
+target `http://localhost/` and library documentation, never the production host. Novamira in
+particular grants full site/DB/filesystem access and must never be pointed at
+`easyquranclasses.com`; `release-check` asserts the Novamira and WPVibe plugins are absent from
+every release archive. This carve-out does not loosen the bans above.
