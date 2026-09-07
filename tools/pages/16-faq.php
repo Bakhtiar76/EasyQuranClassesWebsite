@@ -55,24 +55,11 @@ $faq_content = eqc_section(
 	)
 );
 
-$cta = eqc_section(
-	'eqc-section eqc-section--dark',
-	array(
-		eqc_inner(
-			'eqc-container--narrow',
-			array(
-				eqc_heading( "Didn't find your answer?", 'h2', 'eqc-align-center' ),
-				eqc_text( '<p style="text-align:center;color:var(--eqc-cream-100);opacity:0.85;">Send us a message or book a free trial and ask your teacher directly.</p>' ),
-				eqc_container(
-					array( 'css_classes' => 'eqc-btn-group', 'flex_direction' => 'row', 'content_position' => 'center' ),
-					array(
-						eqc_icon_button( 'mail', __( 'Contact Us', 'easy-quran-classes' ), home_url( '/contact/' ), 'eqc-btn--secondary' ),
-						eqc_icon_button( 'calendar', __( 'Book Free Trial', 'easy-quran-classes' ), $trial_url, 'eqc-btn--bronze' ),
-					)
-				),
-			)
-		),
-	)
-);
+// A trailing dark "Didn't find your answer?" CTA used to close this page,
+// directly above the global footer's own dark "Your First Class Is Free"
+// panel (footer.php) — same color, adjacent, no content between them. Its
+// "Contact Us" link stays reachable via the header nav and footer Quick
+// Links, so removing the duplicate panel loses no path while fixing the
+// double-dark-block heaviness. See 11-about.php for the full note.
 
-eqc_save_elementor_page( 30, array( $hero, $faq_content, $cta ) );
+eqc_save_elementor_page( 30, array( $hero, $faq_content ) );

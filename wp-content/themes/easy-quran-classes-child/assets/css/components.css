@@ -151,6 +151,48 @@ button:focus,
 	border: 0;
 }
 
+/* Ornate section-heading rule (short line - flower glyph - short line),
+   matching the client's own reference screenshots (Assests/) where every
+   H2 sits under this exact motif rather than a bare line. Used by
+   eqc_section_heading_el()/eqc_section_heading(); the plain .eqc-heading-rule
+   above stays as-is for the homepage hero, which only ever shows a plain
+   line under its H1. */
+.eqc-heading-rule--ornate {
+	display: flex;
+	align-items: center;
+	gap: 0.65em;
+	width: 100%;
+	margin-block: 1em;
+	color: var(--eqc-gold-500);
+}
+.eqc-section-heading--center .eqc-heading-rule--ornate { justify-content: center; }
+.eqc-heading-rule--ornate::before,
+.eqc-heading-rule--ornate::after {
+	content: '';
+	flex: 0 1 clamp(28px, 5vw, 70px);
+	height: 1px;
+	background: currentColor;
+	transform-origin: center;
+	transform: scaleX(0);
+	transition: transform var(--eqc-motion-slow) var(--eqc-ease-standard);
+}
+.eqc-divider-flower {
+	width: 15px;
+	height: 15px;
+	flex: none;
+	color: var(--eqc-gold-500);
+	opacity: 0;
+	transition: opacity var(--eqc-motion-slow) var(--eqc-ease-standard);
+}
+html.eqc-js .is-visible .eqc-heading-rule--ornate::before,
+html.eqc-js .is-visible .eqc-heading-rule--ornate::after { transform: scaleX(1); }
+html.eqc-js .is-visible .eqc-divider-flower { opacity: 1; transition-delay: calc(var(--eqc-motion-slow) * 0.4); }
+html:not(.eqc-js) .eqc-heading-rule--ornate::before,
+html:not(.eqc-js) .eqc-heading-rule--ornate::after,
+html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
+.eqc-section--dark .eqc-heading-rule--ornate,
+.eqc-section--dark .eqc-divider-flower { color: var(--eqc-gold-300); }
+
 /* ---------- Buttons ----------
  * Two call sites share one visual language:
  * 1. Raw `<a class="eqc-btn eqc-btn--variant">` in header.php/footer.php.
@@ -284,20 +326,69 @@ button:focus,
 .eqc-grid--2col { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
 .eqc-grid--trust { grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
 
-/* Course card */
-.eqc-card--course { position: relative; overflow: hidden; }
-.eqc-card--course .eqc-card-index {
+/* Numbered index badge — shared by course cards, "How It Works" steps
+   (10-home.php) and the "Beginner Pathway" steps (12-courses.php). This
+   used to be scoped to ".eqc-card--course .eqc-card-index" only, so every
+   other reuse of the same markup rendered as bare unstyled text with no
+   circle at all; base styling now applies wherever the markup is used, and
+   .eqc-card--course layers the extra rosette-ring treatment on top. */
+.eqc-card-index {
+	position: relative;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 2.75em;
-	height: 2.75em;
+	width: 2.9em;
+	height: 2.9em;
 	border-radius: 50%;
 	border: 1px solid var(--eqc-border-strong);
 	color: var(--eqc-bronze-700);
 	font-family: var(--eqc-font-display);
 	font-size: 1.1rem;
+	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard);
 }
+.eqc-card:hover .eqc-card-index { transform: rotate(-8deg) scale(1.05); }
+.eqc-card--course { position: relative; overflow: hidden; }
+/* Faint rosette ring behind the number, echoing the scalloped badge shape
+   in the client's reference course cards — see components.css note above
+   .eqc-corner-motif for why this ships as a mask rather than an <img>. */
+.eqc-card--course .eqc-card-index::before {
+	content: '';
+	position: absolute;
+	inset: -6px;
+	background-color: var(--eqc-bronze-600);
+	opacity: 0.12;
+	-webkit-mask-image: url('../svg/rosette.svg');
+	mask-image: url('../svg/rosette.svg');
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	z-index: 0;
+}
+/* Explicit z-index (not just DOM order) on both layers: a positioned
+   pseudo-element and a positioned real child are otherwise stacked by tree
+   order, which would paint this "behind" decoration on TOP of the number
+   it's meant to sit under. */
+.eqc-card-index-num { position: relative; z-index: 1; }
+/* Faint corner-motif watermark on every course card, matching the small
+   gold arabesque fragment visible in the top-right of each reference card.
+   z-index:0 + real children boosted to z-index:1 keeps it strictly behind
+   card content regardless of DOM order (see note above). */
+.eqc-card--course::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 92px;
+	height: 92px;
+	background-color: var(--eqc-gold-500);
+	opacity: 0.07;
+	-webkit-mask-image: url('../svg/corner-motif.svg');
+	mask-image: url('../svg/corner-motif.svg');
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	pointer-events: none;
+	z-index: 0;
+}
+.eqc-card--course > * { position: relative; z-index: 1; }
 .eqc-card--course h3 { margin-block: 0.6em 0.1em; }
 .eqc-card--course .eqc-card-level {
 	color: var(--eqc-muted);
@@ -329,7 +420,7 @@ button:focus,
 }
 
 /* Teacher card */
-.eqc-card--teacher { text-align: center; }
+.eqc-card--teacher { text-align: center; position: relative; }
 .eqc-card--teacher .eqc-teacher-photo,
 .eqc-card--teacher .eqc-teacher-photo-widget {
 	width: clamp(120px, 30%, 160px);
@@ -339,6 +430,25 @@ button:focus,
 	overflow: hidden;
 	border: 3px solid var(--eqc-gold-300);
 }
+/* Small "seal" badge overlapping the bottom of the photo, matching the
+   reference teacher cards (Assests/). Pulled up with a negative margin
+   (rather than pixel-absolute positioning against the photo) so it stays
+   correctly placed across the photo's own clamp(120px,30%,160px) range. */
+.eqc-teacher-seal {
+	position: relative;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.4em;
+	height: 2.4em;
+	margin: -1.3em auto 0.7em;
+	border-radius: 50%;
+	background: var(--eqc-green-800);
+	color: var(--eqc-white);
+	border: 3px solid var(--eqc-surface);
+}
+.eqc-teacher-seal .eqc-icon { width: 1.1em; height: 1.1em; }
 .eqc-card--teacher .eqc-teacher-photo img,
 .eqc-card--teacher .eqc-teacher-photo-widget img {
 	width: 100%;
@@ -407,6 +517,34 @@ button:focus,
 	border-color: var(--eqc-gold-500);
 	box-shadow: 0 18px 40px rgba(169, 130, 53, 0.18);
 }
+/* Gold scalloped icon badge above the frequency pill, matching the
+   reference pricing cards (Assests/) — same masked-rosette technique as
+   the course-card index badge above. */
+.eqc-pricing-icon {
+	position: relative;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 3.4em;
+	height: 3.4em;
+	margin-bottom: 0.9em;
+	color: var(--eqc-green-800);
+	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+.eqc-pricing-icon::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background-color: var(--eqc-gold-500);
+	opacity: 0.18;
+	-webkit-mask-image: url('../svg/rosette.svg');
+	mask-image: url('../svg/rosette.svg');
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	z-index: 0;
+}
+.eqc-pricing-icon .eqc-icon { position: relative; z-index: 1; width: 1.4em; height: 1.4em; }
+.eqc-card--pricing:hover .eqc-pricing-icon { transform: scale(1.08) rotate(6deg); }
 .eqc-pricing-badge {
 	position: absolute;
 	top: -14px;
@@ -509,9 +647,25 @@ button:focus,
    swallowing the whole card and pushing .eqc-blog-body out of view
    under `overflow: hidden`. */
 .eqc-card--blog { padding: 0; overflow: hidden; display: flex; flex-direction: column; }
-.eqc-blog-media { display: block; flex: none; aspect-ratio: 16/10; overflow: hidden; }
+.eqc-blog-media { position: relative; display: block; flex: none; aspect-ratio: 16/10; overflow: hidden; }
 .eqc-blog-media img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--eqc-motion-slow) var(--eqc-ease-soft); }
 .eqc-card--blog:hover .eqc-blog-media img { transform: scale(1.05); }
+/* Category ribbon overlapping the image corner, matching the reference
+   blog cards (ref_website/) instead of leaving the image bare. */
+.eqc-blog-ribbon {
+	position: absolute;
+	top: 0.9rem;
+	left: 0.9rem;
+	background: var(--eqc-gold-500);
+	color: var(--eqc-green-900);
+	font-size: var(--eqc-fs-small);
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	text-transform: uppercase;
+	padding: 0.4em 0.9em;
+	border-radius: var(--eqc-radius-pill);
+	z-index: 1;
+}
 .eqc-blog-body { padding: clamp(1.1rem, 1rem + 0.5vw, 1.6rem); }
 .eqc-blog-meta {
 	display: flex;
@@ -546,8 +700,23 @@ button:focus,
 	border: 1px solid var(--eqc-border);
 	border-radius: var(--eqc-radius-control);
 	padding: 1.1em 1.2em;
+	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard),
+		box-shadow var(--eqc-motion-base) var(--eqc-ease-standard),
+		border-color var(--eqc-motion-base) var(--eqc-ease-standard);
 }
-.eqc-trust-tile .eqc-icon { flex: none; width: 1.9em; height: 1.9em; color: var(--eqc-green-800); }
+.eqc-trust-tile:hover {
+	transform: translateY(-3px);
+	box-shadow: var(--eqc-shadow-card-hover);
+	border-color: var(--eqc-gold-300);
+}
+.eqc-trust-tile .eqc-icon {
+	flex: none;
+	width: 1.9em;
+	height: 1.9em;
+	color: var(--eqc-green-800);
+	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+.eqc-trust-tile:hover .eqc-icon { transform: scale(1.12) rotate(-6deg); }
 .eqc-trust-tile-title { margin: 0 0 0.15em; font-size: var(--eqc-fs-body); font-weight: 700; color: var(--eqc-heading); }
 .eqc-trust-tile p { margin: 0; font-size: var(--eqc-fs-small); color: var(--eqc-muted); }
 
@@ -564,7 +733,10 @@ button:focus,
 	font-size: var(--eqc-fs-small);
 	font-weight: 600;
 	color: var(--eqc-heading);
+	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard),
+		border-color var(--eqc-motion-base) var(--eqc-ease-standard);
 }
+.eqc-chip:hover { transform: translateY(-2px); border-color: var(--eqc-gold-300); }
 .eqc-chip .eqc-icon { color: var(--eqc-bronze-600); }
 
 /* ---------- Arch media ---------- */
@@ -688,9 +860,50 @@ button:focus,
 .eqc-faq-answer-inner { overflow: hidden; }
 .eqc-faq-answer p { margin: 0 1.3em 1.1em; color: var(--eqc-text); }
 
-/* ---------- Ornaments ---------- */
+/* ---------- Section texture & ornaments ----------
+ * Root-cause fix for "flat, boring, no attracting backgrounds" feedback:
+ * every section in the client's own reference screenshots (Assests/) pairs
+ * its cream/surface background with a faint gold corner motif and/or a
+ * near-invisible geometric texture — ours shipped as solid flat fills with
+ * the ornament SVGs built but never actually placed on a page. Fixed once,
+ * here, rather than per-page: eqc_section_ornaments() (elementor-helpers.php)
+ * injects the two corner-motif spans as a section's first child; any
+ * section carrying `eqc-section--ornamented` gets them positioned and
+ * layered correctly regardless of what else it contains. */
 
-.eqc-corner-motif { position: absolute; opacity: 0.08; pointer-events: none; }
+.eqc-section--textured {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='72' height='72' viewBox='0 0 72 72'%3E%3Cg fill='none' stroke='%23B9974C' stroke-opacity='0.14' stroke-width='1'%3E%3Cpath d='M36 2 L70 36 L36 70 L2 36 Z'/%3E%3Ccircle cx='36' cy='36' r='2.5'/%3E%3C/g%3E%3C/svg%3E");
+	background-repeat: repeat;
+}
+
+.eqc-section--ornamented { position: relative; overflow: hidden; }
+/* Elementor renders every nested Container (eqc_inner, grids, etc.) as a
+   direct-child `.e-con` div; boosting those above the ornament layer here
+   covers every ornamented section regardless of its own content shape. */
+.eqc-section--ornamented > .e-con { position: relative; z-index: 1; }
+
+.eqc-corner-motif {
+	position: absolute;
+	width: clamp(130px, 15vw, 240px);
+	height: clamp(130px, 15vw, 240px);
+	background-color: var(--eqc-gold-600);
+	-webkit-mask-image: url('../svg/corner-motif.svg');
+	mask-image: url('../svg/corner-motif.svg');
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	opacity: 0.1;
+	pointer-events: none;
+	z-index: 0;
+}
+.eqc-corner-motif--tr { top: 0; right: 0; }
+.eqc-corner-motif--bl { bottom: 0; left: 0; transform: rotate(180deg); }
+.eqc-section--dark .eqc-corner-motif { background-color: var(--eqc-gold-300); opacity: 0.12; }
+/* Slow ambient drift (reuses the CTA drift keyframe from motion.css) so the
+   ornament reads as gently alive rather than a static watermark. */
+html.eqc-js .eqc-corner-motif { animation: eqc-drift 24s var(--eqc-ease-soft) infinite alternate; }
+
 .eqc-divider-row { display: flex; align-items: center; justify-content: center; gap: 0.75em; color: var(--eqc-gold-500); margin-block: 1.2em; }
 .eqc-divider-row .eqc-divider-line { height: 1px; width: clamp(30px, 6vw, 90px); background: currentColor; }
 

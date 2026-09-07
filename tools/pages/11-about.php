@@ -140,23 +140,12 @@ $approach = eqc_section(
 	)
 );
 
-// ------------------------------------------------------- CTA (reuses footer panel too, this is a mid-page nudge)
-$cta = eqc_section(
-	'eqc-section eqc-section--dark',
-	array(
-		eqc_inner(
-			'eqc-container--narrow',
-			array(
-				eqc_html( '<div style="text-align:center"><span class="eqc-eyebrow">' . eqc_icon_str( 'calendar' ) . ' Start Learning' . '</span></div>' ),
-				eqc_heading( 'Ready to see how a class actually feels?', 'h2', 'eqc-align-center' ),
-				eqc_text( '<p style="text-align:center;color:var(--eqc-cream-100);opacity:0.85;">Book a free trial class and get matched with a suitable teacher.</p>' ),
-				eqc_container(
-					array( 'css_classes' => 'eqc-btn-group', 'flex_direction' => 'row', 'content_position' => 'center' ),
-					array( eqc_icon_button( 'calendar', __( 'Book Free Trial', 'easy-quran-classes' ), $trial_url, 'eqc-btn--bronze' ) )
-				),
-			)
-		),
-	)
-);
+// A trailing dark CTA section used to close every inner page here, directly
+// above the global footer's own dark "Your First Class Is Free" panel
+// (footer.php) — same color, same message, zero content between them, so
+// the two read as one accidental double-height block rather than two
+// intentional moments. Removed in favor of letting the footer's sitewide
+// CTA be the one closer; the page's own last section stays the content
+// close instead of a second copy of the same pitch.
 
-eqc_save_elementor_page( 25, array( $hero, $mission, $who_we_serve, $approach, $cta ) );
+eqc_save_elementor_page( 25, array( $hero, $mission, $who_we_serve, $approach ) );

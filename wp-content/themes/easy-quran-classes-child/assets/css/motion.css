@@ -99,8 +99,19 @@ html.eqc-js .eqc-cta-ornament {
 		transform: none;
 		stroke-dashoffset: 0;
 	}
-	.eqc-cta-ornament { animation: none; }
+	.eqc-heading-rule--ornate::before,
+	.eqc-heading-rule--ornate::after,
+	.eqc-divider-flower {
+		transition: none;
+		transform: scaleX(1);
+		opacity: 1;
+	}
+	.eqc-cta-ornament,
+	.eqc-corner-motif { animation: none; }
 	.eqc-btn:hover,
-	.eqc-card:hover { transform: none; }
+	.eqc-card:hover,
+	.eqc-card:hover .eqc-card-index,
+	.eqc-card--pricing:hover .eqc-pricing-icon,
+	.eqc-trust-tile:hover .eqc-icon { transform: none; }
 	* { scroll-behavior: auto !important; }
 }

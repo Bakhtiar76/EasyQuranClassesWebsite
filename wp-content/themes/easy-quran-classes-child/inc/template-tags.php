@@ -112,10 +112,11 @@ function eqc_render_blog_cards( $posts ) {
 		$permalink = get_permalink( $post );
 		$cats      = get_the_category( $post->ID );
 		$cat_name  = ! empty( $cats ) ? esc_html( $cats[0]->name ) . ' &middot; ' : '';
+		$ribbon    = ! empty( $cats ) ? '<span class="eqc-blog-ribbon">' . esc_html( $cats[0]->name ) . '</span>' : '';
 		$thumb     = has_post_thumbnail( $post ) ? get_the_post_thumbnail( $post, 'eqc-blog-card' ) : '';
 
 		$html .= '<article class="eqc-card eqc-card--blog" data-eqc-reveal data-eqc-reveal-index="' . min( $i, 3 ) . '">';
-		$html .= '<a class="eqc-blog-media" href="' . esc_url( $permalink ) . '">' . $thumb . '</a>';
+		$html .= '<a class="eqc-blog-media" href="' . esc_url( $permalink ) . '">' . $thumb . $ribbon . '</a>';
 		$html .= '<div class="eqc-blog-body">';
 		$html .= '<div class="eqc-blog-meta">' . $cat_name . esc_html( get_the_date( '', $post ) ) . '</div>';
 		$html .= '<h3><a href="' . esc_url( $permalink ) . '" style="text-decoration:none;color:inherit;">' . esc_html( get_the_title( $post ) ) . '</a></h3>';

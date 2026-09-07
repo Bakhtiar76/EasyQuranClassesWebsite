@@ -117,6 +117,72 @@
 		} );
 	}
 
+	/* ---------- Stat count-up ----------
+	 * Elements marked data-eqc-countup="5000" (optional data-eqc-suffix="+")
+	 * animate from 0 to the target once scrolled into view, e.g. the
+	 * homepage "5,000+ Students Taught" stat. Purely additive motion (the
+	 * final text is correct even if this never runs), and honors
+	 * prefers-reduced-motion by jumping straight to the end value.
+	 */
+	function initCountUp() {
+		var items = document.querySelectorAll( '[data-eqc-countup]' );
+		if ( ! items.length ) {
+			return;
+		}
+
+		function renderFinal( el, target, suffix ) {
+			el.textContent = target.toLocaleString() + suffix;
+		}
+
+		function animate( el ) {
+			var target = parseInt( el.getAttribute( 'data-eqc-countup' ), 10 ) || 0;
+			var suffix = el.getAttribute( 'data-eqc-suffix' ) || '';
+
+			if ( reduceMotion ) {
+				renderFinal( el, target, suffix );
+				return;
+			}
+
+			var duration = 1100;
+			var start = null;
+
+			function step( timestamp ) {
+				if ( null === start ) {
+					start = timestamp;
+				}
+				var progress = Math.min( ( timestamp - start ) / duration, 1 );
+				var eased = 1 - Math.pow( 1 - progress, 3 );
+				el.textContent = Math.round( target * eased ).toLocaleString() + suffix;
+				if ( progress < 1 ) {
+					window.requestAnimationFrame( step );
+				}
+			}
+			window.requestAnimationFrame( step );
+		}
+
+		if ( ! ( 'IntersectionObserver' in window ) ) {
+			items.forEach( function ( el ) {
+				animate( el );
+			} );
+			return;
+		}
+
+		var observer = new IntersectionObserver(
+			function ( entries ) {
+				entries.forEach( function ( entry ) {
+					if ( entry.isIntersecting ) {
+						animate( entry.target );
+						observer.unobserve( entry.target );
+					}
+				} );
+			},
+			{ threshold: 0.6 }
+		);
+		items.forEach( function ( el ) {
+			observer.observe( el );
+		} );
+	}
+
 	/* ---------- FAQ accordion ---------- */
 	function initFaqAccordion() {
 		var items = document.querySelectorAll( '.eqc-faq-item' );
@@ -151,6 +217,7 @@
 		initNavDrawer();
 		initHeaderScrollState();
 		initScrollReveal();
+		initCountUp();
 		initFaqAccordion();
 	}
 

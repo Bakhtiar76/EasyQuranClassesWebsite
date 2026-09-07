@@ -23,8 +23,9 @@ $trial_url = home_url( '/free-trial/' );
 
 // ---------------------------------------------------------------- 1. HERO
 $hero = eqc_section(
-	'eqc-section eqc-section--tight eqc-section--cream',
+	'eqc-section eqc-section--tight eqc-section--cream eqc-section--textured eqc-section--ornamented',
 	array(
+		eqc_section_ornaments(),
 		eqc_inner(
 			'',
 			array(
@@ -100,7 +101,7 @@ $trust = eqc_section(
 
 // ------------------------------------------------------- 3. ABOUT
 $about = eqc_section(
-	'eqc-section eqc-section--cream',
+	'eqc-section eqc-section--cream eqc-section--textured',
 	array(
 		eqc_inner(
 			'',
@@ -133,8 +134,8 @@ $about = eqc_section(
 								eqc_container(
 									array( 'css_classes' => 'eqc-grid eqc-grid--trust', 'flex_direction' => 'row' ),
 									array(
-										eqc_html( '<div style="text-align:center"><strong style="font-family:var(--eqc-font-display);font-size:1.6rem;color:var(--eqc-heading)">5,000+</strong><br><span style="font-size:var(--eqc-fs-small);color:var(--eqc-muted)">Students Taught</span></div>' ),
-										eqc_html( '<div style="text-align:center"><strong style="font-family:var(--eqc-font-display);font-size:1.6rem;color:var(--eqc-heading)">10+</strong><br><span style="font-size:var(--eqc-fs-small);color:var(--eqc-muted)">Countries Served</span></div>' ),
+										eqc_html( '<div style="text-align:center"><strong data-eqc-countup="5000" data-eqc-suffix="+" style="font-family:var(--eqc-font-display);font-size:1.6rem;color:var(--eqc-heading)">0</strong><br><span style="font-size:var(--eqc-fs-small);color:var(--eqc-muted)">Students Taught</span></div>' ),
+										eqc_html( '<div style="text-align:center"><strong data-eqc-countup="10" data-eqc-suffix="+" style="font-family:var(--eqc-font-display);font-size:1.6rem;color:var(--eqc-heading)">0</strong><br><span style="font-size:var(--eqc-fs-small);color:var(--eqc-muted)">Countries Served</span></div>' ),
 										eqc_html( '<div style="text-align:center"><strong style="font-family:var(--eqc-font-display);font-size:1.6rem;color:var(--eqc-heading)">1-to-1</strong><br><span style="font-size:var(--eqc-fs-small);color:var(--eqc-muted)">Private Lessons</span></div>' ),
 									)
 								),
@@ -167,8 +168,9 @@ foreach ( $course_data as $i => $c ) {
 	$course_cards[] = eqc_course_card( $c[0], $c[1], '(' . $c[2] . ')', $c[3], $trial_url, $i );
 }
 $courses = eqc_section(
-	'eqc-section eqc-section--surface',
+	'eqc-section eqc-section--surface eqc-section--ornamented',
 	array(
+		eqc_section_ornaments(),
 		eqc_inner(
 			'',
 			array_merge(
@@ -225,8 +227,9 @@ foreach ( $teacher_data as $i => $t ) {
 	$teacher_cards[] = eqc_teacher_card( $teacher_ids[ $i ], $t[0], $t[1], $t[2] );
 }
 $teachers = eqc_section(
-	'eqc-section eqc-section--surface',
+	'eqc-section eqc-section--surface eqc-section--ornamented',
 	array(
+		eqc_section_ornaments(),
 		eqc_inner(
 			'',
 			array_merge(
@@ -255,8 +258,9 @@ foreach ( $plans as $p ) {
 	$pricing_cards[] = eqc_pricing_card( $p[0], $p[1], 'month', $p[2], $trial_url, $p[3] );
 }
 $pricing = eqc_section(
-	'eqc-section eqc-section--cream',
+	'eqc-section eqc-section--cream eqc-section--textured eqc-section--ornamented',
 	array(
+		eqc_section_ornaments(),
 		eqc_inner(
 			'',
 			array_merge(
@@ -281,8 +285,9 @@ foreach ( $testi_data as $i => $t ) {
 	$testi_cards[] = eqc_testimonial_card( $testi_ids[ $i ], $t[0], $t[1], $t[2], array( 'certificate' => 'Expert Tutors', 'chart-up' => 'Progress Tracking' ) );
 }
 $testimonials = eqc_section(
-	'eqc-section eqc-section--surface',
+	'eqc-section eqc-section--surface eqc-section--ornamented',
 	array(
+		eqc_section_ornaments(),
 		eqc_inner(
 			'',
 			array_merge(

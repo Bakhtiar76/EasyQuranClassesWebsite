@@ -28,8 +28,9 @@ foreach ( $course_data as $i => $c ) {
 	$course_cards[] = eqc_course_card( $c[0], $c[1], '(' . $c[2] . ')', $c[3], $trial_url, $i );
 }
 $courses_grid = eqc_section(
-	'eqc-section eqc-section--surface',
+	'eqc-section eqc-section--surface eqc-section--ornamented',
 	array(
+		eqc_section_ornaments(),
 		eqc_inner( '', array( eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--courses', 'flex_direction' => 'row' ), $course_cards ) ) ),
 	)
 );

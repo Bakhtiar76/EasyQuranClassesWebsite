@@ -22,7 +22,9 @@ function eqc_set_demo_thumbnail( $post_id, $filename_fragment ) {
 	}
 }
 
-$category_id = wp_create_category( 'Learning Tips' );
+$category_id         = wp_create_category( 'Learning Tips' );
+$tajweed_category_id = wp_create_category( 'Tajweed' );
+$parents_category_id = wp_create_category( 'For Parents' );
 
 $posts = array(
 	array(
@@ -46,6 +48,22 @@ $posts = array(
 		'content'   => "<p><em>This is a local demo post used to prove the blog template while real articles are written.</em></p>\n<p>There's no single right number of classes per week — the right schedule is the one a student can actually keep consistently for months, not the most ambitious one on paper.</p>\n<h2>Questions worth asking before committing</h2>\n<p>What time of day is genuinely free, not just theoretically free? Is the student more focused right after school, or in the evening? Flexible scheduling exists precisely so the answer can be specific to one family.</p>",
 		'thumbnail' => 'blog-islamic-education-3',
 	),
+	array(
+		'slug'      => 'demo-common-tajweed-mistakes-new-reciters-make',
+		'title'     => '[DEMO] 5 Common Tajweed Mistakes New Reciters Make',
+		'excerpt'   => "Small, easy-to-miss habits that change how a letter sounds — and how a teacher usually corrects them.",
+		'content'   => "<p><em>This is a local demo post used to prove the blog template while real articles are written.</em></p>\n<p>Most Tajweed mistakes aren't dramatic — they're small habits that feel natural until a teacher points them out. A few of the most common ones:</p>\n<ul>\n<li>Rushing through letters that need to be held (madd) for their full length.</li>\n<li>Softening letters that require a firm, full articulation (the qalqalah letters).</li>\n<li>Merging two letters together instead of pronouncing each from its correct point of articulation.</li>\n<li>Losing the nasal sound (ghunnah) where the rules call for it.</li>\n<li>Reading at a pace too fast to apply any rule consciously.</li>\n</ul>\n<h2>Why real-time correction matters</h2>\n<p>Reading rules in a book rarely fixes a habit already learned by ear. A live teacher who stops a student mid-word and demonstrates the correct sound is, in practice, the fastest way most people actually unlearn these patterns.</p>",
+		'thumbnail' => 'about-quran-open-page',
+		'category'  => $tajweed_category_id,
+	),
+	array(
+		'slug'      => 'demo-keeping-kids-motivated-between-classes',
+		'title'     => '[DEMO] How to Keep Kids Motivated Between Quran Classes',
+		'excerpt'   => 'Simple, low-pressure habits parents can use on the days there is no class at all.',
+		'content'   => "<p><em>This is a local demo post used to prove the blog template while real articles are written.</em></p>\n<p>The days between classes matter as much as the class itself. A child doesn't need a long practice session at home — a few consistent minutes of encouragement usually does more than an occasional long, tense one.</p>\n<h2>What tends to help</h2>\n<p>Reviewing just the previous class's short passage rather than assigning something new, letting the child read aloud to a parent even if the parent can't correct it, and praising effort and consistency rather than only correct recitation, all help a child stay willing to keep going.</p>\n<h2>What to avoid</h2>\n<p>Turning home practice into a test, comparing progress to another child, or treating a missed day as a failure rather than something to simply pick back up.</p>",
+		'thumbnail' => 'about-child-reading-quran',
+		'category'  => $parents_category_id,
+	),
 );
 
 foreach ( $posts as $p ) {
@@ -67,7 +85,7 @@ foreach ( $posts as $p ) {
 			'post_status'  => 'publish',
 			'post_excerpt' => $p['excerpt'],
 			'post_content' => $p['content'],
-			'post_category'=> array( $category_id ),
+			'post_category'=> array( isset( $p['category'] ) ? $p['category'] : $category_id ),
 		),
 		true
 	);

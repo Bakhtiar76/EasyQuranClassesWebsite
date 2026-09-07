@@ -34,15 +34,18 @@ foreach ( $teacher_data as $i => $t ) {
 	}
 	$teacher_cards[] = eqc_teacher_card( $teacher_ids[ $i ], $t[0], $t[1], $t[2] );
 }
-// Two clearly-marked placeholder slots round out the team page — the
-// client mentioned more teachers than the four confirmed profiles we
-// have; these are stubs an admin fills in via Elementor, never presented
-// as real people (see eqc_teacher_card_stub() for why).
-$teacher_cards[] = eqc_teacher_card_stub( 'Add a Teacher' );
-$teacher_cards[] = eqc_teacher_card_stub( 'Add a Teacher' );
+// Four clearly-marked placeholder slots round out the team page to an
+// 8-teacher roster (matching the fuller instructor-directory scale seen on
+// riwaqalquran.com's own "All Instructors" page) — these are stubs an
+// admin fills in via Elementor, never presented as real people (see
+// eqc_teacher_card_stub() for why).
+for ( $i = 0; $i < 4; $i++ ) {
+	$teacher_cards[] = eqc_teacher_card_stub( 'Add a Teacher' );
+}
 $grid = eqc_section(
-	'eqc-section eqc-section--surface',
+	'eqc-section eqc-section--surface eqc-section--ornamented',
 	array(
+		eqc_section_ornaments(),
 		eqc_inner( '', array( eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--teachers', 'flex_direction' => 'row' ), $teacher_cards ) ) ),
 	)
 );
@@ -100,22 +103,9 @@ $expect = eqc_section(
 	)
 );
 
-// ------------------------------------------------------- CTA
-$cta = eqc_section(
-	'eqc-section eqc-section--dark',
-	array(
-		eqc_inner(
-			'eqc-container--narrow',
-			array(
-				eqc_heading( 'Ready to meet your teacher?', 'h2', 'eqc-align-center' ),
-				eqc_text( '<p style="text-align:center;color:var(--eqc-cream-100);opacity:0.85;">Book a free trial and we will match a suitable teacher before your first class.</p>' ),
-				eqc_container(
-					array( 'css_classes' => 'eqc-btn-group', 'flex_direction' => 'row', 'content_position' => 'center' ),
-					array( eqc_icon_button( 'calendar', __( 'Book Free Trial', 'easy-quran-classes' ), $trial_url, 'eqc-btn--bronze' ) )
-				),
-			)
-		),
-	)
-);
+// Trailing dark CTA removed — it sat directly above the global footer's own
+// dark "Your First Class Is Free" panel (footer.php), same color and
+// message with nothing between them, reading as one duplicated block
+// rather than two intentional moments. See 11-about.php for the full note.
 
-eqc_save_elementor_page( 27, array( $hero, $grid, $matching, $expect, $cta ) );
+eqc_save_elementor_page( 27, array( $hero, $grid, $matching, $expect ) );

@@ -39,8 +39,9 @@ foreach ( $inclusions as $inc ) {
 $inclusion_html .= '</div>';
 
 $pricing_section = eqc_section(
-	'eqc-section eqc-section--surface',
+	'eqc-section eqc-section--surface eqc-section--ornamented',
 	array(
+		eqc_section_ornaments(),
 		eqc_inner(
 			'',
 			array(
@@ -88,22 +89,9 @@ $faq = eqc_section(
 	)
 );
 
-// ------------------------------------------------------- CTA
-$cta = eqc_section(
-	'eqc-section eqc-section--dark',
-	array(
-		eqc_inner(
-			'eqc-container--narrow',
-			array(
-				eqc_heading( 'Try a class before you choose a plan', 'h2', 'eqc-align-center' ),
-				eqc_text( '<p style="text-align:center;color:var(--eqc-cream-100);opacity:0.85;">Book a free trial first — pricing decisions are easier once you have seen a real class.</p>' ),
-				eqc_container(
-					array( 'css_classes' => 'eqc-btn-group', 'flex_direction' => 'row', 'content_position' => 'center' ),
-					array( eqc_icon_button( 'calendar', __( 'Book Free Trial', 'easy-quran-classes' ), $trial_url, 'eqc-btn--bronze' ) )
-				),
-			)
-		),
-	)
-);
+// Trailing dark CTA removed — it sat directly above the global footer's own
+// dark "Your First Class Is Free" panel (footer.php), same color and
+// message with nothing between them, reading as one duplicated block
+// rather than two intentional moments. See 11-about.php for the full note.
 
-eqc_save_elementor_page( 28, array( $hero, $pricing_section, $guidance, $faq, $cta ) );
+eqc_save_elementor_page( 28, array( $hero, $pricing_section, $guidance, $faq ) );
