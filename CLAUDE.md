@@ -252,6 +252,19 @@ Default release process:
 
 The exact deployment variant depends on whether production is empty, a new WordPress install, or an existing live site. Read `CPANEL-WORKFLOW.md` before any release.
 
+**Confirmed gotchas from the first production migration (2026-09-07)**, full
+detail in `CPANEL-WORKFLOW.md` §8: (1) the standard `wp search-replace` URL
+migration misses Elementor's JSON-escaped URLs (`http:\/\/old` vs.
+`http://old`) — invisible locally, surfaces as mixed-content warnings on
+specific images/widgets after a real domain migration, needs a documented
+manual phpMyAdmin fix post-import; (2) `blog_public=0`'s authoritative
+enforcement is the `noindex` meta tag (always correctly wired), not
+`robots.txt` (a WP-core-refactor + Rank Math interaction leaves it
+permissive by default — cosmetic, not an indexing risk, but worth knowing);
+(3) never delete local credentials (e.g. an Application Password) directly
+to keep them out of a release export — that mutates the live local DB;
+exclude them from the export instead (`--skip-tables`).
+
 ## Verification
 A file change is not completion. Verify with the relevant combination of:
 - local browser

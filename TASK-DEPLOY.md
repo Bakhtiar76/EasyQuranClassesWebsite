@@ -524,18 +524,44 @@ Do not mutate the working local DB unnecessarily.
 
 Before exporting: deactivate `novamira` and `vibe-ai` locally (both are
 local-development-only AI-agent connectors that must never reach
-production — see `release-check`), delete the admin's Application Passwords
-(`... wpcli user meta delete 1 _application_passwords`), and pass an
-explicit table list to `--export` that excludes `wp_novamira_*` tables
-(OAuth clients/tokens/device codes) rather than shipping them to production.
-Reactivate `novamira` locally afterwards. Never `DROP`/`TRUNCATE` — excluding
-a table from an export's table list is not a destructive operation on the
-working database.
+production — see `release-check`), and add `--skip-tables=wp_novamira_*,wp_wpvibe_*`
+to the export command rather than shipping those OAuth/audit tables to
+production (verified empirically 2026-09-07: `--skip-tables` genuinely
+excludes the table's data from the `--export` output, not just from the
+replacement pass — confirmed via file-size delta on a real export, since
+`.sql` content itself cannot be inspected directly). Reactivate `novamira`
+locally afterwards.
+
+**Do NOT delete the admin's Application Passwords directly** (e.g.
+`wp user meta delete 1 _application_passwords`) as a way to keep them out of
+production — that mutates the *live local working database* permanently
+(confirmed the hard way 2026-09-07: it broke the local Novamira MCP
+connection, which depends on one of those passwords, and had to be
+regenerated). `--skip-tables`/table exclusion only touches the *export*, not
+the working DB — use that pattern for any other local-only credential
+consistently. Never `DROP`/`TRUNCATE` either way.
 
 Note the site's `blog_public` setting travels with this export as-is. If it
-is `0` (discourage search engines), production launches non-indexable by
-design until the setting is deliberately changed in Settings > Reading —
-confirm this is the intended launch state, don't discover it after go-live.
+is `0` (discourage search engines), the authoritative protection is
+WordPress core's own `<meta name='robots' content='noindex, nofollow'>` tag —
+confirmed present and correctly wired to `blog_public` on every page,
+independent of any theme/plugin. **`robots.txt` itself is a separate, weaker
+signal and can be misleading**: a WordPress-core refactor plus a Rank Math
+conditional gate mean `do_robots()` no longer enforces `Disallow: /` on its
+own when `blog_public=0` and no custom Rank Math robots.txt text is set — it
+falls back to the permissive `Disallow: /wp-admin/` default (confirmed
+present on both local and production; not a deployment artifact). This
+doesn't cause indexing (the meta tag already blocks that) but does let
+crawlers waste time fetching pages. Fix via Rank Math → General Settings →
+Edit robots.txt, adding `Disallow: /` as custom content, if wanted. Confirm
+the noindex meta tag (not just `blog_public`'s raw value or robots.txt) is
+what you check when verifying a site is protected from indexing.
+
+Elementor stores `_elementor_data`/`_elementor_element_cache` as JSON with
+**escaped slashes** (`http:\/\/localhost`) that the search-replace above does
+**not** catch (it only matches the literal unescaped form) — see
+`CPANEL-WORKFLOW.md` §8 for the confirmed post-import verification/fix
+required for this before QA can pass.
 
 --------------------------------
 FILES
@@ -669,9 +695,16 @@ not reproduce this — verify independently on production rather than
 assuming the local result carries over either way.
 
 If needed:
-- regenerate Elementor CSS/data;
+- regenerate Elementor CSS/data (via wp-admin → Elementor → Tools →
+  Regenerate CSS & Data — confirmed 2026-09-07 this alone does NOT fix
+  stale JSON-escaped URLs baked into `_elementor_data` itself; that needs
+  the separate database fix in `CPANEL-WORKFLOW.md` §8, this only
+  regenerates the compiled CSS file cache);
 - refresh permalinks;
-- clear production cache/CDN.
+- clear production cache/CDN (confirmed this account has an account-level
+  NGINX reverse-proxy cache, separate from any WordPress cache — clear via
+  cPanel home page's "NGINX Caching" widget → Clear Cache if a change
+  doesn't appear to take effect).
 
 After successful verification remove public:
 

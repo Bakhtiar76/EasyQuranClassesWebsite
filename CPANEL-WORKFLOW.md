@@ -187,6 +187,49 @@ wp search-replace 'http://local.example' 'https://example.com' \
 
 Adjust command syntax/path for the actual local environment and URL. Never run this with placeholder URLs.
 
+**Known gap, confirmed 2026-09-07 during the first production deployment**: this
+command only catches the *unescaped* form of the URL (`http://local.example`).
+Elementor stores page content (`_elementor_data`, `_elementor_element_cache`)
+as **JSON with escaped slashes** (`http:\/\/local.example`) — a different byte
+sequence the plain search-replace never matches, even though `--all-tables-with-prefix`
+covers the table. This is invisible locally (the site always legitimately
+runs at the local URL, so there is no mismatch to expose it) and only
+surfaces as **mixed-content warnings for specific images/widgets** after a
+real domain migration, once the new production URL is live. It does not
+affect every image — widgets that reference media by attachment ID resolve
+their URL fresh at render time regardless of what's cached in the JSON;
+only widgets/fields that bake a literal URL string are affected.
+
+After importing to production, verify and fix it as a mandatory post-import
+step, via phpMyAdmin (no shell access, so this must be a manual UI step):
+
+1. **Check** for remaining escaped occurrences (safe: a length/count query, not a raw content dump):
+   ```sql
+   SELECT COUNT(*) FROM wp_postmeta
+   WHERE (LENGTH(meta_value)-LENGTH(REPLACE(meta_value,'http:\\/\\/local.example','')))
+         / LENGTH('http:\\/\\/local.example') > 0
+   ```
+2. **If non-zero**, fix with a literal substring replace — safe here specifically because
+   this is JSON, not PHP `serialize()` format, so there is no length-prefix to corrupt:
+   ```sql
+   UPDATE wp_postmeta SET meta_value = REPLACE(meta_value, 'http:\\/\\/local.example', 'https:\\/\\/example.com')
+   WHERE meta_key IN ('_elementor_data','_elementor_element_cache')
+   ```
+   **Use doubled backslashes** (`\\/`) in the SQL literal — MySQL's string-literal
+   parser treats an unrecognized single-backslash escape (`\/`) as "drop the
+   backslash," silently turning the pattern back into the plain unescaped URL
+   and matching nothing (confirmed: this exact mistake produced "0 rows
+   affected" once during this deployment before doubling the backslashes fixed it).
+3. Re-run the count query — expect `0`.
+4. Re-check the live page for mixed-content console warnings to confirm visually.
+
+This has not yet been folded into a single reliable one-shot WP-CLI command —
+a `--regex` pattern matching both forms was attempted and did not work
+through this project's Docker Compose invocation layer (untraced backslash
+handling through the compose→entrypoint chain); the manual phpMyAdmin
+two-step above is the proven, verified process. Revisit a single-command fix
+only if it can be verified end-to-end, not assumed from a shorter dry-run.
+
 ## 9. File Packaging
 
 Before packaging:
