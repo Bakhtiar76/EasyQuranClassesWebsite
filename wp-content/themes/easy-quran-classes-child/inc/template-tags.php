@@ -120,7 +120,9 @@ function eqc_render_blog_cards( $posts ) {
 		$html .= '<div class="eqc-blog-meta">' . $cat_name . esc_html( get_the_date( '', $post ) ) . '</div>';
 		$html .= '<h3><a href="' . esc_url( $permalink ) . '" style="text-decoration:none;color:inherit;">' . esc_html( get_the_title( $post ) ) . '</a></h3>';
 		$html .= '<p class="eqc-blog-excerpt">' . esc_html( wp_trim_words( get_the_excerpt( $post ), 18 ) ) . '</p>';
-		$html .= '<a class="eqc-read-more" href="' . esc_url( $permalink ) . '">' . esc_html__( 'Read More', 'easy-quran-classes' ) . ' ' . eqc_get_icon_html( 'arrow-right' ) . '</a>';
+		/* translators: %s: post title, read by screen readers only — the visible link text stays the short "Read More". */
+		$read_more_label = sprintf( __( 'Read more: %s', 'easy-quran-classes' ), get_the_title( $post ) );
+		$html           .= '<a class="eqc-read-more" href="' . esc_url( $permalink ) . '" aria-label="' . esc_attr( $read_more_label ) . '">' . esc_html__( 'Read More', 'easy-quran-classes' ) . ' ' . eqc_get_icon_html( 'arrow-right' ) . '</a>';
 		$html .= '</div></article>';
 	}
 	$html .= '</div>';
