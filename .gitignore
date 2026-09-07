@@ -45,6 +45,9 @@ debug.log
 node_modules/
 .playwright/
 .playwright-cli/
+# added for mcp
+.playwright-mcp/
+
 playwright-report/
 test-results/
 auth.json
