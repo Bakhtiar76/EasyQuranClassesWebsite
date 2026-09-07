@@ -51,6 +51,18 @@ img { display: block; max-width: 100%; height: auto; }
 	overflow: visible;
 }
 
+/*
+ * Elementor's own base widget CSS sets `position: relative` on every
+ * `.elementor-widget-html` wrapper. Our eqc_html() snippets often contain
+ * `position: absolute` children (badges, avatars) that are meant to
+ * anchor to an ANCESTOR container (e.g. .eqc-card--testimonial), not to
+ * this wrapper — which also collapses to near-zero height, so the
+ * intended offset ends up measured from the wrong box entirely. Reset it
+ * site-wide; nothing here relies on the wrapper itself being a
+ * positioning context.
+ */
+.elementor-widget-html { position: static; }
+
 /* ---------- Layout ---------- */
 
 .eqc-section {
@@ -155,10 +167,13 @@ img { display: block; max-width: 100%; height: auto; }
    its own block-level width/margin around the link. */
 .elementor-widget-button.eqc-btn {
 	display: inline-block;
-	align-self: flex-start;
+	align-self: center;
 	width: auto;
 	max-width: 100%;
 }
+/* Button groups that are explicitly left-aligned (e.g. a hero text column)
+   opt back in by wrapping native buttons in a container with this class. */
+.eqc-align-start > .elementor-widget-button.eqc-btn { align-self: flex-start; }
 
 .eqc-btn:hover,
 .elementor-widget-button.eqc-btn .elementor-button:hover { transform: translateY(-2px); }
@@ -290,7 +305,8 @@ img { display: block; max-width: 100%; height: auto; }
 
 /* Teacher card */
 .eqc-card--teacher { text-align: center; }
-.eqc-card--teacher .eqc-teacher-photo {
+.eqc-card--teacher .eqc-teacher-photo,
+.eqc-card--teacher .eqc-teacher-photo-widget {
 	width: clamp(120px, 30%, 160px);
 	aspect-ratio: 1;
 	margin-inline: auto;
@@ -298,14 +314,18 @@ img { display: block; max-width: 100%; height: auto; }
 	overflow: hidden;
 	border: 3px solid var(--eqc-gold-300);
 }
-.eqc-card--teacher .eqc-teacher-photo img {
+.eqc-card--teacher .eqc-teacher-photo img,
+.eqc-card--teacher .eqc-teacher-photo-widget img {
 	width: 100%;
 	height: 100%;
 	object-fit: cover;
 	transition: transform var(--eqc-motion-slow) var(--eqc-ease-soft);
 }
-.eqc-card--teacher:hover .eqc-teacher-photo img { transform: scale(1.06); }
-.eqc-card--teacher h4 { margin-block: 0.9em 0.1em; }
+.eqc-card--teacher:hover .eqc-teacher-photo img,
+.eqc-card--teacher:hover .eqc-teacher-photo-widget img { transform: scale(1.06); }
+/* h3 here for correct heading hierarchy (H2 section title -> H3 card
+   title, no skipped level) while keeping the compact card-title size. */
+.eqc-card--teacher h3 { margin-block: 0.9em 0.1em; font-size: var(--eqc-fs-h4); font-weight: 600; font-family: var(--eqc-font-body); }
 .eqc-card--teacher .eqc-teacher-role {
 	color: var(--eqc-bronze-600);
 	font-size: var(--eqc-fs-small);
@@ -403,7 +423,8 @@ img { display: block; max-width: 100%; height: auto; }
 	justify-content: center;
 	font-family: var(--eqc-font-display);
 }
-.eqc-card--testimonial h4 { margin-block: 0 0.1em; }
+/* h3 here for correct heading hierarchy (see .eqc-card--teacher h3 above). */
+.eqc-card--testimonial h3 { margin-block: 0 0.1em; font-size: var(--eqc-fs-h4); font-weight: 600; font-family: var(--eqc-font-body); }
 .eqc-testimonial-location {
 	color: var(--eqc-muted);
 	font-size: var(--eqc-fs-small);
@@ -462,7 +483,7 @@ img { display: block; max-width: 100%; height: auto; }
 	padding: 1.1em 1.2em;
 }
 .eqc-trust-tile .eqc-icon { flex: none; width: 1.9em; height: 1.9em; color: var(--eqc-green-800); }
-.eqc-trust-tile h4 { margin: 0 0 0.15em; font-size: var(--eqc-fs-body); }
+.eqc-trust-tile-title { margin: 0 0 0.15em; font-size: var(--eqc-fs-body); font-weight: 700; color: var(--eqc-heading); }
 .eqc-trust-tile p { margin: 0; font-size: var(--eqc-fs-small); color: var(--eqc-muted); }
 
 /* Chips (hero benefit chips) */

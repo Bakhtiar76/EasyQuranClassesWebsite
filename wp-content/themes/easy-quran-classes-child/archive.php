@@ -36,41 +36,11 @@ get_header();
 		</div>
 
 		<?php if ( have_posts() ) : ?>
-			<div class="eqc-grid eqc-grid--blog">
-				<?php
-				$i = 0;
-				while ( have_posts() ) :
-					the_post();
-					$i++;
-					?>
-					<article <?php post_class( 'eqc-card eqc-card--blog' ); ?> <?php eqc_reveal_attrs( min( $i, 3 ) ); ?>>
-						<a class="eqc-blog-media" href="<?php the_permalink(); ?>">
-							<?php if ( has_post_thumbnail() ) : ?>
-								<?php the_post_thumbnail( 'eqc-blog-card' ); ?>
-							<?php else : ?>
-								<img src="<?php echo esc_url( get_stylesheet_directory_uri() . '/assets/svg/corner-motif.svg' ); ?>" alt="" loading="lazy" style="background:var(--eqc-cream-100);object-fit:contain;padding:2rem;" />
-							<?php endif; ?>
-						</a>
-						<div class="eqc-blog-body">
-							<div class="eqc-blog-meta">
-								<?php
-								$cats = get_the_category();
-								if ( ! empty( $cats ) ) {
-									echo esc_html( $cats[0]->name );
-									echo ' &middot; ';
-								}
-								echo esc_html( get_the_date() );
-								?>
-							</div>
-							<h3><a href="<?php the_permalink(); ?>" style="text-decoration:none;color:inherit;"><?php the_title(); ?></a></h3>
-							<p class="eqc-blog-excerpt"><?php echo esc_html( wp_trim_words( get_the_excerpt(), 20 ) ); ?></p>
-							<a class="eqc-read-more" href="<?php the_permalink(); ?>">
-								<?php esc_html_e( 'Read More', 'easy-quran-classes' ); ?> <?php eqc_icon( 'arrow-right' ); ?>
-							</a>
-						</div>
-					</article>
-				<?php endwhile; ?>
-			</div>
+			<?php
+			// Shared with the [eqc_latest_posts] shortcode (inc/template-tags.php)
+			// so the Blog page and any homepage/section preview never drift apart.
+			echo eqc_render_blog_cards( $wp_query->posts ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped internally.
+			?>
 
 			<nav class="eqc-pagination" aria-label="<?php esc_attr_e( 'Blog pagination', 'easy-quran-classes' ); ?>" style="margin-top:var(--eqc-section-space);display:flex;justify-content:center;gap:0.75rem;">
 				<?php

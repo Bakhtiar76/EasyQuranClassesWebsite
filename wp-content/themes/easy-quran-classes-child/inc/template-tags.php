@@ -8,17 +8,22 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Echo one icon from the sprite in inc/icon-sprite.php.
+ * One icon's markup from the sprite in inc/icon-sprite.php, as a string.
  *
  * @param string $name  Icon id without the "eqc-icon-" prefix.
  * @param string $class Extra classes appended to "eqc-icon".
  */
-function eqc_icon( $name, $class = '' ) {
-	printf(
+function eqc_get_icon_html( $name, $class = '' ) {
+	return sprintf(
 		'<svg class="eqc-icon %s" aria-hidden="true" focusable="false"><use href="#eqc-icon-%s"></use></svg>',
 		esc_attr( $class ),
 		esc_attr( $name )
 	);
+}
+
+/** Echo one icon — see eqc_get_icon_html(). */
+function eqc_icon( $name, $class = '' ) {
+	echo eqc_get_icon_html( $name, $class ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped internally.
 }
 
 /**
@@ -86,6 +91,64 @@ function eqc_section_heading( $eyebrow, $heading, $centered = false ) {
 	</div>
 	<?php
 }
+
+/**
+ * Render the shared blog-card markup for a list of WP_Post objects.
+ * Used by archive.php (the real Blog page) and by the [eqc_latest_posts]
+ * shortcode below, so the two never drift apart.
+ *
+ * @param WP_Post[] $posts
+ * @return string
+ */
+function eqc_render_blog_cards( $posts ) {
+	if ( empty( $posts ) ) {
+		return '<div class="eqc-card" style="max-width:var(--eqc-content-narrow);margin-inline:auto;text-align:center;"><p>' . esc_html__( 'No posts have been published yet. Please check back soon.', 'easy-quran-classes' ) . '</p></div>';
+	}
+
+	$html = '<div class="eqc-grid eqc-grid--blog">';
+	$i    = 0;
+	foreach ( $posts as $post ) {
+		$i++;
+		$permalink = get_permalink( $post );
+		$cats      = get_the_category( $post->ID );
+		$cat_name  = ! empty( $cats ) ? esc_html( $cats[0]->name ) . ' &middot; ' : '';
+		$thumb     = has_post_thumbnail( $post ) ? get_the_post_thumbnail( $post, 'eqc-blog-card' ) : '';
+
+		$html .= '<article class="eqc-card eqc-card--blog" data-eqc-reveal data-eqc-reveal-index="' . min( $i, 3 ) . '">';
+		$html .= '<a class="eqc-blog-media" href="' . esc_url( $permalink ) . '">' . $thumb . '</a>';
+		$html .= '<div class="eqc-blog-body">';
+		$html .= '<div class="eqc-blog-meta">' . $cat_name . esc_html( get_the_date( '', $post ) ) . '</div>';
+		$html .= '<h3><a href="' . esc_url( $permalink ) . '" style="text-decoration:none;color:inherit;">' . esc_html( get_the_title( $post ) ) . '</a></h3>';
+		$html .= '<p class="eqc-blog-excerpt">' . esc_html( wp_trim_words( get_the_excerpt( $post ), 18 ) ) . '</p>';
+		$html .= '<a class="eqc-read-more" href="' . esc_url( $permalink ) . '">' . esc_html__( 'Read More', 'easy-quran-classes' ) . ' ' . eqc_get_icon_html( 'arrow-right' ) . '</a>';
+		$html .= '</div></article>';
+	}
+	$html .= '</div>';
+	return $html;
+}
+
+/**
+ * [eqc_latest_posts count="3"] — the site's only "dynamic Posts" mechanism
+ * for Elementor Free (which ships no query/Posts widget). Registered here
+ * instead of a plugin: it is a three-line WP_Query wrapped around the same
+ * card markup archive.php already uses, always reflects the live Posts
+ * table, and an admin drops it anywhere via Elementor's Shortcode widget.
+ */
+function eqc_latest_posts_shortcode( $atts ) {
+	$atts  = shortcode_atts( array( 'count' => 3 ), $atts );
+	$query = new WP_Query(
+		array(
+			'post_type'      => 'post',
+			'post_status'    => 'publish',
+			'posts_per_page' => (int) $atts['count'],
+			'ignore_sticky_posts' => true,
+		)
+	);
+	$html = eqc_render_blog_cards( $query->posts );
+	wp_reset_postdata();
+	return $html;
+}
+add_shortcode( 'eqc_latest_posts', 'eqc_latest_posts_shortcode' );
 
 /**
  * Fetch the Media Library URL for one of the placeholder images seeded

@@ -157,18 +157,247 @@ function eqc_button( $text, $url, $classes = '' ) {
 
 /**
  * Look up a seeded Media Library attachment ID by its recognizable
- * filename fragment (set during the media import in this session), so
- * page-building scripts never hardcode brittle numeric IDs.
+ * source filename fragment (e.g. 'hero-online-quran-class', matching
+ * local/media-staging/hero-online-quran-class.jpg), so page-building
+ * scripts never hardcode brittle numeric IDs.
+ *
+ * Matches on the attached file path (_wp_attached_file), not post_name —
+ * `wp media import --title="..."` derives post_name from the given title,
+ * not the source filename, so a post_name match would silently miss.
  */
 function eqc_media_id( $slug_fragment ) {
 	global $wpdb;
 	$id = $wpdb->get_var(
 		$wpdb->prepare(
-			"SELECT ID FROM {$wpdb->posts} WHERE post_type = 'attachment' AND post_name = %s LIMIT 1",
-			$slug_fragment
+			"SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value LIKE %s LIMIT 1",
+			'%' . $wpdb->esc_like( $slug_fragment ) . '%'
 		)
 	);
+	if ( ! $id ) {
+		WP_CLI::warning( "eqc_media_id(): no attachment found for '{$slug_fragment}'." );
+	}
 	return $id ? (int) $id : 0;
+}
+
+/**
+ * Return one icon's markup as a string. The active theme's
+ * inc/template-tags.php (loaded by WordPress before this file runs under
+ * `wp eval-file`) already defines eqc_get_icon_html() — reuse it rather
+ * than duplicating the sprite markup here.
+ */
+function eqc_icon_str( $name, $class = '' ) {
+	return eqc_get_icon_html( $name, $class );
+}
+
+/**
+ * A circular icon-only link (arrow/whatsapp/etc button used inside cards),
+ * as a small HTML widget — there is no native Elementor equivalent and the
+ * icon is decorative chrome, not editable copy.
+ */
+function eqc_icon_link( $icon, $url, $classes = 'eqc-arrow-btn' ) {
+	return eqc_html( sprintf( '<a class="%s" href="%s">%s</a>', esc_attr( $classes ), esc_url( $url ), eqc_icon_str( $icon ) ) );
+}
+
+/**
+ * Course card (DESIGN.md §16 Course Card): a .eqc-card--course container
+ * with the numbered badge + arrow as decorative HTML, but title/level/
+ * description as native Heading/Text-Editor widgets so an admin edits
+ * them as plain text in Elementor — no code involved.
+ */
+function eqc_course_card( $number, $title, $level, $description, $link, $reveal_index = 0 ) {
+	return eqc_container(
+		array(
+			'css_classes'    => 'eqc-card eqc-card--course',
+			'flex_direction' => 'column',
+		),
+		array(
+			eqc_html( '<span class="eqc-card-index">' . esc_html( $number ) . '</span>' ),
+			eqc_heading( $title, 'h3' ),
+			eqc_html( '<p class="eqc-card-level">' . esc_html( $level ) . '</p>' ),
+			eqc_text( '<p>' . wp_kses_post( $description ) . '</p>' ),
+			eqc_icon_link( 'arrow-right', $link ),
+		)
+	);
+}
+
+/**
+ * Teacher card (DESIGN.md §16 Teacher Card). Photo via native Image
+ * widget (admin can swap it from the Media Library); name/role/facts as
+ * native Heading/Text-Editor.
+ */
+function eqc_teacher_card( $attachment_id, $name, $role, $facts ) {
+	$facts_html = '<ul class="eqc-teacher-facts">';
+	foreach ( $facts as $icon => $label ) {
+		$facts_html .= '<li>' . eqc_icon_str( $icon ) . '<span>' . esc_html( $label ) . '</span></li>';
+	}
+	$facts_html .= '</ul>';
+
+	return eqc_container(
+		array(
+			'css_classes'    => 'eqc-card eqc-card--teacher',
+			'flex_direction' => 'column',
+		),
+		array(
+			eqc_widget(
+				'image',
+				array(
+					'image'        => array(
+						'id'  => $attachment_id,
+						'url' => wp_get_attachment_image_url( $attachment_id, 'eqc-teacher' ),
+					),
+					'image_size'   => 'eqc-teacher',
+					'_css_classes' => 'eqc-teacher-photo-widget',
+				)
+			),
+			eqc_heading( $name, 'h3' ),
+			eqc_html( '<p class="eqc-teacher-role">' . esc_html( $role ) . '</p>' ),
+			eqc_html( $facts_html ),
+		)
+	);
+}
+
+/**
+ * Pricing card (DESIGN.md §16 Pricing Card).
+ *
+ * @param array $features Plain-text feature list.
+ */
+function eqc_pricing_card( $frequency, $price, $unit, $features, $link, $featured = false ) {
+	$features_html = '<ul class="eqc-pricing-list">';
+	foreach ( $features as $feature ) {
+		$features_html .= '<li>' . eqc_icon_str( 'check' ) . '<span>' . esc_html( $feature ) . '</span></li>';
+	}
+	$features_html .= '</ul>';
+
+	$classes = 'eqc-card eqc-card--pricing' . ( $featured ? ' eqc-card--pricing--featured' : '' );
+
+	$children = array();
+	if ( $featured ) {
+		$children[] = eqc_html( '<span class="eqc-pricing-badge">' . esc_html__( 'Recommended', 'easy-quran-classes' ) . '</span>' );
+	}
+	$children[] = eqc_html( '<span class="eqc-pricing-freq">' . esc_html( $frequency ) . '</span>' );
+	$children[] = eqc_html( $features_html );
+	$children[] = eqc_html( '<p class="eqc-pricing-price">$' . esc_html( $price ) . '<small>/ ' . esc_html( $unit ) . '</small></p>' );
+	$children[] = eqc_button( __( 'Choose Plan', 'easy-quran-classes' ), $link, $featured ? 'eqc-btn--bronze' : 'eqc-btn--primary' );
+
+	return eqc_container(
+		array(
+			'css_classes'    => $classes,
+			'flex_direction' => 'column',
+		),
+		$children
+	);
+}
+
+/**
+ * Testimonial card (DESIGN.md §16 Testimonial Card).
+ *
+ * @param array $tags Short trust-tag labels shown at the card's foot.
+ */
+function eqc_testimonial_card( $attachment_id, $name, $location, $quote, $tags = array() ) {
+	$tags_html = '';
+	if ( $tags ) {
+		$tags_html = '<div class="eqc-testimonial-tags">';
+		foreach ( $tags as $icon => $label ) {
+			$tags_html .= '<span>' . eqc_icon_str( $icon ) . esc_html( $label ) . '</span>';
+		}
+		$tags_html .= '</div>';
+	}
+
+	return eqc_container(
+		array(
+			'css_classes'    => 'eqc-card eqc-card--testimonial',
+			'flex_direction' => 'column',
+		),
+		array(
+			eqc_html(
+				'<div class="eqc-testimonial-photo">' . wp_get_attachment_image( $attachment_id, 'eqc-testimonial' ) . '</div>'
+				. '<div class="eqc-testimonial-quote-mark">' . eqc_icon_str( 'quote' ) . '</div>',
+				'eqc-static-wrap'
+			),
+			eqc_heading( $name, 'h3' ),
+			eqc_html( '<p class="eqc-testimonial-location">' . eqc_icon_str( 'map-pin' ) . ' ' . esc_html( $location ) . '</p>' ),
+			eqc_text( '<p>' . esc_html( $quote ) . '</p>' ),
+			eqc_html( $tags_html ),
+		)
+	);
+}
+
+/**
+ * Section heading block (eyebrow + H2 + gold rule) as an Elementor element
+ * — the page-building equivalent of the theme's eqc_section_heading()
+ * template tag (which echoes PHP for header.php-style templates and can't
+ * be used inside an elements array passed to Document::save()).
+ */
+function eqc_section_heading_el( $eyebrow, $heading, $centered = false ) {
+	$class = 'eqc-stack eqc-section-heading' . ( $centered ? ' eqc-section-heading--center' : '' );
+	$html  = '<div class="' . esc_attr( $class ) . '" data-eqc-reveal data-eqc-reveal-index="0">';
+	if ( $eyebrow ) {
+		$html .= '<span class="eqc-eyebrow">' . esc_html( $eyebrow ) . '</span>';
+	}
+	$html .= '<h2>' . wp_kses_post( $heading ) . '</h2>';
+	$html .= '<hr class="eqc-heading-rule eqc-heading-rule--draw" />';
+	$html .= '</div>';
+	return eqc_html( $html );
+}
+
+/** Trust/benefit tile (small icon + heading + description). */
+function eqc_trust_tile( $icon, $title, $description ) {
+	// A styled paragraph, not a heading: these tiles are minor benefit
+	// labels, not real subsections, so making them headings would skip a
+	// level wherever they sit between an H1/H2 and the page's next real
+	// H2/H3 (DESIGN.md §22 wants no skipped heading levels).
+	return eqc_html(
+		'<div class="eqc-trust-tile">' . eqc_icon_str( $icon, 'eqc-icon' )
+		. '<div><p class="eqc-trust-tile-title">' . esc_html( $title ) . '</p><p>' . esc_html( $description ) . '</p></div></div>'
+	);
+}
+
+/** Small pill chip used in the hero (icon + short label). */
+function eqc_chip( $icon, $label ) {
+	return '<span class="eqc-chip">' . eqc_icon_str( $icon ) . '<span>' . esc_html( $label ) . '</span></span>';
+}
+
+/** A raw icon-labeled anchor matching the .eqc-btn pattern used in header/footer (for icon CTAs). */
+function eqc_icon_button( $icon, $text, $url, $variant = 'eqc-btn--primary' ) {
+	return eqc_html(
+		sprintf(
+			'<a class="eqc-btn %s" href="%s">%s %s</a>',
+			esc_attr( $variant ),
+			esc_url( $url ),
+			eqc_icon_str( $icon ),
+			esc_html( $text )
+		)
+	);
+}
+
+/** One FAQ accordion item (question/answer), matching assets/js/eqc.js's expected markup. */
+function eqc_faq_item_html( $question, $answer ) {
+	return '<div class="eqc-faq-item" data-open="false">'
+		. '<button type="button" class="eqc-faq-question" aria-expanded="false">'
+		. '<span>' . esc_html( $question ) . '</span>'
+		. '<span class="eqc-faq-icon">' . eqc_icon_str( 'plus' ) . '</span>'
+		. '</button>'
+		. '<div class="eqc-faq-answer"><div class="eqc-faq-answer-inner"><p>' . wp_kses_post( $answer ) . '</p></div></div>'
+		. '</div>';
+}
+
+/**
+ * A titled FAQ group: heading + a stack of eqc_faq_item_html() items, all
+ * inside one HTML widget so the accordion's JS/CSS contract (siblings
+ * inside one .eqc-faq-group) stays intact.
+ *
+ * @param array $items [ [question, answer], ... ].
+ */
+function eqc_faq_group( $title, $items ) {
+	$html = '<div class="eqc-faq-group">';
+	if ( $title ) {
+		$html .= '<h3>' . esc_html( $title ) . '</h3>';
+	}
+	foreach ( $items as $item ) {
+		$html .= eqc_faq_item_html( $item[0], $item[1] );
+	}
+	$html .= '</div>';
+	return eqc_html( $html );
 }
 
 /**
