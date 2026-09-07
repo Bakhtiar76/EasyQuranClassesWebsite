@@ -77,9 +77,14 @@ img { display: block; max-width: 100%; height: auto; }
 	background: var(--eqc-green-900);
 	color: var(--eqc-cream-100);
 }
+/* !important: Elementor's Kit-driven heading color (tools/01-elementor-kit.php
+   sets the "Primary" global color, which every Heading widget uses by
+   default) is injected with equal-or-higher effective priority and
+   otherwise wins over this descendant selector, leaving dark-green text
+   on a dark-green background. */
 .eqc-section--dark h1,
 .eqc-section--dark h2,
-.eqc-section--dark h3 { color: var(--eqc-white); }
+.eqc-section--dark h3 { color: var(--eqc-white) !important; }
 
 .eqc-container {
 	width: 100%;
@@ -659,6 +664,9 @@ img { display: block; max-width: 100%; height: auto; }
 .eqc-single-content img { border-radius: var(--eqc-radius-card); margin-block: 1.2em; }
 
 /* ---------- Utility ---------- */
+
+.eqc-align-center { text-align: center; }
+.eqc-body-l { font-size: var(--eqc-fs-body-l); }
 
 .eqc-visually-hidden {
 	position: absolute !important;

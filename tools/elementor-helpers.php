@@ -323,6 +323,28 @@ function eqc_testimonial_card( $attachment_id, $name, $location, $quote, $tags =
 }
 
 /**
+ * Standard inner-page hero: eyebrow + H1 + intro paragraph, centered, on
+ * the cream background — the consistent "hero" every inner page opens
+ * with (DESIGN.md §18 gives each page a hero; the homepage's own richer
+ * split hero stays specific to tools/pages/10-home.php).
+ */
+function eqc_page_hero( $eyebrow, $title, $intro, $icon = 'book-open' ) {
+	return eqc_section(
+		'eqc-section eqc-section--tight eqc-section--cream',
+		array(
+			eqc_inner(
+				'eqc-container--narrow',
+				array(
+					eqc_html( '<div style="text-align:center"><span class="eqc-eyebrow">' . eqc_icon_str( $icon ) . ' ' . esc_html( $eyebrow ) . '</span></div>' ),
+					eqc_heading( $title, 'h1', 'eqc-align-center' ),
+					eqc_text( '<p class="eqc-body-l" style="text-align:center;">' . wp_kses_post( $intro ) . '</p>' ),
+				)
+			),
+		)
+	);
+}
+
+/**
  * Section heading block (eyebrow + H2 + gold rule) as an Elementor element
  * — the page-building equivalent of the theme's eqc_section_heading()
  * template tag (which echoes PHP for header.php-style templates and can't

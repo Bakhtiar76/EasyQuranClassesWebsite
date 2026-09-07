@@ -1,0 +1,162 @@
+<?php
+/**
+ * About page (post #25) — TASK-WEBSITE.md Phase J "About".
+ * Run with: wp --user=1 eval-file /tools/pages/11-about.php
+ */
+require_once '/tools/elementor-helpers.php';
+
+$boy_img  = eqc_media_id( 'about-child-reading-quran' );
+$book_img = eqc_media_id( 'about-quran-open-page' );
+$trial_url = home_url( '/free-trial/' );
+
+$hero = eqc_page_hero(
+	'About Us',
+	'Learning the Quran, built around real life',
+	'Easy Quran Classes exists for one reason: to make qualified, personal Quran teaching available to anyone, regardless of where they live or how packed their week already is.'
+);
+
+// ------------------------------------------------------- MISSION / PURPOSE
+$mission = eqc_section(
+	'eqc-section eqc-section--surface',
+	array(
+		eqc_inner(
+			'',
+			array(
+				eqc_container(
+					array( 'css_classes' => 'eqc-about-grid', 'flex_direction' => 'row' ),
+					array(
+						eqc_container(
+							array( 'css_classes' => 'eqc-about-media', 'flex_direction' => 'column' ),
+							array(
+								eqc_widget(
+									'image',
+									array(
+										'image'        => array( 'id' => $boy_img, 'url' => wp_get_attachment_image_url( $boy_img, 'large' ) ),
+										'image_size'   => 'large',
+										'_css_classes' => 'eqc-arch-media',
+									)
+								),
+							)
+						),
+						eqc_container(
+							array( 'css_classes' => 'eqc-align-start', 'flex_direction' => 'column' ),
+							array(
+								eqc_html( '<span class="eqc-eyebrow">' . eqc_icon_str( 'shield' ) . ' Our Mission</span>' ),
+								eqc_heading( 'Consistent, personal teaching &mdash; not one more app to abandon', 'h2' ),
+								eqc_text(
+									'<p>Plenty of apps promise to teach the Quran. Very few replace what a real teacher gives: correction the moment a mistake happens, encouragement that responds to how a specific student is actually doing, and a relationship that keeps a student coming back next week.</p>'
+									. '<p>We built Easy Quran Classes around live, 1-to-1 teaching first, and treat scheduling flexibility as the thing that makes consistency realistic for busy families &mdash; not the other way around.</p>'
+								),
+							)
+						),
+					)
+				),
+			)
+		),
+	)
+);
+
+// ------------------------------------------------------- WHO WE SERVE
+$audiences = array(
+	array( 'graduation-cap', 'Complete Beginners', 'Children and adults starting from the Arabic alphabet itself, with no reading ability assumed.' ),
+	array( 'users', 'Families with Multiple Learners', 'Siblings or a parent and child learning on schedules that fit around each other.' ),
+	array( 'book-open', 'Returning Adults', 'Adults who read as children but want to correct Tajweed and rebuild consistency now.' ),
+	array( 'globe', 'Learners Anywhere', 'Students outside easy reach of a qualified local teacher, in any time zone.' ),
+);
+$audience_cards = array();
+foreach ( $audiences as $a ) {
+	$audience_cards[] = eqc_html(
+		'<div class="eqc-card" style="text-align:center;">'
+		. '<div style="color:var(--eqc-green-800);">' . eqc_icon_str( $a[0] ) . '</div>'
+		. '<h3 style="margin:0.6em 0 0.3em;font-size:var(--eqc-fs-h4);font-family:var(--eqc-font-body);font-weight:700;">' . esc_html( $a[1] ) . '</h3>'
+		. '<p style="margin:0;color:var(--eqc-muted);font-size:var(--eqc-fs-small);">' . esc_html( $a[2] ) . '</p>'
+		. '</div>'
+	);
+}
+$who_we_serve = eqc_section(
+	'eqc-section eqc-section--cream',
+	array(
+		eqc_inner(
+			'',
+			array_merge(
+				array( eqc_section_heading_el( 'Who We Serve', 'A learning path for every starting point', true ) ),
+				array( eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--trust', 'flex_direction' => 'row' ), $audience_cards ) )
+			)
+		),
+	)
+);
+
+// ------------------------------------------------------- TEACHING APPROACH
+$approach_img = eqc_media_id( 'about-quran-open-page' );
+$approach = eqc_section(
+	'eqc-section eqc-section--surface',
+	array(
+		eqc_inner(
+			'',
+			array(
+				eqc_container(
+					// Text-then-media order (opposite of the mission section above)
+					// achieves the alternating layout directly — no reverse CSS needed.
+					array( 'css_classes' => 'eqc-about-grid', 'flex_direction' => 'row' ),
+					array(
+						eqc_container(
+							array( 'css_classes' => 'eqc-align-start', 'flex_direction' => 'column' ),
+							array(
+								eqc_html( '<span class="eqc-eyebrow">' . eqc_icon_str( 'headset' ) . ' Our Approach</span>' ),
+								eqc_heading( 'Paced to the student, not a fixed curriculum clock', 'h2' ),
+								eqc_text(
+									'<p>Every student starts with an honest assessment of where they actually are, not where a course outline assumes they should be. From there, teachers adjust pace, revision and difficulty as progress happens.</p>'
+								),
+								eqc_html(
+									'<ul class="eqc-teacher-facts" style="text-align:left;">'
+									. '<li>' . eqc_icon_str( 'check' ) . '<span>1-to-1 live video classes, never pre-recorded</span></li>'
+									. '<li>' . eqc_icon_str( 'check' ) . '<span>Male and female teachers so families can choose what suits them</span></li>'
+									. '<li>' . eqc_icon_str( 'check' ) . '<span>Regular progress check-ins with parents/guardians</span></li>'
+									. '</ul>'
+								),
+								eqc_container(
+									array( 'css_classes' => 'eqc-btn-group eqc-align-start', 'flex_direction' => 'row' ),
+									array( eqc_button( __( 'Book a Free Trial', 'easy-quran-classes' ), $trial_url, 'eqc-btn--bronze' ) )
+								),
+							)
+						),
+						eqc_container(
+							array( 'css_classes' => 'eqc-about-media', 'flex_direction' => 'column' ),
+							array(
+								eqc_widget(
+									'image',
+									array(
+										'image'        => array( 'id' => $approach_img, 'url' => wp_get_attachment_image_url( $approach_img, 'large' ) ),
+										'image_size'   => 'large',
+										'_css_classes' => 'eqc-arch-media',
+									)
+								),
+							)
+						),
+					)
+				),
+			)
+		),
+	)
+);
+
+// ------------------------------------------------------- CTA (reuses footer panel too, this is a mid-page nudge)
+$cta = eqc_section(
+	'eqc-section eqc-section--dark',
+	array(
+		eqc_inner(
+			'eqc-container--narrow',
+			array(
+				eqc_html( '<div style="text-align:center"><span class="eqc-eyebrow">' . eqc_icon_str( 'calendar' ) . ' Start Learning' . '</span></div>' ),
+				eqc_heading( 'Ready to see how a class actually feels?', 'h2', 'eqc-align-center' ),
+				eqc_text( '<p style="text-align:center;color:var(--eqc-cream-100);opacity:0.85;">Book a free trial class and get matched with a suitable teacher.</p>' ),
+				eqc_container(
+					array( 'css_classes' => 'eqc-btn-group', 'flex_direction' => 'row', 'content_position' => 'center' ),
+					array( eqc_icon_button( 'calendar', __( 'Book Free Trial', 'easy-quran-classes' ), $trial_url, 'eqc-btn--bronze' ) )
+				),
+			)
+		),
+	)
+);
+
+eqc_save_elementor_page( 25, array( $hero, $mission, $who_we_serve, $approach, $cta ) );
