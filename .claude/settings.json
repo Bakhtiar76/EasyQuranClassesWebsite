@@ -1,6 +1,26 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
+    "allow": [
+      "Bash(node --check *)",
+      "Bash(php -l *)",
+      "Bash(docker compose -f local/docker-compose.yml ps*)",
+      "Bash(docker compose -f local/docker-compose.yml up -d*)",
+      "Bash(docker compose -f local/docker-compose.yml logs*)",
+      "Bash(docker compose -f local/docker-compose.yml exec wordpress php -l *)",
+      "Bash(docker compose -f local/docker-compose.yml exec wordpress id*)",
+      "Bash(docker compose -f local/docker-compose.yml --env-file local/.env run --rm wpcli --info*)",
+      "Bash(docker compose -f local/docker-compose.yml --env-file local/.env run --rm wpcli core version*)",
+      "Bash(docker compose -f local/docker-compose.yml --env-file local/.env run --rm wpcli core is-installed*)",
+      "Bash(docker compose -f local/docker-compose.yml --env-file local/.env run --rm wpcli plugin list*)",
+      "Bash(docker compose -f local/docker-compose.yml --env-file local/.env run --rm wpcli theme list*)",
+      "Bash(docker compose -f local/docker-compose.yml --env-file local/.env run --rm wpcli option get*)",
+      "Bash(docker compose -f local/docker-compose.yml --env-file local/.env run --rm wpcli post list*)",
+      "PowerShell(local\\wp.ps1 --info*)",
+      "PowerShell(local\\wp.ps1 plugin list*)",
+      "PowerShell(local\\wp.ps1 theme list*)",
+      "PowerShell(local\\wp.ps1 option get*)"
+    ],
     "deny": [
       "Read(.env)",
       "Read(.env.local)",
@@ -37,37 +57,28 @@
       "Bash(*scp.exe *)",
       "Bash(icacls *)",
       "PowerShell(icacls *)",
-      "Bash(wp db *)",
-      "Bash(wp search-replace *)",
-      "Bash(wp plugin delete *)",
-      "Bash(wp plugin uninstall *)",
-      "Bash(wp theme delete *)",
-      "Bash(wp core update *)",
+      "Bash(*wpcli db *)",
+      "Bash(*wpcli search-replace *)",
+      "Bash(*wpcli plugin delete *)",
+      "Bash(*wpcli plugin uninstall *)",
+      "Bash(*wpcli theme delete *)",
+      "Bash(*wpcli core update *)",
+      "Bash(*wp.ps1 db *)",
+      "Bash(*wp.ps1 search-replace *)",
+      "PowerShell(local\\wp.ps1 db *)",
+      "PowerShell(local\\wp.ps1 search-replace *)",
+      "PowerShell(local\\wp.ps1 plugin delete *)",
+      "PowerShell(local\\wp.ps1 plugin uninstall *)",
+      "PowerShell(local\\wp.ps1 theme delete *)",
+      "Bash(docker compose -f local/docker-compose.yml down -v*)",
+      "Bash(docker volume rm *)",
+      "Bash(docker system prune*)",
       "Bash(npm install -g *)",
       "Bash(npm i -g *)",
       "PowerShell(Remove-Item *)",
       "PowerShell(git push *)",
       "PowerShell(git reset --hard *)"
-    ],
-    "allow": [
-      "Bash(node --check *)",
-      "Bash(wp --info)",
-      "Bash(wp core version)",
-      "Bash(wp plugin list *)",
-      "Bash(wp theme list *)"
     ]
-  },
-  "enabledPlugins": {
-    "playwright@claude-plugins-official": false,
-    "build-with-wordpress@claude-plugins-official": false,
-    "figma@claude-plugins-official": false,
-    "telegram@claude-plugins-official": false,
-    "ui-ux-pro-max@ui-ux-pro-max-skill": false,
-    "taste-skill@taste-skill": false,
-    "ponytail@ponytail": false,
-    "codex@openai-codex": false,
-    "claude-mem@thedotmack": false,
-    "context-mode@context-mode": false
   },
   "hooks": {
     "PreToolUse": [
@@ -92,5 +103,17 @@
         ]
       }
     ]
+  },
+  "enabledPlugins": {
+    "playwright@claude-plugins-official": true,
+    "build-with-wordpress@claude-plugins-official": true,
+    "figma@claude-plugins-official": false,
+    "telegram@claude-plugins-official": false,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": false,
+    "taste-skill@taste-skill": false,
+    "ponytail@ponytail": false,
+    "codex@openai-codex": true,
+    "claude-mem@thedotmack": false,
+    "context-mode@context-mode": false
   }
 }

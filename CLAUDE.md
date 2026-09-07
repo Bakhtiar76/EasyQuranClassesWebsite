@@ -24,6 +24,17 @@ Do not waste time probing SSH, remote WP-CLI, rsync, cPanel Terminal, or remote 
 
 cPanel is the final hosting/deployment target, not the development environment.
 
+## Local Environment (established 2026-09-07)
+
+Stack: **Docker Desktop** (Windows host, no WSL/LocalWP/XAMPP in play). Compose file: `local/docker-compose.yml`. Services: `wordpress` (`wordpress:php8.2-apache`, port `8080`), `db` (`mariadb:11`), one-shot `wpcli` (`wordpress:cli-php8.2`, **`user: "33:33"`** — required, see the compose file's comment: the CLI image is Alpine (`www-data`=82) while the Apache image is Debian (`www-data`=33); without matching uids, wp-cli can't write to uploads/plugins the Apache container owns).
+
+- Site: `http://localhost:8080` · Admin: `http://localhost:8080/wp-admin/`.
+- Run WP-CLI as `docker compose -f local/docker-compose.yml --env-file local/.env run --rm wpcli <args>`, or `local/wp.ps1 <args>` from PowerShell.
+- **From Git Bash on Windows, prefix any command with a `/`-leading argument (permalink structures, WP-CLI export paths, route args) with `MSYS_NO_PATHCONV=1`** — otherwise MSYS silently rewrites it into a Windows path (e.g. `/backups/x.sql` → `C:/Program Files/Git/backups/x.sql`) and the command fails, or worse, silently no-ops against the wrong path.
+- Named volume `eqc_wp` holds WordPress core/plugins/uploads (mutable local state, not in Git). Only `wp-content/themes/easy-quran-classes-child/` is bind-mounted from the repo. `local/backups/` is bind-mounted to `/backups` in the `wpcli` service for exports/checkpoints (gitignored).
+- Visual QA: project-local Playwright (`tests/visual/`, not a global install — see `tests/visual/README.md`) for scripted multi-viewport sweeps against `DESIGN.md` §21 viewports; `chrome-devtools` MCP for interactive inspection and Lighthouse.
+- **Novamira** (`github.com/use-novamira/novamira`, AGPL-3.0) is approved as a local-only WordPress MCP: direct connection (not a hosted relay, unlike WPVibe which was rejected), authenticated by Application Password, granting PHP execution/`$wpdb`/WP-CLI/filesystem access. Its own README says "For dev and staging environments. With backups. Always." — **never install on `easyquranclasses.com`**, always checkpoint the DB first, and `release-check` must assert it is absent from any release archive.
+
 ## Core Method
 Inspect first. Reuse second. Change third. Verify fourth.
 

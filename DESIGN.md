@@ -4,7 +4,8 @@
 
 This file is the visual source of truth for the Easy Quran Classes website.
 
-The client screenshots are the primary design reference. Riwaq Al Quran may inform UX, information architecture, trust-building and conversion flow, but must not be copied visually or structurally one-to-one.
+The client screenshots are the primary design reference at Assests Folder.
+For inspiration: Riwaq Al Quran (https://riwaqalquran.com/) may inform UX, information architecture, trust-building and conversion flow, but must not be copied visually or structurally one-to-one.
 
 The finished website should feel:
 
@@ -26,6 +27,18 @@ For design work:
 - screenshots should be captured from the local site during implementation;
 - production-specific URL/content facts must remain configurable and must not be hardcoded into reusable theme code;
 - final visual QA must be repeated after cPanel deployment because hosting fonts/cache/image delivery can differ from local.
+
+## 1a. Screenshot Reference — Verified Against Assets (2026-09-07)
+
+The 8 `Assests/` screenshots and 4 `Assests/Logo/` files were reviewed directly (not assumed) against this file:
+
+**Color/typography tokens confirmed, no changes needed.** The screenshots' cream/warm-white backgrounds, deep near-black forest green (headings, dark CTA panels, footer), gold ornamental accents (dividers, badges, rosette motifs), and bronze/brown primary buttons match §5's tokens closely — including the specific rule that the highest-priority CTA is bronze in a light section but gold-on-green in the dark final-CTA panel, exactly as §5 already prescribes. Serif display headings over sans-serif body text is likewise consistent with §6.
+
+**Section inventory confirmed from the screenshots** (all present, in order): header (logo, centered nav, bronze Free Trial pill) · hero (trust eyebrow, H1, benefit chips, dual CTA, arch-framed image) · about/accessibility panel (arch-framed Quran imagery, stat row) · courses grid (6 numbered cards matching §17.4's list exactly) · teachers grid (4 cards, qualifications, View Profile) · testimonials (3-card carousel with location) · blog/news cards (3-up) · final CTA (dark forest panel, gold pill button) · footer (CTA strip, about/contact/quick-links columns, copyright). This validates §17's blueprint section-by-section — no structural changes to that section were needed.
+
+**Unresolved — logo colorway (needs your/client decision, not decided here).** `Assests/Logo/` contains the same headphones-and-open-book mark in four colorways: purple (`Logo.jpeg`), teal (`Logo1.jpeg`), forest green (`Logo2.jpeg`), navy (`Logo3.jpeg`). None of the screenshots use this mark — their footer shows a simpler generic placeholder logo, not a real brand asset. Only the **forest-green** variant is consistent with the confirmed green/gold palette above; purple, teal and navy would each require a parallel token system this file does not define. Per §2's priority order, logo/brand identity outranks this file — treat forest green as the working assumption for any placeholder logo use until the client confirms.
+
+**Reinforcing §4 — do not treat screenshot content as fact.** The screenshots' teacher names/photos, "5,000 students", "10 countries", "$39–$69" pricing, "Random Address, USA 733898", phone and email are unverified template/demo content (the repeated identical "Education For Poor Children" blog copy across all three cards is itself evidence of this) — §4 already forbids publishing any of it as fact. No new placeholder policy was needed; this only confirms the existing one applies to everything in these screenshots.
 
 ## 2. Design Priority
 

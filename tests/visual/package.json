@@ -1,0 +1,12 @@
+{
+  "name": "eqc-visual-qa",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Playwright viewport sweep for Easy Quran Classes local WordPress QA (see DESIGN.md §21).",
+  "scripts": {
+    "sweep": "node sweep.mjs"
+  },
+  "devDependencies": {
+    "playwright": "1.63.0"
+  }
+}

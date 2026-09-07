@@ -39,20 +39,20 @@ If instructions conflict, use the safer rule and report the conflict.
 
 Before any implementation create this TODO and keep it updated:
 
-- [ ] Scan repository and relevant local WordPress/project state.
-- [ ] Identify reusable code, styles, helpers, libraries, hooks, templates, skills or config.
-- [ ] If reuse is not possible, state briefly why a new implementation is necessary.
-- [ ] Define the smallest correct implementation.
-- [ ] Check native WordPress/Elementor/existing dependencies before custom code.
-- [ ] Identify the correct existing file/location before creating anything.
-- [ ] Define realistic edge cases and verification first.
-- [ ] Implement only the minimal required change.
-- [ ] Test every modified code path and relevant edge cases.
-- [ ] Remove dead/obsolete/duplicated/debug code exposed by the change when safely in scope.
-- [ ] Update relevant docs/checklists.
-- [ ] Keep `CLAUDE.md` current with durable knowledge only and under 1000 lines.
-- [ ] Review Git status/diff and ensure no secrets, generated release files or unrelated changes are included.
-- [ ] Run applicable verification and report manual checks.
+- [x] Scan repository and relevant local WordPress/project state.
+- [x] Identify reusable code, styles, helpers, libraries, hooks, templates, skills or config. (all 6 rules, both hooks, 14 skills, `.gitignore` reused unchanged)
+- [x] If reuse is not possible, state briefly why a new implementation is necessary. (no local stack existed — see Phase B)
+- [x] Define the smallest correct implementation.
+- [x] Check native WordPress/Elementor/existing dependencies before custom code.
+- [x] Identify the correct existing file/location before creating anything.
+- [x] Define realistic edge cases and verification first.
+- [x] Implement only the minimal required change.
+- [x] Test every modified code path and relevant edge cases.
+- [x] Remove dead/obsolete/duplicated/debug code exposed by the change when safely in scope. (stale `EQC_SSH_*` block removed from `.env.example`; test-only SQL exports and staged plugin zip cleaned up after verification)
+- [x] Update relevant docs/checklists.
+- [x] Keep `CLAUDE.md` current with durable knowledge only and under 1000 lines. (238 lines)
+- [x] Review Git status/diff and ensure no secrets, generated release files or unrelated changes are included.
+- [x] Run applicable verification and report manual checks.
 
 Never create empty, duplicate or unnecessary files/folders.
 
@@ -411,21 +411,21 @@ Do not push unless explicitly authorized.
 
 # 17. Completion criteria
 
-- [ ] repository/toolchain audit complete;
-- [ ] one primary local WordPress stack selected;
-- [ ] local WordPress runs successfully;
-- [ ] Elementor Free/Hello available locally;
-- [ ] local WP-CLI strategy works;
-- [ ] project rules/skills reflect local-first/no-shell deployment;
-- [ ] permissions/hooks validated;
-- [ ] browser QA tooling configured when justified;
-- [ ] no unnecessary MCPs/plugins installed;
-- [ ] no cPanel/SSH/database MCP installed;
-- [ ] cPanel release workflow documented;
-- [ ] DB/backup/release artifacts ignored by Git;
-- [ ] docs/checklists updated;
-- [ ] Git diff reviewed;
-- [ ] no production changes occurred.
+- [x] repository/toolchain audit complete;
+- [x] one primary local WordPress stack selected (Docker Desktop);
+- [x] local WordPress runs successfully (WP 7.1 at `http://localhost:8080`, HTTP 200, pretty permalinks verified end-to-end);
+- [x] Elementor Free/Hello available locally (Elementor 4.2.4 active, Hello Elementor 3.5.1 parent, child theme active);
+- [x] local WP-CLI strategy works (containerized `wpcli` service, verified via install/config/export/import);
+- [x] project rules/skills reflect local-first/no-shell deployment;
+- [x] permissions/hooks validated (both hooks tested with synthetic input; settings.json is valid JSON);
+- [x] browser QA tooling configured when justified (Playwright project-local + `chrome-devtools` MCP, both verified against the live site);
+- [ ] no unnecessary MCPs/plugins installed — **Novamira install blocked by the auto-mode safety classifier; awaiting your decision (see report).**
+- [x] no cPanel/SSH/database MCP installed;
+- [x] cPanel release workflow documented (domain/404 status recorded in `CPANEL-WORKFLOW.md`; search-replace export dry-run and real export both verified without mutating the local DB);
+- [x] DB/backup/release artifacts ignored by Git (verified with `git check-ignore` on `local/.env`, `local/backups/*`, `tests/visual/node_modules`, `tests/visual/test-results`);
+- [x] docs/checklists updated;
+- [x] Git diff reviewed;
+- [x] no production changes occurred.
 
 ---
 
