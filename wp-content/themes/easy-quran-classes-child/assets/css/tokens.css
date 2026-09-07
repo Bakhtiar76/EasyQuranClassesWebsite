@@ -1,0 +1,81 @@
+/*
+ * Design tokens — Easy Quran Classes.
+ * Source of truth: DESIGN.md §5–8. Do not duplicate these values inline;
+ * reference the custom properties so a palette/type change happens once.
+ */
+
+:root {
+	/* Color — DESIGN.md §5 */
+	--eqc-green-900: #143126;
+	--eqc-green-800: #1B3A2D;
+	--eqc-green-700: #24503B;
+	--eqc-brand-green: #006B3D;
+
+	--eqc-gold-600: #A98235;
+	--eqc-gold-500: #B9974C;
+	--eqc-gold-300: #D9C48D;
+
+	--eqc-bronze-700: #7A432A;
+	--eqc-bronze-600: #925234;
+
+	--eqc-cream-100: #F7F3EC;
+	--eqc-cream-50: #FBF8F2;
+	--eqc-surface: #FFFDF9;
+	--eqc-white: #FFFFFF;
+
+	--eqc-heading: #14231B;
+	--eqc-text: #40483F;
+	--eqc-muted: #737A72;
+	--eqc-border: #E5DCCB;
+	--eqc-border-strong: #D4C5A7;
+
+	--eqc-success: #2F6B4A;
+	--eqc-error: #9F3B32;
+
+	/* Typography — DESIGN.md §6 */
+	--eqc-font-display: 'DM Serif Display', Georgia, 'Times New Roman', serif;
+	--eqc-font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	--eqc-font-arabic: 'Noto Naskh Arabic', 'Traditional Arabic', serif;
+
+	/* Fluid type scale */
+	--eqc-fs-display-xl: clamp(2.6rem, 1.4rem + 4.4vw, 4.75rem);
+	--eqc-fs-h1: clamp(2.375rem, 1.55rem + 3vw, 4.125rem);
+	--eqc-fs-h2: clamp(2rem, 1.35rem + 2.4vw, 3.375rem);
+	--eqc-fs-h3: clamp(1.75rem, 1.5rem + 1vw, 2.125rem);
+	--eqc-fs-h4: clamp(1.3125rem, 1.2rem + 0.4vw, 1.5rem);
+	--eqc-fs-body-l: 1.125rem;
+	--eqc-fs-body: 1rem;
+	--eqc-fs-small: 0.875rem;
+	--eqc-fs-eyebrow: 0.8125rem;
+	--eqc-fs-button: 0.9375rem;
+
+	/* Layout — DESIGN.md §7 */
+	--eqc-content-max: 1240px;
+	--eqc-content-narrow: 820px;
+	--eqc-text-max: 680px;
+
+	--eqc-section-space: clamp(2.75rem, 2rem + 3vw, 6.5rem);
+	--eqc-gutter: clamp(1rem, 0.6rem + 1.6vw, 2rem);
+	--eqc-grid-gap: clamp(1rem, 0.75rem + 1vw, 1.875rem);
+	--eqc-stack-gap: clamp(0.75rem, 0.6rem + 0.6vw, 1.25rem);
+
+	/* Radius — DESIGN.md §7 */
+	--eqc-radius-control: 11px;
+	--eqc-radius-card: 18px;
+	--eqc-radius-panel: 28px;
+	--eqc-radius-media: 32px;
+	--eqc-radius-pill: 999px;
+
+	/* Elevation — DESIGN.md §8 */
+	--eqc-shadow-card: 0 10px 28px rgba(32, 46, 37, 0.06);
+	--eqc-shadow-card-hover: 0 16px 36px rgba(32, 46, 37, 0.10);
+
+	/* Motion — DESIGN.md §20 */
+	--eqc-motion-fast: 160ms;
+	--eqc-motion-base: 260ms;
+	--eqc-motion-reveal: 520ms;
+	--eqc-motion-slow: 800ms;
+	--eqc-motion-stagger: 70ms;
+	--eqc-ease-standard: cubic-bezier(.22, 1, .36, 1);
+	--eqc-ease-soft: cubic-bezier(.16, 1, .3, 1);
+}

@@ -1,0 +1,674 @@
+/*
+ * Shared components — Easy Quran Classes.
+ * Reusable classes so page composition (Elementor containers) never repeats
+ * one-off CSS. See DESIGN.md §16–19 for the source rules.
+ */
+
+/* ---------- Base / resets scoped to our content ---------- */
+
+body {
+	background: var(--eqc-cream-100);
+	color: var(--eqc-text);
+	font-family: var(--eqc-font-body);
+	font-size: var(--eqc-fs-body);
+	line-height: 1.7;
+}
+
+h1, h2, h3, .eqc-display {
+	font-family: var(--eqc-font-display);
+	color: var(--eqc-heading);
+	font-weight: 400;
+	line-height: 1.08;
+}
+
+h1 { font-size: var(--eqc-fs-h1); }
+h2 { font-size: var(--eqc-fs-h2); }
+h3 { font-size: var(--eqc-fs-h3); line-height: 1.18; }
+h4 { font-size: var(--eqc-fs-h4); font-weight: 600; font-family: var(--eqc-font-body); }
+
+a { color: inherit; }
+
+img { display: block; max-width: 100%; height: auto; }
+
+/* Decorative SVG must never be announced to assistive tech. */
+.eqc-ornament,
+[data-eqc-decorative="true"] {
+	pointer-events: none;
+}
+
+/*
+ * Icon sprite references (inc/icon-sprite.php + eqc_icon()) are bare
+ * <svg><use></svg> elements with no width/height attribute, so without an
+ * explicit size a browser renders them at the SVG replaced-element default
+ * (300x150) — this rule is load-bearing, not cosmetic.
+ */
+.eqc-icon {
+	width: 1.15em;
+	height: 1.15em;
+	display: inline-block;
+	flex: none;
+	vertical-align: -0.15em;
+	overflow: visible;
+}
+
+/* ---------- Layout ---------- */
+
+.eqc-section {
+	padding-block: var(--eqc-section-space);
+}
+
+.eqc-section--tight { padding-block: calc(var(--eqc-section-space) * 0.55); }
+
+.eqc-section--cream { background: var(--eqc-cream-100); }
+.eqc-section--surface { background: var(--eqc-surface); }
+.eqc-section--dark {
+	background: var(--eqc-green-900);
+	color: var(--eqc-cream-100);
+}
+.eqc-section--dark h1,
+.eqc-section--dark h2,
+.eqc-section--dark h3 { color: var(--eqc-white); }
+
+.eqc-container {
+	width: 100%;
+	max-width: var(--eqc-content-max);
+	margin-inline: auto;
+	padding-inline: var(--eqc-gutter);
+	box-sizing: border-box;
+}
+
+.eqc-container--narrow { max-width: var(--eqc-content-narrow); }
+.eqc-container--text { max-width: var(--eqc-text-max); }
+
+.eqc-stack { display: flex; flex-direction: column; gap: var(--eqc-stack-gap); }
+
+/* ---------- Eyebrow / section heading ---------- */
+
+.eqc-eyebrow {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	font-size: var(--eqc-fs-eyebrow);
+	font-weight: 700;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--eqc-bronze-600);
+	background: var(--eqc-surface);
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-pill);
+	padding: 0.5em 1.1em;
+}
+
+.eqc-section--dark .eqc-eyebrow {
+	color: var(--eqc-gold-300);
+	background: rgba(255, 255, 255, 0.06);
+	border-color: rgba(217, 196, 141, 0.35);
+}
+
+.eqc-heading-rule {
+	display: block;
+	width: clamp(64px, 8vw, 120px);
+	height: 1px;
+	margin-block: 0.9em;
+	background: linear-gradient(90deg, var(--eqc-gold-500), transparent);
+	border: 0;
+}
+
+/* ---------- Buttons ----------
+ * Two call sites share one visual language:
+ * 1. Raw `<a class="eqc-btn eqc-btn--variant">` in header.php/footer.php.
+ * 2. Elementor's native Button widget elsewhere (tools/elementor-helpers.php
+ *    eqc_button()), kept for in-editor text/link editability. Elementor's
+ *    `_css_classes` control lands on the widget's OUTER wrapper div, not
+ *    the inner <a class="elementor-button">, so every rule below also
+ *    targets ".elementor-widget-button.eqc-btn(--variant) .elementor-button"
+ *    to re-skin the real link — this is the one deliberate override of
+ *    Elementor's own button chrome (DESIGN.md §19: child-theme CSS is the
+ *    approved place for reusable styling Elementor Free can't express).
+ */
+
+.eqc-btn,
+.elementor-widget-button.eqc-btn .elementor-button {
+	--_h: clamp(48px, 4vw, 56px);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.6em;
+	height: var(--_h);
+	width: auto;
+	padding-inline: 1.5em;
+	border-radius: var(--eqc-radius-pill);
+	font-family: var(--eqc-font-body);
+	font-size: var(--eqc-fs-button);
+	font-weight: 600;
+	text-decoration: none;
+	white-space: nowrap;
+	border: 1px solid transparent;
+	cursor: pointer;
+	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard),
+		background-color var(--eqc-motion-base) var(--eqc-ease-standard),
+		box-shadow var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+
+/* The outer Elementor wrapper itself must stay a plain inline shrink-wrap
+   box (and not stretch to the container's cross-axis) so it doesn't add
+   its own block-level width/margin around the link. */
+.elementor-widget-button.eqc-btn {
+	display: inline-block;
+	align-self: flex-start;
+	width: auto;
+	max-width: 100%;
+}
+
+.eqc-btn:hover,
+.elementor-widget-button.eqc-btn .elementor-button:hover { transform: translateY(-2px); }
+.eqc-btn:active,
+.elementor-widget-button.eqc-btn .elementor-button:active { transform: translateY(0); }
+.eqc-btn:focus-visible,
+.elementor-widget-button.eqc-btn .elementor-button:focus-visible {
+	outline: 3px solid var(--eqc-gold-500);
+	outline-offset: 2px;
+}
+
+.eqc-btn--primary,
+.elementor-widget-button.eqc-btn--primary .elementor-button {
+	background: var(--eqc-green-800);
+	color: var(--eqc-white);
+}
+.eqc-btn--primary:hover,
+.elementor-widget-button.eqc-btn--primary .elementor-button:hover { background: var(--eqc-green-700); }
+
+.eqc-btn--bronze,
+.elementor-widget-button.eqc-btn--bronze .elementor-button {
+	background: var(--eqc-bronze-700);
+	color: var(--eqc-white);
+}
+.eqc-btn--bronze:hover,
+.elementor-widget-button.eqc-btn--bronze .elementor-button:hover { background: var(--eqc-bronze-600); }
+
+.eqc-btn--secondary,
+.elementor-widget-button.eqc-btn--secondary .elementor-button {
+	background: transparent;
+	color: var(--eqc-green-800);
+	border-color: var(--eqc-border-strong);
+}
+.eqc-btn--secondary:hover,
+.elementor-widget-button.eqc-btn--secondary .elementor-button:hover { background: var(--eqc-surface); }
+
+.eqc-section--dark .eqc-btn--secondary,
+.eqc-footer-cta .eqc-btn--secondary,
+.eqc-section--dark .elementor-widget-button.eqc-btn--secondary .elementor-button,
+.eqc-footer-cta .elementor-widget-button.eqc-btn--secondary .elementor-button {
+	color: var(--eqc-cream-100);
+	border-color: rgba(247, 243, 236, 0.4);
+}
+.eqc-section--dark .eqc-btn--secondary:hover,
+.eqc-footer-cta .eqc-btn--secondary:hover,
+.eqc-section--dark .elementor-widget-button.eqc-btn--secondary .elementor-button:hover,
+.eqc-footer-cta .elementor-widget-button.eqc-btn--secondary .elementor-button:hover { background: rgba(255, 255, 255, 0.08); }
+
+.eqc-btn-group {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.9rem;
+	align-items: center;
+}
+
+/* ---------- Cards ---------- */
+
+.eqc-card {
+	background: var(--eqc-surface);
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-card);
+	box-shadow: var(--eqc-shadow-card);
+	padding: clamp(1.25rem, 1rem + 1vw, 2rem);
+	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard),
+		box-shadow var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+
+.eqc-card:hover {
+	transform: translateY(-3px);
+	box-shadow: var(--eqc-shadow-card-hover);
+}
+
+.eqc-grid {
+	display: grid;
+	gap: var(--eqc-grid-gap);
+}
+
+.eqc-grid--courses { grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); }
+.eqc-grid--teachers { grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr)); }
+.eqc-grid--pricing { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
+.eqc-grid--testimonials { grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); }
+.eqc-grid--blog { grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); }
+.eqc-grid--2col { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
+.eqc-grid--trust { grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
+
+/* Course card */
+.eqc-card--course { position: relative; overflow: hidden; }
+.eqc-card--course .eqc-card-index {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.75em;
+	height: 2.75em;
+	border-radius: 50%;
+	border: 1px solid var(--eqc-border-strong);
+	color: var(--eqc-bronze-700);
+	font-family: var(--eqc-font-display);
+	font-size: 1.1rem;
+}
+.eqc-card--course h3 { margin-block: 0.6em 0.1em; }
+.eqc-card--course .eqc-card-level {
+	color: var(--eqc-muted);
+	font-size: var(--eqc-fs-small);
+	font-weight: 600;
+}
+.eqc-card--course p { margin-block: 0.8em; }
+
+.eqc-arrow-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.6em;
+	height: 2.6em;
+	border-radius: 50%;
+	border: 1px solid var(--eqc-border-strong);
+	color: var(--eqc-green-800);
+	transition: background-color var(--eqc-motion-base) var(--eqc-ease-standard),
+		transform var(--eqc-motion-base) var(--eqc-ease-standard),
+		color var(--eqc-motion-base) var(--eqc-ease-standard);
+	text-decoration: none;
+}
+.eqc-card:hover .eqc-arrow-btn,
+.eqc-arrow-btn:hover,
+.eqc-arrow-btn:focus-visible {
+	background: var(--eqc-green-800);
+	color: var(--eqc-white);
+	transform: translateX(3px);
+}
+
+/* Teacher card */
+.eqc-card--teacher { text-align: center; }
+.eqc-card--teacher .eqc-teacher-photo {
+	width: clamp(120px, 30%, 160px);
+	aspect-ratio: 1;
+	margin-inline: auto;
+	border-radius: 50%;
+	overflow: hidden;
+	border: 3px solid var(--eqc-gold-300);
+}
+.eqc-card--teacher .eqc-teacher-photo img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	transition: transform var(--eqc-motion-slow) var(--eqc-ease-soft);
+}
+.eqc-card--teacher:hover .eqc-teacher-photo img { transform: scale(1.06); }
+.eqc-card--teacher h4 { margin-block: 0.9em 0.1em; }
+.eqc-card--teacher .eqc-teacher-role {
+	color: var(--eqc-bronze-600);
+	font-size: var(--eqc-fs-small);
+	font-weight: 600;
+	margin-bottom: 0.8em;
+}
+.eqc-teacher-facts {
+	list-style: none;
+	margin: 0 0 1em;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.5em;
+	font-size: var(--eqc-fs-small);
+	text-align: left;
+}
+.eqc-teacher-facts li { display: flex; gap: 0.6em; align-items: flex-start; }
+
+/* Pricing card */
+.eqc-card--pricing { text-align: center; position: relative; }
+.eqc-card--pricing--featured {
+	border-color: var(--eqc-gold-500);
+	box-shadow: 0 18px 40px rgba(169, 130, 53, 0.18);
+}
+.eqc-pricing-badge {
+	position: absolute;
+	top: -14px;
+	left: 50%;
+	transform: translateX(-50%);
+	background: var(--eqc-gold-500);
+	color: var(--eqc-green-900);
+	font-size: var(--eqc-fs-small);
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	text-transform: uppercase;
+	padding: 0.35em 1em;
+	border-radius: var(--eqc-radius-pill);
+}
+.eqc-pricing-freq {
+	display: inline-block;
+	background: var(--eqc-green-800);
+	color: var(--eqc-white);
+	border-radius: var(--eqc-radius-pill);
+	padding: 0.5em 1.4em;
+	font-weight: 700;
+	margin-block: 0.75em 1.1em;
+}
+.eqc-pricing-list {
+	list-style: none;
+	margin: 0 0 1.2em;
+	padding: 0;
+	text-align: left;
+	display: flex;
+	flex-direction: column;
+	gap: 0.55em;
+}
+.eqc-pricing-list li { display: flex; gap: 0.6em; align-items: flex-start; font-size: var(--eqc-fs-small); }
+.eqc-pricing-price {
+	font-family: var(--eqc-font-display);
+	font-size: 2.25rem;
+	color: var(--eqc-heading);
+	display: flex;
+	align-items: baseline;
+	justify-content: center;
+	gap: 0.35em;
+	margin-bottom: 1em;
+}
+.eqc-pricing-price small { font-family: var(--eqc-font-body); font-size: var(--eqc-fs-small); color: var(--eqc-muted); font-weight: 600; }
+
+/* Testimonial card */
+.eqc-card--testimonial { position: relative; padding-top: 3.5rem; }
+.eqc-testimonial-photo {
+	width: 84px;
+	height: 84px;
+	border-radius: 50%;
+	overflow: hidden;
+	position: absolute;
+	top: -2.2rem;
+	left: 1.5rem;
+	border: 3px solid var(--eqc-surface);
+	box-shadow: var(--eqc-shadow-card);
+}
+.eqc-testimonial-photo img { width: 100%; height: 100%; object-fit: cover; }
+.eqc-testimonial-quote-mark {
+	position: absolute;
+	top: -1rem;
+	left: 5.4rem;
+	width: 2.2em;
+	height: 2.2em;
+	border-radius: 50%;
+	background: var(--eqc-green-800);
+	color: var(--eqc-white);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	font-family: var(--eqc-font-display);
+}
+.eqc-card--testimonial h4 { margin-block: 0 0.1em; }
+.eqc-testimonial-location {
+	color: var(--eqc-muted);
+	font-size: var(--eqc-fs-small);
+	margin-bottom: 0.8em;
+}
+.eqc-testimonial-tags {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.6em;
+	margin-top: 1.1em;
+	padding-top: 1.1em;
+	border-top: 1px solid var(--eqc-border);
+	font-size: var(--eqc-fs-small);
+	color: var(--eqc-muted);
+}
+.eqc-testimonial-tags span { display: inline-flex; align-items: center; gap: 0.4em; }
+
+/* Blog card */
+.eqc-card--blog { padding: 0; overflow: hidden; }
+.eqc-blog-media { aspect-ratio: 16/10; overflow: hidden; }
+.eqc-blog-media img { width: 100%; height: 100%; object-fit: cover; transition: transform var(--eqc-motion-slow) var(--eqc-ease-soft); }
+.eqc-card--blog:hover .eqc-blog-media img { transform: scale(1.05); }
+.eqc-blog-body { padding: clamp(1.1rem, 1rem + 0.5vw, 1.6rem); }
+.eqc-blog-meta {
+	display: flex;
+	gap: 0.9em;
+	align-items: center;
+	font-size: var(--eqc-fs-small);
+	color: var(--eqc-bronze-600);
+	font-weight: 600;
+	text-transform: uppercase;
+	letter-spacing: 0.03em;
+	margin-bottom: 0.6em;
+}
+.eqc-blog-body h3 { font-size: var(--eqc-fs-h4); font-family: var(--eqc-font-body); font-weight: 700; margin: 0 0 0.5em; }
+.eqc-blog-excerpt { color: var(--eqc-muted); margin-bottom: 1em; }
+.eqc-read-more {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	color: var(--eqc-bronze-700);
+	font-weight: 700;
+	font-size: var(--eqc-fs-small);
+	text-decoration: none;
+}
+.eqc-read-more:hover { text-decoration: underline; }
+
+/* Trust / benefit tiles */
+.eqc-trust-tile {
+	display: flex;
+	align-items: flex-start;
+	gap: 0.9em;
+	background: var(--eqc-surface);
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-control);
+	padding: 1.1em 1.2em;
+}
+.eqc-trust-tile .eqc-icon { flex: none; width: 1.9em; height: 1.9em; color: var(--eqc-green-800); }
+.eqc-trust-tile h4 { margin: 0 0 0.15em; font-size: var(--eqc-fs-body); }
+.eqc-trust-tile p { margin: 0; font-size: var(--eqc-fs-small); color: var(--eqc-muted); }
+
+/* Chips (hero benefit chips) */
+.eqc-chip-row { display: flex; flex-wrap: wrap; gap: 0.7rem; }
+.eqc-chip {
+	display: flex;
+	align-items: center;
+	gap: 0.6em;
+	background: var(--eqc-surface);
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-control);
+	padding: 0.65em 1em;
+	font-size: var(--eqc-fs-small);
+	font-weight: 600;
+	color: var(--eqc-heading);
+}
+.eqc-chip .eqc-icon { color: var(--eqc-bronze-600); }
+
+/* ---------- Arch media ---------- */
+
+/*
+ * Islamic-arch media frame. A true pointed-arch clip-path is supplied by the
+ * inline SVG mask referenced via mask-image (see eqc_arch_media() in
+ * inc/template-tags.php) for browsers that support it; this rounded-panel
+ * fallback keeps the image readable everywhere else.
+ */
+.eqc-arch-media {
+	position: relative;
+	width: 100%;
+	aspect-ratio: 4/5;
+	border-radius: var(--eqc-radius-media);
+	overflow: hidden;
+	border: 1px solid var(--eqc-border);
+}
+.eqc-arch-media--masked {
+	-webkit-mask-image: url('../svg/arch-mask.svg');
+	mask-image: url('../svg/arch-mask.svg');
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	border-radius: 0;
+	border: none;
+}
+.eqc-arch-media:not(.eqc-arch-media--masked)::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	border-radius: inherit;
+	box-shadow: inset 0 0 0 2px var(--eqc-gold-500);
+	pointer-events: none;
+	z-index: 2;
+}
+.eqc-arch-media img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
+
+/* ---------- Forms (Fluent Forms wrapper) ---------- */
+
+.eqc-form-wrap { background: var(--eqc-surface); border: 1px solid var(--eqc-border); border-radius: var(--eqc-radius-panel); padding: clamp(1.5rem, 1.2rem + 1.5vw, 2.75rem); }
+.eqc-form-wrap .ff-el-form-control,
+.eqc-form-wrap select.ff-el-form-control,
+.eqc-form-wrap textarea.ff-el-form-control {
+	min-height: 50px;
+	border-radius: var(--eqc-radius-control) !important;
+	border: 1px solid var(--eqc-border-strong) !important;
+	background: var(--eqc-cream-50) !important;
+	font-family: var(--eqc-font-body) !important;
+}
+.eqc-form-wrap .ff-el-form-control:focus {
+	border-color: var(--eqc-green-700) !important;
+	box-shadow: 0 0 0 3px rgba(36, 80, 59, 0.15) !important;
+}
+.eqc-form-wrap .ff-el-input--label label,
+.eqc-form-wrap .ff_wrapper label {
+	font-weight: 600 !important;
+	color: var(--eqc-heading) !important;
+}
+.eqc-form-wrap .ff-btn,
+.eqc-form-wrap button[type="submit"] {
+	background: var(--eqc-bronze-700) !important;
+	border-radius: var(--eqc-radius-pill) !important;
+	font-weight: 600 !important;
+	padding: 0.9em 1.8em !important;
+	border: none !important;
+}
+.eqc-form-wrap .ff-btn:hover { background: var(--eqc-bronze-600) !important; }
+
+/* ---------- FAQ accordion ---------- */
+
+.eqc-faq-group + .eqc-faq-group { margin-top: var(--eqc-stack-gap); }
+.eqc-faq-group h3 { margin-bottom: 0.6em; }
+.eqc-faq-item {
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-control);
+	background: var(--eqc-surface);
+	overflow: hidden;
+}
+.eqc-faq-item + .eqc-faq-item { margin-top: 0.75rem; }
+.eqc-faq-question {
+	width: 100%;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	text-align: left;
+	background: none;
+	border: none;
+	cursor: pointer;
+	padding: 1.1em 1.3em;
+	font-family: var(--eqc-font-body);
+	font-weight: 700;
+	font-size: var(--eqc-fs-body);
+	color: var(--eqc-heading);
+}
+.eqc-faq-question:focus-visible { outline: 3px solid var(--eqc-gold-500); outline-offset: -3px; }
+.eqc-faq-icon {
+	flex: none;
+	width: 1.6em;
+	height: 1.6em;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	border: 1px solid var(--eqc-border-strong);
+	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+.eqc-faq-item[data-open="true"] .eqc-faq-icon { transform: rotate(45deg); background: var(--eqc-green-800); border-color: var(--eqc-green-800); color: #fff; }
+.eqc-faq-answer {
+	display: grid;
+	grid-template-rows: 0fr;
+	transition: grid-template-rows var(--eqc-motion-reveal) var(--eqc-ease-standard);
+}
+.eqc-faq-item[data-open="true"] .eqc-faq-answer { grid-template-rows: 1fr; }
+.eqc-faq-answer-inner { overflow: hidden; }
+.eqc-faq-answer p { margin: 0 1.3em 1.1em; color: var(--eqc-text); }
+
+/* ---------- Ornaments ---------- */
+
+.eqc-corner-motif { position: absolute; opacity: 0.08; pointer-events: none; }
+.eqc-divider-row { display: flex; align-items: center; justify-content: center; gap: 0.75em; color: var(--eqc-gold-500); margin-block: 1.2em; }
+.eqc-divider-row .eqc-divider-line { height: 1px; width: clamp(30px, 6vw, 90px); background: currentColor; }
+
+/* ---------- Section heading block ---------- */
+
+.eqc-section-heading { max-width: var(--eqc-content-narrow); }
+.eqc-section-heading--center {
+	max-width: var(--eqc-content-narrow);
+	margin-inline: auto;
+	align-items: center;
+	text-align: center;
+}
+.eqc-section-heading--center .eqc-heading-rule { margin-inline: auto; }
+
+/* ---------- Blog single-post prose ---------- */
+
+.eqc-single-content h2 { font-size: var(--eqc-fs-h3); margin-top: 1.6em; }
+.eqc-single-content h3 { font-size: var(--eqc-fs-h4); font-family: var(--eqc-font-body); font-weight: 700; margin-top: 1.4em; }
+.eqc-single-content p { margin-block: 1.1em; }
+.eqc-single-content ul, .eqc-single-content ol { padding-inline-start: 1.4em; margin-block: 1.1em; }
+.eqc-single-content li + li { margin-top: 0.4em; }
+.eqc-single-content a { color: var(--eqc-bronze-700); text-decoration-color: var(--eqc-border-strong); }
+.eqc-single-content blockquote {
+	border-left: 3px solid var(--eqc-gold-500);
+	margin: 1.6em 0;
+	padding: 0.2em 0 0.2em 1.2em;
+	color: var(--eqc-heading);
+	font-family: var(--eqc-font-display);
+	font-size: 1.15em;
+}
+.eqc-single-content img { border-radius: var(--eqc-radius-card); margin-block: 1.2em; }
+
+/* ---------- Utility ---------- */
+
+.eqc-visually-hidden {
+	position: absolute !important;
+	width: 1px; height: 1px;
+	padding: 0; margin: -1px;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
+}
+
+.eqc-skip-link {
+	position: absolute;
+	left: 1rem;
+	top: -100px;
+	background: var(--eqc-green-900);
+	color: #fff;
+	padding: 0.8em 1.2em;
+	border-radius: var(--eqc-radius-control);
+	z-index: 1000;
+	transition: top var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+.eqc-skip-link:focus { top: 1rem; }
+
+/* Focus-visible baseline across the site */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+	outline: 3px solid var(--eqc-gold-500);
+	outline-offset: 2px;
+}

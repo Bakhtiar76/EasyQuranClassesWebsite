@@ -65,6 +65,8 @@ services:
       - eqc_wp:/var/www/html
       - ../wp-content/themes/easy-quran-classes-child:/var/www/html/wp-content/themes/easy-quran-classes-child
       - ./backups:/backups
+      - ./media-staging:/media-staging:ro
+      - ../tools:/tools:ro
     networks: [eqc]
     entrypoint: ["wp", "--path=/var/www/html"]
 

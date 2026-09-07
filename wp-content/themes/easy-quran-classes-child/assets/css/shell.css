@@ -1,0 +1,217 @@
+/*
+ * Site shell — header, mobile nav drawer, footer. DESIGN.md §14–15.
+ * Structural layout only; color/spacing tokens come from tokens.css,
+ * interactive states from components.css, transitions from motion.css.
+ */
+
+/* ---------- Header ---------- */
+
+.eqc-header {
+	position: sticky;
+	top: 0;
+	z-index: 100;
+	background: var(--eqc-cream-100);
+	padding-block: clamp(0.75rem, 0.6rem + 0.6vw, 1.1rem);
+}
+
+.eqc-header-bar {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: clamp(0.75rem, 1vw, 2rem);
+	background: var(--eqc-surface);
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-pill);
+	padding: 0.6rem 0.6rem 0.6rem clamp(1rem, 1vw, 1.75rem);
+	box-shadow: var(--eqc-shadow-card);
+}
+
+.eqc-logo { display: flex; align-items: center; min-width: 0; }
+.eqc-logo img { max-height: clamp(36px, 3.4vw, 52px); width: auto; }
+.eqc-logo-text {
+	font-family: var(--eqc-font-display);
+	font-size: clamp(1.1rem, 1vw + 0.7rem, 1.4rem);
+	color: var(--eqc-heading);
+	text-decoration: none;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.eqc-nav-list {
+	display: none;
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	gap: clamp(1rem, 1.6vw, 1.9rem);
+	align-items: center;
+}
+
+.eqc-nav-list a {
+	text-decoration: none;
+	color: var(--eqc-heading);
+	font-weight: 600;
+	font-size: 0.95rem;
+	position: relative;
+	padding-block: 0.4em;
+}
+.eqc-nav-list a::after {
+	content: '';
+	position: absolute;
+	left: 0;
+	bottom: -2px;
+	width: 100%;
+	height: 2px;
+	background: var(--eqc-bronze-600);
+	transform: scaleX(0);
+	transform-origin: left;
+	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+.eqc-nav-list a:hover::after,
+.eqc-nav-list .current-menu-item > a::after,
+.eqc-nav-list .current_page_item > a::after { transform: scaleX(1); }
+.eqc-nav-list .current-menu-item > a,
+.eqc-nav-list .current_page_item > a { color: var(--eqc-bronze-700); }
+
+.eqc-header-actions { display: flex; align-items: center; gap: 0.6rem; flex: none; }
+.eqc-header-cta { display: none; }
+
+.eqc-nav-toggle {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	border: 1px solid var(--eqc-border-strong);
+	background: var(--eqc-cream-50);
+	color: var(--eqc-heading);
+	cursor: pointer;
+	flex: none;
+}
+.eqc-nav-toggle .eqc-icon { width: 1.35em; height: 1.35em; }
+.eqc-nav-toggle .eqc-icon-close { display: none; }
+.eqc-nav-toggle[aria-expanded="true"] .eqc-icon-open { display: none; }
+.eqc-nav-toggle[aria-expanded="true"] .eqc-icon-close { display: block; }
+
+/* Content-driven breakpoint: once there is room for the full nav + CTA
+   without crowding (measured against the 7-item nav + button), switch
+   from the drawer to the inline desktop layout. */
+@media (min-width: 64rem) {
+	.eqc-nav-list { display: flex; }
+	.eqc-header-cta { display: inline-flex; }
+	.eqc-nav-toggle { display: none; }
+}
+
+/* ---------- Mobile nav drawer ---------- */
+
+.eqc-nav-scrim {
+	position: fixed;
+	inset: 0;
+	background: rgba(20, 35, 27, 0.45);
+	z-index: 150;
+}
+
+.eqc-nav-drawer {
+	position: fixed;
+	top: 0;
+	right: 0;
+	bottom: 0;
+	width: min(320px, 86vw);
+	background: var(--eqc-surface);
+	z-index: 151;
+	padding: clamp(4.5rem, 8vh, 6rem) 1.5rem 2rem;
+	display: flex;
+	flex-direction: column;
+	gap: 1.5rem;
+	overflow-y: auto;
+	box-shadow: -12px 0 32px rgba(20, 35, 27, 0.18);
+}
+
+.eqc-nav-drawer-list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.25rem;
+}
+.eqc-nav-drawer-list a {
+	display: block;
+	padding: 0.85em 0.25em;
+	text-decoration: none;
+	color: var(--eqc-heading);
+	font-weight: 600;
+	font-size: 1.05rem;
+	border-bottom: 1px solid var(--eqc-border);
+}
+.eqc-nav-drawer-list .current-menu-item > a,
+.eqc-nav-drawer-list .current_page_item > a { color: var(--eqc-bronze-700); }
+
+@media (min-width: 64rem) {
+	.eqc-nav-scrim, .eqc-nav-drawer { display: none; }
+}
+
+/* ---------- Footer ---------- */
+
+.eqc-footer {
+	background: var(--eqc-cream-50);
+	padding-block: var(--eqc-section-space);
+}
+
+.eqc-footer-cta {
+	background: var(--eqc-green-900);
+	color: var(--eqc-cream-100);
+	border-radius: var(--eqc-radius-panel);
+	padding: clamp(1.75rem, 1.3rem + 2vw, 3.25rem);
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1.75rem;
+	margin-bottom: clamp(2.5rem, 2rem + 2vw, 4rem);
+	position: relative;
+	overflow: hidden;
+}
+.eqc-footer-cta h2 { color: var(--eqc-white); margin-block: 0.3em 0.4em; font-size: var(--eqc-fs-h2); }
+.eqc-footer-cta p { max-width: 40ch; color: var(--eqc-cream-100); opacity: 0.85; }
+.eqc-footer-cta-text { flex: 1 1 340px; }
+.eqc-footer-cta-actions { display: flex; flex-wrap: wrap; gap: 0.85rem; }
+
+.eqc-footer-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+	gap: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+	padding-bottom: clamp(2rem, 1.5rem + 1.5vw, 3rem);
+	border-bottom: 1px solid var(--eqc-border);
+}
+
+.eqc-footer-col h4 { margin: 0 0 1em; color: var(--eqc-heading); }
+.eqc-footer-about p { color: var(--eqc-muted); max-width: 42ch; }
+.eqc-logo--footer img { max-height: 56px; margin-bottom: 1rem; }
+
+.eqc-footer-social { display: flex; gap: 0.6rem; margin-top: 1.1rem; }
+.eqc-social-icon {
+	width: 40px; height: 40px;
+	border-radius: 50%;
+	border: 1px solid var(--eqc-border-strong);
+	display: inline-flex; align-items: center; justify-content: center;
+	color: var(--eqc-green-800);
+	transition: background-color var(--eqc-motion-base) var(--eqc-ease-standard), color var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+.eqc-social-icon:hover { background: var(--eqc-green-800); color: #fff; }
+
+.eqc-footer-contact, .eqc-footer-links {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 0.85em;
+}
+.eqc-footer-contact li { display: flex; gap: 0.7em; align-items: flex-start; color: var(--eqc-text); }
+.eqc-footer-contact a, .eqc-footer-links a { color: var(--eqc-text); text-decoration: none; }
+.eqc-footer-contact a:hover, .eqc-footer-links a:hover { color: var(--eqc-bronze-700); }
+
+.eqc-footer-bottom { padding-top: clamp(1.25rem, 1rem + 1vw, 2rem); text-align: center; color: var(--eqc-muted); font-size: var(--eqc-fs-small); }
+.eqc-footer-bottom p { margin: 0; }
