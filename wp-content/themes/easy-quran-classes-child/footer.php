@@ -57,7 +57,7 @@ defined( 'ABSPATH' ) || exit;
 			</div>
 
 			<div class="eqc-footer-col">
-				<h4><?php esc_html_e( 'Get In Touch', 'easy-quran-classes' ); ?></h4>
+				<h3 class="eqc-footer-heading"><?php esc_html_e( 'Get In Touch', 'easy-quran-classes' ); ?></h3>
 				<ul class="eqc-footer-contact">
 					<?php $address = get_theme_mod( 'eqc_address', '' ); ?>
 					<?php if ( $address ) : ?>
@@ -75,7 +75,7 @@ defined( 'ABSPATH' ) || exit;
 			</div>
 
 			<div class="eqc-footer-col">
-				<h4><?php esc_html_e( 'Quick Links', 'easy-quran-classes' ); ?></h4>
+				<h3 class="eqc-footer-heading"><?php esc_html_e( 'Quick Links', 'easy-quran-classes' ); ?></h3>
 				<?php
 				wp_nav_menu(
 					array(

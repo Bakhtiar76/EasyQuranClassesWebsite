@@ -204,8 +204,8 @@ function eqc_icon_str( $name, $class = '' ) {
  * as a small HTML widget — there is no native Elementor equivalent and the
  * icon is decorative chrome, not editable copy.
  */
-function eqc_icon_link( $icon, $url, $classes = 'eqc-arrow-btn' ) {
-	return eqc_html( sprintf( '<a class="%s" href="%s">%s</a>', esc_attr( $classes ), esc_url( $url ), eqc_icon_str( $icon ) ) );
+function eqc_icon_link( $icon, $url, $label, $classes = 'eqc-arrow-btn' ) {
+	return eqc_html( sprintf( '<a class="%s" href="%s" aria-label="%s">%s</a>', esc_attr( $classes ), esc_url( $url ), esc_attr( $label ), eqc_icon_str( $icon ) ) );
 }
 
 /**
@@ -225,7 +225,7 @@ function eqc_course_card( $number, $title, $level, $description, $link, $reveal_
 			eqc_heading( $title, 'h3' ),
 			eqc_html( '<p class="eqc-card-level">' . esc_html( $level ) . '</p>' ),
 			eqc_text( '<p>' . wp_kses_post( $description ) . '</p>' ),
-			eqc_icon_link( 'arrow-right', $link ),
+			eqc_icon_link( 'arrow-right', $link, sprintf( __( 'Book a free trial for %s', 'easy-quran-classes' ), $title ) ),
 		)
 	);
 }

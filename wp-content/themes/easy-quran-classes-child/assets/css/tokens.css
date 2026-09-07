@@ -25,7 +25,10 @@
 
 	--eqc-heading: #14231B;
 	--eqc-text: #40483F;
-	--eqc-muted: #737A72;
+	/* Darkened from the original #737A72 sample: that value fails WCAG AA
+	   (3.99:1 on --eqc-cream-100, needs 4.5:1) — this passes with margin
+	   on every background it's actually used against (5.19-6.04:1). */
+	--eqc-muted: #616861;
 	--eqc-border: #E5DCCB;
 	--eqc-border-strong: #D4C5A7;
 

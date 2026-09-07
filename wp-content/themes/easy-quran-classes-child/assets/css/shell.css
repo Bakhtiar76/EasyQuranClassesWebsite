@@ -186,7 +186,17 @@
 	border-bottom: 1px solid var(--eqc-border);
 }
 
-.eqc-footer-col h4 { margin: 0 0 1em; color: var(--eqc-heading); }
+/* h3 tag for correct document heading order (this follows the h2 footer
+   CTA heading above it with no skip); visually sized to match the former
+   h4 treatment since these are footer column labels, not major headings. */
+.eqc-footer-heading {
+	margin: 0 0 1em;
+	color: var(--eqc-heading);
+	font-size: var(--eqc-fs-h4);
+	font-family: var(--eqc-font-body);
+	font-weight: 700;
+	line-height: 1.25;
+}
 .eqc-footer-about p { color: var(--eqc-muted); max-width: 42ch; }
 .eqc-logo--footer img { max-height: 56px; margin-bottom: 1rem; }
 
