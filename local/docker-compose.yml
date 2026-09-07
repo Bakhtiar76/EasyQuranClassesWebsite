@@ -21,7 +21,7 @@ services:
     networks: [eqc]
 
   wordpress:
-    image: wordpress:php8.2-apache
+    image: wordpress:php8.3-apache
     restart: unless-stopped
     depends_on: [db]
     ports:
@@ -44,9 +44,9 @@ services:
   # `docker compose run --rm wpcli <args>` (or local/wp.ps1) — it is not a
   # long-running service.
   wpcli:
-    image: wordpress:cli-php8.2
+    image: wordpress:cli-php8.3
     depends_on: [db, wordpress]
-    # wordpress:cli-php8.2 is Alpine-based (www-data=82); wordpress:php8.2-apache
+    # wordpress:cli-php8.3 is Alpine-based (www-data=82); wordpress:php8.3-apache
     # is Debian-based (www-data=33) and owns the shared eqc_wp volume. Without
     # this, wp-cli can't write uploads/plugins the Apache container just made.
     user: "33:33"

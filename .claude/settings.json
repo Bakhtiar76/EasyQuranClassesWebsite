@@ -16,6 +16,8 @@
       "Bash(docker compose -f local/docker-compose.yml --env-file local/.env run --rm wpcli theme list*)",
       "Bash(docker compose -f local/docker-compose.yml --env-file local/.env run --rm wpcli option get*)",
       "Bash(docker compose -f local/docker-compose.yml --env-file local/.env run --rm wpcli post list*)",
+      "Bash(docker compose -f local/docker-compose.yml --env-file local/.env run --rm wpcli plugin install /backups/novamira-install.zip --activate*)",
+      "Bash(docker compose -f local/docker-compose.yml --env-file local/.env run --rm wpcli user application-password create*)",
       "PowerShell(local\\wp.ps1 --info*)",
       "PowerShell(local\\wp.ps1 plugin list*)",
       "PowerShell(local\\wp.ps1 theme list*)",

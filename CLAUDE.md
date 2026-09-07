@@ -24,16 +24,17 @@ Do not waste time probing SSH, remote WP-CLI, rsync, cPanel Terminal, or remote 
 
 cPanel is the final hosting/deployment target, not the development environment.
 
-## Local Environment (established 2026-09-07)
+## Local Environment (established 2026-09-07, PHP re-pinned 2026-09-07)
 
-Stack: **Docker Desktop** (Windows host, no WSL/LocalWP/XAMPP in play). Compose file: `local/docker-compose.yml`. Services: `wordpress` (`wordpress:php8.2-apache`, port `8080`), `db` (`mariadb:11`), one-shot `wpcli` (`wordpress:cli-php8.2`, **`user: "33:33"`** — required, see the compose file's comment: the CLI image is Alpine (`www-data`=82) while the Apache image is Debian (`www-data`=33); without matching uids, wp-cli can't write to uploads/plugins the Apache container owns).
+Stack: **Docker Desktop**. Compose file: `local/docker-compose.yml`. Services: `wordpress` (`wordpress:php8.3-apache`, port `8080` — **matches confirmed production PHP 8.3** from cPanel MultiPHP Manager), `db` (`mariadb:11`), one-shot `wpcli` (`wordpress:cli-php8.3`, **`user: "33:33"`** — required: the CLI image is Alpine (`www-data`=82) while the Apache image is Debian (`www-data`=33); without matching uids, wp-cli can't write to uploads/plugins the Apache container owns).
 
 - Site: `http://localhost:8080` · Admin: `http://localhost:8080/wp-admin/`.
 - Run WP-CLI as `docker compose -f local/docker-compose.yml --env-file local/.env run --rm wpcli <args>`, or `local/wp.ps1 <args>` from PowerShell.
-- **From Git Bash on Windows, prefix any command with a `/`-leading argument (permalink structures, WP-CLI export paths, route args) with `MSYS_NO_PATHCONV=1`** — otherwise MSYS silently rewrites it into a Windows path (e.g. `/backups/x.sql` → `C:/Program Files/Git/backups/x.sql`) and the command fails, or worse, silently no-ops against the wrong path.
-- Named volume `eqc_wp` holds WordPress core/plugins/uploads (mutable local state, not in Git). Only `wp-content/themes/easy-quran-classes-child/` is bind-mounted from the repo. `local/backups/` is bind-mounted to `/backups` in the `wpcli` service for exports/checkpoints (gitignored).
-- Visual QA: project-local Playwright (`tests/visual/`, not a global install — see `tests/visual/README.md`) for scripted multi-viewport sweeps against `DESIGN.md` §21 viewports; `chrome-devtools` MCP for interactive inspection and Lighthouse.
-- **Novamira** (`github.com/use-novamira/novamira`, AGPL-3.0) is approved as a local-only WordPress MCP: direct connection (not a hosted relay, unlike WPVibe which was rejected), authenticated by Application Password, granting PHP execution/`$wpdb`/WP-CLI/filesystem access. Its own README says "For dev and staging environments. With backups. Always." — **never install on `easyquranclasses.com`**, always checkpoint the DB first, and `release-check` must assert it is absent from any release archive.
+- **From Git Bash on Windows, prefix any command with a `/`-leading argument with `MSYS_NO_PATHCONV=1`** — otherwise MSYS silently rewrites it into a Windows path (e.g. `/backups/x.sql` → `C:/Program Files/Git/backups/x.sql`) and the command fails or silently targets the wrong path.
+- Named volume `eqc_wp` holds WordPress core/plugins/uploads (mutable local state, not in Git). Only `wp-content/themes/easy-quran-classes-child/` is bind-mounted from the repo. `local/backups/` is bind-mounted to `/backups` in the `wpcli` service (gitignored).
+- Visual QA: project-local Playwright (`tests/visual/`, not a global install) for scripted multi-viewport sweeps; `chrome-devtools` MCP for interactive inspection and Lighthouse.
+- **Novamira** (`github.com/use-novamira/novamira`, AGPL-3.0) is approved as a local-only WordPress MCP (direct connection, Application Password auth, grants PHP execution/`$wpdb`/WP-CLI/filesystem access — never on production, DB checkpoint first, `release-check` asserts its absence from any release archive). **Install currently blocked**: the Claude Code auto-mode safety classifier denies the `wp plugin install ... --activate` command even with an explicit narrow `.claude/settings.json` allow rule added for it — the classifier does not appear to consult that allow-list for this action category. Until resolved, install it manually via WordPress Admin → Plugins → Add New → Upload (the vetted release ZIP is `github.com/use-novamira/novamira/releases/download/v1.12.2/novamira-1.12.2.zip`).
+- Production confirmed: `https://easyquranclasses.com` is empty (Mode A, no existing content to preserve) — see `CPANEL-WORKFLOW.md`.
 
 ## Core Method
 Inspect first. Reuse second. Change third. Verify fourth.
@@ -116,6 +117,26 @@ Expected custom-code locations:
 Theme owns presentation. A site plugin owns business functionality that should survive a theme change. Elementor owns page content/composition, containers, responsive layout and supported global styles.
 
 The full local WordPress site/database is **not** represented by Git alone. Elementor data, WordPress settings, posts, media and plugin settings require local backups/export packages.
+
+## Responsive WordPress Stack — Mandatory
+Use **one cohesive WordPress presentation stack**. Do not mix multiple parent themes, CSS frameworks, page builders or Elementor addon ecosystems to solve responsiveness.
+
+Approved default stack:
+- WordPress core for CMS, menus, media and dynamic content;
+- Hello Elementor as the lightweight parent theme;
+- Easy Quran Classes child theme for shared presentation code/templates only where needed;
+- Elementor Free Containers/Flexbox for page composition;
+- native WordPress Posts/query behavior for the blog;
+- minimal project-owned CSS/JS/SVG for responsive behavior and motion Elementor Free cannot express cleanly;
+- one lightweight plugin per genuinely missing responsibility when approved.
+
+Do not switch themes mid-build merely because another theme has a convenient widget. Re-evaluate the parent theme only **before substantial page implementation** if a measurable accessibility, responsive-layout or maintainability blocker exists, and explain migration cost before changing the approved stack.
+
+Responsiveness is **fluid, not breakpoint-only**. Build mobile-first and make layouts interpolate cleanly between phones, tablets, laptops, desktops and wide screens. Prefer CSS Grid/Flexbox, `minmax()`, `clamp()`, percentages, `max-width`, `aspect-ratio`, wrapping and responsive WordPress images (`srcset`/`sizes`) over fixed pixel canvases.
+
+Avoid fixed section heights and fixed card/text widths unless the design genuinely requires a bounded control. No page may depend on one exact viewport size to look correct.
+
+Dynamic WordPress behavior should come from WordPress where it adds maintainability: menus, Posts, archives, categories, shared templates and reusable global components. Do not hardcode dynamic lists into ten separate pages. Do not create custom post types or frameworks merely to make the site feel "dynamic"; introduce them only when they materially improve future administration.
 
 ## Elementor
 Use Elementor Free containers/flexbox. Prefer global colors/typography, reusable classes, native widgets and child-theme CSS for reusable styling Elementor Free cannot express cleanly.

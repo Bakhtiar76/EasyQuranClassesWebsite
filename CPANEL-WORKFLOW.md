@@ -103,7 +103,7 @@ Do not track:
 
 Because Claude cannot use remote shell, the user should inspect cPanel and provide values/screenshots when needed.
 
-**Known so far (2026-09-07):** production domain is `https://easyquranclasses.com`, currently returning HTTP 404 on `/` — consistent with **Mode A (empty/new hosting target)** below, pending your confirmation in cPanel. PHP version, document root and DB availability are not yet confirmed; local development pins to PHP 8.2 until MultiPHP Manager is checked.
+**Confirmed (2026-09-07):** production domain is `https://easyquranclasses.com`; the client confirmed it is genuinely empty — **Mode A (empty/new hosting target)** applies. PHP version confirmed via MultiPHP Manager screenshot: **PHP 8.3** (`ea-php83`); local development is re-pinned to match. Document root and DB availability are still not confirmed.
 
 Collect:
 - production domain;

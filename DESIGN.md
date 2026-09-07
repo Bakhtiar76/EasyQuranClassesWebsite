@@ -28,18 +28,6 @@ For design work:
 - production-specific URL/content facts must remain configurable and must not be hardcoded into reusable theme code;
 - final visual QA must be repeated after cPanel deployment because hosting fonts/cache/image delivery can differ from local.
 
-## 1a. Screenshot Reference — Verified Against Assets (2026-09-07)
-
-The 8 `Assests/` screenshots and 4 `Assests/Logo/` files were reviewed directly (not assumed) against this file:
-
-**Color/typography tokens confirmed, no changes needed.** The screenshots' cream/warm-white backgrounds, deep near-black forest green (headings, dark CTA panels, footer), gold ornamental accents (dividers, badges, rosette motifs), and bronze/brown primary buttons match §5's tokens closely — including the specific rule that the highest-priority CTA is bronze in a light section but gold-on-green in the dark final-CTA panel, exactly as §5 already prescribes. Serif display headings over sans-serif body text is likewise consistent with §6.
-
-**Section inventory confirmed from the screenshots** (all present, in order): header (logo, centered nav, bronze Free Trial pill) · hero (trust eyebrow, H1, benefit chips, dual CTA, arch-framed image) · about/accessibility panel (arch-framed Quran imagery, stat row) · courses grid (6 numbered cards matching §17.4's list exactly) · teachers grid (4 cards, qualifications, View Profile) · testimonials (3-card carousel with location) · blog/news cards (3-up) · final CTA (dark forest panel, gold pill button) · footer (CTA strip, about/contact/quick-links columns, copyright). This validates §17's blueprint section-by-section — no structural changes to that section were needed.
-
-**Unresolved — logo colorway (needs your/client decision, not decided here).** `Assests/Logo/` contains the same headphones-and-open-book mark in four colorways: purple (`Logo.jpeg`), teal (`Logo1.jpeg`), forest green (`Logo2.jpeg`), navy (`Logo3.jpeg`). None of the screenshots use this mark — their footer shows a simpler generic placeholder logo, not a real brand asset. Only the **forest-green** variant is consistent with the confirmed green/gold palette above; purple, teal and navy would each require a parallel token system this file does not define. Per §2's priority order, logo/brand identity outranks this file — treat forest green as the working assumption for any placeholder logo use until the client confirms.
-
-**Reinforcing §4 — do not treat screenshot content as fact.** The screenshots' teacher names/photos, "5,000 students", "10 countries", "$39–$69" pricing, "Random Address, USA 733898", phone and email are unverified template/demo content (the repeated identical "Education For Poor Children" blog copy across all three cards is itself evidence of this) — §4 already forbids publishing any of it as fact. No new placeholder policy was needed; this only confirms the existing one applies to everything in these screenshots.
-
 ## 2. Design Priority
 
 When visual references conflict, use this order:
@@ -101,7 +89,9 @@ When the screenshots contain such content but the client has not confirmed it, t
 
 ## 5. Core Color System
 
-These are the initial working tokens. Refine only after sampling the final logo asset and validating contrast.
+**Confirmed brand mark (2026-09-07):** the client's logo is the headphones-and-open-book mark at `Assests/Logo/Logo2.jpeg` — **forest green**. (Three other colorways — purple, teal, navy — exist in `Assests/Logo/` as unused drafts; forest green is the approved one.) It matches the tokens below, sampled from the client's own reference screenshots.
+
+These are the working tokens, validated against both the confirmed logo and the client screenshots.
 
 ```css
 :root {
@@ -699,60 +689,323 @@ Use semantic reusable classes where custom CSS is necessary, for example:
 
 Do not use classes tied to one temporary page position such as `.section-3-left-card`.
 
-## 20. Motion
+## 19A. Responsive & Dynamic WordPress Architecture
 
-Use very restrained motion.
+The design system must be implemented as a **fluid WordPress website**, not as a fixed desktop mockup with separate mobile patches.
 
-Allowed:
+### Approved presentation stack
 
-- 150–250ms hover transitions
-- gentle fade/translate reveal where Elementor/native CSS can do it cheaply
-- subtle carousel movement
+Prefer one cohesive stack:
+
+```text
+WordPress
++ Hello Elementor
++ Easy Quran Classes child theme where needed
++ Elementor Free Containers/Flexbox
++ native WordPress Posts/menus/media/templates
++ project-owned responsive CSS / minimal vanilla JS / SVG
+```
+
+Do not mix multiple parent themes, page builders, large Elementor addon suites or frontend frameworks merely to obtain responsive widgets.
+
+The theme provides a lightweight site shell. Elementor provides page composition. The child theme provides shared presentation code that belongs to the site rather than to one page. WordPress owns dynamic content such as menus, Posts, archives and media derivatives.
+
+### Fluid layout principles
+
+Breakpoints are escape hatches, not the primary layout system.
+
+Use:
+- flexible containers;
+- CSS Grid/Flexbox;
+- wrapping;
+- `minmax()` and `auto-fit` where useful;
+- `clamp()` for fluid type/spacing when it improves continuity;
+- percentage/bounded widths;
+- `max-width` for readable text and page containment;
+- `aspect-ratio` for stable media;
+- responsive WordPress images via `srcset`/`sizes`;
+- content-driven breakpoints.
 
 Avoid:
+- fixed page widths;
+- fixed section heights;
+- fixed card heights that can clip real content;
+- absolute-positioned primary layout;
+- device-specific duplicate content;
+- a large collection of one-off media queries;
+- designing only at 1440px and 390px with broken states in between.
 
-- parallax-heavy sections
-- constant floating decorations
-- large scroll animation libraries
-- motion that delays interaction or LCP
+### Responsive range
 
-Respect `prefers-reduced-motion` in custom code.
+Design intentionally for the whole range from approximately **320px to 2560px+**.
+
+Key behavior:
+- small phones: prioritize one clean reading/action path;
+- normal phones: maintain comfortable gutters and tap targets;
+- tablets: use 1–2 columns based on actual available width;
+- laptops: avoid cramped 4-column layouts when copy does not fit;
+- desktops: use balanced whitespace and bounded text widths;
+- ultrawide: contain content rather than stretching text/cards unnaturally across the viewport.
+
+### Touch / pointer behavior
+
+Every interaction must work without hover.
+
+Hover may enhance a card/button, but:
+- the action must remain obvious on touch;
+- focus-visible must communicate keyboard state;
+- tap targets should be at least ~44px where practical;
+- hover-only tooltips/content are not acceptable for important information.
+
+### Dynamic content principles
+
+"Dynamic" means maintainable WordPress behavior, not unnecessary frontend complexity.
+
+Use WordPress dynamically for:
+- navigation menus;
+- Blog Posts/categories/archives;
+- featured images;
+- shared templates;
+- reusable global components;
+- site URL/logo/title settings;
+- future administrator-managed content when appropriate.
+
+Do not introduce a custom post type, custom database layer, headless frontend or JS framework unless the editorial requirements genuinely justify it.
+
+### Responsive component rules
+
+**Hero**
+- no fixed hero height;
+- copy and media must reflow naturally;
+- hero image uses stable aspect ratio/object-fit;
+- CTA group wraps cleanly;
+- ornament simplifies before content becomes cramped.
+
+**Course/teacher/blog cards**
+- grid adapts by available component width;
+- cards grow with content;
+- buttons remain reachable when titles/descriptions wrap;
+- image ratio remains consistent without clipping faces/content badly.
+
+**Pricing**
+- 4 columns only when readable;
+- collapse before cards become narrow;
+- never reduce core text to tiny sizes just to preserve four columns.
+
+**Forms**
+- full-width controls on narrow screens;
+- labels never overlap;
+- two-column fields collapse based on width/content;
+- validation messages do not cause horizontal overflow.
+
+**Header**
+- use a real mobile/tablet navigation state;
+- do not squeeze desktop nav into a narrow row;
+- sticky state must preserve viewport space on mobile.
+
+**Footer**
+- columns collapse intentionally;
+- long contact/link text wraps safely;
+- CTA blocks remain visually balanced at narrow widths.
+
+### Responsive QA principle
+
+Do not approve a page by checking only Elementor's Desktop/Tablet/Mobile toggles.
+
+Validate real browser widths, intermediate widths, orientation changes and wide-screen containment. A page is complete only when there are no obvious broken states between the named QA samples.
+
+## 20. Motion & Interaction
+
+The website should feel **dynamic, engaging and premium**, while still calm and respectful for a Quran-learning brand.
+
+Motion is part of the design system. It must improve hierarchy, storytelling, feedback or perceived quality — never exist only to show off an effect.
+
+### Motion character
+
+Use motion that feels:
+
+- soft;
+- confident;
+- elegant;
+- intentional;
+- slightly editorial;
+- responsive to user action;
+- consistent across pages.
+
+Avoid motion that feels:
+
+- flashy;
+- gaming-like;
+- crypto/agency-demo-like;
+- chaotic;
+- overly bouncy;
+- constantly moving;
+- slow enough to block content.
+
+### Timing system
+
+```css
+--eqc-motion-fast: 160ms;
+--eqc-motion-base: 260ms;
+--eqc-motion-reveal: 520ms;
+--eqc-motion-slow: 800ms;
+--eqc-motion-stagger: 70ms;
+--eqc-ease-standard: cubic-bezier(.22, 1, .36, 1);
+--eqc-ease-soft: cubic-bezier(.16, 1, .3, 1);
+```
+
+Use a small reusable timing vocabulary instead of random durations.
+
+### Preferred techniques
+
+Prefer, in order:
+
+1. CSS transitions/transforms/keyframes;
+2. supported Elementor Free entrance animations when appropriate;
+3. reusable vanilla JS / IntersectionObserver for viewport reveals;
+4. lightweight SVG motion graphics;
+5. a dedicated animation library only when a specific interaction clearly justifies it.
+
+Animate `transform` and `opacity` whenever possible.
+
+### Recommended signature motion
+
+Evaluate and selectively use:
+
+- staged hero copy/CTA entrance;
+- arch-image mask/clip reveal;
+- subtle geometric SVG/ornament reveal;
+- section-heading gold line draw;
+- staggered course-card entrance;
+- small card lift/border/arrow hover interactions;
+- progressive "How It Works" line/path drawing;
+- teacher-card image micro-zoom;
+- pricing-card focus/hover emphasis;
+- smooth FAQ accordion transition;
+- blog image/arrow microinteraction;
+- subtle sticky-header state change;
+- restrained final-CTA background ornament motion.
+
+The homepage may carry several coordinated motions. Inner pages should reuse that language rather than introduce unrelated effects.
+
+### Motion graphics
+
+Prefer project-owned SVG/CSS Islamic geometry — arches, rosettes, line ornaments and subtle patterns — over heavy animation assets.
+
+External animated assets must have a verified license, a clear design purpose, an optimized file size and a static/reduced-motion state.
+
+### Motion density
+
+- approximately one signature motion idea per major section;
+- avoid animating every child widget independently;
+- no more than 1–2 subtle continuous decorative animations in one viewport;
+- simplify/disable complex motion on mobile;
+- never hide essential information behind hover-only behavior.
+
+### Do not use
+
+- scroll hijacking;
+- forced smooth-scroll libraries;
+- blocking preloaders;
+- cursor replacement;
+- constant text marquees unless there is a strong content reason;
+- autoplay background video by default;
+- aggressive parallax;
+- large particle/canvas effects;
+- infinite CTA pulsing;
+- excessive 3D tilt.
+
+### Accessibility
+
+All custom motion must respect `prefers-reduced-motion`.
+
+When reduced motion is requested:
+
+- reveal content immediately;
+- remove nonessential transforms/parallax;
+- keep state changes understandable;
+- preserve all functionality.
+
+### Performance
+
+Motion must not:
+
+- delay H1/LCP content;
+- introduce visible CLS;
+- create obvious mobile scroll jank;
+- require a heavy library for trivial fades;
+- attach duplicated scroll listeners per section.
+
+Use IntersectionObserver or similarly efficient strategies for viewport-triggered effects when custom JS is required.
 
 ## 21. Responsive Behavior
 
-### Desktop
+Responsive design is fluid from approximately 320px through ultrawide desktop sizes. The named widths below are validation samples, not fixed design buckets.
 
-- balanced whitespace
-- readable line lengths
-- 3-column course grids
-- 4-column pricing if content fits naturally
+### Small Phone — ~320–359px
 
-### Tablet
+- preserve readable 16px body text;
+- simplify ornament and secondary visual effects first;
+- keep CTA buttons easy to tap;
+- ensure no content depends on two columns;
+- avoid hero compositions that consume several screens before the first action.
 
-- 2-column cards
-- hero may remain split until it becomes cramped
-- reduce decorative elements before reducing readability
+### Phone — ~360–430px
 
-### Mobile
+- one clear content flow;
+- H1 must not dominate the entire first screen;
+- primary CTA appears early;
+- complex multi-column sections become one column;
+- forms use full available width;
+- no clipped ornament/SVG overflow;
+- cards can grow with content rather than match artificial fixed heights.
 
-- one clear content flow
-- H1 must not dominate the entire first screen
-- primary CTA should appear early
-- convert complex multi-column sections to 1 column
-- avoid horizontal carousels unless they materially improve usability
-- no clipped ornament or SVG overflow
-- forms use full available width
-- buttons must remain easy to tap
+### Tablet — ~768–1024px
 
-Target QA viewports:
+- use one or two columns based on actual content fit;
+- split hero only while both sides remain comfortably readable;
+- reduce decorative elements before shrinking typography excessively;
+- avoid forcing desktop navigation when it becomes cramped;
+- handle both portrait and landscape intentionally.
 
-- 1440x900
-- 1280x800
-- 1024x768
-- 768x1024
-- 430x932
-- 390x844
+### Laptop — ~1024–1440px
+
+- maintain useful gutters;
+- allow 3-column course grids when card copy fits;
+- use 4-column pricing only when readability remains strong;
+- avoid oversized empty regions caused by fixed-height desktop sections.
+
+### Desktop — ~1440–1920px
+
+- balanced whitespace;
+- bounded readable line lengths;
+- use the max-content system rather than stretching every component;
+- maintain strong visual hierarchy and purposeful negative space.
+
+### Wide / Ultrawide — 1920–2560px+
+
+- keep main content centered/bounded;
+- do not stretch paragraphs into very long lines;
+- allow selected hero/background treatments to breathe without stretching cards unnaturally;
+- verify background ornaments and gradients do not expose abrupt edges.
+
+### Target QA samples
+
+- 320x568
 - 360x800
+- 375x812
+- 390x844
+- 430x932
+- 768x1024
+- 820x1180 where practical
+- 1024x768
+- 1280x800
+- 1366x768
+- 1440x900
+- 1920x1080
+- 2560x1440 where practical
+
+Also inspect several intermediate widths by resizing the browser. Fix the layout at the component breakpoint where content becomes cramped rather than relying only on device labels.
 
 ## 22. Accessibility
 
