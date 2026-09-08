@@ -67,3 +67,43 @@ export function spikedRosettePath(cx, cy, rOuter, rInner, points, angleOffset = 
 export function regularPolygonPath(cx, cy, r, n, angleOffset = -Math.PI / 2) {
 	return pathFromPoints(polygonVertices(cx, cy, r, n, angleOffset));
 }
+
+/**
+ * A "girih" woven-star rosette: `folds` interlacing kite/petal shapes
+ * around a centre, each petal running tip -> shoulder -> valley (its
+ * innermost point, shared with the next petal) -> mirrored shoulder ->
+ * next tip. Distinct from spikedRosettePath (a single two-radius zigzag
+ * ring) and starPolygonPath (a single-ring {n/step} star) — this has a
+ * THIRD radius (the shoulder) partway along each petal edge, which is
+ * what produces the lens/kite silhouette instead of a plain zigzag point.
+ *
+ * The default ratios (shoulderR, valleyR, shoulderFrac) are measured, not
+ * guessed: extracted from tools/graphics/reference/rosette.png — the
+ * client's 8-fold reference — after forcing exact dihedral symmetry
+ * (lib/trace.mjs's symmetrizeDihedral) and averaging the resulting
+ * (angle-fraction, radius) landmarks across all 8 congruent petals (see
+ * README.md's "Rosette" section for the extraction). For folds=8 at
+ * those defaults this is a close *straight-edge* approximation of the
+ * reference (the reference's own edges are gently curved, traced exactly
+ * as `rosette-traced.json` for the assets that need pixel fidelity — see
+ * trace-rosette.mjs); for other fold counts it's the same measured
+ * construction honestly generalized, not a new guess.
+ */
+export function girihRosettePath(cx, cy, R, folds, {
+	shoulderR = 0.844,
+	valleyR = 0.604,
+	shoulderFrac = 0.33,
+} = {}) {
+	const angleStep = TAU / folds;
+	const pts = [];
+	for (let k = 0; k < folds; k++) {
+		const tipAngle = -Math.PI / 2 + k * angleStep;
+		const nextTipAngle = tipAngle + angleStep;
+		const valleyAngle = tipAngle + angleStep / 2;
+		pts.push(polar(cx, cy, R, tipAngle));
+		pts.push(polar(cx, cy, R * shoulderR, tipAngle + angleStep * shoulderFrac));
+		pts.push(polar(cx, cy, R * valleyR, valleyAngle));
+		pts.push(polar(cx, cy, R * shoulderR, nextTipAngle - angleStep * shoulderFrac));
+	}
+	return pathFromPoints(pts);
+}

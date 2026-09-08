@@ -1133,10 +1133,12 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 /* Each masked variant's aspect-ratio matches its own SVG's true bbox
    (see tools/graphics/gen-ornaments.mjs) — a mismatch here would get
    stretched by mask-size:100% 100%, reintroducing a subtler version of
-   the clipping/distortion bug the arch rebuild fixed. The ogee arch's
-   bbox comes out an exact 400:500 (its shoulder bulge stays within the
-   nominal jamb width, unlike the four-centred/horseshoe arches below,
-   which do genuinely overshoot slightly). */
+   the clipping/distortion bug the arch rebuild fixed. --masked's curve
+   (ogeeArchPanel, lib/arches.mjs) is measured from the client's own
+   approved page mockup (Assests/WhatsApp Image 2026-09-04 at 4.23.19
+   PM.jpeg) — a plain single-curve ogee, not the wider four-centred/
+   horseshoe domes below (which stay parametric and do genuinely
+   overshoot their nominal box slightly). */
 .eqc-arch-media--masked,
 .eqc-arch-media--fourcentred,
 .eqc-arch-media--horseshoe {
@@ -1144,7 +1146,7 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	border: none;
 	overflow: visible; /* the outline (below) deliberately extends past this box */
 }
-.eqc-arch-media--masked { aspect-ratio: 4 / 5; }
+.eqc-arch-media--masked { aspect-ratio: 400 / 459; }
 .eqc-arch-media--fourcentred { aspect-ratio: 329 / 389; }
 .eqc-arch-media--horseshoe { aspect-ratio: 327.198 / 349; }
 /* The mask lives on the <img> itself, not the container: a mask on a
@@ -1164,18 +1166,18 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 .eqc-arch-media--masked img { -webkit-mask-image: url('../svg/arch-mask.svg'); mask-image: url('../svg/arch-mask.svg'); }
 .eqc-arch-media--fourcentred img { -webkit-mask-image: url('../svg/fourcentred-mask.svg'); mask-image: url('../svg/fourcentred-mask.svg'); }
 .eqc-arch-media--horseshoe img { -webkit-mask-image: url('../svg/horseshoe-mask.svg'); mask-image: url('../svg/horseshoe-mask.svg'); }
-/* Offset gold outline outside the photo, matching the client reference's
-   visible arch line. Deliberately reuses the exact SAME *-mask.svg shape
-   as the photo above (not a *-outline.svg stroke render): a stroke's own
-   padding is only ~1% of the shape's size, but this layer is enlarged
-   ~6-8% via `inset` — stretching that thin, barely-padded stroke onto a
-   box that much bigger distorted its curvature into a soft, wrong-shaped
-   "blob" (confirmed against a live screenshot). Reusing the identical
-   mask on a uniformly bigger box is a mathematically exact scaled-up
-   copy of the same silhouette, so it can't distort. `::before` (not
-   `::after`, and no z-index) so it paints BEHIND the photo in normal
-   document order — only the sliver that peeks out past the smaller photo
-   on top is visible, reading as a clean outline. */
+/* Offset gold outline outside the photo, matching the four-centred/
+   horseshoe reference's visible arch line. Deliberately reuses the exact
+   SAME *-mask.svg shape as the photo above (not a *-outline.svg stroke
+   render): a stroke's own padding is only ~1% of the shape's size, but
+   this layer is enlarged ~6-8% via `inset` — stretching that thin,
+   barely-padded stroke onto a box that much bigger distorted its
+   curvature into a soft, wrong-shaped "blob" (confirmed against a live
+   screenshot). Reusing the identical mask on a uniformly bigger box is a
+   mathematically exact scaled-up copy of the same silhouette, so it can't
+   distort. `::before` (not `::after`, and no z-index) so it paints BEHIND
+   the photo in normal document order — only the sliver that peeks out
+   past the smaller photo on top is visible, reading as a clean outline. */
 .eqc-arch-media--masked::before,
 .eqc-arch-media--fourcentred::before,
 .eqc-arch-media--horseshoe::before {
@@ -1189,7 +1191,17 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	mask-size: 100% 100%;
 	pointer-events: none;
 }
-.eqc-arch-media--masked::before { -webkit-mask-image: url('../svg/arch-mask.svg'); mask-image: url('../svg/arch-mask.svg'); }
+/* --masked is the exception: the client's own mockup shows a thin single
+   gold hairline sitting right AT the photo's edge, not a thick offset
+   band. inset:0 (same box as the photo, no enlargement) + arch-outline.svg
+   (a thin stroke traced on arch-mask's own exact, unpadded bbox — see
+   gen-ornaments.mjs — so it shares the identical coordinate frame and
+   can't suffer the padding/inset mismatch distortion described above). */
+.eqc-arch-media--masked::before {
+	inset: 0;
+	-webkit-mask-image: url('../svg/arch-outline.svg');
+	mask-image: url('../svg/arch-outline.svg');
+}
 .eqc-arch-media--fourcentred::before { -webkit-mask-image: url('../svg/fourcentred-mask.svg'); mask-image: url('../svg/fourcentred-mask.svg'); }
 .eqc-arch-media--horseshoe::before { -webkit-mask-image: url('../svg/horseshoe-mask.svg'); mask-image: url('../svg/horseshoe-mask.svg'); }
 .eqc-arch-media:not(.eqc-arch-media--masked):not(.eqc-arch-media--fourcentred):not(.eqc-arch-media--horseshoe)::before {

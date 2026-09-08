@@ -11,12 +11,16 @@ cd tools/graphics
 npm install
 node trace-logo.mjs        # traces Assests/Logo/Logo2.jpeg -> scratch/logo-mark-traced.svg
 node build-logo.mjs        # composes the 4 logo SVG variants from that trace
-node gen-ornaments.mjs     # generates all ornament/arch/divider assets
+node trace-rosette.mjs     # traces reference/rosette.png -> scratch/rosette-traced.json
+node gen-ornaments.mjs     # generates all ornament/arch/divider assets (reads rosette-traced.json)
 node build-icon-sprite.mjs # regenerates inc/icon-sprite.php from Lucide + Simple Icons
 ```
 
 Re-run any script after editing it; each is idempotent (overwrites its
-own output). `scratch/` holds build intermediates and is gitignored.
+own output). `scratch/` holds build intermediates and is gitignored —
+`gen-ornaments.mjs` depends on `trace-rosette.mjs` having been run at
+least once in the current checkout (same relationship `build-logo.mjs`
+has to `trace-logo.mjs`).
 
 ## Logo
 
@@ -72,9 +76,6 @@ entirely by a shared module built on one primitive:
   branch to pick), and the tangency is structural — a kink at that
   junction is no longer possible by construction. Used by the
   **four-centred (Persian/Timurid) arch** for the haunch→crown transition.
-  Tried and abandoned for the keel arch's shoulder→apex transition (see
-  below) — forcing exact tangency into a sharp point is a genuinely
-  different, ill-conditioned problem from this solver's designed use case.
 - **Pointed arch**, **horseshoe arch** and **mandorla** (pointed-oval
   frame) are direct closed-form circle constructions with citations in
   `lib/arches.mjs` itself (Wikipedia's pointed-arch and horseshoe-arch
@@ -86,51 +87,114 @@ entirely by a shared module built on one primitive:
   their shared endpoint (a semicircle's tangent at its diameter endpoint
   is always perpendicular to that diameter) — no solver needed, and no
   kink possible there either.
-- **Keel/Mughal arch** (the hero/photo arch — `keelArchPanel`): a
-  vertical jamb, a larger lower bump, a smaller upper bump, then a sharp
-  point, matching the client's reference icon exactly. Went through three
-  different constructions before this one converged — worth recording
-  precisely because the failure modes aren't obvious in advance:
-  1. A single-bump ogee (`nextTangentArc` solving the shoulder→apex
-     transition) matched a *different*, single-bump reference shown
-     earlier, but not this multi-cusp one, and separately the solver
-     produced a self-intersecting loop when pushed toward a sharper apex
-     — see the tangent-arc solver note below.
-  2. Reusing the multifoil's `scallopSide` (semicircles on chords) with
-     `outward: true` produced bumps that were uniformly too big and too
-     round: a semicircle's bulge is *forced* to exactly half its own
-     chord length, so there's no way to make one bump smaller/flatter
-     than another independent of moving it — the wrong degree of freedom
-     for a reference with two visibly different-sized cusps.
-  3. **What actually worked**: `arcChain`, a sequence of 4 independent
-     `arcThroughBulge` arcs per side (3 interior waypoints along the
-     base→apex line, picked by fraction; each of the 4 segments its own
-     bulge). This decouples "where is each cusp" (waypoint fractions)
-     from "how round is each cusp" (bulge), which is exactly the control
-     the reference needs. The visual convex/concave alternation (bump,
-     valley, bump, finish to a point) falls out of each segment's own
-     local direction along the winding path — every `bulge` value here
-     is positive; nothing needs an alternating sign, which is easy to
-     assume wrongly.
-  A load-bearing, genuinely counter-intuitive fact about `arcThroughBulge`
-  surfaced tuning this: bulge `0` gives a full **semicircle** (radius =
-  half the chord — the roundest possible), and *increasing* the
-  magnitude makes the arc **flatter**, not deeper. Reads backwards in
-  plain English ("more bulge" sounds like "more curve"), and several
-  early tuning passes at "small bulge for a subtler bump" produced
-  near-identical full-round bumps until this was worked out properly —
-  see the function's own doc comment before changing any bulge constant.
-- **Exact bounding boxes, not fixed canvases.** Every arch function
-  returns `{ d, bbox }` with the bbox computed from the actual circle
-  geometry (`circleExtent`/`semicircleExtent`: an arc's true extent is its
-  two endpoints plus any 0°/90°/180°/270° axis crossing it sweeps
-  through), not guessed padding. The keel arch's bbox comes out an exact
-  400:500 at production scale (no overshoot), but the four-centred and
-  horseshoe arches do genuinely overshoot slightly — confirmed by the
-  exact math, not assumed either way. `wrapArch()`/`svgFromBbox()` size
-  the final `<svg>`'s viewBox from the true bbox, so a consumer's CSS
+- **Exact bounding boxes, not fixed canvases.** Every parametric arch
+  function returns `{ d, bbox }` with the bbox computed from the actual
+  circle geometry (`circleExtent`/`semicircleExtent`: an arc's true extent
+  is its two endpoints plus any 0°/90°/180°/270° axis crossing it sweeps
+  through), not guessed padding. The four-centred and horseshoe arches do
+  genuinely overshoot their nominal box slightly — confirmed by the exact
+  math, not assumed either way. `wrapArch()`/`svgFromBbox()` size the
+  final `<svg>`'s viewBox from the true bbox, so a consumer's CSS
   `aspect-ratio` must match the asset's own bbox ratio (documented per
   class in `components.css`).
+
+### The hero/photo arch: measured from the client's own mockup (`ogeeArchPanel`)
+
+The hero/photo arch (`arch-mask.svg`/`arch-outline.svg`/`arch-frame.svg`,
+`ogeeArchPanel` in `lib/arches.mjs`) went through **four** rejected
+attempts before converging — worth recording precisely, since each
+rejection pointed at a different, non-obvious mistake:
+
+1. A hand-tuned ogee (`nextTangentArc` solving a shoulder→apex
+   transition) matched an earlier, different single-bump reference, but
+   not the reference shown next.
+2. A `keelArchPanel` built from independent `arcThroughBulge` arcs (tuned
+   to a two-cusp reading of a Flaticon-style abstract icon reference) was
+   closer to *that* reference, but was rejected — the icon reference
+   itself turned out to be the wrong thing to chase.
+3. **Bitmap-tracing that same icon reference exactly** (flood-fill +
+   mirror-symmetrize + potrace, achieving 0.9966 IoU against it — the
+   technique is still in `lib/trace.mjs`, unused by this asset now) was
+   rejected too, and correctly so: it was a faithful reproduction of an
+   abstract vector icon, not of the client's actual approved page design.
+   DESIGN.md is explicit that client screenshots outrank this kind of
+   secondary reference, and the live result — a fairly ornate S-curve with
+   a small capital-circle detail, painted with a thick solid offset gold
+   band — read as "weird," not decent, next to the client's own mockup.
+4. **What actually worked**: measure the arch drawn in the client's own
+   approved page mockup (`Assests/WhatsApp Image 2026-09-04 at 4.23.19
+   PM.jpeg`) and fit a curve to *that*. Scanning the mockup for the
+   photo-vs-page-background boundary (robust against the JPEG noise a
+   gold-color-specific threshold hit once the arch line crossed busy photo
+   content) gave a clean half-width-vs-height profile from apex to
+   springline. A two-centred circular arc through the same apex/springline
+   endpoints — the obvious first guess — missed that profile by 4-5x the
+   error a direct least-squares cubic-bezier fit achieved (RMSE ≈10px on a
+   271px half-span), confirming the real curve is a plain designed bezier,
+   not a circle. `ogeeArchPanel`'s default `c1`/`c2` are that fitted
+   bezier's control points, and `riseFrac` is the measured rise÷half-span
+   ratio — none of the three numbers are guessed.
+
+A cubic bezier's curve always stays within the convex hull of its own 4
+control points, and here all 4 (apex, `c1`, `c2`, springline) lie within
+the panel's own half-span×rise box by construction — so, same as the
+arc-based panels above, the bbox is exact with no overshoot possible,
+just via a different argument than `circleExtent`.
+
+**Thin outline, not a thick band:** the mockup's own gold line is a thin
+hairline sitting right at the photo's edge, not an offset band. So unlike
+`--fourcentred`/`--horseshoe` (which still reuse their `*-mask.svg` at
+`inset:-3%`, per the distortion bug documented below), `--masked`'s
+`::before` uses `arch-outline.svg` at `inset:0` — a thin stroke traced on
+`arch-mask.svg`'s own *unpadded* bbox (not `wrapArch`'s padded box), so it
+shares the identical coordinate frame and can't hit that same
+padding/inset mismatch.
+
+### The rosette medallion: also traced (`trace-rosette.mjs`)
+
+`rosette.svg`, `divider-medallion.svg` and the centre medallion in
+`divider-section.svg`/`divider-card.svg` are the client's 8-fold girih
+star (`reference/rosette.png` — a small 8-point star void at the centre,
+surrounded by 8 interlacing lens/kite petals), replacing the previous
+plain `{8/3}` star (`starPolygonPath`). Same reasoning as the arch: this
+specific woven interlace is real geometry to reproduce exactly, not
+something to re-derive by eye.
+
+Unlike the arch, this trace does **not** run `fillFromBorder` — the
+centre star and the gaps between petals are meant to stay holes, and
+`potrace`'s own even-odd fill-rule output already gets that right when
+traced directly off the ink pixels (confirmed: 10 subpaths — 1 outer
+boundary, 8 congruent petal-hole loops at 45° apart, 1 centre-star void).
+Symmetrization uses `lib/trace.mjs`'s `symmetrizeDihedral` (8-fold
+rotation + mirror) — by **majority vote** across all 16 symmetric copies,
+not union: this is a thin (~4-5px) stroke, and unioning 16 rotated copies
+of a thin stroke systematically grows it every single time (each
+rotation's nearest-pixel rounding can only add area, never remove it) —
+confirmed by measurement (raw-vs-union IoU 0.93, raw-vs-majority-vote IoU
+0.95, and the union version visibly fatter on inspection). The resulting
+traced path is embedded directly (`tracedRosette()` in
+`gen-ornaments.mjs`, reading `scratch/rosette-traced.json`), positioned at
+any `(cx, cy, r)` via a plain translate+scale — not re-parametrized,
+since the exact bezier curvature is part of what needs reproducing.
+
+A calibration note on the IoU verification metric: for a stroke this
+thin, IoU is intrinsically noisy — the reference bitmap compared against
+*itself* shifted by a single pixel already drops to ~0.93 IoU, because a
+1px edge disagreement on a 4px stroke is a large fraction of the stroke's
+own area. So unlike the arch (a big filled shape, where 0.99+ is the
+right bar), the rosette trace is verified against that same-image
+1px-shift noise floor, not a flat number — and confirmed visually
+side-by-side against the reference (`scratch/gallery.html`).
+
+`rosette-12.svg` (a decorative ring at `.eqc-pricing-icon-ring`, no
+12-fold reference exists) and `star-8-filled.svg` (the pricing bullet,
+rendered too small — ~12px — for the rosette's interior weave to read)
+use `girihRosettePath` (`lib/geometry.mjs`) instead: a parametric
+tip→shoulder→valley kite construction whose three radius/angle ratios
+were measured off the SAME averaged, symmetrized `reference/rosette.png`
+landmarks, generalized honestly to other fold counts (12) or filled as an
+outer silhouette only (8, for the tiny bullet) rather than guessed from
+scratch.
 
 **CSS masking gotcha worth remembering:** `mask-image` on a parent clips
 its *entire* rendered subtree, including a differently-sized or

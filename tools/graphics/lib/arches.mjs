@@ -206,6 +206,60 @@ export function pointedArchPanel(w, jamb, baseH, opts = {}) {
 	return { d, bbox: panelBbox };
 }
 
+/**
+ * Ogee/keel arch (the hero/photo arch — `ogeeArchPanel`): a vertical
+ * jamb into ONE smooth cubic-bezier curve per side, rising to a
+ * moderately blunt point — no capital-circle detail, no S-curve
+ * inflection, no second cusp. This is the client's own approved page
+ * mockup's arch (`Assests/WhatsApp Image 2026-09-04 at 4.23.19 PM.jpeg`),
+ * which per DESIGN.md outranks the abstract Flaticon-style icon reference
+ * used earlier in this asset's history — an exact bitmap trace of that
+ * icon (`lib/trace.mjs`'s flood-fill + mirror-symmetrize + potrace
+ * pipeline, since removed along with its now-unused reference PNG) was a
+ * faithful reproduction of the wrong reference, not what the live page
+ * needed. See README.md's "hero/photo arch" section for the full history.
+ *
+ * The default control points are MEASURED, not guessed: extracted by
+ * scanning the mockup's own pixels for the photo-vs-background boundary
+ * (immune to the JPEG noise a color-specific "is this gold" threshold hit
+ * over busy photo content) to get a dx(dy) half-width profile from apex
+ * to springline, then least-squares fitting a single cubic bezier to that
+ * profile (RMSE ≈ 10px on a 271px half-span — a two-centred circular arc
+ * through the same endpoints, tried first, missed by 4-5x that error,
+ * confirming the real curve isn't a simple circular arc). `c1`/`c2` are
+ * that bezier's two control points, as fractions of (halfSpan, rise) in a
+ * frame with the apex at the origin — this is what makes the curve scale
+ * cleanly to any panel size. `riseFrac` (rise ÷ halfSpan) was measured the
+ * same way: 286px rise on a 271px half-span.
+ *
+ * Bbox is exact with no extra computation needed: a cubic bezier's curve
+ * always stays within the convex hull of its 4 control points, and here
+ * all 4 (apex, c1, c2, springline) lie within the [0,halfSpan]×[0,rise]
+ * box by construction (c1, c2 are both fractions in [0,1]) — so the panel
+ * can't overshoot its own w×baseH rectangle, the same guarantee every
+ * other arch in this module gets via `circleExtent`, just via a different
+ * (and here, simpler) argument.
+ */
+export function ogeeArchPanel(w, jamb, baseH, {
+	riseFrac = 1.0554,
+	c1 = [0.4626, 0.2063],
+	c2 = [1.0, 0.7448],
+} = {}) {
+	const hw = w / 2;
+	const rise = hw * riseFrac;
+	const apexY = jamb - rise;
+	const apex = [hw, apexY];
+	const ctrl = (c) => [hw + c[0] * hw, apexY + c[1] * rise];
+	const P1r = ctrl(c1), P2r = ctrl(c2);
+	const mirrorX = (p) => [2 * hw - p[0], p[1]];
+	const P1l = mirrorX(P1r), P2l = mirrorX(P2r);
+	const d = `M${fmt(w)} ${fmt(baseH)} L${fmt(w)} ${fmt(jamb)} ` +
+		`C${fmt(P2r[0])} ${fmt(P2r[1])} ${fmt(P1r[0])} ${fmt(P1r[1])} ${fmt(apex[0])} ${fmt(apex[1])} ` +
+		`C${fmt(P1l[0])} ${fmt(P1l[1])} ${fmt(P2l[0])} ${fmt(P2l[1])} 0 ${fmt(jamb)} L0 ${fmt(baseH)} Z`;
+	const bbox = { minX: 0, minY: apexY, maxX: w, maxY: baseH };
+	return { d, bbox };
+}
+
 // ---------------------------------------------------------------------
 // Four-centred (Persian/Timurid) arch: a steep small-radius haunch from
 // each springing point, tangent-transitioning (via nextTangentArc) into a
@@ -246,95 +300,6 @@ export function fourCentredArchPanel(w, jamb, baseH, { haunchFrac = 0.32, haunch
 	bbox = mergeBbox(bbox, bboxOf(circleExtent(C2r[0], C2r[1], r2r, J1r, apex)));
 	bbox = mergeBbox(bbox, bboxOf(circleExtent(C2l[0], C2l[1], r2r, apex, J1l)));
 	bbox = mergeBbox(bbox, bboxOf(circleExtent(C1l[0], C1l[1], r1, J1l, [0, spring])));
-	return { d, bbox };
-}
-
-/**
- * Circle through two given points P1, P2 with a chosen "bulge" — the
- * center sits on the perpendicular bisector of P1-P2, offset by
- * `bulge * |P1-P2|` (sign picks which side). Unlike nextTangentArc
- * (solving for a circle tangent to a PRIOR circle), this has no
- * reflex/continuation branch to go unstable: bulge is a plain, bounded
- * design choice, so it can't produce the tiny/huge-radius degenerate
- * arcs a forced tangent-solve can when the target point sits awkwardly
- * relative to the previous circle (this is exactly what happened trying
- * to force ogeeArchPanel's sharp apex via nextTangentArc — small
- * parameter changes flipped the solver into a self-intersecting loop at
- * the tip).
- *
- * Counter-intuitive part, easy to get backwards: bulge as `0` puts the
- * center ON the chord's midpoint, giving radius = |P1-P2|/2 — a full
- * SEMICIRCLE, the roundest/deepest this can produce. As `|bulge|`
- * *increases*, the center moves further away and the radius grows
- * faster than the offset, so the arc gets FLATTER, not deeper. "Bigger
- * bulge" reads as "more dramatic curve" in plain English but means the
- * opposite here — confirmed the hard way tuning keelArchPanel below,
- * where several tries at "smaller bulge for a subtler bump" all
- * produced near-identical full-round semicircles until this was
- * derived properly. Verify new values by rendering, not by guessing
- * which direction "more bulge" should move the shape.
- */
-function arcThroughBulge(P1, P2, bulge) {
-	const mid = [(P1[0] + P2[0]) / 2, (P1[1] + P2[1]) / 2];
-	const d = sub(P2, P1);
-	const length = len(d);
-	const perp = [-d[1] / length, d[0] / length];
-	const center = [mid[0] + perp[0] * bulge * length, mid[1] + perp[1] * bulge * length];
-	const radius = len(sub(center, P1));
-	return { center, radius };
-}
-
-// ---------------------------------------------------------------------
-// Ogee/keel arch: one convex shoulder arc off the jamb, into one concave
-// arc up to a sharp apex — the classic two-arc-per-side ogee S-curve,
-// matching the client's clean keel-arch reference (a single smooth
-// shoulder bulge per side, not a multi-cusp scallop, and a true point at
-// the top, not a soft dome).
-//
-// The shoulder arc's centre is constrained to the springline (exactly
-// fourCentredArchPanel's own haunch construction), which is what
-// guarantees it departs the vertical jamb tangentially — an
-// arcThroughBulge chord here left a visible kink at the springline,
-// since nothing tied its tangent direction to the jamb. The finish arc
-// (shoulder's end point up to the sharp apex) uses arcThroughBulge, not
-// the tangent-arc solver: forcing exact tangency into a sharp apex point
-// is ill-conditioned there (the solved circle's radius can blow up or
-// collapse for small parameter changes, producing a self-intersecting
-// loop at the tip — confirmed by rendering an early attempt), whereas
-// choosing its bulge directly is stable by construction and still reads
-// as a smooth continuous sweep once tuned by rendering.
-// ---------------------------------------------------------------------
-export function ogeeArchPanel(w, jamb, baseH, { shoulderFrac = 0.12, shoulderSweepDeg = 48, bulge2 = 0.32, riseFrac = 0.62 } = {}) {
-	const hw = w / 2;
-	const spring = jamb;
-	const apex = [hw, spring - hw * riseFrac];
-	const J0 = [w, spring];
-
-	// Shoulder: centre on the springline (tangent to the vertical jamb at
-	// J0), sweeping CCW by shoulderSweepDeg to J1.
-	const r1 = hw * shoulderFrac;
-	const C1 = [w - r1, spring];
-	const theta = (shoulderSweepDeg * Math.PI) / 180;
-	const J1 = [C1[0] + r1 * Math.cos(Math.PI - theta), C1[1] - r1 * Math.sin(Math.PI - theta)];
-	const shoulderR = arcCmd(C1[0], C1[1], r1, J0, J1);
-
-	const finish = arcThroughBulge(J1, apex, bulge2);
-	const finishR = arcCmd(finish.center[0], finish.center[1], finish.radius, J1, apex);
-
-	// Left half is the exact mirror across x = hw, traced apex -> base.
-	const mirrorX = (p) => [2 * hw - p[0], p[1]];
-	const J1l = mirrorX(J1), J0l = mirrorX(J0), C1l = mirrorX(C1);
-	const finishCl = mirrorX(finish.center);
-	const finishL = arcCmd(finishCl[0], finishCl[1], finish.radius, apex, J1l);
-	const shoulderL = arcCmd(C1l[0], C1l[1], r1, J1l, J0l);
-
-	const d = `M${fmt(w)} ${fmt(baseH)} L${fmt(w)} ${fmt(spring)} ${shoulderR} ${finishR} ${finishL} ${shoulderL} L0 ${fmt(baseH)} Z`;
-
-	let bbox = { minX: 0, minY: 0, maxX: w, maxY: baseH };
-	bbox = mergeBbox(bbox, bboxOf(circleExtent(C1[0], C1[1], r1, J0, J1)));
-	bbox = mergeBbox(bbox, bboxOf(circleExtent(finish.center[0], finish.center[1], finish.radius, J1, apex)));
-	bbox = mergeBbox(bbox, bboxOf(circleExtent(finishCl[0], finishCl[1], finish.radius, apex, J1l)));
-	bbox = mergeBbox(bbox, bboxOf(circleExtent(C1l[0], C1l[1], r1, J1l, J0l)));
 	return { d, bbox };
 }
 
@@ -462,82 +427,4 @@ function scallopedArchPanel(w, jamb, baseH, breakpoints, outward) {
 export function multifoilArchPanel(w, jamb, baseH, { lobes = 3 } = {}) {
 	const breakpoints = Array.from({ length: lobes - 1 }, (_, i) => (i + 1) / lobes);
 	return scallopedArchPanel(w, jamb, baseH, breakpoints, false);
-}
-
-/**
- * A chain of arcs through a sequence of waypoints, each segment its own
- * arcThroughBulge (stable, independently-sized/shaped) rather than a
- * semicircle whose size is locked to its own chord length. This is what
- * `keelArchPanel` needs and `scallopSide` above can't give it: a
- * multi-cusp reference where each bump has its own scale (a semicircle's
- * bulge is forced to exactly half its chord — too round, and every bump
- * the same relative size — verified by rendering, not assumed, when a
- * scallopSide-based attempt at this exact reference produced oversized,
- * uniformly-round bumps that didn't match).
- */
-function arcChain(waypoints, bulges) {
-	let d = '';
-	let extent = [];
-	const arcs = [];
-	for (let i = 0; i < waypoints.length - 1; i++) {
-		const from = waypoints[i], to = waypoints[i + 1];
-		const { center, radius } = arcThroughBulge(from, to, bulges[i]);
-		d += `${arcCmd(center[0], center[1], radius, from, to)} `;
-		extent = extent.concat(circleExtent(center[0], center[1], radius, from, to));
-		arcs.push({ center, radius });
-	}
-	return { d, extent, arcs };
-}
-
-/**
- * Keel/Mughal cusped arch — matches the client's reference image: a
- * vertical jamb, a larger lower bump, a smaller upper bump (with a
- * shallow valley between them, not a direct bump-to-bump transition),
- * then a sharp point. Four arcs per side along the base->apex line, each
- * an independent `arcThroughBulge` so bump size and the valley's depth
- * are tuned separately, not derived from chord geometry. `t` are the 3
- * interior waypoint fractions (jamb->apex); `bulge` the 4 segments'
- * curve amounts, all positive here — the visual convex/concave
- * alternation (bump, valley, bump, finish) emerges from each segment's
- * own direction along the winding jamb->apex path, NOT from alternating
- * the bulge sign (confirmed by rendering: flipping any sign here breaks
- * the silhouette, since arcThroughBulge's rotation is relative to each
- * segment's own local direction, which already turns through the curve).
- * Larger bulge = a FLATTER arc, smaller (toward 0) = closer to a full
- * semicircle — counter-intuitive, easy to get backwards; verify by
- * rendering rather than assuming which way a change should read.
- */
-export function keelArchPanel(w, jamb, baseH, {
-	t = [0.38, 0.58, 0.83],
-	bulge = [0.3, 0.85, 0.4, 0.55],
-} = {}) {
-	const hw = w / 2;
-	const apex = [hw, 0];
-	const baseR = [w, jamb], baseL = [0, jamb];
-	const waypointsR = [baseR, ...t.map((f) => lerp(baseR, apex, f)), apex];
-	const right = arcChain(waypointsR, bulge);
-
-	// Left half: mirror every waypoint and every solved arc centre across
-	// x = hw, tracing apex->base (reverse order) — arcCmd's minor-arc pick
-	// is direction-agnostic so no bulge-sign bookkeeping is needed, only
-	// the geometry itself needs mirroring.
-	const mirrorX = (p) => [2 * hw - p[0], p[1]];
-	const waypointsL = waypointsR.map(mirrorX).reverse();
-	let leftD = '';
-	let leftExtent = [];
-	for (let i = right.arcs.length - 1; i >= 0; i--) {
-		const { center, radius } = right.arcs[i];
-		const from = waypointsL[right.arcs.length - 1 - i];
-		const to = waypointsL[right.arcs.length - i];
-		const c = mirrorX(center);
-		leftD += `${arcCmd(c[0], c[1], radius, from, to)} `;
-		leftExtent = leftExtent.concat(circleExtent(c[0], c[1], radius, from, to));
-	}
-
-	const d = `M${fmt(w)} ${fmt(baseH)} L${fmt(w)} ${fmt(jamb)} ${right.d} ${leftD} L0 ${fmt(baseH)} Z`;
-	const bbox = mergeBbox(
-		bboxOf([[0, 0], [w, 0], [0, baseH], [w, baseH]]),
-		bboxOf([...right.extent, ...leftExtent])
-	);
-	return { d, bbox };
 }

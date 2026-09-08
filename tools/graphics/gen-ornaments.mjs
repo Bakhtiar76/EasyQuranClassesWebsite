@@ -5,25 +5,45 @@
 // notes behind each shape and DESIGN.md's asset-library section for how
 // each is consumed (mask-image vs inline currentColor).
 //
-// Usage: node gen-ornaments.mjs
-import { writeFileSync, mkdirSync } from 'node:fs';
+// The 8-fold rosette is the one exception to "parametric geometry": it's
+// traced from a client-supplied reference bitmap (reference/rosette.png)
+// by trace-rosette.mjs, which must be re-run first if that reference or
+// its trace parameters change — see that script and README.md. The arch
+// (ogeeArchPanel, lib/arches.mjs) IS parametric, but its default control
+// points are measured off the client's own approved page mockup rather
+// than guessed — see the function's own doc comment and README.md's
+// "hero/photo arch" section for the measurement + bezier-fit derivation.
+//
+// Usage: node trace-rosette.mjs && node gen-ornaments.mjs
+import { writeFileSync, mkdirSync, readFileSync } from 'node:fs';
 import { optimize } from 'svgo';
 import {
 	fmt,
 	starPolygonPath,
 	spikedRosettePath,
 	regularPolygonPath,
+	girihRosettePath,
 } from './lib/geometry.mjs';
 import {
 	arcCmd,
 	wrapArch,
 	svgFromBbox,
-	keelArchPanel,
+	ogeeArchPanel,
 	fourCentredArchPanel,
 	horseshoeArchPanel,
 	mandorlaPanel,
 	multifoilArchPanel,
 } from './lib/arches.mjs';
+
+const rosetteTrace = JSON.parse(readFileSync('tools/graphics/scratch/rosette-traced.json', 'utf8'));
+
+/** Place the traced 8-fold rosette (centered at its own origin, see
+ * trace-rosette.mjs) at (cx, cy) scaled so its outer radius becomes r. */
+function tracedRosette(cx, cy, r) {
+	const s = r / rosetteTrace.radius;
+	return `<g transform="translate(${fmt(cx)} ${fmt(cy)}) scale(${fmt(s)})">` +
+		`<path fill="currentColor" fill-rule="evenodd" d="${rosetteTrace.d}"/></g>`;
+}
 
 // Flat into the theme's existing assets/svg/ — no new subfolder (CLAUDE.md:
 // don't create parallel structures). Where a direct predecessor exists
@@ -45,37 +65,45 @@ const svgWrap = (w, h, body, attrs = '') =>
 
 // =====================================================================
 // 1. Rosettes — badge medallions and divider centerpieces.
-//    Outline style (stroke only) so they work as mask-image silhouettes
-//    exactly like the asset they replace; a filled variant is also
-//    produced for inline currentColor use (divider medallions, the new
-//    star-8 bullet icon).
+//    rosette.svg and the 3 medallions below are the client's 8-fold girih
+//    star (tools/graphics/reference/rosette.png), traced exactly rather
+//    than the previous simple {n/step} star — see trace-rosette.mjs and
+//    README.md. rosette-12.svg and star-8-filled.svg have no reference to
+//    trace, so they use girihRosettePath (lib/geometry.mjs), the same
+//    tip/shoulder/valley construction measured off that same reference,
+//    honestly generalized rather than guessed.
 // =====================================================================
-for (const points of [8, 12]) {
-	const cx = 32, cy = 32;
-	const star = starPolygonPath(cx, cy, 26, points, Math.floor(points / 2) - 1 || 3, -Math.PI / 2);
-	const body =
-		`<g fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round">` +
-		`<circle cx="${cx}" cy="${cy}" r="30"/>` +
-		`<path d="${star}"/>` +
-		`<circle cx="${cx}" cy="${cy}" r="9"/>` +
-		`</g>`;
-	// 8-point overwrites the existing rosette.svg in place (same CSS mask
-	// references keep working); 12-point ships alongside as a bonus variant.
-	const filename = points === 8 ? 'rosette.svg' : `rosette-${points}.svg`;
-	save(filename, svgWrap(64, 64, body, 'aria-hidden="true" focusable="false"'));
+
+// rosette.svg: the exact traced 8-fold shape (fill, using its own
+// evenodd interior holes — the traced ink shape already reproduces the
+// woven look, no separate stroke needed). Overwrites the previous
+// circle+star+circle placeholder in place (same CSS mask references keep
+// working).
+save('rosette.svg', svgWrap(64, 64, tracedRosette(32, 32, 28), 'aria-hidden="true" focusable="false"'));
+
+// rosette-12.svg: no 12-fold reference exists, so this is the measured
+// tip/shoulder/valley construction generalized to 12 points (stroke
+// outline, matching this asset's decorative-ring role at
+// .eqc-pricing-icon-ring's ~60px render size).
+{
+	const d = girihRosettePath(32, 32, 28, 12);
+	save('rosette-12.svg', svgWrap(64, 64, `<path fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" d="${d}"/>`, 'aria-hidden="true" focusable="false"'));
 }
 
-// Filled 8-point star bullet — pricing feature lists, replacing plain
-// checkmarks per the reference screenshots' gold-star list markers.
+// Filled 8-point star bullet — pricing feature lists. Renders around
+// 12px, far too small for the rosette's interior weave to read, so this
+// uses girihRosettePath's OUTER silhouette only (filled solid) — the
+// same measured tip/shoulder/valley proportions as rosette-12.svg, just
+// at folds=8 to match this bullet's established 8-point look.
 {
-	const d = starPolygonPath(12, 12, 10, 8, 3);
+	const d = girihRosettePath(12, 12, 11, 8);
 	save('star-8-filled.svg', svgWrap(24, 24, `<path fill="currentColor" d="${d}"/>`, 'aria-hidden="true" focusable="false"'));
 }
 
-// Divider medallion (small, for the section-heading rule).
+// Divider medallion (small, for the section-heading rule) — the exact
+// traced rosette, scaled down.
 {
-	const d = spikedRosettePath(16, 16, 15, 6.5, 8);
-	save('divider-medallion.svg', svgWrap(32, 32, `<path fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" d="${d}"/>`, 'aria-hidden="true" focusable="false"'));
+	save('divider-medallion.svg', svgWrap(32, 32, tracedRosette(16, 16, 14), 'aria-hidden="true" focusable="false"'));
 }
 
 // =====================================================================
@@ -276,24 +304,33 @@ function sparklePath(cx, cy, r) {
 //    proportions here would distort on the live page — see README.md).
 // =====================================================================
 
-// Keel/Mughal cusped arch — matches the client's reference: jamb, a
-// larger lower bump, a smaller upper bump, then a sharp point. Replaces
-// arch-mask/outline/frame in place (same CSS references keep working
-// unchanged). Its bbox comes out an exact 400:500 at this scale (no
-// overshoot), but it's still wrapped via wrapArch() rather than a fixed
-// box — the same safety net every arch in this file gets, on principle,
-// matching .eqc-arch-media--masked's 4:5 aspect-ratio in components.css.
+// Ogee/keel arch — matches the client's own approved page mockup
+// (see ogeeArchPanel's doc comment in lib/arches.mjs for the measurement
+// + bezier-fit derivation): a plain vertical jamb into one smooth curve
+// per side, thin single-line gold treatment, no capital-circle or
+// second-cusp detail. jamb (springline y, apex at 0 by construction of
+// the default riseFrac) and baseH keep the measured 271:336 half-span:
+// straight-jamb-height ratio (scaled to a tidy 400 width) so the curve's
+// own shape is preserved exactly, not stretched.
 {
-	const w = 400, jamb = 170, baseH = 500;
-	const panel = keelArchPanel(w, jamb, baseH);
+	const w = 400, hw = w / 2, riseFrac = 1.0554, jambHeightFrac = 1.2399;
+	const jamb = Math.round(hw * riseFrac), baseH = jamb + Math.round(hw * jambHeightFrac);
+	const panel = ogeeArchPanel(w, jamb, baseH, { riseFrac });
 	save('arch-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
-	save('arch-outline.svg', wrapArch(panel, { pad: 2, stroke: true, strokeWidth: 3 }));
+
+	// Thin outline: stroked directly on arch-mask's own exact bbox (pad 0,
+	// not wrapArch's padded box) so it shares the identical coordinate
+	// frame/viewBox as the mask — the fix for an earlier bug where a
+	// separately-padded outline asset, stretched via a CSS inset percentage
+	// that didn't match its own padding ratio, distorted the curve. A thin
+	// stroke's half-width poking a fraction of a unit past the bbox on a
+	// 400-wide canvas is visually inert.
+	save('arch-outline.svg', svgFromBbox(panel.bbox, `<path fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" d="${panel.d}"/>`, 0));
 
 	// Double-line frame: outline plus a second, uniformly inset copy
-	// (inset both axes, not just x, so the two lines stay concentric),
-	// wrapped to the union of both panels' true bboxes.
+	// (inset both axes, not just x, so the two lines stay concentric).
 	const inset = 14;
-	const inner = keelArchPanel(w - inset * 2, jamb - inset, baseH - inset * 2);
+	const inner = ogeeArchPanel(w - inset * 2, jamb - inset, baseH - inset * 2);
 	const unionBbox = {
 		minX: Math.min(panel.bbox.minX, inner.bbox.minX + inset),
 		minY: Math.min(panel.bbox.minY, inner.bbox.minY + inset),
@@ -449,11 +486,12 @@ function quatrefoilPath(size) {
 
 // divider-section: the main fix. A centered hairline with diamond
 // terminals and a rosette medallion at the center — replaces the broken
-// eqc-heading-rule--ornate (see components.css).
+// eqc-heading-rule--ornate (see components.css). The medallion is the
+// same traced rosette as divider-medallion.svg/rosette.svg (see §1),
+// not the plain spikedRosettePath star this divider used before.
 {
 	const w = 240, h = 32, cy = 16;
 	const diamond = (cx) => regularPolygonPath(cx, cy, 3.2, 4, 0);
-	const medallion = spikedRosettePath(w / 2, cy, 11, 5, 8);
 	const lineLen = 74;
 	const body =
 		`<g fill="none" stroke="currentColor" stroke-width="1">` +
@@ -464,7 +502,7 @@ function quatrefoilPath(size) {
 		`<path d="${diamond(w / 2 - lineLen - 16)}"/>` +
 		`<path d="${diamond(w / 2 + lineLen + 16)}"/>` +
 		`</g>` +
-		`<path fill="none" stroke="currentColor" stroke-width="1.3" stroke-linejoin="round" d="${medallion}"/>`;
+		tracedRosette(w / 2, cy, 11);
 	save('divider-section.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 
@@ -478,15 +516,15 @@ function quatrefoilPath(size) {
 	save('divider-eyebrow.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 
-// divider-card: short in-card rule with a small central rosette.
+// divider-card: short in-card rule with a small central rosette (same
+// traced shape as divider-section.svg's medallion, smaller).
 {
 	const w = 140, h = 20, cy = 10;
-	const medallion = spikedRosettePath(w / 2, cy, 7, 3, 8);
 	const lineLen = 46;
 	const body =
 		`<line x1="${fmt(w / 2 - lineLen - 10)}" y1="${cy}" x2="${fmt(w / 2 - 10)}" y2="${cy}" stroke="currentColor" stroke-width="1"/>` +
 		`<line x1="${fmt(w / 2 + 10)}" y1="${cy}" x2="${fmt(w / 2 + lineLen + 10)}" y2="${cy}" stroke="currentColor" stroke-width="1"/>` +
-		`<path fill="none" stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" d="${medallion}"/>`;
+		tracedRosette(w / 2, cy, 7);
 	save('divider-card.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 
