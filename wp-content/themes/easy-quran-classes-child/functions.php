@@ -57,7 +57,7 @@ function eqc_setup() {
 add_action( 'after_setup_theme', 'eqc_setup' );
 
 /**
- * Enqueue parent stylesheet, Google fonts, then the child's tokens ->
+ * Enqueue parent stylesheet, self-hosted fonts, then the child's tokens ->
  * components -> motion -> style.css cascade (each layer can safely
  * override the one before it), then the shared vanilla JS.
  */
@@ -66,9 +66,9 @@ function eqc_enqueue_assets() {
 
 	wp_enqueue_style(
 		'easy-quran-classes-fonts',
-		'https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600&display=swap',
+		get_stylesheet_directory_uri() . '/assets/css/fonts.css',
 		array(),
-		null
+		$theme_version
 	);
 
 	// Hello Elementor registers/enqueues its own 'hello-elementor' style
@@ -113,6 +113,14 @@ function eqc_enqueue_assets() {
 	);
 }
 add_action( 'wp_enqueue_scripts', 'eqc_enqueue_assets', 20 );
+
+/** Discover the two above-the-fold font files before stylesheets finish loading. */
+function eqc_preload_fonts() {
+	foreach ( array( 'dm-serif-display-latin-400.woff2', 'manrope-latin-variable.woff2' ) as $font ) {
+		printf( '<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>', esc_url( get_stylesheet_directory_uri() . '/assets/fonts/' . $font ) );
+	}
+}
+add_action( 'wp_head', 'eqc_preload_fonts', 2 );
 
 /**
  * Mark the document as JS-capable before first paint, so motion.css can

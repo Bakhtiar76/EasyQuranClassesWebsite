@@ -100,6 +100,7 @@ These are the working tokens, validated against both the confirmed logo and the 
   --eqc-green-700: #24503B;
   --eqc-brand-green: #006B3D;
 
+  --eqc-gold-700: #6F551C; /* Small gold text on cream: AA contrast. */
   --eqc-gold-600: #A98235;
   --eqc-gold-500: #B9974C;
   --eqc-gold-300: #D9C48D;
@@ -191,7 +192,7 @@ Do not reduce body copy below 16px on mobile.
 ### Global Widths
 
 ```css
---eqc-content-max: 1240px;
+--eqc-content-max: 1400px;
 --eqc-content-narrow: 820px;
 --eqc-text-max: 680px;
 ```
@@ -368,6 +369,8 @@ Do not collect more personal information than the business genuinely needs.
 
 ## 14. Header
 
+Parity implementation (2026-09-09): shared chrome spans94% of the viewport, capped at1810px. Header bar scales64–150px; the approved vector mark accompanies a two-line live wordmark. Six links are Home, About Us, Courses, Teachers, Pricing, Contact Us; the separate gift CTA reads FREE TRIAL. The drawer is used below1024px, traps focus, makes the background inert and clears its state when resized to desktop. The header compacts on scroll. Fonts are bundled locally with their OFL licences.
+
 Desktop header should follow the client reference direction:
 
 - white/surface rounded container
@@ -399,6 +402,10 @@ FAQ and Blog may live in a secondary route, footer, or expanded navigation depen
 - drawer must be keyboard accessible
 
 ## 15. Footer
+
+Parity implementation follows `Assests/End.jpeg`: a dark CTA with a two-line white/gold heading and three-line paragraph, one white rounded action capsule containing four avatars, a count circle and gold button. It remains two columns from1120px. The cream footer panel has three ruled columns (brand/about, contact, two columns of four quick links), then a dark copyright bar with an overlapping logo medallion. The footer grid stacks below1024px. Small gold text uses gold700; decorative gold retains the reference palette. Missing social URLs render noninteractive labelled marks. Photography sources and fictional portrait status are documented in QA/ASSET-SOURCES.md.
+
+TASK-DESIGN-PARITY.md explicitly permits exact unverified reference claims on the local staging site. Every such string belongs in QA/PLACEHOLDER-REGISTER.md and requires clearance before production; this local task exception supersedes the general prohibition below during parity work only.
 
 Footer should combine the client reference's strong dark-green identity with a clean information hierarchy.
 

@@ -168,7 +168,7 @@ function eqc_button( $text, $url, $classes = '' ) {
 /**
  * Look up a seeded Media Library attachment ID by its recognizable
  * source filename fragment (e.g. 'hero-online-quran-class', matching
- * local/media-staging/hero-online-quran-class.jpg), so page-building
+ * local/media-staging/hero-online-quran-class.webp), so page-building
  * scripts never hardcode brittle numeric IDs.
  *
  * Matches on the attached file path (_wp_attached_file), not post_name —
@@ -606,6 +606,12 @@ function eqc_faq_group( $title, $items ) {
  * @param array $elements Top-level array of container elements.
  */
 function eqc_save_elementor_page( $post_id, $elements ) {
+	if ( 'local' !== wp_get_environment_type() || 'localhost' !== wp_parse_url( home_url(), PHP_URL_HOST ) ) {
+		WP_CLI::error( 'Page builders require the approved localhost environment.' );
+	}
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		WP_CLI::error( 'Page builders require an editor user; run with --user=1.' );
+	}
 	if ( ! did_action( 'elementor/loaded' ) ) {
 		WP_CLI::error( 'Elementor is not loaded.' );
 	}
@@ -621,6 +627,13 @@ function eqc_save_elementor_page( $post_id, $elements ) {
 			'settings' => array(),
 		)
 	);
+
+	// Re-query persisted markup: Elementor can report success after a no-op.
+	// Fresh element IDs are generated every build, so the root ID proves this save landed.
+	$saved = json_decode( get_post_meta( $post_id, '_elementor_data', true ), true );
+	if ( empty( $elements[0]['id'] ) || ( $saved[0]['id'] ?? null ) !== $elements[0]['id'] ) {
+		WP_CLI::error( "Elementor save verification failed for post #{$post_id}." );
+	}
 
 	// Force the page to be recognized as Elementor-built and regenerate CSS.
 	update_post_meta( $post_id, '_elementor_edit_mode', 'builder' );

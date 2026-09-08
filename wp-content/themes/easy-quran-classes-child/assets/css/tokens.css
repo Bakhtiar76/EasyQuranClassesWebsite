@@ -11,6 +11,12 @@
 	--eqc-green-700: #24503B;
 	--eqc-brand-green: #006B3D;
 
+	/* --eqc-gold-700 is the only gold dark enough to carry text on cream at
+	   any size (6.3:1 on --eqc-cream-100; --eqc-gold-600 is 3.2:1, which
+	   only clears AA as large text). DESIGN.md §5 warns against
+	   low-contrast gold on cream but stops at --eqc-gold-600, so this
+	   extends the ramp rather than introducing a new hue. */
+	--eqc-gold-700: #6F551C;
 	--eqc-gold-600: #A98235;
 	--eqc-gold-500: #B9974C;
 	--eqc-gold-300: #D9C48D;
@@ -56,6 +62,22 @@
 	--eqc-content-max: 1400px;
 	--eqc-content-narrow: 820px;
 	--eqc-text-max: 680px;
+
+	/* Site chrome — header bar and footer panels.
+	 * These deliberately do NOT use --eqc-content-max. In the client
+	 * reference the header bar and the footer panels are near-full-bleed
+	 * frames — 1232/1307 of the Home.jpeg canvas and 1403/1489 of
+	 * End.jpeg, i.e. ~94% in both — while the page content inside them
+	 * stays on the narrower content column. See
+	 * QA/design-review/global-chrome.md rows 1 and 7.
+	 * The bar height, mark size and panel radius are the same proportion
+	 * of the canvas scaled fluidly, so the chrome keeps the reference's
+	 * generous desktop presence without becoming oversized on a phone. */
+	--eqc-chrome-width: 94%;
+	--eqc-chrome-max: 1810px;
+	--eqc-header-h: clamp(64px, 34px + 6vw, 150px);
+	--eqc-logo-mark-size: clamp(44px, 22px + 4.4vw, 106px);
+	--eqc-radius-chrome: clamp(22px, 1rem + 1.4vw, 44px);
 
 	--eqc-section-space: clamp(2.75rem, 2rem + 3vw, 6.5rem);
 	--eqc-gutter: clamp(1rem, 0.6rem + 1.6vw, 2rem);

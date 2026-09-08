@@ -14,6 +14,10 @@ if ( ! defined( 'WP_CLI' ) ) {
 	exit( "Run via WP-CLI: wp eval-file /tools/00-site-setup.php\n" );
 }
 
+if ( 'local' !== wp_get_environment_type() || 'localhost' !== wp_parse_url( home_url(), PHP_URL_HOST ) ) {
+	WP_CLI::error( 'Site scaffolding requires the approved localhost environment.' );
+}
+
 /**
  * Create a page if it does not already exist (matched by slug), else
  * return the existing page's ID untouched.
@@ -93,24 +97,24 @@ if ( $sample && 'trash' !== $sample->post_status ) {
 // 5. Primary navigation menu.
 $primary_items = array(
 	'Home'       => home_url( '/' ),
-	'About'      => home_url( '/about/' ),
+	'About Us'   => home_url( '/about/' ),
 	'Courses'    => home_url( '/courses/' ),
 	'Teachers'   => home_url( '/teachers/' ),
 	'Pricing'    => home_url( '/pricing/' ),
-	'Contact'    => home_url( '/contact/' ),
-	'Free Trial' => home_url( '/free-trial/' ),
+	'Contact Us' => home_url( '/contact/' ),
 );
 $primary_menu_id = eqc_ensure_menu( 'Primary Navigation', $primary_items );
 
 // 6. Footer quick-links menu.
 $footer_items = array(
 	'About'                          => home_url( '/about/' ),
-	'Courses'                        => home_url( '/courses/' ),
-	'Teachers'                       => home_url( '/teachers/' ),
-	'Pricing'                        => home_url( '/pricing/' ),
-	'Blog'                           => home_url( '/blog/' ),
-	'FAQ'                            => home_url( '/faq/' ),
-	'Online Quran Classes for Kids'  => home_url( '/online-quran-classes-for-kids/' ),
+	'Give Donation'                  => home_url( '/contact/?enquiry=donation' ),
+	'Education Support'              => home_url( '/contact/?enquiry=education-support' ),
+	'Our Campaign'                   => home_url( '/contact/?enquiry=campaign' ),
+	'Contact'                        => home_url( '/contact/' ),
+	'Privacy Policy'                 => home_url( '/contact/?enquiry=privacy-policy' ),
+	'Terms & Conditions'             => home_url( '/contact/?enquiry=terms' ),
+	'FAQs'                           => home_url( '/faq/' ),
 );
 $footer_menu_id = eqc_ensure_menu( 'Footer Quick Links', $footer_items );
 $locations               = (array) get_theme_mod( 'nav_menu_locations', array() );
@@ -120,20 +124,23 @@ set_theme_mod( 'nav_menu_locations', $locations );
 
 /**
  * Create a nav menu with the given label => URL items if a menu with this
- * name does not already exist; otherwise return the existing menu's ID
- * (left untouched so manual admin edits are never clobbered by a re-run).
+ * name does not already exist. Reconcile the reference labels once on an
+ * existing local site; subsequent bootstrap runs preserve administrator edits.
  */
 function eqc_ensure_menu( $name, $items ) {
 	$existing = wp_get_nav_menu_object( $name );
-	if ( $existing ) {
+	$marker = 'eqc_parity_menu_' . sanitize_key( $name );
+	if ( $existing && get_option( $marker ) ) {
 		return $existing->term_id;
 	}
-	$menu_id = wp_create_nav_menu( $name );
+	$menu_id = $existing ? $existing->term_id : wp_create_nav_menu( $name );
+	$old_items = wp_get_nav_menu_items( $menu_id ) ?: array();
 	$position = 1;
 	foreach ( $items as $label => $url ) {
+		$old_item = array_shift( $old_items );
 		wp_update_nav_menu_item(
 			$menu_id,
-			0,
+			$old_item ? $old_item->ID : 0,
 			array(
 				'menu-item-title'    => $label,
 				'menu-item-url'      => $url,
@@ -142,7 +149,11 @@ function eqc_ensure_menu( $name, $items ) {
 			)
 		);
 	}
-	WP_CLI::log( "Created menu: {$name} (#{$menu_id})" );
+	foreach ( $old_items as $old_item ) {
+		wp_delete_post( $old_item->ID, true ); // Only obsolete local navigation items, never destination pages.
+	}
+	update_option( $marker, 1 );
+	WP_CLI::log( "Reconciled menu: {$name} (#{$menu_id})" );
 	return $menu_id;
 }
 
@@ -170,12 +181,14 @@ $contact_defaults = array(
 	'eqc_contact_email'    => 'info@easyquranclasses.com',
 	'eqc_whatsapp_number'  => '10000000000',
 	'eqc_whatsapp_display' => '+1 (000) 000-0000',
-	'eqc_phone_display'    => '+1 (000) 000-0000',
-	'eqc_address'          => '',
+	'eqc_phone_display'    => '(406) 555-0120',
+	'eqc_address'          => 'Random Address, USA 733898',
 	'eqc_footer_about'     => 'Online Quran classes for kids and adults with qualified teachers. Learn Quran, Tajweed, Hifz and Islamic Studies from the comfort of your home.',
 );
 foreach ( $contact_defaults as $mod => $value ) {
-	if ( false === get_theme_mod( $mod, false ) ) {
+	$current = get_theme_mod( $mod, false );
+	$replace_placeholder = ( 'eqc_phone_display' === $mod && '+1 (000) 000-0000' === $current ) || ( 'eqc_address' === $mod && '' === $current );
+	if ( false === $current || $replace_placeholder ) {
 		set_theme_mod( $mod, $value );
 	}
 }

@@ -100,7 +100,57 @@ function eqc_divider_svg( $variant, $class = '' ) {
  * @return string
  */
 function eqc_logo_mark_svg( $class = '' ) {
-	return eqc_get_svg_asset( 'logo/eqc-logo-mark', trim( 'eqc-logo-mark ' . $class ) );
+	$svg = eqc_get_svg_asset( 'logo/eqc-logo-mark', trim( 'eqc-logo-mark ' . $class ) );
+	if ( ! $svg ) {
+		return '';
+	}
+	// The asset file carries aria-label="Easy Quran Classes". Every call site
+	// pairs the mark with live text that already says the same thing (the
+	// lockup below) or is purely ornamental (the footer medallion), so the
+	// label would only duplicate the link name — hide the mark from
+	// assistive tech at the point of use rather than in the generated asset.
+	return preg_replace( '/<svg /', '<svg aria-hidden="true" focusable="false" ', $svg, 1 );
+}
+
+/**
+ * The full brand lockup as a home link: the mark, "EASY QURAN" on one line,
+ * and a letterspaced "CLASSES" between two short gold rules below it —
+ * the two-line wordmark the client reference uses in both the header and
+ * the footer (Assests/Home.jpeg, Assests/End.jpeg).
+ *
+ * Both lines are live text driven by the WordPress site title (the last
+ * word becomes the ruled sub-line), so the brand name is still owned by
+ * Settings > General and stays selectable, translatable and searchable
+ * instead of being baked into an image. A single-word site title simply
+ * renders without the sub-line.
+ *
+ * Shared by header.php and footer.php so the two can never drift apart.
+ *
+ * @param string $class Extra classes appended to "eqc-logo-link".
+ * @return string
+ */
+function eqc_logo_lockup( $class = '' ) {
+	$name  = trim( wp_strip_all_tags( get_bloginfo( 'name', 'display' ) ) );
+	$words = $name ? preg_split( '/\s+/', $name ) : array();
+	$sub   = count( $words ) > 1 ? array_pop( $words ) : '';
+	$main  = implode( ' ', $words );
+
+	// Preserve a real word separator between the two display lines so the
+	// link's accessible name comes directly from its visible text.
+	$html  = '<a class="' . esc_attr( trim( 'eqc-logo-link ' . $class ) ) . '" href="' . esc_url( home_url( '/' ) ) . '" rel="home">';
+	$html .= eqc_logo_mark_svg();
+	$html .= '<span class="eqc-logo-lockup">';
+	$html .= '<span class="eqc-logo-name">' . esc_html( $main ) . '</span> ';
+	if ( $sub ) {
+		$html .= '<span class="eqc-logo-sub">'
+			. '<span class="eqc-logo-rule" aria-hidden="true"></span>'
+			. '<span class="eqc-logo-sub-text">' . esc_html( $sub ) . '</span>'
+			. '<span class="eqc-logo-rule" aria-hidden="true"></span>'
+			. '</span>';
+	}
+	$html .= '</span></a>';
+
+	return $html;
 }
 
 /**

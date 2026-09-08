@@ -1,0 +1,6 @@
+closed   {"open":false,"drawerInert":true,"headerInert":false,"mainInert":false,"expanded":"false","bodyOverflow":""}
+opened   {"open":true,"drawerInert":false,"headerInert":true,"mainInert":true,"expanded":"true","bodyOverflow":"hidden"} focus: BUTTON.eqc-nav-close|Close menu
+trap     focus stayed inside for 14 tabs
+escaped  {"open":false,"drawerInert":true,"headerInert":false,"mainInert":false,"expanded":"false","bodyOverflow":""} focus: BUTTON.eqc-nav-toggle|Menu
+closebtn {"open":false,"drawerInert":true,"headerInert":false,"mainInert":false,"expanded":"false","bodyOverflow":""} focus: BUTTON.eqc-nav-toggle|Menu
+resized  {"open":false,"drawerInert":true,"headerInert":false,"mainInert":false,"expanded":"false","bodyOverflow":""}

@@ -11,7 +11,7 @@
 // Usage: node build-icon-sprite.mjs
 import * as lucide from 'lucide-static';
 import * as simpleIcons from 'simple-icons';
-import { writeFileSync } from 'node:fs';
+import { readFileSync, writeFileSync } from 'node:fs';
 import { optimize } from 'svgo';
 import { starPolygonPath } from './lib/geometry.mjs';
 
@@ -45,6 +45,14 @@ const LUCIDE_MAP = {
 	sparkle: 'Sparkle',
 	'chevron-right': 'ChevronRight',
 	'monitor-play': 'MonitorPlay',
+	// Global chrome parity (QA/design-review/global-chrome.md #4, #6): the
+	// header CTA is a gift + FREE TRIAL, and the footer CTA button carries a
+	// circled double chevron. Both come from Lucide as outline glyphs so they
+	// sit on the same 24px grid and 1.75px stroke as the rest of the family
+	// (DESIGN.md §11) — the reference draws the gift filled, which would be a
+	// second icon style for one button.
+	gift: 'Gift',
+	'chevrons-right': 'ChevronsRight',
 };
 
 // existing id -> simple-icons export name. Shipped filled (their real
@@ -53,7 +61,7 @@ const LUCIDE_MAP = {
 const BRAND_MAP = {
 	whatsapp: 'siWhatsapp',
 	facebook: 'siFacebook',
-	twitter: 'siX', // the bird mark was retired; siX is the current official X glyph
+	twitter: null, // Reference uses the bird; vendored CC0 Simple Icons 9.21.0 asset.
 	instagram: 'siInstagram',
 	youtube: 'siYoutube',
 };
@@ -86,7 +94,7 @@ for (const [id, lucideName] of Object.entries(LUCIDE_MAP)) {
 }
 
 for (const [id, siName] of Object.entries(BRAND_MAP)) {
-	const icon = simpleIcons[siName];
+	const icon = siName ? simpleIcons[siName] : { svg: readFileSync(new URL('./twitter-reference.svg', import.meta.url), 'utf8') };
 	if (!icon) throw new Error(`Simple Icons icon not found: ${siName} (for eqc-icon-${id})`);
 	const inner = extractInner(icon.svg);
 	const cleaned = optimizeFragment(inner, '0 0 24 24');

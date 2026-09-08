@@ -1,8 +1,29 @@
 /*
  * Site shell — header, mobile nav drawer, footer. DESIGN.md §14–15.
  * Structural layout only; color/spacing tokens come from tokens.css,
- * interactive states from components.css, transitions from motion.css.
+ * interactive states from components.css, scroll/reveal motion from
+ * motion.css. (The one transition declared here is the sticky-header
+ * size change, because the properties it animates are the chrome sizing
+ * tokens defined in this file and nowhere else.)
+ *
+ * Geometry follows the client reference as measured in
+ * QA/design-review/global-chrome.md: the header bar and footer panels are
+ * ~94% of the canvas (--eqc-chrome-*), not the narrower content column.
  */
+
+/* ---------- Shared chrome frame ---------- */
+
+/*
+ * Full-bleed-ish frame for the header bar and footer panels. Overrides
+ * .eqc-container's content max-width and drops its inline padding — here
+ * the container box *is* the painted panel, so the inset belongs to the
+ * panel's own padding instead.
+ */
+.eqc-container--chrome {
+	width: min(var(--eqc-chrome-width), calc(100% - 2 * var(--eqc-gutter)));
+	max-width: var(--eqc-chrome-max);
+	padding-inline: 0;
+}
 
 /* ---------- Header ---------- */
 
@@ -11,52 +32,126 @@
 	top: 0;
 	z-index: 100;
 	background: var(--eqc-cream-100);
-	padding-block: clamp(0.75rem, 0.6rem + 0.6vw, 1.1rem);
+	padding-block: clamp(0.6rem, 0.2rem + 1.9vw, 2.6rem);
 }
 
 .eqc-header-bar {
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: clamp(0.75rem, 1vw, 2rem);
-	background: var(--eqc-surface);
+	gap: clamp(0.75rem, 1.4vw, 2.5rem);
+	min-height: var(--eqc-header-h);
+	background: var(--eqc-white);
 	border: 1px solid var(--eqc-border);
 	border-radius: var(--eqc-radius-pill);
-	padding: 0.6rem 0.6rem 0.6rem clamp(1rem, 1vw, 1.75rem);
+	padding-block: 0.5rem;
+	padding-inline: clamp(1rem, 0.2rem + 3.6vw, 4.5rem);
 	box-shadow: var(--eqc-shadow-card);
 }
 
+/*
+ * Sticky-header compaction. The reference is a static mock-up, so it says
+ * nothing about scrolled state — and its full 150px bar would eat a third
+ * of a laptop viewport on every scroll. Shrinking the chrome tokens keeps
+ * the reference's presence at the top of the page while honouring
+ * DESIGN.md §14 ("sticky state must preserve viewport space").
+ */
+.eqc-header.is-scrolled {
+	--eqc-header-h: clamp(60px, 32px + 3.1vw, 92px);
+	--eqc-logo-mark-size: clamp(34px, 20px + 2.3vw, 62px);
+	padding-block: clamp(0.4rem, 0.25rem + 0.5vw, 0.85rem);
+}
+.eqc-header,
+.eqc-header-bar,
+.eqc-logo-mark {
+	transition: min-height var(--eqc-motion-base) var(--eqc-ease-standard),
+		height var(--eqc-motion-base) var(--eqc-ease-standard),
+		padding-block var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+
+/* ---------- Logo lockup ---------- */
+
+/* Vector mark + two lines of live text (eqc_logo_lockup() in
+   inc/template-tags.php): "EASY QURAN" over a letterspaced "CLASSES"
+   between two gold rules, as both the header and the footer draw it in
+   the reference. The mark inherits `color`, so one asset serves the
+   header, the footer column and the copyright medallion. */
 .eqc-logo { display: flex; align-items: center; min-width: 0; }
-/* Vector mark + live text, replacing the previous raster <img> (traced
-   from Assests/Logo/Logo2.jpeg — see tools/graphics/README.md): crisp at
-   any size, and inheriting `color` means one asset serves both the header
-   (dark green) and the dark footer CTA (gold) with no separate "mono"
-   file, unlike the old fixed-color PNG/WebP. */
+
 .eqc-logo-link {
+	--eqc-logo-sub-color: var(--eqc-heading);
 	display: flex;
 	align-items: center;
-	gap: 0.6em;
+	gap: clamp(0.5rem, 0.2rem + 0.8vw, 1rem);
 	min-width: 0;
 	text-decoration: none;
+	color: var(--eqc-heading);
+}
+
+.eqc-logo-mark {
+	height: var(--eqc-logo-mark-size);
+	width: auto;
+	flex: none;
 	color: var(--eqc-green-800);
 }
-.eqc-logo-mark { height: clamp(36px, 3.4vw, 52px); width: auto; flex: none; }
-.eqc-logo-text {
-	font-family: var(--eqc-font-display);
-	font-size: clamp(1.1rem, 1vw + 0.7rem, 1.4rem);
-	color: var(--eqc-heading);
-	text-decoration: none;
-	white-space: nowrap;
-	overflow: hidden;
-	text-overflow: ellipsis;
+
+/* One font-size drives the whole wordmark, derived from the mark height so
+   the lockup keeps its proportions at every viewport. */
+.eqc-logo-lockup {
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 0.24em;
+	min-width: 0;
+	font-size: calc(var(--eqc-logo-mark-size) * 0.32);
 }
+
+.eqc-logo-name {
+	font-family: var(--eqc-font-display);
+	font-size: 1em;
+	line-height: 1;
+	letter-spacing: 0.01em;
+	text-transform: uppercase;
+	white-space: nowrap;
+	color: var(--eqc-heading);
+}
+
+/* The rules flex to fill whatever the tracked word leaves, so the second
+   line always measures exactly as wide as the first. */
+.eqc-logo-sub {
+	display: flex;
+	align-items: center;
+	gap: 0.55em;
+	font-size: 0.34em;
+}
+.eqc-logo-rule {
+	flex: 1 1 0;
+	min-width: 1.4em;
+	height: 1px;
+	background: var(--eqc-gold-500);
+}
+.eqc-logo-sub-text {
+	font-family: var(--eqc-font-body);
+	font-weight: 600;
+	font-size: 1em;
+	line-height: 1;
+	text-transform: uppercase;
+	white-space: nowrap;
+	color: var(--eqc-logo-sub-color);
+	/* letter-spacing also adds a trailing gap after the last letter; the
+	   matching indent re-centres the word between its two rules. */
+	letter-spacing: 0.62em;
+	text-indent: 0.62em;
+}
+
+/* ---------- Primary navigation ---------- */
 
 .eqc-nav-list {
 	display: none;
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	gap: clamp(1rem, 1.6vw, 1.9rem);
+	gap: clamp(1rem, 0.4rem + 1.9vw, 2.9rem);
 	align-items: center;
 }
 
@@ -64,7 +159,7 @@
 	text-decoration: none;
 	color: var(--eqc-heading);
 	font-weight: 600;
-	font-size: 0.95rem;
+	font-size: clamp(0.95rem, 0.75rem + 0.5vw, 1.3rem);
 	position: relative;
 	padding-block: 0.4em;
 }
@@ -72,9 +167,10 @@
 	content: '';
 	position: absolute;
 	left: 0;
-	bottom: -2px;
+	bottom: -0.35em;
 	width: 100%;
-	height: 2px;
+	height: 3px;
+	border-radius: 2px;
 	background: var(--eqc-bronze-600);
 	transform: scaleX(0);
 	transform-origin: left;
@@ -86,8 +182,29 @@
 .eqc-nav-list .current-menu-item > a,
 .eqc-nav-list .current_page_item > a { color: var(--eqc-bronze-700); }
 
+/* ---------- Header actions ---------- */
+
 .eqc-header-actions { display: flex; align-items: center; gap: 0.6rem; flex: none; }
-.eqc-header-cta { display: none; }
+
+/* Element-qualified throughout: components.css deliberately writes its
+   button rules as `a.eqc-btn` (0,1,1), so a bare `.eqc-header-cta` (0,1,0)
+   loses — including the `display` reset, which is why the pill used to
+   overlap the logo on a 390px screen instead of staying in the drawer. */
+a.eqc-header-cta {
+	display: none;
+	--_h: clamp(44px, 20px + 2.9vw, 76px);
+	padding-inline: clamp(1rem, 0.4rem + 1.5vw, 2.1rem);
+	font-size: clamp(0.875rem, 1.08vw, 1.3rem);
+	font-weight: 700;
+	letter-spacing: 0.07em;
+	text-transform: uppercase;
+}
+/* The reference's gift sits at ~0.55 of the pill height; keying it to the
+   pill rather than the label keeps that ratio as the bar scales. */
+a.eqc-header-cta .eqc-icon {
+	width: calc(var(--_h) * 0.55);
+	height: calc(var(--_h) * 0.55);
+}
 
 .eqc-nav-toggle {
 	display: inline-flex;
@@ -107,12 +224,19 @@
 .eqc-nav-toggle[aria-expanded="true"] .eqc-icon-open { display: none; }
 .eqc-nav-toggle[aria-expanded="true"] .eqc-icon-close { display: block; }
 
+/* The conversion CTA returns to the bar as soon as the logo lockup, the
+   pill and the menu button fit without crowding — measured: comfortable
+   from 480px, out of room by 430px. Below this it lives in the drawer
+   only, per DESIGN.md §14. */
+@media (min-width: 30rem) {
+	a.eqc-header-cta { display: inline-flex; }
+}
+
 /* Content-driven breakpoint: once there is room for the full nav + CTA
-   without crowding (measured against the 7-item nav + button), switch
+   without crowding (measured against the 6-item nav + button), switch
    from the drawer to the inline desktop layout. */
 @media (min-width: 64rem) {
 	.eqc-nav-list { display: flex; }
-	.eqc-header-cta { display: inline-flex; }
 	.eqc-nav-toggle { display: none; }
 }
 
@@ -141,6 +265,25 @@
 	box-shadow: -12px 0 32px rgba(20, 35, 27, 0.18);
 }
 
+/* Close control inside the overlay itself — the header toggle that opened
+   the drawer sits behind the scrim and is made inert while it is open. */
+.eqc-nav-close {
+	position: absolute;
+	top: 1rem;
+	right: 1rem;
+	width: 44px;
+	height: 44px;
+	border-radius: 50%;
+	border: 1px solid var(--eqc-border-strong);
+	background: var(--eqc-cream-50);
+	color: var(--eqc-heading);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	cursor: pointer;
+}
+.eqc-nav-close .eqc-icon { width: 1.35em; height: 1.35em; }
+
 .eqc-nav-drawer-list {
 	list-style: none;
 	margin: 0;
@@ -165,107 +308,498 @@
 	.eqc-nav-scrim, .eqc-nav-drawer { display: none; }
 }
 
-/* ---------- Footer ---------- */
+/* ---------- Footer shell ---------- */
 
 .eqc-footer {
-	background: var(--eqc-cream-50);
-	padding-block: var(--eqc-section-space);
+	background: var(--eqc-cream-100);
+	padding-block: var(--eqc-section-space) clamp(1.5rem, 1rem + 1.6vw, 3rem);
 }
+
+/* ---------- Final CTA panel ---------- */
 
 .eqc-footer-cta {
 	background: var(--eqc-green-900);
 	color: var(--eqc-cream-100);
-	border-radius: var(--eqc-radius-panel);
-	padding: clamp(1.75rem, 1.3rem + 2vw, 3.25rem);
+	border-radius: var(--eqc-radius-chrome);
+	padding: clamp(1.75rem, 0.9rem + 2.6vw, 4.25rem);
 	display: flex;
 	flex-wrap: wrap;
 	align-items: center;
 	justify-content: space-between;
-	gap: 1.75rem;
-	margin-bottom: clamp(2.5rem, 2rem + 2vw, 4rem);
+	gap: clamp(1.5rem, 1rem + 2vw, 3.5rem);
+	margin-bottom: clamp(0.9rem, 0.6rem + 0.7vw, 1.5rem);
 	position: relative;
 	overflow: hidden;
 }
-.eqc-footer-cta h2 { color: var(--eqc-white); margin-block: 0.3em 0.4em; font-size: var(--eqc-fs-h2); }
-.eqc-footer-cta p { max-width: 40ch; color: var(--eqc-cream-100); opacity: 0.85; }
-.eqc-footer-cta-text { flex: 1 1 340px; }
-.eqc-footer-cta-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 0.85rem; }
+.eqc-footer-cta::before {
+	content: '';
+	position: absolute;
+	inset: 0 0 0 auto;
+	width: 36%;
+	background: var(--eqc-gold-300);
+	opacity: 0.035;
+	mask: url('../svg/girih-lattice-fine.svg') right center / 72px repeat;
+	pointer-events: none;
+}
+.eqc-footer-cta > * { position: relative; }
+/* Grows into whatever the capsule leaves; the basis only has to be small
+   enough not to force a wrap above the explicit stacking breakpoint below. */
+.eqc-footer-cta-text { flex: 1 1 min(100%, 22rem); min-width: 0; }
 
-/* Floating avatar-stack + student-count pill overlapping the dark CTA
-   panel, matching the reference (Assests/WhatsApp Image 2026-09-04 at
-   4.23.27 PM (1).jpeg) instead of a bare pair of buttons. */
-.eqc-footer-stat-pill {
+/* The reference's CTA eyebrow is a circled icon beside a ruled gold label,
+   not the site's pill `.eqc-eyebrow` — kept as its own small component so
+   neither treatment has to override the other. */
+.eqc-cta-eyebrow {
 	display: flex;
 	align-items: center;
-	gap: 0.7em;
-	background: var(--eqc-surface);
-	color: var(--eqc-heading);
-	border-radius: var(--eqc-radius-pill);
-	padding: 0.55em 1.1em 0.55em 0.55em;
-	box-shadow: var(--eqc-shadow-card);
+	gap: clamp(0.6rem, 0.9vw, 1.1rem);
 }
-.eqc-avatar-stack { display: flex; }
+/* Circular icon badges size their glyph off their own diameter (a local
+   custom property + em), so the ratio the reference uses holds at every
+   viewport instead of drifting with the inherited font-size. */
+.eqc-cta-eyebrow-icon {
+	--_badge-size: clamp(38px, 20px + 1.9vw, 58px);
+	width: var(--_badge-size);
+	height: var(--_badge-size);
+	font-size: calc(var(--_badge-size) * 0.4);
+	flex: none;
+	border-radius: 50%;
+	border: 1px solid var(--eqc-gold-600);
+	color: var(--eqc-gold-300);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+.eqc-cta-eyebrow-label {
+	font-size: clamp(0.8125rem, 0.7rem + 0.28vw, 1.05rem);
+	font-weight: 700;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--eqc-gold-300);
+	padding-bottom: 0.65em;
+	border-bottom: 1px solid var(--eqc-gold-600);
+}
+
+.eqc-footer-cta h2 {
+	color: var(--eqc-white);
+	font-family: var(--eqc-font-display);
+	/* Capped so "Your First Class Is Free." holds the reference's single
+	   line in the column width the capsule leaves beside it — this face
+	   sets wider than the mock-up's, so the mock-up's ~71px would wrap. */
+	font-size: clamp(2rem, 1.1rem + 2.65vw, 3.875rem);
+	line-height: 1.12;
+	margin: clamp(1rem, 0.8rem + 0.8vw, 1.9rem) 0 0;
+}
+.eqc-cta-title-alt { display: block; color: var(--eqc-gold-500); }
+
+.eqc-cta-rule {
+	display: block;
+	width: clamp(72px, 40px + 3.2vw, 152px);
+	height: 2px;
+	border-radius: 2px;
+	background: var(--eqc-gold-500);
+	margin-block: clamp(1rem, 0.8rem + 0.9vw, 2rem);
+}
+
+.eqc-cta-body {
+	margin: 0;
+	/* At desktop the flex column is narrower than this and governs; the
+	   bound only matters once the CTA stacks and the panel goes full width. */
+	max-width: min(100%, 46rem);
+	color: var(--eqc-cream-100);
+	font-size: clamp(1rem, 0.92rem + 0.3vw, 1.3rem);
+	line-height: 1.85;
+}
+/* One block per reference line: the break points hold at desktop and each
+   line still wraps naturally when the column is narrower. */
+.eqc-cta-body > span { display: block; }
+
+/* One white action capsule holding the avatar stack, the student-count
+   circle and the primary button — reference row 6. */
+.eqc-cta-capsule {
+	display: flex;
+	align-items: center;
+	flex-wrap: wrap;
+	justify-content: center;
+	gap: clamp(0.5rem, 0.2rem + 0.75vw, 1.2rem);
+	flex: 0 1 auto;
+	background: var(--eqc-white);
+	border-radius: var(--eqc-radius-pill);
+	padding: clamp(0.4rem, 0.1rem + 1.1vw, 1.4rem);
+	box-shadow: 0 18px 44px rgba(10, 22, 16, 0.28);
+}
+
+.eqc-avatar-stack { display: flex; flex: none; }
 .eqc-avatar-stack img {
-	width: 34px;
-	height: 34px;
+	--_avatar: clamp(38px, 20px + 4.6vw, 112px);
+	width: var(--_avatar);
+	height: var(--_avatar);
 	border-radius: 50%;
 	object-fit: cover;
-	border: 2px solid var(--eqc-surface);
-	margin-inline-start: -10px;
+	border: 3px solid var(--eqc-white);
+	background: var(--eqc-cream-100);
+	margin-inline-start: calc(var(--_avatar) * -0.1);
 }
 .eqc-avatar-stack img:first-child { margin-inline-start: 0; }
-.eqc-footer-stat-text { font-size: var(--eqc-fs-small); font-weight: 600; white-space: nowrap; }
-.eqc-footer-stat-text strong { font-family: var(--eqc-font-display); font-weight: 400; color: var(--eqc-bronze-700); }
 
-.eqc-footer-grid {
-	display: grid;
-	grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
-	gap: clamp(2rem, 1.5rem + 2vw, 3.5rem);
-	padding-bottom: clamp(2rem, 1.5rem + 1.5vw, 3rem);
-	border-bottom: 1px solid var(--eqc-border);
+/* Both labels are sized as a fraction of the circle, at the reference's own
+   ratios (0.22 and 0.13 of the diameter), so the badge stays in proportion
+   as it scales. */
+.eqc-cta-stat {
+	--_stat: clamp(64px, 39px + 4.1vw, 118px);
+	width: var(--_stat);
+	height: var(--_stat);
+	flex: none;
+	margin: 0;
+	border-radius: 50%;
+	background: var(--eqc-cream-100);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 0.2em;
+	text-align: center;
+	line-height: 1.1;
 }
-
-/* h3 tag for correct document heading order (this follows the h2 footer
-   CTA heading above it with no skip); visually sized to match the former
-   h4 treatment since these are footer column labels, not major headings. */
-.eqc-footer-heading {
-	margin: 0 0 1em;
-	color: var(--eqc-heading);
-	font-size: var(--eqc-fs-h4);
-	font-family: var(--eqc-font-body);
+.eqc-cta-stat strong {
+	font-size: calc(var(--_stat) * 0.22);
 	font-weight: 700;
-	line-height: 1.25;
+	/* The reference's brighter gold is only 3.2:1 on this cream circle,
+	   which fails AA once the badge scales the figure below large-text
+	   size. Same hue family, dark enough at every size. */
+	color: var(--eqc-gold-700);
 }
-.eqc-footer-about p { color: var(--eqc-muted); max-width: 42ch; }
-/* .eqc-footer-about sits on the light .eqc-footer background (cream), not
-   the dark .eqc-footer-cta panel above it — the logo here uses the same
-   dark-on-light treatment as the header, just larger; a gold/cream color
-   (right for the dark CTA panel) would be near-invisible here. */
-.eqc-logo--footer { margin-bottom: 1rem; }
-.eqc-logo--footer .eqc-logo-mark { height: 56px; }
+.eqc-cta-stat span {
+	font-size: calc(var(--_stat) * 0.13);
+	font-weight: 600;
+	color: var(--eqc-green-800);
+}
 
-.eqc-footer-social { display: flex; gap: 0.6rem; margin-top: 1.1rem; }
+a.eqc-cta-button {
+	--_h: clamp(44px, 16px + 3.4vw, 102px);
+	background: var(--eqc-gold-500);
+	color: var(--eqc-green-900);
+	gap: clamp(0.5rem, 0.9vw, 1.1rem);
+	padding-inline: clamp(0.35rem, 0.6vw, 0.8rem) clamp(0.9rem, 0.3rem + 1.2vw, 2rem);
+	font-size: clamp(0.9rem, 0.72rem + 0.42vw, 1.35rem);
+	font-weight: 700;
+}
+a.eqc-cta-button:hover { background: var(--eqc-gold-300); }
+/* The shared gold focus ring would vanish against this button's own gold
+   fill and the white capsule behind it. */
+a.eqc-cta-button:focus-visible { outline-color: var(--eqc-green-900); }
+.eqc-cta-button-icon {
+	--_badge-size: clamp(30px, 8px + 2.5vw, 58px);
+	width: var(--_badge-size);
+	height: var(--_badge-size);
+	font-size: calc(var(--_badge-size) * 0.38);
+	flex: none;
+	border-radius: 50%;
+	background: var(--eqc-green-900);
+	color: var(--eqc-gold-300);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+
+/* Scale the reference's two-column composition together on desktop. */
+@media (min-width: 70rem) {
+	.eqc-footer-cta {
+		display: grid;
+		grid-template-columns: minmax(0, 0.39fr) minmax(0, 0.61fr);
+		gap: min(1.5vw, 29px);
+		padding: min(3.6vw, 69px) min(1.8vw, 35px) min(3.6vw, 69px) min(3.7vw, 71px);
+	}
+	.eqc-footer-cta h2 { font-size: min(3.25vw, 62px); }
+	.eqc-cta-body { font-size: min(1.15vw, 22px); line-height: 1.7; }
+	.eqc-cta-capsule { align-self: end; flex-wrap: nowrap; margin-bottom: min(0.8vw, 15px); gap: min(0.8vw, 15px); padding: min(2.05vw, 39px) min(1.3vw, 25px); border-radius: min(3.2vw, 62px); }
+	.eqc-avatar-stack img { --_avatar: min(6.1vw, 117px); margin-inline-start: calc(var(--_avatar) * -0.17); }
+	.eqc-avatar-stack img:first-child { margin-inline-start: 0; }
+	.eqc-cta-stat { --_stat: min(6.15vw, 118px); }
+	a.eqc-cta-button { --_h: min(5.1vw, 98px); flex: 1; font-size: min(1.05vw, 20px); padding-inline: min(0.8vw, 15px); white-space: nowrap; }
+	.eqc-cta-button-icon { --_badge-size: min(3vw, 58px); }
+}
+@media (max-width: 69.99rem) {
+	.eqc-footer-cta-text { flex-basis: 100%; }
+}
+
+/*
+ * Below the desktop split the capsule stops being a single pill row, and
+ * the student-count circle becomes a pill: a circle small enough for a
+ * tablet would shrink "Happy Students" to ~8px, which is unreadable. The
+ * circle is the reference's form at the width the reference was drawn at.
+ */
+@media (max-width: 64rem) {
+	.eqc-cta-stat {
+		width: auto;
+		height: auto;
+		flex-direction: row;
+		gap: 0.45em;
+		padding: 0.55em 1em;
+		border-radius: var(--eqc-radius-pill);
+	}
+	.eqc-cta-stat strong { font-size: 1.05rem; }
+	.eqc-cta-stat span { font-size: 0.8125rem; }
+}
+
+@media (max-width: 48rem) {
+	.eqc-cta-capsule {
+		border-radius: var(--eqc-radius-panel);
+		width: 100%;
+	}
+}
+
+/* ---------- Footer panel ---------- */
+
+.eqc-footer-panel {
+	background: var(--eqc-surface);
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-chrome);
+	padding: 0 clamp(6px, 0.55vw, 12px) clamp(6px, 0.55vw, 12px);
+}
+
+/* Three measured columns divided by full-height hairlines. The divider is
+   the column's own inline-start border, so it always spans the tallest
+   column without a separate spacer element. */
+.eqc-footer-grid {
+	--_col-gap: clamp(1.25rem, 1.1rem + 2.4vw, 4rem);
+	display: grid;
+	grid-template-columns: 1.02fr 1fr 1.38fr;
+	column-gap: var(--_col-gap);
+	row-gap: clamp(2rem, 1.5rem + 2vw, 3.5rem);
+	padding: clamp(1.75rem, 0.9rem + 2.6vw, 4.25rem) clamp(1.5rem, 0.6rem + 2.6vw, 3.75rem);
+}
+.eqc-footer-col--contact,
+.eqc-footer-col--links {
+	border-inline-start: 1px solid var(--eqc-border);
+	padding-inline-start: var(--_col-gap);
+}
+
+/* h3 for correct document heading order (it follows the h2 CTA heading
+   above with no skip); sized as an uppercase column label with the
+   reference's short gold underline. */
+.eqc-footer-heading {
+	margin: 0 0 clamp(1.25rem, 0.9rem + 1.1vw, 2.5rem);
+	color: var(--eqc-heading);
+	font-family: var(--eqc-font-body);
+	font-size: clamp(1.05rem, 0.85rem + 0.5vw, 1.6rem);
+	font-weight: 700;
+	letter-spacing: 0.02em;
+	line-height: 1.2;
+	text-transform: uppercase;
+}
+.eqc-footer-heading::after {
+	content: '';
+	display: block;
+	width: clamp(40px, 20px + 1.5vw, 68px);
+	height: 3px;
+	border-radius: 2px;
+	margin-top: clamp(0.6rem, 0.5rem + 0.4vw, 1.1rem);
+	background: var(--eqc-gold-500);
+}
+
+/* .eqc-footer-about sits on the light panel, so the lockup keeps the same
+   dark-on-light treatment as the header; only the "CLASSES" sub-line goes
+   gold, as the reference draws it. */
+.eqc-logo--footer { --eqc-logo-mark-size: clamp(46px, 26px + 3.6vw, 92px); }
+.eqc-logo--footer .eqc-logo-lockup { font-size: calc(var(--eqc-logo-mark-size) * 0.46); }
+.eqc-logo--footer .eqc-logo-link { --eqc-logo-sub-color: var(--eqc-gold-700); }
+
+.eqc-footer-about p {
+	color: var(--eqc-text);
+	max-width: 36ch;
+	margin: clamp(1.25rem, 0.9rem + 1.1vw, 2.25rem) 0 0;
+	font-size: clamp(0.95rem, 0.88rem + 0.25vw, 1.2rem);
+	line-height: 2;
+}
+
+.eqc-footer-social {
+	display: flex;
+	flex-wrap: wrap;
+	gap: clamp(0.5rem, 0.2rem + 0.6vw, 0.95rem);
+	margin-top: clamp(1.5rem, 1rem + 1.4vw, 2.75rem);
+}
 .eqc-social-icon {
-	width: 40px; height: 40px;
+	--_badge-size: clamp(40px, 22px + 2.2vw, 64px);
+	width: var(--_badge-size);
+	height: var(--_badge-size);
+	font-size: calc(var(--_badge-size) * 0.36);
+	flex: none;
 	border-radius: 50%;
 	border: 1px solid var(--eqc-border-strong);
-	display: inline-flex; align-items: center; justify-content: center;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
 	color: var(--eqc-green-800);
-	transition: background-color var(--eqc-motion-base) var(--eqc-ease-standard), color var(--eqc-motion-base) var(--eqc-ease-standard);
+	transition: background-color var(--eqc-motion-base) var(--eqc-ease-standard),
+		color var(--eqc-motion-base) var(--eqc-ease-standard);
 }
-.eqc-social-icon:hover { background: var(--eqc-green-800); color: #fff; }
+a.eqc-social-icon:hover { background: var(--eqc-green-800); color: var(--eqc-white); }
+/* No account URL supplied yet: the mark is drawn (the reference shows four)
+   but as a muted, non-interactive span — never a link to an invented
+   profile. Its accessible name says so; see footer.php. */
+.eqc-social-icon--pending {
+	color: var(--eqc-muted);
+	border-color: var(--eqc-border);
+	cursor: default;
+}
 
-.eqc-footer-contact, .eqc-footer-links {
+/* ---------- Footer contact list ---------- */
+
+.eqc-footer-contact {
+	--_badge: clamp(38px, 22px + 1.9vw, 54px);
+	--_badge-gap: clamp(0.75rem, 0.4rem + 0.7vw, 1.35rem);
 	list-style: none;
 	margin: 0;
 	padding: 0;
-	display: flex;
-	flex-direction: column;
-	gap: 0.85em;
 }
-.eqc-footer-contact li { display: flex; gap: 0.7em; align-items: flex-start; color: var(--eqc-text); }
-.eqc-footer-contact a, .eqc-footer-links a { color: var(--eqc-text); text-decoration: none; }
-.eqc-footer-contact a:hover, .eqc-footer-links a:hover { color: var(--eqc-bronze-700); }
+.eqc-footer-contact li {
+	position: relative;
+	display: flex;
+	align-items: center;
+	gap: var(--_badge-gap);
+	padding-block: clamp(0.7rem, 0.5rem + 0.7vw, 1.35rem);
+	color: var(--eqc-text);
+	font-size: clamp(0.95rem, 0.88rem + 0.25vw, 1.2rem);
+	line-height: 1.5;
+}
+.eqc-footer-contact li:first-child > span:last-child { max-width: 15ch; }
+/* The reference's hairline starts at the text, not at the icon badge. */
+.eqc-footer-contact li + li::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: calc(var(--_badge) + var(--_badge-gap));
+	right: 0;
+	height: 1px;
+	background: var(--eqc-border);
+}
+.eqc-contact-icon {
+	width: var(--_badge);
+	height: var(--_badge);
+	font-size: calc(var(--_badge) * 0.38);
+	flex: none;
+	border-radius: 50%;
+	background: var(--eqc-green-900);
+	color: var(--eqc-gold-300);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
 
-.eqc-footer-bottom { padding-top: clamp(1.25rem, 1rem + 1vw, 2rem); text-align: center; color: var(--eqc-muted); font-size: var(--eqc-fs-small); }
-.eqc-footer-bottom p { margin: 0; }
+/* ---------- Footer quick links ---------- */
+
+.eqc-footer-links {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	columns: 2;
+	column-gap: clamp(1.25rem, 0.5rem + 1.9vw, 3rem);
+}
+.eqc-footer-links li {
+	break-inside: avoid;
+	margin-bottom: clamp(0.9rem, 0.6rem + 1vw, 1.9rem);
+}
+.eqc-footer-links a {
+	display: inline-flex;
+	/* flex-start + half the leading keeps the bullet on the FIRST line when
+	   a label wraps to two, instead of floating to the item's centre. */
+	align-items: flex-start;
+	gap: 0.7em;
+	line-height: 1.5;
+	color: var(--eqc-text);
+	text-decoration: none;
+	font-size: clamp(0.95rem, 0.88rem + 0.25vw, 1.2rem);
+}
+.eqc-footer-links .eqc-footer-link-chevron {
+	width: 1em;
+	height: 1em;
+	margin-block-start: 0.25em;
+	color: var(--eqc-gold-600);
+}
+.eqc-footer-contact a,
+.eqc-footer-links a { color: var(--eqc-text); text-decoration: none; }
+.eqc-footer-contact a:hover,
+.eqc-footer-links a:hover { color: var(--eqc-bronze-700); }
+
+/* ---------- Copyright bar + medallion ---------- */
+
+.eqc-footer-bottom {
+	position: relative;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	min-height: clamp(56px, 30px + 3.6vw, 100px);
+	padding: clamp(0.9rem, 0.6rem + 1vw, 1.6rem) clamp(3.5rem, 8vw, 6rem);
+	border: 1px solid var(--eqc-gold-600);
+	border-radius: var(--eqc-radius-panel);
+	background: var(--eqc-green-900);
+	text-align: center;
+}
+.eqc-footer-bottom p {
+	margin: 0;
+	color: var(--eqc-cream-100);
+	font-size: clamp(0.85rem, 0.8rem + 0.25vw, 1.15rem);
+}
+
+.eqc-footer-medallion {
+	--_medallion: clamp(52px, 30px + 2.7vw, 82px);
+	position: absolute;
+	left: 50%;
+	top: 0;
+	transform: translate(-50%, -55%);
+	width: var(--_medallion);
+	height: var(--_medallion);
+	border-radius: 50%;
+	border: 1px solid var(--eqc-gold-600);
+	background: var(--eqc-green-900);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+}
+.eqc-footer-medallion .eqc-logo-mark {
+	height: 58%;
+	width: auto;
+	color: var(--eqc-gold-300);
+}
+
+/* ---------- Footer responsive collapse ---------- */
+
+@media (min-width: 70rem) {
+	.eqc-footer-grid { padding-block: min(2.8vw, 54px); }
+	.eqc-logo--footer { --eqc-logo-mark-size: min(4.8vw, 92px); }
+	.eqc-footer-about p { margin-top: min(2.4vw, 46px); line-height: 1.9; }
+	.eqc-footer-social { margin-top: min(2vw, 38px); }
+	.eqc-social-icon { --_badge-size: min(3.35vw, 64px); }
+	.eqc-footer-links li { margin-bottom: min(1.6vw, 31px); }
+	.eqc-footer-contact li { padding-block: min(1.1vw, 21px); }
+	.eqc-footer-about p,
+	.eqc-footer-contact li,
+	.eqc-footer-links a { font-size: min(1.15vw, 22px); }
+	.eqc-footer-heading { font-size: min(1.6vw, 31px); }
+}
+
+@media (max-width: 63.99rem) {
+	.eqc-footer-grid { grid-template-columns: 1fr; }
+	.eqc-footer-col--contact,
+	.eqc-footer-col--links {
+		border-inline-start: 0;
+		border-top: 1px solid var(--eqc-border);
+		padding-inline-start: 0;
+		padding-top: clamp(1.75rem, 4vw, 2.5rem);
+	}
+	.eqc-footer-about p { max-width: none; }
+}
+
+@media (max-width: 30rem) {
+	.eqc-footer-links { columns: 1; }
+}
+
+/* The sticky-header compaction above is the only size animation in the
+   shell; DESIGN.md §20 requires it to stand still under reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+	.eqc-header,
+	.eqc-header-bar,
+	.eqc-logo-mark,
+	.eqc-nav-list a::after { transition: none; }
+}

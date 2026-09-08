@@ -9,7 +9,15 @@
 
 	var reduceMotion = window.matchMedia( '(prefers-reduced-motion: reduce)' ).matches;
 
-	/* ---------- Mobile nav drawer ---------- */
+	/* ---------- Mobile nav drawer ----------
+	 * The drawer is a modal overlay, so while it is open the rest of the
+	 * page is made `inert` (no pointer, no focus, hidden from assistive
+	 * tech) and Tab is cycled inside the drawer as a fallback for browsers
+	 * without `inert`. It always has its own close control, and it closes
+	 * itself if the viewport grows past the desktop breakpoint where the
+	 * drawer is display:none — otherwise focus and body scroll-lock would
+	 * be stranded on an invisible element.
+	 */
 	function initNavDrawer() {
 		var toggle = document.querySelector( '.eqc-nav-toggle' );
 		var drawer = document.getElementById( 'eqc-nav-drawer' );
@@ -18,47 +26,114 @@
 			return;
 		}
 
+		var closeButton = drawer.querySelector( '[data-eqc-nav-close]' );
+		var background = document.querySelectorAll( '.eqc-header, #eqc-content, .eqc-footer' );
+		var desktop = window.matchMedia( '(min-width: 64rem)' );
+		var FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
+		function isOpen() {
+			return drawer.classList.contains( 'is-open' );
+		}
+
+		function setBackgroundInert( inert ) {
+			background.forEach( function ( el ) {
+				if ( inert ) {
+					el.setAttribute( 'inert', '' );
+				} else {
+					el.removeAttribute( 'inert' );
+				}
+			} );
+		}
+
 		function open() {
 			drawer.classList.add( 'is-open' );
 			scrim.classList.add( 'is-open' );
+			drawer.removeAttribute( 'inert' );
 			drawer.setAttribute( 'aria-hidden', 'false' );
 			toggle.setAttribute( 'aria-expanded', 'true' );
 			document.body.style.overflow = 'hidden';
-			var firstLink = drawer.querySelector( 'a' );
-			if ( firstLink ) {
-				firstLink.focus();
-			}
+			setBackgroundInert( true );
+			( closeButton || drawer.querySelector( 'a' ) || drawer ).focus();
 		}
 
-		function close() {
+		function close( returnFocus ) {
+			if ( ! isOpen() ) {
+				return;
+			}
 			drawer.classList.remove( 'is-open' );
 			scrim.classList.remove( 'is-open' );
 			drawer.setAttribute( 'aria-hidden', 'true' );
 			toggle.setAttribute( 'aria-expanded', 'false' );
 			document.body.style.overflow = '';
+			// Un-inert before moving focus back: focusing an inert element
+			// silently does nothing.
+			setBackgroundInert( false );
+			if ( returnFocus ) {
+				toggle.focus();
+			}
+			drawer.setAttribute( 'inert', '' );
 		}
 
 		toggle.addEventListener( 'click', function () {
-			var isOpen = drawer.classList.contains( 'is-open' );
-			if ( isOpen ) {
-				close();
+			if ( isOpen() ) {
+				close( true );
 			} else {
 				open();
 			}
 		} );
 
-		scrim.addEventListener( 'click', close );
+		if ( closeButton ) {
+			closeButton.addEventListener( 'click', function () {
+				close( true );
+			} );
+		}
+
+		scrim.addEventListener( 'click', function () {
+			close( true );
+		} );
 
 		document.addEventListener( 'keydown', function ( e ) {
-			if ( 'Escape' === e.key && drawer.classList.contains( 'is-open' ) ) {
-				close();
-				toggle.focus();
+			if ( 'Escape' === e.key ) {
+				close( true );
+			}
+		} );
+
+		drawer.addEventListener( 'keydown', function ( e ) {
+			if ( 'Tab' !== e.key || ! isOpen() ) {
+				return;
+			}
+			var items = Array.prototype.filter.call(
+				drawer.querySelectorAll( FOCUSABLE ),
+				function ( el ) {
+					return null !== el.offsetParent;
+				}
+			);
+			if ( ! items.length ) {
+				return;
+			}
+			var first = items[ 0 ];
+			var last = items[ items.length - 1 ];
+			if ( e.shiftKey && document.activeElement === first ) {
+				e.preventDefault();
+				last.focus();
+			} else if ( ! e.shiftKey && document.activeElement === last ) {
+				e.preventDefault();
+				first.focus();
 			}
 		} );
 
 		// Close the drawer on nav to avoid stale open state after a route change.
 		drawer.querySelectorAll( 'a' ).forEach( function ( link ) {
-			link.addEventListener( 'click', close );
+			link.addEventListener( 'click', function () {
+				close( false );
+			} );
+		} );
+
+		// Resizing past the desktop breakpoint hides the drawer in CSS.
+		desktop.addEventListener( 'change', function ( e ) {
+			if ( e.matches ) {
+				close( false );
+			}
 		} );
 	}
 
