@@ -54,6 +54,16 @@ update_option( 'blogdescription', 'Learning the Quran step by step' );
 update_option( 'blog_public', 0 ); // Local indexing disabled per TASK-WEBSITE.md.
 update_option( 'timezone_string', 'UTC' );
 
+// `wp core install` never sets a permalink structure — a fresh install
+// defaults to plain "?p=123" links, under which every /slug/ request falls
+// through to the front page instead of its own page (confirmed on a fully
+// fresh, isolated bootstrap run: every pretty-URL page rendered identical
+// homepage content until this was set). Match production's structure and
+// flush so the rewrite rules actually take effect immediately, the same
+// as clicking Save on Settings -> Permalinks.
+update_option( 'permalink_structure', '/%postname%/' );
+flush_rewrite_rules();
+
 // 2. The 10-page sitemap (TASK-WEBSITE.md §8).
 $pages = array(
 	'home'                             => eqc_ensure_page( 'home', 'Home' ),
