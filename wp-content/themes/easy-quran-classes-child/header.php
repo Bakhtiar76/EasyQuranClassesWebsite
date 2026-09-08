@@ -27,11 +27,10 @@ defined( 'ABSPATH' ) || exit;
 <header class="eqc-header" id="eqc-header">
 	<div class="eqc-container eqc-header-bar">
 		<div class="eqc-logo">
-			<?php if ( has_custom_logo() ) : ?>
-				<?php the_custom_logo(); ?>
-			<?php else : ?>
-				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="eqc-logo-text"><?php bloginfo( 'name' ); ?></a>
-			<?php endif; ?>
+			<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="eqc-logo-link">
+				<?php echo eqc_logo_mark_svg(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped internally, static local SVG file. ?>
+				<span class="eqc-logo-text"><?php bloginfo( 'name' ); ?></span>
+			</a>
 		</div>
 
 		<nav class="eqc-nav-desktop" aria-label="<?php esc_attr_e( 'Primary', 'easy-quran-classes' ); ?>">

@@ -50,11 +50,12 @@ defined( 'ABSPATH' ) || exit;
 
 		<div class="eqc-footer-grid">
 			<div class="eqc-footer-col eqc-footer-about">
-				<?php if ( has_custom_logo() ) : ?>
-					<div class="eqc-logo eqc-logo--footer"><?php the_custom_logo(); ?></div>
-				<?php else : ?>
-					<p class="eqc-logo-text"><?php bloginfo( 'name' ); ?></p>
-				<?php endif; ?>
+				<div class="eqc-logo eqc-logo--footer">
+					<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="eqc-logo-link">
+						<?php echo eqc_logo_mark_svg(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped internally, static local SVG file. ?>
+						<span class="eqc-logo-text"><?php bloginfo( 'name' ); ?></span>
+					</a>
+				</div>
 				<p><?php echo esc_html( get_theme_mod( 'eqc_footer_about', '' ) ); ?></p>
 				<div class="eqc-footer-social">
 					<?php

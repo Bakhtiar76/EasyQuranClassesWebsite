@@ -222,16 +222,6 @@ function eqc_section_ornaments() {
 	);
 }
 
-/**
- * Small inline divider-flower glyph (assets/svg/divider-flower.svg),
- * inlined directly rather than referenced as an <img>/mask so `currentColor`
- * follows the surrounding gold tone — the centerpiece of the ornate
- * section-heading rule (see eqc_section_heading_el()).
- */
-function eqc_divider_flower_svg() {
-	return '<svg class="eqc-divider-flower" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false"><path d="M16 4 L18 13 L27 11 L20 17 L27 21 L18 19 L16 28 L14 19 L5 21 L12 17 L5 11 L14 13 Z" stroke="currentColor" stroke-width="1.3"/></svg>';
-}
-
 function eqc_icon_link( $icon, $url, $label, $classes = 'eqc-arrow-btn' ) {
 	return eqc_html( sprintf( '<a class="%s" href="%s" aria-label="%s">%s</a>', esc_attr( $classes ), esc_url( $url ), esc_attr( $label ), eqc_icon_str( $icon ) ) );
 }
@@ -436,6 +426,14 @@ function eqc_page_hero( $eyebrow, $title, $intro, $icon = 'book-open' ) {
  * — the page-building equivalent of the theme's eqc_section_heading()
  * template tag (which echoes PHP for header.php-style templates and can't
  * be used inside an elements array passed to Document::save()).
+ *
+ * The rule is the generated divider-section.svg (hairline + diamond
+ * terminals + rosette medallion, see tools/graphics/gen-ornaments.mjs) as
+ * one self-contained inline asset — fixes a real bug where this div
+ * previously carried BOTH `eqc-heading-rule` and `eqc-heading-rule--ornate`,
+ * so it inherited the plain rule's `height:1px; background:linear-gradient`
+ * as well as the ornate modifier, painting as a full-width flat gold bar
+ * with the old tiny flower glyph stranded near the left edge inside it.
  */
 function eqc_section_heading_el( $eyebrow, $heading, $centered = false ) {
 	$class = 'eqc-stack eqc-section-heading' . ( $centered ? ' eqc-section-heading--center' : '' );
@@ -444,7 +442,7 @@ function eqc_section_heading_el( $eyebrow, $heading, $centered = false ) {
 		$html .= '<span class="eqc-eyebrow">' . esc_html( $eyebrow ) . '</span>';
 	}
 	$html .= '<h2>' . wp_kses_post( $heading ) . '</h2>';
-	$html .= '<div class="eqc-heading-rule eqc-heading-rule--ornate">' . eqc_divider_flower_svg() . '</div>';
+	$html .= '<div class="eqc-heading-rule--ornate">' . eqc_divider_svg( 'section' ) . '</div>';
 	$html .= '</div>';
 	return eqc_html( $html );
 }
