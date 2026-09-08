@@ -249,6 +249,83 @@ export function fourCentredArchPanel(w, jamb, baseH, { haunchFrac = 0.32, haunch
 	return { d, bbox };
 }
 
+/**
+ * Circle through two given points P1, P2 with a chosen "bulge" — the
+ * center sits on the perpendicular bisector of P1-P2, offset by
+ * `bulge * |P1-P2|` (sign picks which side, magnitude how deeply it
+ * curves). Unlike nextTangentArc (solving for a circle tangent to a
+ * PRIOR circle), this has no reflex/continuation branch to go unstable:
+ * bulge is a plain, bounded design choice, so it can't produce the
+ * tiny/huge-radius degenerate arcs a forced tangent-solve can when the
+ * target point sits awkwardly relative to the previous circle (this is
+ * exactly what happened trying to force ogeeArchPanel's sharp apex via
+ * nextTangentArc — small parameter changes flipped the solver into a
+ * self-intersecting loop at the tip).
+ */
+function arcThroughBulge(P1, P2, bulge) {
+	const mid = [(P1[0] + P2[0]) / 2, (P1[1] + P2[1]) / 2];
+	const d = sub(P2, P1);
+	const length = len(d);
+	const perp = [-d[1] / length, d[0] / length];
+	const center = [mid[0] + perp[0] * bulge * length, mid[1] + perp[1] * bulge * length];
+	const radius = len(sub(center, P1));
+	return { center, radius };
+}
+
+// ---------------------------------------------------------------------
+// Ogee/keel arch: one convex shoulder arc off the jamb, into one concave
+// arc up to a sharp apex — the classic two-arc-per-side ogee S-curve,
+// matching the client's clean keel-arch reference (a single smooth
+// shoulder bulge per side, not a multi-cusp scallop, and a true point at
+// the top, not a soft dome).
+//
+// The shoulder arc's centre is constrained to the springline (exactly
+// fourCentredArchPanel's own haunch construction), which is what
+// guarantees it departs the vertical jamb tangentially — an
+// arcThroughBulge chord here left a visible kink at the springline,
+// since nothing tied its tangent direction to the jamb. The finish arc
+// (shoulder's end point up to the sharp apex) uses arcThroughBulge, not
+// the tangent-arc solver: forcing exact tangency into a sharp apex point
+// is ill-conditioned there (the solved circle's radius can blow up or
+// collapse for small parameter changes, producing a self-intersecting
+// loop at the tip — confirmed by rendering an early attempt), whereas
+// choosing its bulge directly is stable by construction and still reads
+// as a smooth continuous sweep once tuned by rendering.
+// ---------------------------------------------------------------------
+export function ogeeArchPanel(w, jamb, baseH, { shoulderFrac = 0.12, shoulderSweepDeg = 48, bulge2 = 0.32, riseFrac = 0.62 } = {}) {
+	const hw = w / 2;
+	const spring = jamb;
+	const apex = [hw, spring - hw * riseFrac];
+	const J0 = [w, spring];
+
+	// Shoulder: centre on the springline (tangent to the vertical jamb at
+	// J0), sweeping CCW by shoulderSweepDeg to J1.
+	const r1 = hw * shoulderFrac;
+	const C1 = [w - r1, spring];
+	const theta = (shoulderSweepDeg * Math.PI) / 180;
+	const J1 = [C1[0] + r1 * Math.cos(Math.PI - theta), C1[1] - r1 * Math.sin(Math.PI - theta)];
+	const shoulderR = arcCmd(C1[0], C1[1], r1, J0, J1);
+
+	const finish = arcThroughBulge(J1, apex, bulge2);
+	const finishR = arcCmd(finish.center[0], finish.center[1], finish.radius, J1, apex);
+
+	// Left half is the exact mirror across x = hw, traced apex -> base.
+	const mirrorX = (p) => [2 * hw - p[0], p[1]];
+	const J1l = mirrorX(J1), J0l = mirrorX(J0), C1l = mirrorX(C1);
+	const finishCl = mirrorX(finish.center);
+	const finishL = arcCmd(finishCl[0], finishCl[1], finish.radius, apex, J1l);
+	const shoulderL = arcCmd(C1l[0], C1l[1], r1, J1l, J0l);
+
+	const d = `M${fmt(w)} ${fmt(baseH)} L${fmt(w)} ${fmt(spring)} ${shoulderR} ${finishR} ${finishL} ${shoulderL} L0 ${fmt(baseH)} Z`;
+
+	let bbox = { minX: 0, minY: 0, maxX: w, maxY: baseH };
+	bbox = mergeBbox(bbox, bboxOf(circleExtent(C1[0], C1[1], r1, J0, J1)));
+	bbox = mergeBbox(bbox, bboxOf(circleExtent(finish.center[0], finish.center[1], finish.radius, J1, apex)));
+	bbox = mergeBbox(bbox, bboxOf(circleExtent(finishCl[0], finishCl[1], finish.radius, apex, J1l)));
+	bbox = mergeBbox(bbox, bboxOf(circleExtent(C1l[0], C1l[1], r1, J1l, J0l)));
+	return { d, bbox };
+}
+
 // ---------------------------------------------------------------------
 // Horseshoe (Moorish/keyhole) arch: a single circle whose centre sits
 // ABOVE the springline, so the arc from one springing point to the other
@@ -306,32 +383,27 @@ export function mandorlaPanel(w, h, opts = {}) {
 }
 
 // ---------------------------------------------------------------------
-// Scalloped support-line construction — shared by the inward-cusped
-// multifoil arch (Gothic tracery: semicircles bulging INTO the arch) and
-// the outward-cusped keel/Mughal arch (semicircles bulging AWAY from the
-// arch, matching the client's Mughal keel-arch reference image: a
-// vertical jamb, a large outward shoulder cusp, a smaller cusp above it,
-// then a straight run to a sharp point).
+// Scalloped support-line construction — the multifoil arch (Gothic
+// tracery: semicircles bulging INTO the arch, drawn on chords of the
+// straight base->apex support line).
 //
 // Why this can never kink at a cusp junction: each semicircle is drawn on
-// a chord of the *same straight line* (base corner to apex); a
-// semicircle's tangent at its own diameter endpoint is always
-// perpendicular to that diameter, so two adjacent semicircles on
-// collinear chords share the identical tangent direction at their shared
-// endpoint — automatically G1-continuous, no solver needed. The final
-// short run to the apex is deliberately a straight line, not another
-// arc: real cusped/keel arches end in a visible sharp point, not a smooth
-// dome, so a small corner there is correct, not a defect.
+// a chord of the *same straight line*; a semicircle's tangent at its own
+// diameter endpoint is always perpendicular to that diameter, so two
+// adjacent semicircles on collinear chords share the identical tangent
+// direction at their shared endpoint — automatically G1-continuous, no
+// solver needed. The final short run to the apex is deliberately a
+// straight line, not another arc: a multifoil arch ends in a visible
+// point, not a smooth dome, so a small corner there is correct.
 // ---------------------------------------------------------------------
 /** One side of a scalloped support line, base->apex. Returns the path
  * fragment AND the exact extent points of every semicircle drawn (each
  * one computed with the SAME sweepFlag used in the path, via
  * semicircleExtent, so the reported bbox can never disagree with what's
- * actually drawn — the gap that let the previous ogee arch's shoulders
- * get clipped). */
-function scallopSide(base, apex, breakpoints, outward) {
+ * actually drawn). */
+function scallopSide(base, apex, breakpoints) {
 	const pts = [base, ...breakpoints.map((t) => lerp(base, apex, t))];
-	const sweepFlag = outward ? 0 : 1; // verified by rendering, see README.md
+	const sweepFlag = 1; // inward — verified by rendering, see README.md
 	let d = '';
 	let extent = [];
 	for (let i = 0; i < pts.length - 1; i++) {
@@ -344,50 +416,15 @@ function scallopSide(base, apex, breakpoints, outward) {
 	return { d, extent };
 }
 
-/** Keel/Mughal cusped arch — outward-bulging cusps (matches the client's
- * reference image). `breakpoints` are fractions along the base->apex line
- * where each cusp ends; defaults give one large lower cusp and one
- * smaller upper cusp before the final straight run to the point. */
-export function keelArchPanel(w, jamb, baseH, { breakpoints = [0.52, 0.8] } = {}) {
-	const hw = w / 2;
-	const apex = [hw, 0];
-	const baseR = [w, jamb], baseL = [0, jamb];
-	const sweepFlag = 0; // outward — same flag scallopSide uses, verified symmetric by rendering
-	const right = scallopSide(baseR, apex, breakpoints, true);
-	// Left half is built directly apex->base (the mirror direction of the
-	// right half) rather than by algebraically reversing a path string.
-	const leftPts = [apex, ...breakpoints.map((t) => lerp(baseL, apex, t)).reverse(), baseL];
-	let leftD = '';
-	let leftExtent = [];
-	for (let i = 0; i < leftPts.length - 1; i++) {
-		const [from, to] = [leftPts[i], leftPts[i + 1]];
-		if (i === 0) {
-			leftD += `L${fmt(to[0])} ${fmt(to[1])} `; // apex -> first breakpoint: straight run (mirror of the right side's final segment)
-			continue;
-		}
-		const r = len(sub(to, from)) / 2;
-		leftD += `A${fmt(r)} ${fmt(r)} 0 0 ${sweepFlag} ${fmt(to[0])} ${fmt(to[1])} `;
-		leftExtent = leftExtent.concat(semicircleExtent(from, to, sweepFlag));
-	}
-
-	const d = `M${fmt(w)} ${fmt(baseH)} L${fmt(w)} ${fmt(jamb)} ${right.d} ${leftD} L0 ${fmt(baseH)} Z`;
-	const bbox = mergeBbox(
-		bboxOf([[0, 0], [w, 0], [0, baseH], [w, baseH]]),
-		bboxOf([...right.extent, ...leftExtent])
-	);
-	return { d, bbox };
-}
-
-/** Classic multifoil (inward-cusped) card frame — same construction,
- * bulging into the interior. Rebuilt on scallopSide for a single shared
- * implementation instead of a parallel hand-rolled version. */
+/** Classic multifoil (inward-cusped) card frame. `breakpoints` are
+ * fractions along the base->apex line where each cusp ends. */
 export function multifoilArchPanel(w, jamb, baseH, { lobes = 3 } = {}) {
 	const breakpoints = Array.from({ length: lobes - 1 }, (_, i) => (i + 1) / lobes);
 	const hw = w / 2;
 	const apex = [hw, 0];
 	const baseR = [w, jamb], baseL = [0, jamb];
 	const sweepFlag = 1; // inward — same flag scallopSide uses, verified symmetric by rendering
-	const right = scallopSide(baseR, apex, breakpoints, false);
+	const right = scallopSide(baseR, apex, breakpoints);
 	const leftPts = [apex, ...breakpoints.map((t) => lerp(baseL, apex, t)).reverse(), baseL];
 	let leftD = '';
 	let leftExtent = [];

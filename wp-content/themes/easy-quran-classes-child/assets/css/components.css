@@ -943,11 +943,12 @@ html:not(.eqc-js) .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
 	border: 1px solid var(--eqc-border);
 }
 /* Each masked variant's aspect-ratio matches its own SVG's true bbox
-   (see tools/graphics/gen-ornaments.mjs) — the keel arch's outward
-   shoulder cusps, for instance, genuinely widen its bbox to ~439.4:500
-   rather than a plain 4:5, and mask-size:100% 100% stretches whatever
-   mismatch there is, so getting this wrong reintroduces a subtler version
-   of the clipping/distortion bug the arch rebuild fixed. */
+   (see tools/graphics/gen-ornaments.mjs) — a mismatch here would get
+   stretched by mask-size:100% 100%, reintroducing a subtler version of
+   the clipping/distortion bug the arch rebuild fixed. The ogee arch's
+   bbox comes out an exact 400:500 (its shoulder bulge stays within the
+   nominal jamb width, unlike the four-centred/horseshoe arches below,
+   which do genuinely overshoot slightly). */
 .eqc-arch-media--masked,
 .eqc-arch-media--fourcentred,
 .eqc-arch-media--horseshoe {
@@ -955,7 +956,7 @@ html:not(.eqc-js) .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
 	border: none;
 	overflow: visible; /* the outline (below) deliberately extends past this box */
 }
-.eqc-arch-media--masked { aspect-ratio: 439.448 / 500; }
+.eqc-arch-media--masked { aspect-ratio: 4 / 5; }
 .eqc-arch-media--fourcentred { aspect-ratio: 329 / 389; }
 .eqc-arch-media--horseshoe { aspect-ratio: 327.198 / 349; }
 /* The mask lives on the <img> itself, not the container: a mask on a

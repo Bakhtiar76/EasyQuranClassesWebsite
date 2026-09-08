@@ -18,7 +18,7 @@ import {
 	arcCmd,
 	wrapArch,
 	svgFromBbox,
-	keelArchPanel,
+	ogeeArchPanel,
 	fourCentredArchPanel,
 	horseshoeArchPanel,
 	mandorlaPanel,
@@ -276,20 +276,19 @@ function sparklePath(cx, cy, r) {
 //    proportions here would distort on the live page — see README.md).
 // =====================================================================
 
-// Keel/Mughal cusped arch — matches the client's Mughal keel-arch
-// reference: jamb, large outward shoulder cusp, smaller cusp, sharp
-// point. Replaces arch-mask/outline/frame in place (same CSS references
-// keep working unchanged). The cusps genuinely bulge past the nominal
-// jamb width (a real feature of the reference's "shoulder", not a bug —
-// confirmed by the exact bbox: ~20px overshoot per side at this scale),
-// so the viewBox is sized from the panel's own true bbox via wrapArch()
-// rather than a fixed w×baseH box — using the fixed box here is exactly
-// the mistake that clipped the previous hero arch's shoulders. The
-// resulting aspect ratio (~0.84, vs the nominal 400:500=0.8) is what
-// .eqc-arch-media's CSS aspect-ratio must match (see components.css).
+// Ogee/keel arch — matches the client's clean keel-arch reference: jamb,
+// one smooth shoulder bulge per side, concave finish to a sharp point.
+// Replaces arch-mask/outline/frame in place (same CSS references keep
+// working unchanged). The shoulder genuinely bulges past the nominal
+// jamb width by a small amount (confirmed by the exact bbox, not a fixed
+// guess), so the viewBox is sized from the panel's own true bbox via
+// wrapArch() rather than a fixed w×baseH box — using a fixed box here is
+// exactly the mistake that clipped the original hero arch's shoulders.
+// The resulting aspect ratio is what .eqc-arch-media's CSS aspect-ratio
+// must match (see components.css).
 {
 	const w = 400, jamb = 190, baseH = 500;
-	const panel = keelArchPanel(w, jamb, baseH);
+	const panel = ogeeArchPanel(w, jamb, baseH);
 	save('arch-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
 	save('arch-outline.svg', wrapArch(panel, { pad: 2, stroke: true, strokeWidth: 3 }));
 
@@ -297,7 +296,7 @@ function sparklePath(cx, cy, r) {
 	// (inset both axes, not just x, so the two lines stay concentric),
 	// wrapped to the union of both panels' true bboxes.
 	const inset = 14;
-	const inner = keelArchPanel(w - inset * 2, jamb - inset, baseH - inset * 2);
+	const inner = ogeeArchPanel(w - inset * 2, jamb - inset, baseH - inset * 2);
 	const unionBbox = {
 		minX: Math.min(panel.bbox.minX, inner.bbox.minX + inset),
 		minY: Math.min(panel.bbox.minY, inner.bbox.minY + inset),
