@@ -961,39 +961,56 @@ DEFINITION OF DONE
 
 Do not mark complete until:
 
-[ ] TASK-DEPLOY.md reviewed/corrected
-[ ] production state audited
-[ ] backups verified
-[ ] local release QA passed
-[ ] images optimized/WebP where appropriate
-[ ] media quality verified
-[ ] frontend assets optimized
-[ ] production SQL exported safely
-[ ] production package reviewed
-[ ] first cPanel files deployment succeeded
-[ ] DB import succeeded
-[ ] wp-config configured safely
-[ ] all 10 pages work
-[ ] Elementor works
-[ ] Blog works
-[ ] forms work
-[ ] email works
-[ ] responsive QA works
-[ ] HTTPS/mixed-content clean
-[ ] SEO URLs/indexing correct
-[ ] production performance checked
-[ ] main contains clean production-ready project code
-[ ] no secrets/DB/backups/uploads tracked
-[ ] no-shell auto-deploy mechanism selected
-[ ] GitHub Actions configured if FTPS selected
-[ ] auto-deploy paths narrow/reviewed
-[ ] real main auto-deploy test passed
-[ ] DB/uploads/wp-config untouched by Git deploy
-[ ] production smoke test passed
-[ ] rollback documented
-[ ] public deployment temp files removed
-[ ] docs/checklists updated
-[ ] CLAUDE.md updated and under 1000 lines
+[x] TASK-DEPLOY.md reviewed/corrected
+[x] production state audited
+[x] backups verified
+[x] local release QA passed
+[x] images optimized/WebP where appropriate
+[x] media quality verified
+[x] frontend assets optimized
+[x] production SQL exported safely
+[x] production package reviewed
+[x] first cPanel files deployment succeeded
+[x] DB import succeeded
+[x] wp-config configured safely
+[x] all 10 pages work (verified across two QA passes; homepage/About/Contact
+    freshly re-checked 2026-09-08 after the Rank Math fix, remaining pages
+    verified in the initial post-migration QA pass)
+[x] Elementor works
+[x] Blog works
+[x] forms work (Contact + Free Trial verified via real stored submissions)
+[ ] email works — form submissions are confirmed stored in the DB, but
+    actual outgoing SMTP/email delivery was never independently verified
+    (the "Email Deliverability" plugin was found unapproved and left
+    inactive — see `CPANEL-WORKFLOW.md` §17 — so mail currently depends on
+    the host's default PHP `mail()` path, unverified). Test a real
+    submission and confirm an email actually arrives before relying on it.
+[x] responsive QA works (desktop + mobile emulation verified on production)
+[x] HTTPS/mixed-content clean
+[x] SEO URLs/indexing correct (sitemap + per-page titles/meta fixed
+    2026-09-08 — see `CPANEL-WORKFLOW.md` §19; canonical tag still missing
+    site-wide, tracked as a separate open item, low urgency while noindex)
+[x] production performance checked
+[x] main contains clean production-ready project code
+[x] no secrets/DB/backups/uploads tracked
+[x] no-shell auto-deploy mechanism selected (GitHub Actions → FTPS —
+    cPanel's own Git Version Control confirmed to require shell access this
+    account doesn't have)
+[x] GitHub Actions configured
+[x] auto-deploy paths narrow/reviewed (FTP account physically scoped to
+    `wp-content/themes/easy-quran-classes-child/` only)
+[x] real main auto-deploy test passed (2026-09-08: pushed a version-bump
+    commit to `main`, watched it land on production automatically within
+    the pipeline's normal run time, confirmed via the live file content and
+    the enqueued `?ver=` query string after clearing the NGINX cache)
+[x] DB/uploads/wp-config untouched by Git deploy (physically impossible —
+    the deploy FTP account's home directory is the theme folder itself)
+[x] production smoke test passed
+[x] rollback documented and proven (reverted the test commit through the
+    same pipeline and confirmed production rolled back automatically)
+[x] public deployment temp files removed
+[x] docs/checklists updated
+[x] CLAUDE.md updated and under 1000 lines (317 lines)
 
 ==================================================
 FINAL REPORT
