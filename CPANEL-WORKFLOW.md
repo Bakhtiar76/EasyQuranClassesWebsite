@@ -582,3 +582,72 @@ environments:
   priority than the production question this was blocking), but is worth
   investigating before relying on local for any other Rank Math behavior
   check.
+
+## 20. Production Backup & Restore Runbook (built 2026-09-08)
+
+The site went live with **no post-deployment backup** — the only prior
+account backup (`backup-9.7.2026_13-44-52_easyquranclasses.tar.gz`) predates
+the deployment (taken while `public_html` was still empty) and cannot restore
+today's content. This section covers the first real backup and how to use it.
+
+### What exists
+
+Two artifacts, both taken via cPanel's native **Files > Backup** page
+(no JetBackup on this account — confirmed on the Backup page itself, only
+"Full Backup" and "Partial Backups" sections are offered), downloaded
+off-server into `local/backups/` (gitignored, never committed — both files
+contain live DB credentials via `wp-config.php`/the SQL dump):
+
+| File | What it is | Size |
+|---|---|---|
+| `local/backups/prod-db-2026-09-08.sql.gz` | `mysqldump` of `easyquranclasses_wp_prod` only, via **Backup > Download a Database Backup** (streams straight to the browser, writes nothing on the server) | 491 KB |
+| `local/backups/prod-full-2026-09-08.tar.gz` | **Full Account Backup** (home directory + all DBs + account config), via **Backup > Download a Full Account Backup → Home Directory**. Also still present server-side at `/home/easyquranclasses/backup-9.8.2026_11-25-25_easyquranclasses.tar.gz` for a host-side restore without re-uploading 161 MB. | 161 MB |
+
+Checksums and the full verification trail are in `local/backups/RELEASE-MANIFEST.md`.
+
+**Verification performed, not assumed:** `gzip -t`/`tar -tzf` integrity on
+both; confirmed presence of `wp-config.php`, `wp-content/uploads/`, the child
+theme, and the DB dump inside the full archive; and — the step that actually
+proves it restores — **imported the `.sql.gz` into a throwaway database in
+local's own Docker MariaDB** (`eqc_restore_test`, isolated from local's real
+`wordpress` DB, not referenced by local's WordPress install) and confirmed:
+27 tables (matches the dump's own `CREATE TABLE` count), `siteurl`/`home` =
+`https://easyquranclasses.com` (proves it's genuinely production, not a
+stale local export), 5 published posts, 10 published pages. That scratch
+database was intentionally left in place afterward — cleanup via `DROP
+DATABASE` is blocked by the safety classifier (any DROP/TRUNCATE, regardless
+of target, per `CLAUDE.md`'s "Never Do" list) and it is harmless sitting
+alongside local's real DB in the same container, so it was not worth forcing.
+Drop it manually (`DROP DATABASE eqc_restore_test;` via phpMyAdmin or wp-cli
+against the local `db` container) next time local's DB is touched, if ever.
+
+### How to restore
+
+**Database only** (e.g. bad data, plugin misconfiguration, safe to keep
+current files): cPanel → phpMyAdmin → select `easyquranclasses_wp_prod` →
+Import → upload `prod-db-2026-09-08.sql.gz` (phpMyAdmin decompresses `.gz`
+automatically) → **this replaces all data in the existing database**, so
+per `CLAUDE.md`'s Stop-and-Ask list this step needs explicit approval before
+running, and a *fresh* backup should be taken first if any content exists
+that isn't already in this dump.
+
+**Full site** (e.g. corrupted files, need to move host, disaster recovery):
+extract `prod-full-2026-09-08.tar.gz`'s `homedir/public_html/` contents back
+into the document root via File Manager, then import
+`mysql/easyquranclasses_wp_prod.sql` from inside the same archive via
+phpMyAdmin. cPanel's own UI **cannot** restore a full backup automatically
+(confirmed on the Backup page: "You cannot restore full backups through your
+cPanel interface") — it must be done manually via File Manager + phpMyAdmin,
+the same as the original deployment.
+
+### Cadence recommendation
+
+No automated backup schedule exists on this account ("Account Backups" on
+the Backup page explicitly states the server administrator must enable that
+feature — not available here). Until/unless that changes, take a fresh pair
+of these two backups **before any risky production change** (plugin
+activation, bulk content edit, PHP/theme update) and periodically (e.g.
+monthly) otherwise, following this same procedure. Do not delete the
+2026-09-07 pre-deployment backup or these 2026-09-08 backups when taking new
+ones — keep the most recent 2-3 rotations per `CPANEL-WORKFLOW.md` §14's
+"never delete the last known-good backup" rule.
