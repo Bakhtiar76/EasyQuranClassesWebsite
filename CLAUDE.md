@@ -52,8 +52,9 @@ setup + the known-issues catalogue: `README-SETUP.md` (§5 Codex, §7 issues).
 - **`AGENTS.md`** (repo root) — thin: points Codex at `CLAUDE.md` + `.claude/rules/*.md` +
   `DESIGN.md` + `CPANEL-WORKFLOW.md` as mandatory reading, plus Codex-specific operating notes.
   `CLAUDE.md` stays the single source of truth.
-- **`tools/codex/setup-codex.ps1`** (idempotent, `-Verify`) — registers three MCP servers
-  **globally** in `~/.codex/config.toml` (`novamira-localhost`, `chrome-devtools`, `context7`),
+- **`tools/codex/setup-codex.ps1`** (idempotent, `-Verify`) — registers four MCP servers
+  **globally** in `~/.codex/config.toml` (`novamira-localhost`, `chrome-devtools`, `context7`,
+  `playwright` — the last `--isolated` with production origins in `--blocked-origins`),
   syncs the 14 `.claude/skills/` as `~/.codex/skills/eqc-*` (junction; copy fallback), trusts the repo.
 - **`tools/codex/novamira-mcp.cmd`** — Novamira launcher. Reads `NOVAMIRA_APP_PASSWORD` from
   `local/.env` (Codex strips `*PASSWORD*` env vars before spawning MCP servers, and has no

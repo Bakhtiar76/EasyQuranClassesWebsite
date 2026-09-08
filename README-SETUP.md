@@ -338,12 +338,13 @@ pwsh tools/codex/setup-codex.ps1
 Idempotent. It:
 
 1. **Preflights** Codex version, login, and that a Novamira password is reachable.
-2. **Registers three MCP servers** into `~/.codex/config.toml` (remove-then-add):
+2. **Registers four MCP servers** into `~/.codex/config.toml` (remove-then-add):
    | Server | Command | Purpose |
    |---|---|---|
    | `novamira-localhost` | `cmd /c tools\codex\novamira-mcp.cmd` | WordPress control plane, local site only |
    | `chrome-devtools` | `cmd /c npx -y chrome-devtools-mcp@latest` | screenshots / console / network / Lighthouse |
    | `context7` | `cmd /c npx -y @upstash/context7-mcp` | live library docs |
+   | `playwright` | `cmd /c npx -y @playwright/mcp@latest --isolated --blocked-origins <prod>` | a11y tree, tab order, form fill/submit; isolated profile, production origins blocked |
 
    Every entry goes through `cmd /c` — Codex on Windows cannot spawn a `.cmd`/`npx.cmd`
    directly with working stdio (see §7).
@@ -399,7 +400,7 @@ codex "run: docker compose -f local/docker-compose.yml ps"     # approve the esc
 | 4 | `.\local\wp.ps1 core version` | a version string, no permission errors |
 | 5 | `node tests/visual/sweep.mjs http://localhost/` | screenshots under `tests/visual/test-results/<ts>/`, exit 0 |
 | 6 | `pwsh tools/codex/setup-codex.ps1 -Verify` | `PARITY OK`, exit 0 |
-| 7 | `codex mcp list` (outside a sandbox) | `novamira-localhost`, `chrome-devtools`, `context7` all `enabled` |
+| 7 | `codex mcp list` (outside a sandbox) | `novamira-localhost`, `chrome-devtools`, `context7`, `playwright` all `enabled` |
 | 8 | Claude Code: Novamira ability discovery via `.mcp.json` | abilities list returns |
 | 9 | `.\local\bootstrap.ps1` / `./local/bootstrap.sh` on a fresh clone (empty `eqc_wp` volume) | exits 0; 10 pages + Privacy Policy, 15 attachments, both plugins/theme active, all `tests/visual/sweep.mjs` viewports pass |
 

@@ -5,8 +5,9 @@
 .DESCRIPTION
   Brings the Codex CLI to parity with Claude Code on this repo:
     1. Preflight  - Codex installed, logged in, NOVAMIRA_APP_PASSWORD present.
-    2. MCP        - registers novamira-localhost, chrome-devtools, context7 in
-                    ~/.codex/config.toml (remove-then-add, so re-runs are clean).
+    2. MCP        - registers novamira-localhost, chrome-devtools, context7 and
+                    playwright in ~/.codex/config.toml (remove-then-add, so
+                    re-runs are clean).
     3. Skills     - syncs every .claude/skills/<name> into $CODEX_HOME/skills as
                     eqc-<name> (directory junction; falls back to a copy).
     4. Trust      - ensures this repo path is trust_level = "trusted".
@@ -53,7 +54,19 @@ function Warn ($m) { Write-Host "  [WARN] $m" -ForegroundColor Yellow }
 function Bad  ($m) { Write-Host "  [FAIL] $m" -ForegroundColor Red; $script:Fail++ }
 function Head ($m) { Write-Host "`n$m" -ForegroundColor Cyan }
 
-# The three project MCP servers. Each command array is passed after `-- `.
+# Production origins the Playwright MCP browser must never load. This is
+# defence-in-depth for CLAUDE.md's production boundary, not a security
+# boundary: Playwright's own docs note the blocklist does not affect
+# redirects. The rule ("never point automation at production") still stands
+# on its own; this just makes the common accident fail loudly.
+$BlockedOrigins = @(
+  'https://easyquranclasses.com'
+  'http://easyquranclasses.com'
+  'https://www.easyquranclasses.com'
+  'http://www.easyquranclasses.com'
+) -join ';'
+
+# The four project MCP servers. Each command array is passed after `-- `.
 # Every entry is spawned through `cmd /c`: Codex on Windows cannot start a
 # .cmd/.bat (npx.cmd, the wrapper) directly with working stdio pipes - the MCP
 # stdstreams silently go dead. `cmd /c npx ...` resolves npx via PATHEXT and
@@ -62,6 +75,7 @@ $Servers = [ordered]@{
   'novamira-localhost' = @('cmd', '/c', $Wrapper)
   'chrome-devtools'    = @('cmd', '/c', 'npx', '-y', 'chrome-devtools-mcp@latest')
   'context7'           = @('cmd', '/c', 'npx', '-y', '@upstash/context7-mcp')
+  'playwright'         = @('cmd', '/c', 'npx', '-y', '@playwright/mcp@latest', '--isolated', '--blocked-origins', $BlockedOrigins)
 }
 
 function Get-CodexMcpList {
