@@ -21,11 +21,27 @@ $testi_ids = array(
 
 $trial_url = home_url( '/free-trial/' );
 
+/*
+ * Hero trust row avatars. The reference (Home.jpeg) shows five overlapping
+ * circular portraits; the staging library holds four teachers and three
+ * testimonial portraits, so five are drawn from both. Decorative — the
+ * accessible content is the trust line beside them, so alt is empty.
+ */
+$hero_avatar_ids = array_slice( array_merge( $teacher_ids, $testi_ids ), 0, 5 );
+$hero_avatars    = '';
+foreach ( $hero_avatar_ids as $avatar_id ) {
+	$hero_avatars .= sprintf(
+		'<img src="%s" alt="" width="48" height="48" loading="lazy" decoding="async">',
+		esc_url( wp_get_attachment_image_url( $avatar_id, 'thumbnail' ) )
+	);
+}
+
 // ---------------------------------------------------------------- 1. HERO
+// No --ornamented: the reference's hero ground is plain cream with the fine
+// allover texture only, no girih corner watermark (home.md finding 11).
 $hero = eqc_section(
-	'eqc-section eqc-section--tight eqc-section--cream eqc-section--textured eqc-section--ornamented',
+	'eqc-section eqc-section--tight eqc-section--cream eqc-section--textured',
 	array(
-		eqc_section_ornaments(),
 		eqc_inner(
 			'',
 			array(
@@ -38,15 +54,18 @@ $hero = eqc_section(
 						eqc_container(
 							array( 'css_classes' => 'eqc-hero-text eqc-align-start', 'flex_direction' => 'column' ),
 							array(
-								eqc_html( '<span class="eqc-eyebrow">' . eqc_icon_str( 'users' ) . ' ' . esc_html__( 'Trusted by Families Worldwide', 'easy-quran-classes' ) . '</span>' ),
-								eqc_heading( 'Learn Quran Online with <span style="color:var(--eqc-bronze-700)">Personal Guidance</span>', 'h1' ),
-								eqc_text( '<p class="eqc-body-l">1-to-1 live classes with qualified male &amp; female teachers. Flexible timing, personalized learning, and steady progress.</p>' ),
+								// Sentence case in a white pill with a circular icon chip, per the
+								// reference; --hero drops the shared eyebrow's uppercase/tracking.
+								eqc_html( '<span class="eqc-eyebrow eqc-eyebrow--hero"><span class="eqc-eyebrow-chip">' . eqc_icon_str( 'users' ) . '</span>' . esc_html__( 'Trusted by Families Worldwide', 'easy-quran-classes' ) . '</span>' ),
+								eqc_heading( 'Learn Quran Online <br>with <span style="color:var(--eqc-bronze-700)">Personal Guidance</span>', 'h1' ),
+								eqc_html( '<div class="eqc-hero-rule">' . eqc_divider_svg( 'rule' ) . '</div>' ),
+								eqc_text( '<p class="eqc-body-l">1-to-1 live classes with qualified male &amp; female teachers. <br>Flexible timing, personalized learning, and real progress.</p>' ),
 								eqc_html(
-									'<div class="eqc-chip-row">'
-									. eqc_chip( 'person', '1-to-1 Live Classes' )
-									. eqc_chip( 'users', 'Male &amp; Female Teachers' )
-									. eqc_chip( 'calendar', 'Flexible Schedule' )
-									. eqc_chip( 'chart-up', 'Progress Tracking' )
+									'<div class="eqc-chip-row eqc-chip-row--cards">'
+									. eqc_chip( 'person', '1-to-1', 'Live Classes' )
+									. eqc_chip( 'users', 'Male & Female', 'Teachers' )
+									. eqc_chip( 'calendar', 'Flexible', 'Schedule' )
+									. eqc_chip( 'chart-up', 'Progress', 'Tracking' )
 									. '</div>'
 								),
 								eqc_container(
@@ -55,6 +74,17 @@ $hero = eqc_section(
 										eqc_icon_button( 'calendar', __( 'Book Free Trial', 'easy-quran-classes' ), $trial_url, 'eqc-btn--bronze' ),
 										eqc_icon_button( 'whatsapp', __( 'Chat on WhatsApp', 'easy-quran-classes' ), eqc_whatsapp_url(), 'eqc-btn--secondary' ),
 									)
+								),
+								// Five overlapping avatars, then five gold stars above one trust
+								// line. "5,000+" is an unverified client claim, held in ONE place
+								// here so replacing it is a single edit - QA/PLACEHOLDER-REGISTER.md.
+								eqc_html(
+									'<div class="eqc-hero-trust">'
+									. '<span class="eqc-avatar-stack">' . $hero_avatars . '</span>'
+									. '<span class="eqc-hero-trust-text">'
+									. '<span class="eqc-star-row" aria-hidden="true">' . str_repeat( eqc_icon_str( 'star-filled' ), 5 ) . '</span>'
+									. '<span>' . esc_html__( 'Trusted by 5,000+ Students & Parents', 'easy-quran-classes' ) . '</span>'
+									. '</span></div>'
 								),
 							)
 						),
@@ -66,7 +96,7 @@ $hero = eqc_section(
 									array(
 										'image'        => array( 'id' => $hero_img, 'url' => wp_get_attachment_image_url( $hero_img, 'large' ) ),
 										'image_size'   => 'large',
-										'_css_classes' => 'eqc-arch-media eqc-arch-media--masked',
+										'_css_classes' => 'eqc-arch-media eqc-arch-media--keel',
 									)
 								),
 							)
@@ -88,10 +118,11 @@ $trust = eqc_section(
 				eqc_container(
 					array( 'css_classes' => 'eqc-grid eqc-grid--trust', 'flex_direction' => 'row' ),
 					array(
-						eqc_trust_tile( 'shield', 'Safe & Secure Learning', "Your child's safety is our top priority." ),
-						eqc_trust_tile( 'headset', 'Support 7 Days a Week', "We're here to help anytime you need." ),
-						eqc_trust_tile( 'globe', 'Students from Many Countries', 'A global community of Quran learners.' ),
-						eqc_trust_tile( 'certificate', 'Certificates Available', 'Recognize your progress with achievement.' ),
+						eqc_trust_tile( 'shield', 'Safe & Secure Learning', "Your child's safety is our top priority" ),
+						eqc_trust_tile( 'headset', 'Support 7 Days A Week', "We're here to help anytime you need" ),
+						// "20+ Countries" is an unverified client claim - register entry.
+						eqc_trust_tile( 'globe', 'Students from 20+ Countries', 'A global community of Quran learners' ),
+						eqc_trust_tile( 'certificate', 'Certificates Available', 'Recognize your progress with achievement' ),
 					)
 				),
 			)

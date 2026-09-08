@@ -1,0 +1,41 @@
+{
+  "page": "http://localhost/ (home)",
+  "section": "hero + trust strip",
+  "viewport": "1920x1080",
+  "run_by": "claude-opus-5",
+  "date": "2026-09-09",
+  "method": "computed styles read off the rendered page via Playwright; contrast uses each element's real inherited background, not an assumed one",
+  "wcag_aa_threshold": { "normal_text": 4.5, "large_text": 3.0 },
+  "contrast": [
+    { "label": "hero eyebrow text",  "color": "rgb(146,82,52)", "bg": "rgb(255,255,255)", "fontPx": 16, "weight": 600, "ratio": 6.04, "pass": true },
+    { "label": "hero H1",            "color": "rgb(27,58,45)",  "bg": "rgb(247,243,236)", "fontPx": 79, "weight": 400, "ratio": 11.24, "pass": true },
+    { "label": "hero body",          "color": "rgb(64,72,63)",  "bg": "rgb(247,243,236)", "fontPx": 18, "weight": 400, "ratio": 8.57, "pass": true },
+    { "label": "feature card line 1","color": "rgb(20,35,27)",  "bg": "rgb(255,255,255)", "fontPx": 14, "weight": 600, "ratio": 16.33, "pass": true },
+    { "label": "feature card line 2","color": "rgb(64,72,63)",  "bg": "rgb(255,255,255)", "fontPx": 14, "weight": 500, "ratio": 9.47, "pass": true },
+    { "label": "hero trust line",    "color": "rgb(64,72,63)",  "bg": "rgb(247,243,236)", "fontPx": 14, "weight": 600, "ratio": 8.57, "pass": true },
+    { "label": "trust tile title",   "color": "rgb(97,104,97)", "bg": "rgb(255,253,249)", "fontPx": 14, "weight": 700, "ratio": 5.65, "pass": true },
+    { "label": "trust tile caption", "color": "rgb(97,104,97)", "bg": "rgb(255,253,249)", "fontPx": 14, "weight": 400, "ratio": 5.65, "pass": true },
+    { "label": "secondary button",   "color": "rgb(27,58,45)",  "bg": "rgb(255,253,249)", "fontPx": 15, "weight": 600, "ratio": 12.23, "pass": true }
+  ],
+  "lowest_ratio": 5.65,
+  "accessibility": {
+    "h1_count": 1,
+    "h1_accessible_name": "Learn Quran Online with Personal Guidance",
+    "h1_rendered_lines": 2,
+    "decorative_svgs_exposed_to_a11y_tree": 0,
+    "hero_focusables_with_visible_focus_ring": "2 of 2 (solid 3px outline)",
+    "tap_targets_under_44px": 0,
+    "star_row_aria_hidden": true,
+    "star_row_note": "decorative: the five stars are aria-hidden so no rating is announced, because no verified aggregate rating exists yet (see QA/PLACEHOLDER-REGISTER.md)",
+    "hero_image_alt": "Child following along on a laptop during a live online Quran class with a male teacher",
+    "images_missing_alt": 0
+  },
+  "sweep": {
+    "viewports": [1920, 1440, 1024, 768, 390],
+    "intermediate_scan": "380-1900 step 40 (39 widths)",
+    "horizontal_overflow": "none at any width",
+    "console_errors": 0,
+    "page_errors": 0,
+    "asset_errors": 0
+  }
+}

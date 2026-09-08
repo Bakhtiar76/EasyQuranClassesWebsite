@@ -167,7 +167,7 @@ Recommended weights:
 | Token | Size | Weight | Line Height | Usage |
 |---|---:|---:|---:|---|
 | Display XL | clamp(52px, 5vw, 76px) | 400 | 1.02 | rare hero/display use |
-| H1 | clamp(46px, 4.2vw, 66px) | 400 | 1.06 | page hero |
+| H1 | clamp(38px, 3.55vw, 79px) | 400 | 1.08 | page hero |
 | H2 | clamp(38px, 3.4vw, 54px) | 400 | 1.10 | major section title |
 | H3 | 28–34px | 400/600 | 1.18 | cards/subsections |
 | H4 | 21–24px | 600 | 1.25 | card headings |
@@ -192,10 +192,31 @@ Do not reduce body copy below 16px on mobile.
 ### Global Widths
 
 ```css
---eqc-content-max: 1400px;
+--eqc-content-max: 1708px;
 --eqc-content-narrow: 820px;
 --eqc-text-max: 680px;
 ```
+
+> **Updated from the client reference, 2026-09-09** (`claude-opus-5`, design
+> parity pass — `QA/design-review/home.md` findings 1 and 4).
+>
+> `--eqc-content-max` was 1240px in this document and 1400px in `tokens.css`;
+> neither matched the reference. Measured on `Home.jpeg` (1307px canvas), the
+> hero's content column runs from the H1's left edge x105 to the arch's outer
+> right edge x1224 — 1119px, i.e. 85.6% of the canvas, or **1644px at 1920**.
+> `.eqc-container` is `border-box` with `--eqc-gutter` padding inside, so the
+> token carries 1644 + 2x32 = **1708px**. The trust panel gives a slightly
+> tighter 1620px; the difference is that panel's own inset.
+>
+> The H1 cap rose from 66px to **79px**, derived from glyph width rather than
+> assumed font metrics: the hero's second line spans 823px at 1920 in the
+> reference, and that string in DM Serif Display needs 897px at 86px, so the
+> reference size is 86 x 823/897 ~ 79px. At 66px the hero H1 wrapped to three
+> lines where the reference has two — and in this design the line break is
+> load-bearing, because string length is what sets the column geometry.
+>
+> Only ratios measured *within a single* reference file are meaningful: the
+> section JPEGs are crops at different zoom levels (`QA/LESSONS.md` #11).
 
 ### Section Spacing
 

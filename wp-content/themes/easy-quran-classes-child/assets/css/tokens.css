@@ -48,7 +48,15 @@
 
 	/* Fluid type scale */
 	--eqc-fs-display-xl: clamp(2.6rem, 1.4rem + 4.4vw, 4.75rem);
-	--eqc-fs-h1: clamp(2.375rem, 1.55rem + 3vw, 4.125rem);
+	/* H1 size measured off Home.jpeg by LINE WIDTH, not by assumed font
+	   metrics: the hero's second line "with Personal Guidance" spans 560px on
+	   the 1307px canvas = 823px at 1920, and that same string in DM Serif
+	   Display needs 897px at 86px, so the reference size is 86 x 823/897 =
+	   ~79px. An earlier estimate from ascender height gave 86px and was wrong
+	   - glyph-width measurement uses the real font metrics, an assumed
+	   ascender ratio does not. The build's old 66px is what forced the hero
+	   H1 onto a third line. See home.md finding 4. */
+	--eqc-fs-h1: clamp(2.375rem, 1.3rem + 3.55vw, 4.9375rem);
 	--eqc-fs-h2: clamp(2rem, 1.35rem + 2.4vw, 3.375rem);
 	--eqc-fs-h3: clamp(1.75rem, 1.5rem + 1vw, 2.125rem);
 	--eqc-fs-h4: clamp(1.3125rem, 1.2rem + 0.4vw, 1.5rem);
@@ -58,8 +66,20 @@
 	--eqc-fs-eyebrow: 0.8125rem;
 	--eqc-fs-button: 0.9375rem;
 
-	/* Layout — DESIGN.md §7 */
-	--eqc-content-max: 1400px;
+	/* Layout — DESIGN.md §7
+	 * --eqc-content-max is measured, not chosen. In Home.jpeg (1307px canvas)
+	 * the trust panel — a content-width element — spans x109–1212, i.e.
+	 * 84.39% of the canvas, stable across rows 790/860/890. The header bar on
+	 * that same canvas is 94.3% (QA/design-review/global-chrome.md row 1), so
+	 * content is 0.895 x the chrome width. Against the chrome's own
+	 * --eqc-chrome-max of 1810px that is a 1620px content column; .eqc-container
+	 * is border-box with --eqc-gutter padding inside. The hero's own bounds are
+	 * the tighter check and give 1644px (H1 left edge x105 to the arch's outer
+	 * right edge x1224 = 1119 of 1307), so the token carries 1644 + 2x32 =
+	 * 1708px; the 24px against the trust panel's 1620 is the panel's own inset. See QA/design-review/home.md finding 1.
+	 * Only ratios measured WITHIN one reference file are meaningful — the
+	 * section JPEGs are crops at different zoom levels (LESSONS #11). */
+	--eqc-content-max: 1708px;
 	--eqc-content-narrow: 820px;
 	--eqc-text-max: 680px;
 

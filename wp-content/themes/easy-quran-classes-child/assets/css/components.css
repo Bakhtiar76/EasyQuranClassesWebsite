@@ -1094,6 +1094,14 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 .eqc-trust-tile:hover .eqc-icon { transform: scale(1.12) rotate(-6deg); }
 .eqc-trust-tile-title { margin: 0 0 0.15em; font-size: var(--eqc-fs-body); font-weight: 700; color: var(--eqc-heading); }
 .eqc-trust-tile p { margin: 0; font-size: var(--eqc-fs-small); color: var(--eqc-muted); }
+/* Full-height hairlines between the four columns, as the reference shows
+   (finding 13). Applied to the tile rather than the grid so it survives the
+   auto-fit reflow: the rule is suppressed on any tile that starts a row,
+   which is what `:first-child` alone could not do once the row wraps. */
+.eqc-grid--trust > * + * { border-inline-start: 1px solid var(--eqc-border); }
+@media (max-width: 900px) {
+	.eqc-grid--trust > * + * { border-inline-start: 0; }
+}
 
 /* Chips (hero benefit chips) */
 .eqc-chip-row { display: flex; flex-wrap: wrap; gap: 0.7rem; }
@@ -1113,6 +1121,132 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 }
 .eqc-chip:hover { transform: translateY(-2px); border-color: var(--eqc-gold-300); }
 .eqc-chip .eqc-icon { width: 1.35em; height: 1.35em; color: var(--eqc-bronze-600); }
+
+/* --cards: the hero's own form in Home.jpeg — four WHITE cards on one row,
+   icon left of a two-line label, rather than one-line pills that wrap to a
+   second row. Auto-fit rather than a fixed repeat(4) so the row reflows to
+   2x2 and then stacks below desktop, where the reference is silent
+   (QA/design-review/home.md finding 7). */
+/* Explicit column counts rather than repeat(auto-fit, minmax(min(150px,1fr)))
+   — auto-fit resolved inconsistently here: the grid settled at 2 columns
+   while its Elementor widget wrapper kept the height of the 4-row single
+   column layout (290px for 158px of cards), leaving a large dead gap above
+   the buttons on mobile. Fixed counts are deterministic and also let the
+   desktop row match the reference's four-across exactly. */
+.eqc-chip-row--cards {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 0.75rem;
+	align-items: stretch;
+	width: 100%;
+}
+@media (max-width: 1180px) {
+	.eqc-chip-row--cards { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 400px) {
+	.eqc-chip-row--cards { grid-template-columns: 1fr; }
+}
+.eqc-chip--card {
+	background: var(--eqc-white);
+	border-color: transparent;
+	border-radius: var(--eqc-radius-card);
+	box-shadow: var(--eqc-shadow-card);
+	padding: 0.85em 1em;
+	gap: 0.7em;
+	align-items: center;
+}
+/* Icons here read as dark, near-filled marks in the reference. Only the
+   COLOUR is matched — DESIGN.md §11 forbids mixing icon families, so the
+   shared Lucide outline sprite stays. */
+.eqc-chip--card .eqc-icon {
+	width: 1.7em;
+	height: 1.7em;
+	color: var(--eqc-heading);
+	flex: none;
+}
+.eqc-chip-label { display: flex; flex-direction: column; line-height: 1.35; }
+.eqc-chip--card .eqc-chip-label > span { font-weight: 500; color: var(--eqc-text); }
+
+/* ---------- Hero eyebrow, rule and trust row ---------- */
+
+/* The reference's hero eyebrow is sentence case in a white pill with the
+   icon in its own circular cream chip — not the shared uppercase,
+   letterspaced eyebrow used for section labels (finding 8). */
+.eqc-eyebrow--hero {
+	text-transform: none;
+	letter-spacing: 0;
+	font-size: var(--eqc-fs-body);
+	font-weight: 600;
+	background: var(--eqc-white);
+	gap: 0.7em;
+	padding: 0.4em 1.35em 0.4em 0.4em;
+}
+.eqc-eyebrow-chip {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 2.1em;
+	height: 2.1em;
+	border-radius: 50%;
+	background: var(--eqc-cream-100);
+	flex: none;
+}
+.eqc-eyebrow-chip .eqc-icon { width: 1.1em; height: 1.1em; color: var(--eqc-heading); }
+
+/* Gold rule with a diamond terminal at each end, under the H1. Width from
+   the reference: 141px on a 1307px canvas -> 207px at 1920 (finding 5). */
+.eqc-hero-rule { color: var(--eqc-gold-500); line-height: 0; }
+.eqc-hero-rule .eqc-divider-svg { width: clamp(120px, 10.8vw, 207px); }
+
+/* Five overlapping avatars, then five gold stars above a single trust line. */
+.eqc-hero-trust {
+	display: flex;
+	align-items: center;
+	gap: 1rem;
+	flex-wrap: wrap;
+}
+.eqc-hero-trust .eqc-avatar-stack img {
+	--_avatar: clamp(34px, 18px + 1.4vw, 46px);
+	border-width: 2px;
+	margin-inline-start: calc(var(--_avatar) * -0.28);
+}
+.eqc-hero-trust-text { display: flex; flex-direction: column; gap: 0.15em; }
+.eqc-hero-trust-text > span:last-child {
+	font-size: var(--eqc-fs-small);
+	font-weight: 600;
+	color: var(--eqc-text);
+}
+.eqc-star-row { display: inline-flex; gap: 0.12em; color: var(--eqc-gold-500); }
+/* The sprite's star is an outline glyph whose own path carries fill="none";
+   a presentation attribute on the inner path beats a fill inherited from the
+   <svg>, so the fill has to be set on the path itself to get the reference's
+   solid gold stars. Stroke is dropped so the filled shape keeps its weight. */
+.eqc-star-row .eqc-icon { width: 1.05em; height: 1.05em; }
+.eqc-star-row .eqc-icon path,
+.eqc-star-row .eqc-icon polygon { fill: currentColor; stroke: none; }
+
+/* ---------- Hero grid ---------- */
+
+/* Measured off Home.jpeg: text column x105-670 (830px at 1920), gap 14
+   (21px), media x684-1224 (793px) — 50.5% / 48.2% of the 1644px content
+   column, not the 50/50 Elementor defaults to. The 25px this hands back to
+   the text column is exactly what lets the H1 keep the reference's two-line
+   break instead of spilling "Guidance" onto a third line (finding 4). */
+/* Elementor gives every container 10px of inline padding. Nested two deep
+   that is 40px off the hero's usable width, which is exactly what kept the
+   H1's second line 24px short of fitting and spilled "Guidance" onto a third
+   line. Zeroed here so the measured column widths are the real ones; the
+   page's own gutter still comes from .eqc-container. */
+.eqc-hero-grid,
+.eqc-hero-grid > .eqc-hero-text,
+.eqc-hero-grid > .eqc-hero-media { padding-inline: 0; }
+.eqc-hero-grid { gap: clamp(1rem, 1.1vw, 21px); align-items: center; }
+.eqc-hero-grid > .eqc-hero-text { flex: 1 1 50.5%; }
+.eqc-hero-grid > .eqc-hero-media { flex: 1 1 48.2%; }
+@media (max-width: 900px) {
+	.eqc-hero-grid > .eqc-hero-text,
+	.eqc-hero-grid > .eqc-hero-media { flex-basis: 100%; }
+}
 
 /* ---------- Arch media ---------- */
 
@@ -1203,7 +1337,46 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 }
 .eqc-arch-media--fourcentred::before { -webkit-mask-image: url('../svg/fourcentred-mask.svg'); mask-image: url('../svg/fourcentred-mask.svg'); }
 .eqc-arch-media--horseshoe::before { -webkit-mask-image: url('../svg/horseshoe-mask.svg'); mask-image: url('../svg/horseshoe-mask.svg'); }
-.eqc-arch-media:not(.eqc-arch-media--masked):not(.eqc-arch-media--fourcentred):not(.eqc-arch-media--horseshoe)::before {
+/* --keel: the hero's own silhouette (Home.jpeg). Unlike every variant above
+   it needs TWO gold contours with a cream gap between them, so it uses
+   keel-arch-frame.svg (both lines, generated with pad 0 so its outer
+   contour shares keel-arch-mask.svg's exact coordinate frame — the
+   padding/inset mismatch warned about above) and shrinks the PHOTO's mask
+   to 95.72% instead, i.e. 100% - 2 x the measured 2.14% inset. The gap
+   that opens up shows the section's own cream ground, which is what the
+   reference shows between its two lines. */
+.eqc-arch-media--keel {
+	border-radius: 0;
+	border: none;
+	overflow: visible;
+	aspect-ratio: 559 / 629;
+}
+.eqc-arch-media--keel img {
+	-webkit-mask-image: url('../svg/keel-arch-mask.svg');
+	mask-image: url('../svg/keel-arch-mask.svg');
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: 95.72% 95.72%;
+	mask-size: 95.72% 95.72%;
+	-webkit-mask-position: center;
+	mask-position: center;
+}
+.eqc-arch-media--keel::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background-color: var(--eqc-gold-500);
+	-webkit-mask-image: url('../svg/keel-arch-frame.svg');
+	mask-image: url('../svg/keel-arch-frame.svg');
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	pointer-events: none;
+	z-index: 2;
+}
+
+.eqc-arch-media:not(.eqc-arch-media--masked):not(.eqc-arch-media--fourcentred):not(.eqc-arch-media--horseshoe):not(.eqc-arch-media--keel)::before {
 	content: '';
 	position: absolute;
 	inset: 0;

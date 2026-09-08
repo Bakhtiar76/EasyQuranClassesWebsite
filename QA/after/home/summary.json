@@ -1,0 +1,22 @@
+{
+  "generatedAt": "2026-09-08T23:50:16.973Z",
+  "baseUrl": "http://localhost",
+  "widths": [
+    1920,
+    1440,
+    1024,
+    768,
+    390
+  ],
+  "scan": "380-1900:40",
+  "routes": [
+    {
+      "route": "/",
+      "dir": "home",
+      "failures": 0,
+      "warnings": 0
+    }
+  ],
+  "failures": 0,
+  "warnings": 0
+}

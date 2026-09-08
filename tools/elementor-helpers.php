@@ -549,9 +549,20 @@ function eqc_trust_tile( $icon, $title, $description ) {
 	);
 }
 
-/** Small pill chip used in the hero (icon + short label). */
-function eqc_chip( $icon, $label ) {
-	return '<span class="eqc-chip">' . eqc_icon_str( $icon ) . '<span>' . esc_html( $label ) . '</span></span>';
+/**
+ * Small chip used in the hero (icon + label).
+ *
+ * Pass $label_2 to get the reference's two-line card form (Home.jpeg shows
+ * "1-to-1" over "Live Classes" in a white rounded card, not a one-line
+ * pill) — extended here rather than adding a second card function beside
+ * this one. Callers that pass one label keep the original pill.
+ */
+function eqc_chip( $icon, $label, $label_2 = '' ) {
+	$class = $label_2 ? 'eqc-chip eqc-chip--card' : 'eqc-chip';
+	$text  = '<span class="eqc-chip-label">' . esc_html( $label );
+	$text .= $label_2 ? '<span>' . esc_html( $label_2 ) . '</span>' : '';
+	$text .= '</span>';
+	return '<span class="' . esc_attr( $class ) . '">' . eqc_icon_str( $icon ) . $text . '</span>';
 }
 
 /** A raw icon-labeled anchor matching the .eqc-btn pattern used in header/footer (for icon CTAs). */

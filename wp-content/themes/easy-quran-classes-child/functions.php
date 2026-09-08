@@ -57,18 +57,37 @@ function eqc_setup() {
 add_action( 'after_setup_theme', 'eqc_setup' );
 
 /**
+ * Asset cache-buster.
+ *
+ * Production keeps the theme version, so a release ships one stable URL per
+ * asset. Locally that is actively harmful: the theme version only changes on
+ * a release, so every CSS edit during a design iteration is served from the
+ * browser cache under an unchanged `?ver=`. That produced a genuinely
+ * misleading half-applied page during the Home parity pass — tokens.css had
+ * refreshed while components.css had not, so new custom properties were live
+ * but the rules consuming them were not, which reads exactly like a
+ * specificity bug and is not one. Locally, fall back to the file's own mtime.
+ */
+function eqc_asset_version( $relative_path ) {
+	$version = wp_get_theme()->get( 'Version' );
+	if ( 'local' !== wp_get_environment_type() ) {
+		return $version;
+	}
+	$file = get_stylesheet_directory() . $relative_path;
+	return file_exists( $file ) ? (string) filemtime( $file ) : $version;
+}
+
+/**
  * Enqueue parent stylesheet, self-hosted fonts, then the child's tokens ->
  * components -> motion -> style.css cascade (each layer can safely
  * override the one before it), then the shared vanilla JS.
  */
 function eqc_enqueue_assets() {
-	$theme_version = wp_get_theme()->get( 'Version' );
-
 	wp_enqueue_style(
 		'easy-quran-classes-fonts',
 		get_stylesheet_directory_uri() . '/assets/css/fonts.css',
 		array(),
-		$theme_version
+		eqc_asset_version( '/assets/css/fonts.css' )
 	);
 
 	// Hello Elementor registers/enqueues its own 'hello-elementor' style
@@ -77,38 +96,38 @@ function eqc_enqueue_assets() {
 		'eqc-tokens',
 		get_stylesheet_directory_uri() . '/assets/css/tokens.css',
 		array( 'hello-elementor' ),
-		$theme_version
+		eqc_asset_version( '/assets/css/tokens.css' )
 	);
 	wp_enqueue_style(
 		'eqc-components',
 		get_stylesheet_directory_uri() . '/assets/css/components.css',
 		array( 'eqc-tokens' ),
-		$theme_version
+		eqc_asset_version( '/assets/css/components.css' )
 	);
 	wp_enqueue_style(
 		'eqc-shell',
 		get_stylesheet_directory_uri() . '/assets/css/shell.css',
 		array( 'eqc-components' ),
-		$theme_version
+		eqc_asset_version( '/assets/css/shell.css' )
 	);
 	wp_enqueue_style(
 		'eqc-motion',
 		get_stylesheet_directory_uri() . '/assets/css/motion.css',
 		array( 'eqc-shell' ),
-		$theme_version
+		eqc_asset_version( '/assets/css/motion.css' )
 	);
 	wp_enqueue_style(
 		'easy-quran-classes-style',
 		get_stylesheet_uri(),
 		array( 'eqc-motion' ),
-		$theme_version
+		eqc_asset_version( '/style.css' )
 	);
 
 	wp_enqueue_script(
 		'eqc-scripts',
 		get_stylesheet_directory_uri() . '/assets/js/eqc.js',
 		array(),
-		$theme_version,
+		eqc_asset_version( '/assets/js/eqc.js' ),
 		true
 	);
 }

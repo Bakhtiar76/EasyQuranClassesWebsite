@@ -94,6 +94,8 @@ function eqc_print_icon_sprite() {
 
 		<symbol id="eqc-icon-star-8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2 L19.071 19.071 L2 12 L19.071 4.929 L12 22 L4.929 4.929 L22 12 L4.929 19.071 Z"/></symbol>
 
+		<symbol id="eqc-icon-star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.5 L18.172 20.495 L2.014 8.755 L21.986 8.755 L5.828 20.495 Z"/></symbol>
+
 		</defs>
 	</svg>
 	<?php

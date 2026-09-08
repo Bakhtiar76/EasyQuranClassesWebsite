@@ -111,6 +111,17 @@ for (const [id, siName] of Object.entries(BRAND_MAP)) {
 const star8d = starPolygonPath(12, 12, 10, 8, 3);
 symbols += `\t\t<symbol id="eqc-icon-star-8" viewBox="0 0 24 24" fill="currentColor"><path d="${star8d}"/></symbol>\n\n`;
 
+// star-filled: the solid five-point rating star the hero trust row and the
+// testimonial cards need. Lucide's `star` is an OUTLINE glyph carrying
+// fill="none" on its own path — and because icons render through <use>, that
+// presentation attribute cannot be overridden by CSS from the page (the
+// referenced content is in a shadow tree, and an attribute beats an inherited
+// fill anyway). So the filled star is a symbol in its own right, built from
+// the same starPolygonPath construction as star-8 above rather than a second
+// traced asset. See QA/design-review/home.md finding 9.
+const star5d = starPolygonPath(12, 12, 10.5, 5, 2);
+symbols += `\t\t<symbol id="eqc-icon-star-filled" viewBox="0 0 24 24" fill="currentColor"><path d="${star5d}"/></symbol>\n\n`;
+
 const php = `<?php
 /**
  * Inline SVG icon sprite — DESIGN.md §11.

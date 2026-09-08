@@ -33,6 +33,7 @@ import {
 	horseshoeArchPanel,
 	mandorlaPanel,
 	multifoilArchPanel,
+	cuspedArchPanel,
 } from './lib/arches.mjs';
 
 const rosetteTrace = JSON.parse(readFileSync('tools/graphics/scratch/rosette-traced.json', 'utf8'));
@@ -368,6 +369,43 @@ function sparklePath(cx, cy, r) {
 	save('arch-frame.svg', svgFromBbox(unionBbox, frame, 4));
 }
 
+// Cusped keel arch — the client's Home.jpeg hero silhouette (three outward
+// lobes on a bulged support curve, sharp ogee point, vertical jambs). The
+// profile is a measured fit, not a guess: see cuspedArchPanel's own comment
+// in lib/arches.mjs for the trace, and QA/design-review/home.md finding 2.
+// Verified by re-sampling the generated left profile against the reference's
+// measured boundary (tools/graphics/scratch/fitcheck.mjs): RMSE 4.19px, max
+// deviation 11.3px, on a 559px-wide arch — 0.75% of the width.
+//
+// Generated at the reference's own measured box (559x629, jamb at y291) so
+// the CSS aspect-ratio consuming it matches 1:1 and mask-size cannot distort
+// the curve.
+{
+	const w = 559, jamb = 291, baseH = 629;
+	const panel = cuspedArchPanel(w, jamb, baseH);
+	save('keel-arch-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
+	save('keel-arch-outline.svg', svgFromBbox(panel.bbox, `<path fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" d="${panel.d}"/>`, 0));
+
+	// Double gold contour. The reference's two lines sit 11.5px apart on a
+	// 537px-wide arch = 2.14% of the width (home.md finding 3) — half the
+	// inset arch-frame.svg uses, so the ratio is taken from the measurement
+	// rather than reusing that asset's 14px directly.
+	const inset = Math.round(w * 0.0214);
+	const inner = cuspedArchPanel(w - inset * 2, jamb - inset, baseH - inset * 2);
+	const unionBbox = {
+		minX: Math.min(panel.bbox.minX, inner.bbox.minX + inset),
+		minY: Math.min(panel.bbox.minY, inner.bbox.minY + inset),
+		maxX: Math.max(panel.bbox.maxX, inner.bbox.maxX + inset),
+		maxY: Math.max(panel.bbox.maxY, inner.bbox.maxY + inset),
+	};
+	save('keel-arch-frame.svg', svgFromBbox(unionBbox,
+		`<g fill="none" stroke="currentColor" stroke-width="2">` +
+		`<path d="${panel.d}"/>` +
+		`<path transform="translate(${inset} ${inset})" d="${inner.d}"/>` +
+		`</g>`, 0)); // pad 0: the frame's OUTER contour must share the mask's exact
+		// coordinate frame, or the two render at different scales in the same box
+}
+
 // Four-centred (Persian/Timurid) arch — course/pricing card media frames.
 // Its bbox comes out essentially exact (0..w, 0..baseH) at these
 // proportions, but it's still wrapped via wrapArch() rather than a fixed
@@ -561,7 +599,7 @@ function quatrefoilPath(size) {
 	save('divider-dot.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 
-// divider-accent: left-aligned short rule with a single diamond (hero).
+// divider-accent: left-aligned short rule with a single diamond.
 {
 	const w = 90, h = 8, cy = 4;
 	const diamond = regularPolygonPath(4, cy, 3.4, 4, 0);
@@ -569,6 +607,23 @@ function quatrefoilPath(size) {
 		`<path fill="currentColor" d="${diamond}"/>` +
 		`<line x1="12" y1="${cy}" x2="${w}" y2="${cy}" stroke="currentColor" stroke-width="1"/>`;
 	save('divider-accent.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
+}
+
+// divider-rule: diamond - rule - diamond, the hero's gold rule under the H1.
+// A separate asset rather than a second terminal on divider-accent above,
+// because that one is also consumed by eqc_pricing_card() and the pricing
+// reference has not been reviewed yet — changing it here would silently
+// restyle a section nobody has measured. Merge the two if the pricing pass
+// finds the same symmetric form. Proportion measured off Assests/Home.jpeg:
+// rule x105-246 (141px) with ~8px diamonds, i.e. length:terminal 17.6:1
+// (QA/design-review/home.md finding 5).
+{
+	const w = 120, h = 8, cy = 4, r = 3.4;
+	const body =
+		`<line x1="4" y1="${cy}" x2="${w - 4}" y2="${cy}" stroke="currentColor" stroke-width="1"/>` +
+		`<path fill="currentColor" d="${regularPolygonPath(4, cy, r, 4, 0)}"/>` +
+		`<path fill="currentColor" d="${regularPolygonPath(w - 4, cy, r, 4, 0)}"/>`;
+	save('divider-rule.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 
 console.log('\nAll ornament assets generated to', OUT);
