@@ -148,4 +148,4 @@ $approach = eqc_section(
 // CTA be the one closer; the page's own last section stays the content
 // close instead of a second copy of the same pitch.
 
-eqc_save_elementor_page( 25, array( $hero, $mission, $who_we_serve, $approach ) );
+eqc_save_elementor_page( eqc_page_id( 'about' ), array( $hero, $mission, $who_we_serve, $approach ) );

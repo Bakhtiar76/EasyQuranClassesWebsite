@@ -361,6 +361,6 @@ $blog_section = eqc_section(
 );
 
 eqc_save_elementor_page(
-	24,
+	eqc_page_id( 'home' ),
 	array( $hero, $trust, $about, $courses, $how_it_works, $teachers, $pricing, $testimonials, $faq, $blog_section )
 );

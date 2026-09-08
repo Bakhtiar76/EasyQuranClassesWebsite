@@ -122,4 +122,4 @@ $faq = eqc_section(
 	)
 );
 
-eqc_save_elementor_page( 26, array( $hero, $courses_grid, $choosing, $pathway, $faq ) );
+eqc_save_elementor_page( eqc_page_id( 'courses' ), array( $hero, $courses_grid, $choosing, $pathway, $faq ) );

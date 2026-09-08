@@ -195,6 +195,26 @@ function eqc_media_id( $slug_fragment ) {
 }
 
 /**
+ * Look up a page's post ID by its slug, so `tools/pages/*.php` builders
+ * never hardcode a numeric post ID that only happens to be correct on the
+ * machine that first created the site. `00-site-setup.php` creates pages
+ * with `wp_insert_post()`, whose returned ID depends on install order/
+ * history — a literal ID baked into a builder script would resolve to a
+ * different (or no) page on a second machine.
+ *
+ * Errors out (rather than silently creating anything) when the page is
+ * missing, since page creation is `00-site-setup.php`'s job, not a page
+ * builder's.
+ */
+function eqc_page_id( $slug ) {
+	$page = get_page_by_path( $slug );
+	if ( ! $page ) {
+		WP_CLI::error( "eqc_page_id(): no page found for slug '{$slug}'. Run 'wp eval-file /tools/00-site-setup.php' first." );
+	}
+	return (int) $page->ID;
+}
+
+/**
  * Return one icon's markup as a string. The active theme's
  * inc/template-tags.php (loaded by WordPress before this file runs under
  * `wp eval-file`) already defines eqc_get_icon_html() — reuse it rather

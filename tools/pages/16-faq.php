@@ -62,4 +62,4 @@ $faq_content = eqc_section(
 // Links, so removing the duplicate panel loses no path while fixing the
 // double-dark-block heaviness. See 11-about.php for the full note.
 
-eqc_save_elementor_page( 30, array( $hero, $faq_content ) );
+eqc_save_elementor_page( eqc_page_id( 'faq' ), array( $hero, $faq_content ) );

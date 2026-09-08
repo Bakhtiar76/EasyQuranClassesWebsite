@@ -56,4 +56,4 @@ $contact_section = eqc_section(
 	)
 );
 
-eqc_save_elementor_page( 29, array( $hero, $contact_section ) );
+eqc_save_elementor_page( eqc_page_id( 'contact' ), array( $hero, $contact_section ) );
