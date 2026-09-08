@@ -413,6 +413,44 @@ Deliverability, Fluent Forms, Hello Dolly, Rank Math SEO, Web
 Accessibility) — Elementor, Fluent Forms and Rank Math SEO active; the
 rest inactive.
 
+**Web Accessibility (`pojo-accessibility`) — decision: leave inactive
+(2026-09-08).** Read its `readme.txt` on production. It bundles three
+distinct features: (1) a WCAG violation scanner ("Accessibility
+Assistant") — genuinely could add supplementary QA value, but this site
+already meets the bar the correct way (Lighthouse Accessibility 100,
+hand-built semantic HTML/keyboard-nav/focus-states per `CLAUDE.md`); (2) a
+floating front-end "Usability widget" (font resize, contrast toggle,
+animation pause) — this is the "accessibility overlay" pattern the
+professional accessibility community specifically advises against (the
+multi-signatory "Overlay Fact Sheet", WebAIM, Deque): overlays don't
+achieve real WCAG compliance, can conflict with users' own assistive tech,
+and have drawn public legal/advocacy backlash industry-wide (e.g. the
+accessiBe controversy); (3) an accessibility-statement generator — low
+risk but trivial to write as a static page without a plugin. Full
+functionality also requires "Connecting" to Elementor's cloud service
+(same account-linking friction as Rank Math/Image Optimization). Net: no
+genuine improvement over what the site already does correctly, real
+downside from the overlay widget. Left inactive; revisit only if a future
+audit finds a specific, concrete accessibility gap the scanner would catch
+that Lighthouse/manual review missed.
+
+**Email Deliverability (`site-mailer`) — decision: confirmed real gap,
+activation deferred by client decision (2026-09-08).** Tested with a real
+Contact-form submission on production (stored correctly in
+`wp_fluentform_submissions`) — **no notification email arrived** at the
+site's `admin_email` (inbox or spam), confirming the default host PHP
+`mail()` path genuinely does not deliver here; this is not a hypothetical
+risk. Activating Email Deliverability would fix this, but it requires a
+"Connect Your Account" step to Elementor's own hosted mail-relay service —
+an external account/data-flow decision only the client can make. **Client
+decision: defer activating/connecting this plugin until the real client
+email account is ready** (the current `admin_email` is a placeholder/dev
+address, not worth connecting a production mail service to yet). Action
+for a future session: once the client's real email is set, activate
+`site-mailer`, have the client (or whoever holds the Elementor account)
+complete the Connect step, then re-run this exact same real-submission
+test to confirm delivery before considering it resolved.
+
 Do not automate cPanel login/session capture by default. Claude prepares instructions and release artifacts; the user controls sensitive cPanel actions.
 
 **Scope of the approved MCP servers.** The project's configured MCP servers — `novamira-localhost`

@@ -982,12 +982,13 @@ Do not mark complete until:
 [x] Elementor works
 [x] Blog works
 [x] forms work (Contact + Free Trial verified via real stored submissions)
-[ ] email works — form submissions are confirmed stored in the DB, but
-    actual outgoing SMTP/email delivery was never independently verified
-    (the "Email Deliverability" plugin was found unapproved and left
-    inactive — see `CPANEL-WORKFLOW.md` §17 — so mail currently depends on
-    the host's default PHP `mail()` path, unverified). Test a real
-    submission and confirm an email actually arrives before relying on it.
+[ ] email works — confirmed BROKEN 2026-09-08: a real Contact-form test
+    submission stored correctly but no notification email arrived at
+    `admin_email` (inbox or spam) — default host PHP `mail()` does not
+    deliver here. Fix (activating "Email Deliverability" + connecting an
+    Elementor account) intentionally deferred by client decision until the
+    real client email address is ready — see `CPANEL-WORKFLOW.md` §17.
+    Do not mark this done until re-tested after that connection is made.
 [x] responsive QA works (desktop + mobile emulation verified on production)
 [x] HTTPS/mixed-content clean
 [x] SEO URLs/indexing correct (sitemap + per-page titles/meta fixed
