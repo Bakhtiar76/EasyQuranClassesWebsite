@@ -117,7 +117,7 @@ $about = eqc_section(
 									array(
 										'image'        => array( 'id' => $about_img, 'url' => wp_get_attachment_image_url( $about_img, 'large' ) ),
 										'image_size'   => 'large',
-										'_css_classes' => 'eqc-arch-media',
+										'_css_classes' => 'eqc-arch-media eqc-arch-media--masked',
 									)
 								),
 							)

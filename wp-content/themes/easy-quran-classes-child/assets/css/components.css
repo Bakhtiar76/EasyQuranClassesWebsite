@@ -440,14 +440,48 @@ html:not(.eqc-js) .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
 
 /* Teacher card */
 .eqc-card--teacher { text-align: center; position: relative; }
+/* Mandorla (pointed-oval) frame, replacing a plain circle — matches the
+   client reference's arch-family photo treatment rather than a generic
+   avatar shape. Aspect-ratio matches mandorla-mask.svg's own true bbox
+   (249:330.994, see tools/graphics/gen-ornaments.mjs) so mask-size:100%
+   100% doesn't stretch it; the border becomes a mask-shaped outline
+   layer instead of a round border, since border-radius can't follow an
+   arbitrary silhouette. */
 .eqc-card--teacher .eqc-teacher-photo,
 .eqc-card--teacher .eqc-teacher-photo-widget {
-	width: clamp(120px, 30%, 160px);
-	aspect-ratio: 1;
+	position: relative;
+	width: clamp(110px, 28%, 150px);
+	aspect-ratio: 249 / 330.994;
 	margin-inline: auto;
-	border-radius: 50%;
-	overflow: hidden;
-	border: 3px solid var(--eqc-gold-300);
+}
+/* The mask lives on the <img>, not this container: masking a parent
+   clips its entire subtree (including a differently-sized pseudo-element)
+   to that one shape, which would clip the outline below right back down
+   to the photo's own silhouette instead of letting it trace just outside
+   it (see the .eqc-arch-media--masked comment above for the full case
+   that surfaced this). */
+.eqc-card--teacher .eqc-teacher-photo img,
+.eqc-card--teacher .eqc-teacher-photo-widget img {
+	-webkit-mask-image: url('../svg/mandorla-mask.svg');
+	mask-image: url('../svg/mandorla-mask.svg');
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+}
+.eqc-card--teacher .eqc-teacher-photo::after,
+.eqc-card--teacher .eqc-teacher-photo-widget::after {
+	content: '';
+	position: absolute;
+	inset: -4%;
+	background-color: var(--eqc-gold-300);
+	-webkit-mask-image: url('../svg/mandorla-outline.svg');
+	mask-image: url('../svg/mandorla-outline.svg');
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	pointer-events: none;
 }
 /* Small "seal" badge overlapping the bottom of the photo, matching the
    reference teacher cards (Assests/). Pulled up with a negative margin
@@ -908,17 +942,61 @@ html:not(.eqc-js) .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
 	overflow: hidden;
 	border: 1px solid var(--eqc-border);
 }
-.eqc-arch-media--masked {
-	-webkit-mask-image: url('../svg/arch-mask.svg');
-	mask-image: url('../svg/arch-mask.svg');
-	-webkit-mask-size: 100% 100%;
-	mask-size: 100% 100%;
-	-webkit-mask-repeat: no-repeat;
-	mask-repeat: no-repeat;
+/* Each masked variant's aspect-ratio matches its own SVG's true bbox
+   (see tools/graphics/gen-ornaments.mjs) — the keel arch's outward
+   shoulder cusps, for instance, genuinely widen its bbox to ~439.4:500
+   rather than a plain 4:5, and mask-size:100% 100% stretches whatever
+   mismatch there is, so getting this wrong reintroduces a subtler version
+   of the clipping/distortion bug the arch rebuild fixed. */
+.eqc-arch-media--masked,
+.eqc-arch-media--fourcentred,
+.eqc-arch-media--horseshoe {
 	border-radius: 0;
 	border: none;
+	overflow: visible; /* the outline (below) deliberately extends past this box */
 }
-.eqc-arch-media:not(.eqc-arch-media--masked)::before {
+.eqc-arch-media--masked { aspect-ratio: 439.448 / 500; }
+.eqc-arch-media--fourcentred { aspect-ratio: 329 / 389; }
+.eqc-arch-media--horseshoe { aspect-ratio: 327.198 / 349; }
+/* The mask lives on the <img> itself, not the container: a mask on a
+   parent clips its ENTIRE rendered subtree (including any differently
+   sized/positioned pseudo-element) to that one shape, so an outline meant
+   to extend outside the photo's own silhouette would have been clipped
+   right back down to it — exactly what produced a confusing double-cusp
+   overlap instead of a clean frame when this lived on the container. */
+.eqc-arch-media--masked img,
+.eqc-arch-media--fourcentred img,
+.eqc-arch-media--horseshoe img {
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+}
+.eqc-arch-media--masked img { -webkit-mask-image: url('../svg/arch-mask.svg'); mask-image: url('../svg/arch-mask.svg'); }
+.eqc-arch-media--fourcentred img { -webkit-mask-image: url('../svg/fourcentred-mask.svg'); mask-image: url('../svg/fourcentred-mask.svg'); }
+.eqc-arch-media--horseshoe img { -webkit-mask-image: url('../svg/horseshoe-mask.svg'); mask-image: url('../svg/horseshoe-mask.svg'); }
+/* Offset gold hairline outside the photo, matching the client reference's
+   visible arch line — its own independent mask (not inherited from the
+   now-unmasked container), sized larger via inset so it traces just
+   outside the photo's edge instead of overlapping it. */
+.eqc-arch-media--masked::after,
+.eqc-arch-media--fourcentred::after,
+.eqc-arch-media--horseshoe::after {
+	content: '';
+	position: absolute;
+	inset: -3%;
+	background-color: var(--eqc-gold-500);
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	pointer-events: none;
+	z-index: 2;
+}
+.eqc-arch-media--masked::after { -webkit-mask-image: url('../svg/arch-outline.svg'); mask-image: url('../svg/arch-outline.svg'); }
+.eqc-arch-media--fourcentred::after { -webkit-mask-image: url('../svg/fourcentred-outline.svg'); mask-image: url('../svg/fourcentred-outline.svg'); }
+.eqc-arch-media--horseshoe::after { -webkit-mask-image: url('../svg/horseshoe-outline.svg'); mask-image: url('../svg/horseshoe-outline.svg'); }
+.eqc-arch-media:not(.eqc-arch-media--masked):not(.eqc-arch-media--fourcentred):not(.eqc-arch-media--horseshoe)::before {
 	content: '';
 	position: absolute;
 	inset: 0;
@@ -1043,7 +1121,7 @@ html:not(.eqc-js) .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
 	position: absolute;
 	inset: 0;
 	background-color: var(--eqc-gold-500);
-	opacity: 0.14;
+	opacity: 0.1;
 	-webkit-mask-image: url('../svg/hex-tessellation.svg');
 	mask-image: url('../svg/hex-tessellation.svg');
 	-webkit-mask-size: 52px 90px;
@@ -1053,7 +1131,10 @@ html:not(.eqc-js) .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
 	pointer-events: none;
 	z-index: 0;
 }
-.eqc-section--dark.eqc-section--textured::before { background-color: var(--eqc-gold-300); opacity: 0.1; }
+/* Slightly softer than the original 0.14/0.1 pass now that the corner
+   arabesque brackets carry more of each section's ornamental weight,
+   matching the client reference's near-invisible all-over texture. */
+.eqc-section--dark.eqc-section--textured::before { background-color: var(--eqc-gold-300); opacity: 0.07; }
 .eqc-section--textured > .e-con { position: relative; z-index: 1; }
 
 .eqc-section--ornamented { position: relative; overflow: hidden; }
@@ -1069,8 +1150,8 @@ html:not(.eqc-js) .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
 	background-color: var(--eqc-gold-600);
 	-webkit-mask-image: url('../svg/lattice-corner.svg');
 	mask-image: url('../svg/lattice-corner.svg');
-	-webkit-mask-size: 100% 100%;
-	mask-size: 100% 100%;
+	-webkit-mask-size: contain;
+	mask-size: contain;
 	-webkit-mask-repeat: no-repeat;
 	mask-repeat: no-repeat;
 	opacity: 0.22;
@@ -1080,11 +1161,13 @@ html:not(.eqc-js) .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
 /* lattice-corner.svg is drawn dense at its own top-right corner (see the
    asset's own comment), so .eqc-corner-motif--tr needs no transform and
    --bl's 180deg rotation naturally maps that dense corner to bottom-left.
-   The asset already bakes in a per-star opacity fade (0.95 down to 0.1),
-   so this element-level opacity is a second, smaller multiplier on top —
-   deliberately higher than DESIGN.md §9's 3-10% baseline per explicit user
-   feedback that the previous motif read as "boring and dull" at that
-   strength; the fade keeps the far corner still light. */
+   The asset is a genuine arabesque bracket (concentric arcs + rosette +
+   finial, girih fill clipped to a curved wedge) rather than a lattice
+   field cropped to a square — its own radial-gradient mask fades alpha to
+   true zero well inside the canvas, so this element-level opacity is a
+   second, smaller multiplier on top — deliberately higher than
+   DESIGN.md §9's 3-10% baseline per explicit user feedback that the
+   previous motif read as "boring and dull" at that strength. */
 .eqc-corner-motif--tr { top: 0; right: 0; }
 .eqc-corner-motif--bl { bottom: 0; left: 0; transform: rotate(180deg); }
 .eqc-section--dark .eqc-corner-motif { background-color: var(--eqc-gold-300); opacity: 0.5; }
