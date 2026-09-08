@@ -44,8 +44,7 @@ a hard rule, not a suggestion.
 
 ## Releasing to `main`
 
-Not your job as a collaborator — releases are a separate, deliberate step the repo owner
-does (copying only the built theme folder across, per `.claude/rules/git.md`). If a change
+Don't release to main, if a change
 needs to go live, say so in your PR description; don't push it to `main` yourself.
 
 ## Never
