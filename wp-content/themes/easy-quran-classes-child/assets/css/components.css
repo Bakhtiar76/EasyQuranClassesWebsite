@@ -664,10 +664,16 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
    specificity above it would otherwise lose the cascade to the featured
    card's own later `> *` rule and stop covering the icon/badge areas). */
 .eqc-card--pricing .eqc-card-link { z-index: 2; }
-/* Dark scalloped medallion overlapping the card's top edge (replaces the
-   earlier small calendar glyph sitting inline above the ribbon) — the
-   glyph inside stays green-on-white in the reference; ours goes white on
-   dark-green so it reads clearly against the card's own light surface. */
+/* Dark medallion overlapping the card's top edge (replaces the earlier
+   small calendar glyph sitting inline above the ribbon). A plain solid
+   circle, not a masked rosette: rosette.svg/rosette-12.svg are stroke-only
+   outlines (fill:none) — used as a mask they only paint their thin 1.4px
+   stroke line, leaving everything else (including a white icon meant to
+   sit "inside" the medallion) invisible against the card's own light
+   surface. A solid disc plus a rosette-12 ring drawn ON TOP as a real
+   inline SVG (currentColor follows the gold ring color correctly, unlike
+   an externally-masked one) gives the genuinely solid, scalloped-edge
+   badge the reference shows. */
 .eqc-pricing-icon {
 	position: absolute;
 	top: -1.9rem;
@@ -678,21 +684,20 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	justify-content: center;
 	width: 3.8em;
 	height: 3.8em;
+	border-radius: 50%;
+	background: var(--eqc-green-800);
+	box-shadow: 0 0 0 4px var(--eqc-surface), 0 6px 14px rgba(20, 35, 27, 0.3);
 	z-index: 2;
 	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard);
 }
-.eqc-pricing-icon::before {
-	content: '';
+.eqc-pricing-icon-ring {
 	position: absolute;
-	inset: 0;
-	background-color: var(--eqc-green-800);
-	-webkit-mask-image: url('../svg/rosette-12.svg');
-	mask-image: url('../svg/rosette-12.svg');
-	-webkit-mask-size: 100% 100%;
-	mask-size: 100% 100%;
-	filter: drop-shadow(0 6px 10px rgba(20, 35, 27, 0.28));
+	inset: -0.4em;
+	color: var(--eqc-gold-500);
+	pointer-events: none;
 	z-index: 0;
 }
+.eqc-pricing-icon-ring svg { width: 100%; height: 100%; }
 .eqc-pricing-icon .eqc-icon { position: relative; z-index: 1; width: 1.6em; height: 1.6em; color: var(--eqc-white); }
 .eqc-card--pricing:hover .eqc-pricing-icon { transform: translateX(-50%) scale(1.08) rotate(6deg); }
 /* Corner "Recommended" ribbon tag — a diagonal flag near the top-right
@@ -905,7 +910,14 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 .eqc-carousel { position: relative; padding-inline: clamp(0px, 2vw, 2.75em); }
 .eqc-carousel-viewport { overflow: hidden; }
 .eqc-carousel-track {
-	display: flex;
+	/* !important on display/flex-wrap: Elementor's own container default is
+	   flex-wrap:wrap, which this single-row sliding track can never allow —
+	   at desktop (3 visible) 3 items' percentage widths happened to just
+	   barely fit one row by floating-point luck, masking the bug, but at
+	   1-visible mobile widths every card is 100% wide and wraps onto its
+	   own row, stacking all 9 cards vertically instead of sliding. */
+	display: flex !important;
+	flex-wrap: nowrap !important;
 	gap: var(--eqc-grid-gap);
 	transition: transform var(--eqc-motion-slow) var(--eqc-ease-standard);
 	will-change: transform;
@@ -913,8 +925,18 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 }
 @media (max-width: 61.25rem) { .eqc-carousel-track { --_visible: 2; } }
 @media (max-width: 36rem) { .eqc-carousel-track { --_visible: 1; } }
+/* !important: each card here is an Elementor Container in its own right
+   (eqc_container() in eqc_carousel()/eqc_teacher_card()/etc.), and
+   Elementor's own generated per-element CSS gives every "e-con" child a
+   flex-basis of its own (observed: flex-basis: auto with implicit grow),
+   at a specificity this plain child-combinator selector cannot beat by
+   source order alone — without !important all 9 testimonial cards were
+   observed shrinking to fit one single row (~114px each) instead of
+   showing 3 at a time. Same class of override as .eqc-form-wrap's Fluent
+   Forms rules above (DESIGN.md §19: child-theme CSS is the approved place
+   to override chrome a plugin/widget doesn't expose a control for). */
 .eqc-carousel-track > * {
-	flex: 0 0 calc((100% - (var(--_visible) - 1) * var(--eqc-grid-gap)) / var(--_visible));
+	flex: 0 0 calc((100% - (var(--_visible) - 1) * var(--eqc-grid-gap)) / var(--_visible)) !important;
 	min-width: 0;
 }
 .eqc-carousel-arrow {

@@ -38,17 +38,18 @@ foreach ( $inclusions as $inc ) {
 }
 $inclusion_html .= '</div>';
 
-$pricing_section = eqc_section(
-	'eqc-section eqc-section--surface eqc-section--ornamented',
+$pricing_panel = eqc_container(
+	array( 'css_classes' => 'eqc-pricing-panel', 'flex_direction' => 'column' ),
 	array(
-		eqc_section_ornaments(),
-		eqc_inner(
-			'',
-			array(
-				eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--pricing', 'flex_direction' => 'row' ), $pricing_cards ),
-				eqc_html( $inclusion_html ),
-			)
-		),
+		eqc_section_ornaments( 'eqc-corner-motif--sm' ),
+		eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--pricing', 'flex_direction' => 'row' ), $pricing_cards ),
+		eqc_html( $inclusion_html ),
+	)
+);
+$pricing_section = eqc_section(
+	'eqc-section eqc-section--surface',
+	array(
+		eqc_inner( '', array( $pricing_panel ) ),
 	)
 );
 

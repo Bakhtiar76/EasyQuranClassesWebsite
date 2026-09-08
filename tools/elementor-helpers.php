@@ -214,16 +214,17 @@ function eqc_icon_str( $name, $class = '' ) {
  * .eqc-section--ornamented in components.css. Pass as the FIRST element in
  * an eqc_section()'s children array; the CSS handles layering so real
  * content always paints above it regardless of what that content is.
+ *
+ * @param string $modifier Optional extra class (e.g. 'eqc-corner-motif--sm'
+ *                          for the smaller pair used inside a nested panel
+ *                          like .eqc-pricing-panel).
  */
-function eqc_section_ornaments() {
+function eqc_section_ornaments( $modifier = '' ) {
+	$extra = $modifier ? ' ' . $modifier : '';
 	return eqc_html(
-		'<span class="eqc-corner-motif eqc-corner-motif--tr" aria-hidden="true"></span>'
-		. '<span class="eqc-corner-motif eqc-corner-motif--bl" aria-hidden="true"></span>'
+		'<span class="eqc-corner-motif eqc-corner-motif--tr' . esc_attr( $extra ) . '" aria-hidden="true"></span>'
+		. '<span class="eqc-corner-motif eqc-corner-motif--bl' . esc_attr( $extra ) . '" aria-hidden="true"></span>'
 	);
-}
-
-function eqc_icon_link( $icon, $url, $label, $classes = 'eqc-arrow-btn' ) {
-	return eqc_html( sprintf( '<a class="%s" href="%s" aria-label="%s">%s</a>', esc_attr( $classes ), esc_url( $url ), esc_attr( $label ), eqc_icon_str( $icon ) ) );
 }
 
 /**
@@ -231,19 +232,32 @@ function eqc_icon_link( $icon, $url, $label, $classes = 'eqc-arrow-btn' ) {
  * with the numbered badge + arrow as decorative HTML, but title/level/
  * description as native Heading/Text-Editor widgets so an admin edits
  * them as plain text in Elementor — no code involved.
+ *
+ * The whole panel is the button (round-3 fix — round 2's full-width "Learn
+ * More" bar doubled the button chrome; see the .eqc-card-link comment in
+ * components.css): a stretched invisible anchor covers the entire card,
+ * and the circular arrow is a purely decorative, non-nested affordance
+ * matching the client reference.
  */
 function eqc_course_card( $number, $title, $level, $description, $link, $reveal_index = 0 ) {
+	$label = sprintf(
+		/* translators: %s: course title, read by screen readers only — the card has no other visible link text. */
+		__( 'Learn more about %s', 'easy-quran-classes' ),
+		wp_strip_all_tags( $title )
+	);
 	return eqc_container(
 		array(
 			'css_classes'    => 'eqc-card eqc-card--course',
 			'flex_direction' => 'column',
 		),
 		array(
+			eqc_html( '<a class="eqc-card-link" href="' . esc_url( $link ) . '" aria-label="' . esc_attr( $label ) . '"></a>' ),
 			eqc_html( '<span class="eqc-card-index"><span class="eqc-card-index-num">' . esc_html( $number ) . '</span></span>' ),
 			eqc_heading( $title, 'h3' ),
 			eqc_html( '<p class="eqc-card-level">' . esc_html( $level ) . '</p>' ),
+			eqc_html( '<div class="eqc-card-divider">' . eqc_divider_svg( 'card' ) . '</div>' ),
 			eqc_text( '<p>' . wp_kses_post( $description ) . '</p>' ),
-			eqc_button( __( 'Learn More', 'easy-quran-classes' ), $link, 'eqc-btn--secondary eqc-btn--block' ),
+			eqc_html( '<span class="eqc-arrow-btn" aria-hidden="true">' . eqc_icon_str( 'arrow-right' ) . '</span>', 'eqc-card__foot' ),
 		)
 	);
 }
@@ -279,8 +293,8 @@ function eqc_teacher_card( $attachment_id, $name, $role, $facts ) {
 			),
 			eqc_html( '<span class="eqc-teacher-seal" aria-hidden="true">' . eqc_icon_str( 'book-open' ) . '</span>' ),
 			eqc_heading( $name, 'h3' ),
-			eqc_html( '<p class="eqc-teacher-role">' . esc_html( $role ) . '</p>' ),
-			eqc_html( $facts_html ),
+			eqc_html( '<p class="eqc-teacher-role">' . esc_html( $role ) . '</p><div class="eqc-teacher-divider">' . eqc_divider_svg( 'dot' ) . '</div>' ),
+			eqc_html( $facts_html, 'eqc-card__foot' ),
 		)
 	);
 }
@@ -310,28 +324,44 @@ function eqc_teacher_card_stub( $slot_label = 'Teacher Name' ) {
 }
 
 /**
- * Pricing card (DESIGN.md §16 Pricing Card).
+ * Pricing card (DESIGN.md §16 Pricing Card). Whole panel is the CTA — same
+ * stretched-link pattern as eqc_course_card() — closing in a decorative
+ * circular arrow rather than a separate full "Choose Plan" pill, matching
+ * the reference (Assests/…4.23.20 PM.jpeg).
  *
  * @param array $features Plain-text feature list.
  */
 function eqc_pricing_card( $frequency, $price, $unit, $features, $link, $featured = false ) {
-	$features_html = '<ul class="eqc-pricing-list">';
+	$star           = eqc_get_svg_asset( 'star-8-filled', 'eqc-pricing-bullet' );
+	$features_html  = '<ul class="eqc-pricing-list">';
 	foreach ( $features as $feature ) {
-		$features_html .= '<li>' . eqc_icon_str( 'check' ) . '<span>' . esc_html( $feature ) . '</span></li>';
+		$features_html .= '<li>' . $star . '<span>' . esc_html( $feature ) . '</span></li>';
 	}
 	$features_html .= '</ul>';
 
 	$classes = 'eqc-card eqc-card--pricing' . ( $featured ? ' eqc-card--pricing--featured' : '' );
+	$label   = sprintf(
+		/* translators: %s: plan frequency, e.g. "3 Days/Week" — read by screen readers only. */
+		__( 'Choose the %s plan', 'easy-quran-classes' ),
+		wp_strip_all_tags( $frequency )
+	);
 
-	$children = array();
+	$children   = array();
+	$children[] = eqc_html( '<a class="eqc-card-link" href="' . esc_url( $link ) . '" aria-label="' . esc_attr( $label ) . '"></a>' );
 	if ( $featured ) {
 		$children[] = eqc_html( '<span class="eqc-pricing-badge">' . esc_html__( 'Recommended', 'easy-quran-classes' ) . '</span>' );
 	}
-	$children[] = eqc_html( '<span class="eqc-pricing-icon">' . eqc_icon_str( 'calendar' ) . '</span>' );
+	$children[] = eqc_html(
+		'<span class="eqc-pricing-icon"><span class="eqc-pricing-icon-ring" aria-hidden="true">' . eqc_get_svg_asset( 'rosette-12' ) . '</span>' . eqc_icon_str( 'calendar' ) . '</span>'
+	);
 	$children[] = eqc_html( '<span class="eqc-pricing-freq">' . esc_html( $frequency ) . '</span>' );
+	$children[] = eqc_html( '<div class="eqc-pricing-divider">' . eqc_divider_svg( 'accent' ) . '</div>' );
 	$children[] = eqc_html( $features_html );
-	$children[] = eqc_html( '<p class="eqc-pricing-price">$' . esc_html( $price ) . '<small>/ ' . esc_html( $unit ) . '</small></p>' );
-	$children[] = eqc_button( __( 'Choose Plan', 'easy-quran-classes' ), $link, $featured ? 'eqc-btn--bronze' : 'eqc-btn--primary' );
+	$children[] = eqc_html(
+		'<p class="eqc-pricing-price"><span class="eqc-pricing-price-figure">$' . esc_html( $price ) . '<small>/ ' . esc_html( $unit ) . '</small></span>'
+		. '<span class="eqc-arrow-btn" aria-hidden="true">' . eqc_icon_str( 'arrow-right' ) . '</span></p>',
+		'eqc-card__foot'
+	);
 
 	return eqc_container(
 		array(
@@ -364,14 +394,14 @@ function eqc_testimonial_card( $attachment_id, $name, $location, $quote, $tags =
 		),
 		array(
 			eqc_html(
-				'<div class="eqc-testimonial-photo">' . wp_get_attachment_image( $attachment_id, 'eqc-testimonial' ) . '</div>'
-				. '<div class="eqc-testimonial-quote-mark">' . eqc_icon_str( 'quote' ) . '</div>',
-				'eqc-static-wrap'
+				'<div class="eqc-testimonial-avatar-wrap"><div class="eqc-testimonial-photo">' . wp_get_attachment_image( $attachment_id, 'eqc-testimonial' ) . '</div>'
+				. '<div class="eqc-testimonial-quote-mark">' . eqc_icon_str( 'quote' ) . '</div></div>'
 			),
 			eqc_heading( $name, 'h3' ),
 			eqc_html( '<p class="eqc-testimonial-location">' . eqc_icon_str( 'map-pin' ) . ' ' . esc_html( $location ) . '</p>' ),
+			eqc_html( '<div class="eqc-testimonial-divider">' . eqc_divider_svg( 'dot' ) . '</div>' ),
 			eqc_text( '<p>' . esc_html( $quote ) . '</p>' ),
-			eqc_html( $tags_html ),
+			eqc_html( $tags_html, 'eqc-card__foot' ),
 		)
 	);
 }
@@ -394,6 +424,46 @@ function eqc_testimonial_card_stub() {
 			eqc_html( '<div class="eqc-testimonial-stub-avatar">' . eqc_icon_str( 'quote' ) . '</div>' ),
 			eqc_heading( __( 'Add a Testimonial', 'easy-quran-classes' ), 'h3' ),
 			eqc_html( '<p class="eqc-testimonial-stub-note">' . esc_html__( 'A real family review will go here once received.', 'easy-quran-classes' ) . '</p>' ),
+		)
+	);
+}
+
+/**
+ * A one-card-at-a-time auto-advancing carousel (arrows + dots) — shared by
+ * the homepage teacher row and the testimonials section rather than
+ * duplicating the wiring twice. See initCarousel() in eqc.js and
+ * .eqc-carousel* in components.css for the behavior/sizing this markup
+ * contract expects.
+ *
+ * @param array  $cards      Card elements; each becomes one track item.
+ * @param string $aria_label Accessible label for the dot tablist.
+ */
+function eqc_carousel( $cards, $aria_label ) {
+	$dots = '';
+	foreach ( $cards as $i => $card ) {
+		$dots .= sprintf(
+			'<button type="button" class="eqc-slider-dot%s" data-slide-index="%d" role="tab" aria-selected="%s" aria-label="%s"></button>',
+			0 === $i ? ' is-active' : '',
+			$i,
+			0 === $i ? 'true' : 'false',
+			/* translators: %d: slide number. */
+			esc_attr( sprintf( __( 'Show slide %d', 'easy-quran-classes' ), $i + 1 ) )
+		);
+	}
+
+	$track    = eqc_container( array( 'css_classes' => 'eqc-carousel-track', 'flex_direction' => 'row' ), $cards );
+	$viewport = eqc_container( array( 'css_classes' => 'eqc-carousel-viewport', 'flex_direction' => 'column' ), array( $track ) );
+
+	return eqc_container(
+		array(
+			'css_classes'    => 'eqc-carousel',
+			'flex_direction' => 'column',
+		),
+		array(
+			eqc_html( '<button type="button" class="eqc-carousel-arrow eqc-carousel-arrow--prev" aria-label="' . esc_attr__( 'Previous', 'easy-quran-classes' ) . '">' . eqc_icon_str( 'chevron-right' ) . '</button>' ),
+			$viewport,
+			eqc_html( '<button type="button" class="eqc-carousel-arrow eqc-carousel-arrow--next" aria-label="' . esc_attr__( 'Next', 'easy-quran-classes' ) . '">' . eqc_icon_str( 'chevron-right' ) . '</button>' ),
+			eqc_html( '<div class="eqc-slider-dots" role="tablist" aria-label="' . esc_attr( $aria_label ) . '">' . $dots . '</div>' ),
 		)
 	);
 }
