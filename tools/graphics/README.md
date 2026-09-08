@@ -35,10 +35,9 @@ file; the consumer sets CSS `color`.
 ## Ornament geometry
 
 `lib/geometry.mjs` has the reusable exact-trig helpers (regular polygon
-vertices, `{n/step}` star polygons, spiked rosettes). Everything in
-`gen-ornaments.mjs` is built from real closed-form geometry, **except**
-the arch/finial families below, which don't reduce to simple polygon
-math and were tuned by rendering and comparing against reference images:
+vertices, `{n/step}` star polygons, spiked rosettes). `lib/arches.mjs` has
+the Islamic arch family (see below). Everything in `gen-ornaments.mjs` is
+built from real closed-form geometry:
 
 - **Girih lattice** (`girihTile`, called once per density): the classic Archimedean
   4.8.8 "octagon + square" tiling — regular octagons on a square grid
@@ -50,39 +49,99 @@ math and were tuned by rendering and comparing against reference images:
 - **Hex tessellation**: standard pointy-top hex-grid spacing (same-row
   centers `sqrt(3)*s` apart, rows `1.5*s` apart, alternating rows offset
   by half that width — a 2-row vertical repeat period).
-- **Ogee arch** (`ogeeArchPath`): a single S-curve cubic per side — an
-  S-curve bezier is exactly "control point 1 on one side of the
-  start-to-end chord, control point 2 on the other side" (control 1
-  outward past the vertical base = the convex shoulder; control 2 inward
-  toward the centerline = the concave finish into the point).
-- **Multifoil arch** (`multifoilArchPath`): the documented
-  intersecting-semicircles construction — divide each of the pointed
-  arch's two straight support lines into N equal sections and draw a
-  semicircle on each, bulging into the arch.
 - **Quatrefoil**: 4 circles of radius `r`, centered at distance `r` from
   the shared middle along each cardinal direction (so each one passes
   exactly through that middle point); the union's outline is the 4 "far"
   semicircle arcs between the cusp points where adjacent circles cross.
 - **Mihrab finial**: a dedicated symmetric petal curve (two mirrored
-  cubics from center to a pointed tip), rotated 4× — not a reuse of
-  `ogeeArchPath`, whose control-point formula assumes a small dome atop a
-  tall rectangle and distorts outside that ratio.
+  cubics from center to a pointed tip), rotated 4×.
 
-None of these five have a simple closed form the way a regular polygon
-does; their parameters (springline height, bulge/tuck ratios, lobe count)
-were chosen by generating, rendering, and visually comparing against the
-reference screenshots in `Assests/` and the Flaticon-style Islamic arch
-icons shared during this build — say so plainly rather than presenting
-tuned constants as derived formulas.
+### Arch family (`lib/arches.mjs`)
+
+The original ogee arch (`ogeeArchPath`, a single hand-tuned S-curve
+bezier per side) had two real defects, both confirmed against the
+generated coordinates rather than by eye: its control points fell outside
+its own `viewBox` (the shoulders were silently clipped — the "tent"
+silhouette a client screenshot flagged), and its curve met the vertical
+jamb without matching tangent (a visible kink). It's been replaced
+entirely by a shared module built on one primitive:
+
+- **Tangent-arc solver** (`nextTangentArc`): given a circle and a point on
+  it, solves for the unique second circle that is tangent there *and*
+  passes through a target point. The algebra is linear (no quadratic
+  branch to pick), and the tangency is structural — a kink at that
+  junction is no longer possible by construction. Used by the
+  **four-centred (Persian/Timurid) arch** for the haunch→crown transition.
+- **Pointed arch**, **horseshoe arch** and **mandorla** (pointed-oval
+  frame) are direct closed-form circle constructions with citations in
+  `lib/arches.mjs` itself (Wikipedia's pointed-arch and horseshoe-arch
+  pages — the horseshoe's "centre raised R/3 above the springline" is the
+  documented classical proportion, not tuned).
+- **Keel/Mughal cusped arch** and **multifoil arch** share one
+  "scalloped support line" construction: semicircles drawn on chords of
+  the same straight base→apex line. Two adjacent semicircles on collinear
+  chords are automatically tangent at their shared endpoint (a
+  semicircle's tangent at its diameter endpoint is always perpendicular
+  to that diameter) — no solver needed, and no kink possible there either.
+  The keel arch's cusp *count and relative sizes* (`breakpoints`, e.g.
+  `[0.52, 0.8]` for one large lower cusp and one smaller upper cusp) are a
+  chosen design parameter, matched against the client's own Mughal
+  keel-arch reference image by generating and rendering — that part is
+  honestly tuned, the same way real Islamic pattern books specify cusp
+  proportions as a design rule rather than deriving them from nothing.
+  Multifoil's cusps bulge inward (Gothic tracery); the keel arch's bulge
+  outward (`outward: true` flips one sweep-flag) — verified by rendering,
+  not assumed, since SVG's arc sweep-flag doesn't behave symmetrically in
+  an intuitive way without checking.
+- **Exact bounding boxes, not fixed canvases.** Every arch function
+  returns `{ d, bbox }` with the bbox computed from the actual circle
+  geometry (`circleExtent`/`semicircleExtent`: an arc's true extent is its
+  two endpoints plus any 0°/90°/180°/270° axis crossing it sweeps
+  through), not guessed padding. This matters concretely: the keel arch's
+  outward cusps genuinely overshoot its nominal width by ~5% per side at
+  production scale (a real feature of the "shoulder" look, confirmed by
+  the exact math) — wrapping with a naive fixed `w×h` viewBox would clip
+  them, reintroducing the exact defect this module exists to fix.
+  `wrapArch()`/`svgFromBbox()` size the final `<svg>`'s viewBox from that
+  true bbox, so a consumer's CSS `aspect-ratio` must match the asset's own
+  bbox ratio (documented per class in `components.css`) rather than a
+  round number like 4:5.
+
+**CSS masking gotcha worth remembering:** `mask-image` on a parent clips
+its *entire* rendered subtree, including a differently-sized or
+differently-positioned pseudo-element inside it. An outline meant to
+trace just *outside* a masked photo cannot live as a sibling pseudo-element
+on the same masked container — it gets clipped back down to the smaller
+shape, producing a confusing overlapping-cusps artifact instead of a
+clean frame. Fix: put the mask on the `<img>` itself and leave the
+container (and its `::after` outline) unmasked. See `.eqc-arch-media--masked`
+and `.eqc-card--teacher .eqc-teacher-photo-widget` in `components.css`.
 
 **Mask vs. inline color:** `rosette`, `lattice-corner`, `corner-frame`,
-`arch-mask`/`arch-outline`/`arch-frame`, `multifoil-*`, `quatrefoil-*`,
-`mihrab-finial-*`, `hex-tessellation` and `girih-lattice-*` are consumed
-via CSS `mask-image` (only their alpha coverage matters — recoloring means
-changing the consumer's `background-color`, not the SVG). The 5
-`divider-*` assets are the exception: they're inlined directly as HTML so
-`currentColor` follows the surrounding text/gold color, since dividers sit
-inline in text flow rather than as a full-bleed background layer.
+`arch-mask`/`arch-outline`/`arch-frame`, `fourcentred-*`, `horseshoe-*`,
+`mandorla-*`, `multifoil-*`, `quatrefoil-*`, `mihrab-finial-*`,
+`hex-tessellation` and `girih-lattice-*` are consumed via CSS `mask-image`
+(only their alpha coverage matters — recoloring means changing the
+consumer's `background-color`, not the SVG). The 5 `divider-*` assets are
+the exception: they're inlined directly as HTML so `currentColor` follows
+the surrounding text/gold color, since dividers sit inline in text flow
+rather than as a full-bleed background layer.
+
+### Corner ornament
+
+`lattice-corner.svg` was previously a girih-lattice field simply cropped
+to a square canvas, faded by an opacity formula that never actually
+reached zero at its own inner edges (~0.35 opacity floor) — the
+straight-edged "pasted wallpaper" patches a client screenshot circled.
+It's now a genuine arabesque bracket: concentric quarter-arcs anchored at
+the corner (reusing the same construction as `corner-frame.svg`), a
+rosette and finial as the ornament's own deliberate silhouette, and a
+girih fill *clipped* to a curved annular wedge (`<clipPath>`, bounded by
+real arcs on both its inner and outer edge — never a rectangular crop)
+under a `<radialGradient>` mask that guarantees the alpha reaches true
+zero well inside the canvas. Two independent fixes for one bug: geometry
+that can't produce a straight edge, and a fade that can't fail to
+converge.
 
 ## Icon sprite
 

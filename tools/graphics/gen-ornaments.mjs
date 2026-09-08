@@ -14,6 +14,16 @@ import {
 	spikedRosettePath,
 	regularPolygonPath,
 } from './lib/geometry.mjs';
+import {
+	arcCmd,
+	wrapArch,
+	svgFromBbox,
+	keelArchPanel,
+	fourCentredArchPanel,
+	horseshoeArchPanel,
+	mandorlaPanel,
+	multifoilArchPanel,
+} from './lib/arches.mjs';
 
 // Flat into the theme's existing assets/svg/ — no new subfolder (CLAUDE.md:
 // don't create parallel structures). Where a direct predecessor exists
@@ -123,27 +133,72 @@ for (const [name, a] of [['fine', 34], ['dense', 52]]) {
 	save(`girih-lattice-${name}.svg`, svg);
 }
 
-// Corner placement: the same lattice, radially faded from one corner so
-// it reads as an ornament rather than a wallpaper repeat when used once
-// (replaces lattice-corner.svg). Built by tiling the fine unit across a
-// larger canvas and fading opacity by distance from the top-right corner.
+// Corner ornament: previously a girih-lattice field cropped to a square
+// canvas and faded by a formula that never actually reached zero alpha at
+// its own inner edges (opacity floor ~0.35) — the straight-edged "pasted
+// wallpaper" patches flagged in review. Replaced with a proper arabesque
+// bracket: concentric quarter-arcs anchored at the corner (the same
+// "double gold line sweeping in from a corner" construction as
+// corner-frame.svg, generalized to N rings), a rosette and finial as the
+// ornament's own deliberate silhouette, and a girih fill CLIPPED to a
+// curved annular wedge — bounded by real geometry on every edge, not a
+// crop — with a radial-gradient mask as a second, independent guarantee
+// that alpha reaches true zero well inside the viewBox.
 {
-	const a = 30;
-	const { body, D } = girihTile(a);
-	const cols = 5, rows = 5;
-	const canvas = D * cols;
-	let field = '';
-	for (let i = 0; i < cols; i++) {
-		for (let j = 0; j < rows; j++) {
-			const x = canvas - (i + 1) * D; // dense at top-right: i=0 is the rightmost column
-			const y = j * D;
-			const distFromCorner = Math.hypot(i, j) / Math.hypot(cols, rows);
-			const opacity = Math.max(0, 1 - distFromCorner * 1.15);
-			if (opacity <= 0.02) continue;
-			field += `<g transform="translate(${fmt(x)} ${fmt(y)})" opacity="${fmt(opacity)}">${body}</g>`;
+	const size = 240;
+	const corner = [size, 0]; // top-right, matching the existing --tr/--bl CSS convention
+	const rings = [0.3, 0.48, 0.66, 0.86].map((f) => size * f);
+	const arcs = rings
+		.map((r, i) => {
+			const from = [size - r, 0], to = [size, r];
+			const strokeW = fmt(2.6 - i * 0.5);
+			return `<path fill="none" stroke="currentColor" stroke-width="${strokeW}" stroke-linecap="round" d="M${fmt(from[0])} ${fmt(from[1])} ${arcCmd(corner[0], corner[1], r, from, to)}"/>`;
+		})
+		.join('');
+
+	// Rosette at the second ring, finial (small drop) at the outermost
+	// point along the corner's own diagonal.
+	const diag = Math.SQRT1_2;
+	const rosetteR = rings[1];
+	const rosetteCenter = [size - rosetteR * diag, rosetteR * diag];
+	const rosette = spikedRosettePath(rosetteCenter[0], rosetteCenter[1], 13, 6, 8);
+	const finialR = rings[3] + 14;
+	const finialCenter = [size - finialR * diag, finialR * diag];
+	const finial = spikedRosettePath(finialCenter[0], finialCenter[1], 7, 3, 4);
+
+	// Girih fill clipped to the annular wedge between the first and third
+	// rings — a shape with real curved inner AND outer edges, so it can
+	// never read as a rectangular crop.
+	const rInner = rings[0], rOuter = rings[2];
+	const wedgeClip =
+		`M${fmt(size - rOuter)} 0 ${arcCmd(corner[0], corner[1], rOuter, [size - rOuter, 0], [size, rOuter])} ` +
+		`L${fmt(size)} ${fmt(rInner)} ${arcCmd(corner[0], corner[1], rInner, [size, rInner], [size - rInner, 0])} Z`;
+	const { body: latticeBody, D: latticeD } = girihTile(26);
+	let latticeField = '';
+	for (let i = -1; i <= Math.ceil(size / latticeD); i++) {
+		for (let j = -1; j <= Math.ceil(size / latticeD); j++) {
+			latticeField += `<g transform="translate(${fmt(size - (i + 1) * latticeD)} ${fmt(j * latticeD)})">${latticeBody}</g>`;
 		}
 	}
-	save('lattice-corner.svg', svgWrap(canvas, canvas, `<g fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round">${field}</g>`, 'aria-hidden="true" focusable="false"'));
+
+	const svg = svgWrap(
+		size, size,
+		`<defs>` +
+			`<clipPath id="wedge"><path d="${wedgeClip}"/></clipPath>` +
+			`<radialGradient id="fade" cx="${fmt(corner[0])}" cy="${fmt(corner[1])}" r="${fmt(rings[3])}" gradientUnits="userSpaceOnUse">` +
+			`<stop offset="0%" stop-color="#fff"/><stop offset="70%" stop-color="#fff" stop-opacity="0.5"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/>` +
+			`</radialGradient>` +
+			`<mask id="fadeMask"><rect width="${size}" height="${size}" fill="url(#fade)"/></mask>` +
+			`</defs>` +
+			`<g clip-path="url(#wedge)" mask="url(#fadeMask)">` +
+			`<g fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round">${latticeField}</g>` +
+			`</g>` +
+			`<g mask="url(#fadeMask)">${arcs}</g>` +
+			`<path fill="currentColor" d="${rosette}"/>` +
+			`<path fill="currentColor" opacity="0.6" d="${finial}"/>`,
+		'aria-hidden="true" focusable="false"'
+	);
+	save('lattice-corner.svg', svg);
 }
 
 // =====================================================================
@@ -210,112 +265,95 @@ function sparklePath(cx, cy, r) {
 }
 
 // =====================================================================
-// 5. Ogee (mihrab) arch — hero/photo mask + double-line outline frame.
-//
-//    Construction: a true ogee profile is two S-curves (each a pair of
-//    circular arcs of opposite curvature) rising from the springline to
-//    a point, flanked by vertical sides below the springline. Parametrized
-//    by width w, total height h, springline height (fraction of h) and
-//    shoulder outset (how far the S-curve bulges past the vertical sides)
-//    — not eyeballed control points.
+// 5. Arch family — see tools/graphics/lib/arches.mjs for the geometry
+//    (a shared tangent-arc solver plus direct closed-form constructions,
+//    replacing the previous hand-tuned bezier ogee, whose control points
+//    fell outside its own viewBox and got clipped, and whose curve met
+//    its straight jamb without matching tangent — both defects this
+//    module's bbox guard and tangent solver make structurally impossible
+//    now). Every panel is generated at the real aspect ratio of the CSS
+//    class that consumes it (mask-size stretches 1:1, so mismatched
+//    proportions here would distort on the live page — see README.md).
 // =====================================================================
-function ogeeArchPath(w, h, { springline = 0.62, flareOut = 0.34, tuck = 0.32 } = {}) {
-	// True onion/ogee profile as a single S-curve cubic per side: an
-	// S-curve bezier is exactly "control point 1 on one side of the
-	// start-to-end chord, control point 2 on the other side" — here
-	// control 1 sits outward (past the vertical base line: the convex
-	// shoulder) and control 2 sits inward (toward the centerline: the
-	// concave finish into the point). `flareOut` sets the shoulder's
-	// outward reach, `tuck` how sharply it pulls back in near the apex —
-	// both as fractions of the half-width.
-	const spring = h * (1 - springline);
-	const hw = w / 2;
-	// Left half, base (0,spring) -> apex (hw,0).
-	const c1x = -hw * flareOut;
-	const c1y = spring * 0.62;
-	const c2x = hw * tuck;
-	const c2y = spring * 0.16;
-	const d =
-		`M${fmt(w)} ${fmt(h)} L${fmt(w)} ${fmt(spring)} ` +
-		// right half mirrored: base(w,spring) -> apex(hw,0)
-		`C${fmt(w - c1x)} ${fmt(c1y)} ${fmt(w - c2x)} ${fmt(c2y)} ${fmt(hw)} 0 ` +
-		// left half: apex(hw,0) -> base(0,spring)
-		`C${fmt(hw + c2x)} ${fmt(c2y)} ${fmt(c1x)} ${fmt(c1y)} 0 ${fmt(spring)} ` +
-		`L0 ${fmt(h)} Z`;
-	return d;
-}
 
+// Keel/Mughal cusped arch — matches the client's Mughal keel-arch
+// reference: jamb, large outward shoulder cusp, smaller cusp, sharp
+// point. Replaces arch-mask/outline/frame in place (same CSS references
+// keep working unchanged). The cusps genuinely bulge past the nominal
+// jamb width (a real feature of the reference's "shoulder", not a bug —
+// confirmed by the exact bbox: ~20px overshoot per side at this scale),
+// so the viewBox is sized from the panel's own true bbox via wrapArch()
+// rather than a fixed w×baseH box — using the fixed box here is exactly
+// the mistake that clipped the previous hero arch's shoulders. The
+// resulting aspect ratio (~0.84, vs the nominal 400:500=0.8) is what
+// .eqc-arch-media's CSS aspect-ratio must match (see components.css).
 {
-	const w = 400, h = 500;
-	const d = ogeeArchPath(w, h);
-	// Overwrites the previous arch-mask.svg / arch-outline.svg in place —
-	// same CSS references (.eqc-arch-media--masked) keep working unchanged.
-	save('arch-mask.svg', svgWrap(w, h, `<path fill="#fff" d="${d}"/>`));
-	save('arch-outline.svg', svgWrap(w, h, `<path fill="none" stroke="currentColor" stroke-width="3" d="${d}"/>`, 'aria-hidden="true" focusable="false"'));
+	const w = 400, jamb = 190, baseH = 500;
+	const panel = keelArchPanel(w, jamb, baseH);
+	save('arch-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
+	save('arch-outline.svg', wrapArch(panel, { pad: 2, stroke: true, strokeWidth: 3 }));
 
-	// Double-line frame: the outline plus a second, inset-offset outline —
-	// approximated by drawing the same path at two scales from the arch's
-	// own base-center, which keeps both lines concentric without a true
-	// (and much more complex) path-offset algorithm.
+	// Double-line frame: outline plus a second, uniformly inset copy
+	// (inset both axes, not just x, so the two lines stay concentric),
+	// wrapped to the union of both panels' true bboxes.
 	const inset = 14;
-	const d2 = ogeeArchPath(w - inset * 2, h - inset);
+	const inner = keelArchPanel(w - inset * 2, jamb - inset, baseH - inset * 2);
+	const unionBbox = {
+		minX: Math.min(panel.bbox.minX, inner.bbox.minX + inset),
+		minY: Math.min(panel.bbox.minY, inner.bbox.minY + inset),
+		maxX: Math.max(panel.bbox.maxX, inner.bbox.maxX + inset),
+		maxY: Math.max(panel.bbox.maxY, inner.bbox.maxY + inset),
+	};
 	const frame =
 		`<g fill="none" stroke="currentColor" stroke-width="2">` +
-		`<path d="${d}"/>` +
-		`<path transform="translate(${fmt(inset)} 0)" d="${d2}"/>` +
+		`<path d="${panel.d}"/>` +
+		`<path transform="translate(${fmt(inset)} ${fmt(inset)})" d="${inner.d}"/>` +
 		`</g>`;
-	save('arch-frame.svg', svgWrap(w, h, frame, 'aria-hidden="true" focusable="false"'));
+	save('arch-frame.svg', svgFromBbox(unionBbox, frame, 4));
 }
 
-
-// =====================================================================
-// 6. Multifoil (cusped) arch — card frame.
-//
-//    Construction (documented method, see tools/graphics/README.md):
-//    take the two straight support lines of a pointed arch from the
-//    springline to the apex, divide each into `lobes` equal sections, and
-//    draw a semicircle on each section bulging into the arch. This is the
-//    standard intersecting-circles construction for a multifoil arch.
-// =====================================================================
-function multifoilArchPath(w, h, lobes = 5, springline = 0.55) {
-	const spring = h * (1 - springline);
-	const apex = [w / 2, 0];
-	const baseL = [0, spring];
-	const baseR = [w, spring];
-	// Points along each support line from base to apex.
-	const lerp = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t];
-	const leftPts = Array.from({ length: lobes + 1 }, (_, i) => lerp(baseL, apex, i / lobes));
-	const rightPts = Array.from({ length: lobes + 1 }, (_, i) => lerp(apex, baseR, i / lobes));
-	const supportPts = [...leftPts.slice(0, -1), ...rightPts]; // apex counted once
-
-	// Each semicircle must bulge toward the arch's interior (right, for the
-	// rising left support line; left, for the falling right support line).
-	// SVG's arc sweep-flag=1 draws the "positive angle" arc between two
-	// points — for a line rising left-to-right (left support half) that is
-	// the arc bulging to its right (into the arch); for a line falling
-	// left-to-right (right support half) sweep-flag=1 bulges to its left
-	// (also into the arch). So sweep=1 is correct for every segment here
-	// regardless of which half it's on — confirmed by rendering (see
-	// tools/graphics/README.md).
-	let d = `M0 ${fmt(h)} L0 ${fmt(spring)} `;
-	for (let i = 0; i < supportPts.length - 1; i++) {
-		const [x1, y1] = supportPts[i];
-		const [x2, y2] = supportPts[i + 1];
-		const r = Math.hypot(x2 - x1, y2 - y1) / 2;
-		d += `A${fmt(r)} ${fmt(r)} 0 0 1 ${fmt(x2)} ${fmt(y2)} `;
-	}
-	d += `L${fmt(w)} ${fmt(h)} Z`;
-	return d;
-}
-
+// Four-centred (Persian/Timurid) arch — course/pricing card media frames.
+// Its bbox comes out essentially exact (0..w, 0..baseH) at these
+// proportions, but it's still wrapped via wrapArch() rather than a fixed
+// box — the same safety net every other panel gets, on principle, not
+// because this one happens to need the padding.
 {
-	// 3 lobes per side (a shoulder cusp + a taller center point, not a busy
-	// scalloped edge) — matches the clean mosque-window silhouette in the
-	// reference more closely than the originally-tried 5-per-side version.
-	const w = 260, h = 320;
-	const d = multifoilArchPath(w, h, 3, 0.42);
-	save('multifoil-arch-mask.svg', svgWrap(w, h, `<path fill="#fff" d="${d}"/>`));
-	save('multifoil-arch-outline.svg', svgWrap(w, h, `<path fill="none" stroke="currentColor" stroke-width="2.5" d="${d}"/>`, 'aria-hidden="true" focusable="false"'));
+	const panel = fourCentredArchPanel(320, 200, 380);
+	save('fourcentred-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
+	save('fourcentred-outline.svg', wrapArch(panel, { pad: 2, stroke: true, strokeWidth: 2.5 }));
+}
+
+// Horseshoe (Moorish) arch — decorative accent frame. Genuinely overshoots
+// its nominal width (~9px/side at this scale, the bulge below the
+// springline that makes it a horseshoe rather than a plain round arch).
+{
+	const panel = horseshoeArchPanel(300, 260, 340);
+	save('horseshoe-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
+	save('horseshoe-outline.svg', wrapArch(panel, { pad: 2, stroke: true, strokeWidth: 2.5 }));
+}
+
+// Mandorla (pointed-oval) — teacher/avatar photo frames. Flatter than the
+// equilateral default (e = 0.4*halfWidth, not halfWidth) so it reads as a
+// gentle oval suited to a face photo rather than an aggressive lens; the
+// flatter cap also genuinely overshoots the nominal height (~11px
+// top/bottom), same reasoning as the keel and horseshoe arches above.
+{
+	const w = 240, h = 300;
+	const panel = mandorlaPanel(w, h, { e: (w / 2) * 0.4 });
+	save('mandorla-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
+	save('mandorla-outline.svg', wrapArch(panel, { pad: 2, stroke: true, strokeWidth: 2.5 }));
+}
+
+// Multifoil (inward-cusped) arch — card frame. Rebuilt on the shared
+// scallop construction in lib/arches.mjs (previously a parallel,
+// hand-rolled copy of the same math); 3 lobes per side, matching the
+// clean mosque-window silhouette confirmed against the Flaticon reference.
+// Inward cusps stay within the nominal box by construction (they bulge
+// toward the centerline, never past it), so no overshoot here.
+{
+	const panel = multifoilArchPanel(260, 180, 320, { lobes: 3 });
+	save('multifoil-arch-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
+	save('multifoil-arch-outline.svg', wrapArch(panel, { pad: 2, stroke: true, strokeWidth: 2.5 }));
 }
 
 // =====================================================================
