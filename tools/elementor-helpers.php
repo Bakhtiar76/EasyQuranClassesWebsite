@@ -449,9 +449,9 @@ function eqc_testimonial_card_stub() {
 }
 
 /**
- * A one-card-at-a-time auto-advancing carousel (arrows + dots) — shared by
- * the homepage teacher row and the testimonials section rather than
- * duplicating the wiring twice. See initCarousel() in eqc.js and
+ * A one-card-at-a-time carousel (arrows + dots), advanced only by user
+ * action — shared by the homepage teacher row and the testimonials section
+ * rather than duplicating the wiring twice. See initCarousel() in eqc.js and
  * .eqc-carousel* in components.css for the behavior/sizing this markup
  * contract expects.
  *

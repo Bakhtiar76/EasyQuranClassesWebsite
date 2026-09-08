@@ -184,8 +184,8 @@
 	}
 
 	/* ---------- Carousel ----------
-	 * One-card-at-a-time auto-advancing carousel, shared by the homepage
-	 * teacher row and the testimonials section (see eqc_carousel() in
+	 * One-card-at-a-time carousel, shared by the homepage teacher row and
+	 * the testimonials section (see eqc_carousel() in
 	 * tools/elementor-helpers.php and .eqc-carousel* in components.css).
 	 * Structure: .eqc-carousel > .eqc-carousel-arrow--prev/next (siblings,
 	 * absolutely positioned) + .eqc-carousel-viewport > .eqc-carousel-track
@@ -193,8 +193,9 @@
 	 * number of "pages" depends on how many cards are visible at once,
 	 * which changes per breakpoint).
 	 *
-	 * Auto-advances every 6s, pauses while the pointer or focus is inside
-	 * the carousel, and never starts under prefers-reduced-motion.
+	 * Advances only on user action — the prev/next arrows and the dots.
+	 * There is no autoplay: nothing moves on its own, on load or on scroll.
+	 * The slide transition still respects prefers-reduced-motion (motion.css).
 	 */
 	function initCarousel() {
 		document.querySelectorAll( '.eqc-carousel' ).forEach( function ( carousel ) {
@@ -209,7 +210,6 @@
 
 			var index = 0;
 			var pageCount = 1;
-			var autoplayId = null;
 
 			function visibleCount() {
 				var v = parseInt( window.getComputedStyle( track ).getPropertyValue( '--_visible' ), 10 );
@@ -241,7 +241,16 @@
 				if ( index > pageCount - 1 ) {
 					index = pageCount - 1;
 				}
-				track.style.transform = 'translateX(-' + ( index * ( 100 / visibleCount() ) ) + '%)';
+				// Offset by the leftmost card of this page, measured in real
+				// pixels from the start of the track (that position already
+				// includes the flex gap between cards). A viewport-percentage
+				// offset ignores the gap and drifts card-by-card — most
+				// visible at the 1-card mobile width, where the later cards
+				// end up partly clipped.
+				var trackStart = track.children[0].offsetLeft;
+				var pageCard = track.children[ index ];
+				track.style.transform =
+					'translateX(-' + ( pageCard ? pageCard.offsetLeft - trackStart : 0 ) + 'px)';
 				if ( dotsWrap ) {
 					Array.prototype.forEach.call( dotsWrap.children, function ( dot, i ) {
 						var isActive = i === index;
@@ -273,33 +282,6 @@
 				} );
 			}
 
-			function stopAutoplay() {
-				if ( autoplayId ) {
-					window.clearInterval( autoplayId );
-					autoplayId = null;
-				}
-			}
-			function startAutoplay() {
-				if ( reduceMotion || autoplayId || pageCount <= 1 ) {
-					return;
-				}
-				autoplayId = window.setInterval(
-					function () {
-						goTo( index >= pageCount - 1 ? 0 : index + 1 );
-					},
-					6000
-				);
-			}
-
-			carousel.addEventListener( 'mouseenter', stopAutoplay );
-			carousel.addEventListener( 'mouseleave', startAutoplay );
-			carousel.addEventListener( 'focusin', stopAutoplay );
-			carousel.addEventListener( 'focusout', function ( e ) {
-				if ( ! carousel.contains( e.relatedTarget ) ) {
-					startAutoplay();
-				}
-			} );
-
 			window.addEventListener( 'resize', function () {
 				buildDots();
 				render();
@@ -307,7 +289,6 @@
 
 			buildDots();
 			render();
-			startAutoplay();
 		} );
 	}
 

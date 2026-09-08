@@ -903,13 +903,24 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
    and the homepage teacher row (see initCarousel() in eqc.js), matching the
    arrow+dot reference pattern (Assests/…4.23.27 PM.jpeg). N cards visible
    at once via the track's --_visible custom property (responsive above).
-   Auto-advances every ~6s, pauses on hover/focus, and never starts under
-   prefers-reduced-motion (motion.css). Markup: .eqc-carousel >
-   .eqc-carousel-viewport > .eqc-carousel-track > (cards), plus sibling
-   .eqc-carousel-arrow buttons and an .eqc-slider-dots row. */
-.eqc-carousel { position: relative; padding-inline: clamp(0px, 2vw, 2.75em); }
-.eqc-carousel-viewport { overflow: hidden; }
+   Advances only on user action (prev/next arrows + dots) — no autoplay. The
+   slide transition is dropped under prefers-reduced-motion (motion.css).
+   Markup: .eqc-carousel > .eqc-carousel-viewport > .eqc-carousel-track >
+   (cards), plus sibling .eqc-carousel-arrow buttons and an .eqc-slider-dots
+   row. */
+/* Inline padding always reserves a gutter at least as wide as the flanking
+   arrows (2.75em, absolutely positioned at the inline edges) so they never
+   sit on top of a card. The old clamp() floor of 0 let the arrows overlap
+   the first/last card at tablet and phone widths. */
+.eqc-carousel { position: relative; padding-inline: clamp(2.9rem, 1rem + 5vw, 3.25rem); }
+/* Drop the default Elementor-container inline padding (10px each) on the
+   viewport and the track: it just narrows the visible card for no reason,
+   which is most costly on phones. !important for the same reason the track's
+   display/flex rules below need it — Elementor's container CSS otherwise
+   wins by source order. */
+.eqc-carousel-viewport { overflow: hidden; padding-inline: 0 !important; }
 .eqc-carousel-track {
+	padding-inline: 0 !important;
 	/* !important on display/flex-wrap: Elementor's own container default is
 	   flex-wrap:wrap, which this single-row sliding track can never allow —
 	   at desktop (3 visible) 3 items' percentage widths happened to just
@@ -963,8 +974,12 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 .eqc-carousel-arrow--prev { left: 0; }
 .eqc-carousel-arrow--next { right: 0; }
 .eqc-carousel-arrow--prev .eqc-icon { transform: rotate(180deg); }
+/* Smallest screens: keep the arrows usable (they used to be hidden here,
+   leaving dots as the only control) — shrink them a little and tighten the
+   gutter they sit in so the visible card keeps as much width as possible. */
 @media (max-width: 30rem) {
-	.eqc-carousel-arrow { display: none; }
+	.eqc-carousel { padding-inline: 2.4rem; }
+	.eqc-carousel-arrow { width: 2.25em; height: 2.25em; }
 }
 .eqc-slider-dots { display: flex; justify-content: center; gap: 0.6rem; margin-top: clamp(1.5rem, 1.2rem + 1vw, 2.25rem); }
 /* Button itself is a 24px tap target (Lighthouse/axe target-size minimum;
