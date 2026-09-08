@@ -72,7 +72,7 @@ entirely by a shared module built on one primitive:
   branch to pick), and the tangency is structural — a kink at that
   junction is no longer possible by construction. Used by the
   **four-centred (Persian/Timurid) arch** for the haunch→crown transition.
-  Tried and abandoned for the ogee arch's shoulder→apex transition (see
+  Tried and abandoned for the keel arch's shoulder→apex transition (see
   below) — forcing exact tangency into a sharp point is a genuinely
   different, ill-conditioned problem from this solver's designed use case.
 - **Pointed arch**, **horseshoe arch** and **mandorla** (pointed-oval
@@ -80,50 +80,57 @@ entirely by a shared module built on one primitive:
   `lib/arches.mjs` itself (Wikipedia's pointed-arch and horseshoe-arch
   pages — the horseshoe's "centre raised R/3 above the springline" is the
   documented classical proportion, not tuned).
-- **Ogee/keel arch** (the hero/photo arch — `ogeeArchPanel`): one convex
-  shoulder arc off the jamb into one concave arc up to a sharp apex, per
-  a client reference image showing a single smooth bulge per side (not a
-  multi-cusp scallop, which an earlier reference had shown and an earlier
-  version of this arch matched instead). Two different constructions for
-  the two arcs, each chosen for what makes it stable:
-  - The **shoulder** arc's centre is constrained to the springline
-    (identical to `fourCentredArchPanel`'s haunch), which is what
-    guarantees it departs the vertical jamb tangentially. An earlier
-    attempt built both arcs from an unconstrained "circle through two
-    points with a bulge" helper (`arcThroughBulge`, still used for the
-    finish arc below); with nothing tying its tangent direction to the
-    jamb, that version showed a visible kink right at the springline —
-    caught by rendering at real size, not obvious in a small thumbnail.
-  - The **finish** arc (shoulder's end point up to the apex) uses
-    `arcThroughBulge` rather than `nextTangentArc`: an even earlier
-    attempt tried solving it as a tangent continuation of the shoulder
-    circle into the apex, which is ill-conditioned for a *sharp* target
-    point — small parameter changes (a few degrees of sweep, a slightly
-    taller rise) flipped the solved circle into a tiny, unstable radius
-    that produced a visible self-intersecting loop right at the tip.
-    `arcThroughBulge`'s bulge is a plain bounded fraction with no such
-    branch, so it can't degenerate; the tradeoff is that its junction
-    with the shoulder arc isn't proven tangent the way the solver's
-    would be, only tuned smooth by rendering — a real distinction from
-    the tangent-continuous joins elsewhere in this module, disclosed
-    rather than implied.
 - **Multifoil arch** uses the "scalloped support line" construction:
   semicircles drawn on chords of the same straight base→apex line. Two
   adjacent semicircles on collinear chords are automatically tangent at
   their shared endpoint (a semicircle's tangent at its diameter endpoint
   is always perpendicular to that diameter) — no solver needed, and no
   kink possible there either.
+- **Keel/Mughal arch** (the hero/photo arch — `keelArchPanel`): a
+  vertical jamb, a larger lower bump, a smaller upper bump, then a sharp
+  point, matching the client's reference icon exactly. Went through three
+  different constructions before this one converged — worth recording
+  precisely because the failure modes aren't obvious in advance:
+  1. A single-bump ogee (`nextTangentArc` solving the shoulder→apex
+     transition) matched a *different*, single-bump reference shown
+     earlier, but not this multi-cusp one, and separately the solver
+     produced a self-intersecting loop when pushed toward a sharper apex
+     — see the tangent-arc solver note below.
+  2. Reusing the multifoil's `scallopSide` (semicircles on chords) with
+     `outward: true` produced bumps that were uniformly too big and too
+     round: a semicircle's bulge is *forced* to exactly half its own
+     chord length, so there's no way to make one bump smaller/flatter
+     than another independent of moving it — the wrong degree of freedom
+     for a reference with two visibly different-sized cusps.
+  3. **What actually worked**: `arcChain`, a sequence of 4 independent
+     `arcThroughBulge` arcs per side (3 interior waypoints along the
+     base→apex line, picked by fraction; each of the 4 segments its own
+     bulge). This decouples "where is each cusp" (waypoint fractions)
+     from "how round is each cusp" (bulge), which is exactly the control
+     the reference needs. The visual convex/concave alternation (bump,
+     valley, bump, finish to a point) falls out of each segment's own
+     local direction along the winding path — every `bulge` value here
+     is positive; nothing needs an alternating sign, which is easy to
+     assume wrongly.
+  A load-bearing, genuinely counter-intuitive fact about `arcThroughBulge`
+  surfaced tuning this: bulge `0` gives a full **semicircle** (radius =
+  half the chord — the roundest possible), and *increasing* the
+  magnitude makes the arc **flatter**, not deeper. Reads backwards in
+  plain English ("more bulge" sounds like "more curve"), and several
+  early tuning passes at "small bulge for a subtler bump" produced
+  near-identical full-round bumps until this was worked out properly —
+  see the function's own doc comment before changing any bulge constant.
 - **Exact bounding boxes, not fixed canvases.** Every arch function
   returns `{ d, bbox }` with the bbox computed from the actual circle
   geometry (`circleExtent`/`semicircleExtent`: an arc's true extent is its
   two endpoints plus any 0°/90°/180°/270° axis crossing it sweeps
-  through), not guessed padding. The ogee arch's shoulder happens to stay
-  within its nominal jamb width at production scale (bbox comes out an
-  exact 400:500), but the four-centred and horseshoe arches do genuinely
-  overshoot slightly — confirmed by the exact math, not assumed either
-  way. `wrapArch()`/`svgFromBbox()` size the final `<svg>`'s viewBox from
-  the true bbox, so a consumer's CSS `aspect-ratio` must match the asset's
-  own bbox ratio (documented per class in `components.css`).
+  through), not guessed padding. The keel arch's bbox comes out an exact
+  400:500 at production scale (no overshoot), but the four-centred and
+  horseshoe arches do genuinely overshoot slightly — confirmed by the
+  exact math, not assumed either way. `wrapArch()`/`svgFromBbox()` size
+  the final `<svg>`'s viewBox from the true bbox, so a consumer's CSS
+  `aspect-ratio` must match the asset's own bbox ratio (documented per
+  class in `components.css`).
 
 **CSS masking gotcha worth remembering:** `mask-image` on a parent clips
 its *entire* rendered subtree, including a differently-sized or

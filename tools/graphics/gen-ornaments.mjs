@@ -18,7 +18,7 @@ import {
 	arcCmd,
 	wrapArch,
 	svgFromBbox,
-	ogeeArchPanel,
+	keelArchPanel,
 	fourCentredArchPanel,
 	horseshoeArchPanel,
 	mandorlaPanel,
@@ -276,19 +276,16 @@ function sparklePath(cx, cy, r) {
 //    proportions here would distort on the live page — see README.md).
 // =====================================================================
 
-// Ogee/keel arch — matches the client's clean keel-arch reference: jamb,
-// one smooth shoulder bulge per side, concave finish to a sharp point.
-// Replaces arch-mask/outline/frame in place (same CSS references keep
-// working unchanged). The shoulder genuinely bulges past the nominal
-// jamb width by a small amount (confirmed by the exact bbox, not a fixed
-// guess), so the viewBox is sized from the panel's own true bbox via
-// wrapArch() rather than a fixed w×baseH box — using a fixed box here is
-// exactly the mistake that clipped the original hero arch's shoulders.
-// The resulting aspect ratio is what .eqc-arch-media's CSS aspect-ratio
-// must match (see components.css).
+// Keel/Mughal cusped arch — matches the client's reference: jamb, a
+// larger lower bump, a smaller upper bump, then a sharp point. Replaces
+// arch-mask/outline/frame in place (same CSS references keep working
+// unchanged). Its bbox comes out an exact 400:500 at this scale (no
+// overshoot), but it's still wrapped via wrapArch() rather than a fixed
+// box — the same safety net every arch in this file gets, on principle,
+// matching .eqc-arch-media--masked's 4:5 aspect-ratio in components.css.
 {
-	const w = 400, jamb = 190, baseH = 500;
-	const panel = ogeeArchPanel(w, jamb, baseH);
+	const w = 400, jamb = 170, baseH = 500;
+	const panel = keelArchPanel(w, jamb, baseH);
 	save('arch-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
 	save('arch-outline.svg', wrapArch(panel, { pad: 2, stroke: true, strokeWidth: 3 }));
 
@@ -296,7 +293,7 @@ function sparklePath(cx, cy, r) {
 	// (inset both axes, not just x, so the two lines stay concentric),
 	// wrapped to the union of both panels' true bboxes.
 	const inset = 14;
-	const inner = ogeeArchPanel(w - inset * 2, jamb - inset, baseH - inset * 2);
+	const inner = keelArchPanel(w - inset * 2, jamb - inset, baseH - inset * 2);
 	const unionBbox = {
 		minX: Math.min(panel.bbox.minX, inner.bbox.minX + inset),
 		minY: Math.min(panel.bbox.minY, inner.bbox.minY + inset),

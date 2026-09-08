@@ -252,15 +252,27 @@ export function fourCentredArchPanel(w, jamb, baseH, { haunchFrac = 0.32, haunch
 /**
  * Circle through two given points P1, P2 with a chosen "bulge" — the
  * center sits on the perpendicular bisector of P1-P2, offset by
- * `bulge * |P1-P2|` (sign picks which side, magnitude how deeply it
- * curves). Unlike nextTangentArc (solving for a circle tangent to a
- * PRIOR circle), this has no reflex/continuation branch to go unstable:
- * bulge is a plain, bounded design choice, so it can't produce the
- * tiny/huge-radius degenerate arcs a forced tangent-solve can when the
- * target point sits awkwardly relative to the previous circle (this is
- * exactly what happened trying to force ogeeArchPanel's sharp apex via
- * nextTangentArc — small parameter changes flipped the solver into a
- * self-intersecting loop at the tip).
+ * `bulge * |P1-P2|` (sign picks which side). Unlike nextTangentArc
+ * (solving for a circle tangent to a PRIOR circle), this has no
+ * reflex/continuation branch to go unstable: bulge is a plain, bounded
+ * design choice, so it can't produce the tiny/huge-radius degenerate
+ * arcs a forced tangent-solve can when the target point sits awkwardly
+ * relative to the previous circle (this is exactly what happened trying
+ * to force ogeeArchPanel's sharp apex via nextTangentArc — small
+ * parameter changes flipped the solver into a self-intersecting loop at
+ * the tip).
+ *
+ * Counter-intuitive part, easy to get backwards: bulge as `0` puts the
+ * center ON the chord's midpoint, giving radius = |P1-P2|/2 — a full
+ * SEMICIRCLE, the roundest/deepest this can produce. As `|bulge|`
+ * *increases*, the center moves further away and the radius grows
+ * faster than the offset, so the arc gets FLATTER, not deeper. "Bigger
+ * bulge" reads as "more dramatic curve" in plain English but means the
+ * opposite here — confirmed the hard way tuning keelArchPanel below,
+ * where several tries at "smaller bulge for a subtler bump" all
+ * produced near-identical full-round semicircles until this was
+ * derived properly. Verify new values by rendering, not by guessing
+ * which direction "more bulge" should move the shape.
  */
 function arcThroughBulge(P1, P2, bulge) {
 	const mid = [(P1[0] + P2[0]) / 2, (P1[1] + P2[1]) / 2];
@@ -383,9 +395,12 @@ export function mandorlaPanel(w, h, opts = {}) {
 }
 
 // ---------------------------------------------------------------------
-// Scalloped support-line construction — the multifoil arch (Gothic
-// tracery: semicircles bulging INTO the arch, drawn on chords of the
-// straight base->apex support line).
+// Scalloped support-line construction — semicircles drawn on chords of
+// the straight base->apex support line. Used both by the multifoil arch
+// (Gothic tracery: cusps bulge INWARD, into the arch) and the keel/Mughal
+// arch below (cusps bulge OUTWARD, away from the arch — the client's
+// keel-arch reference: a vertical jamb, two stacked outward bumps, then
+// a sharp point).
 //
 // Why this can never kink at a cusp junction: each semicircle is drawn on
 // a chord of the *same straight line*; a semicircle's tangent at its own
@@ -393,17 +408,19 @@ export function mandorlaPanel(w, h, opts = {}) {
 // adjacent semicircles on collinear chords share the identical tangent
 // direction at their shared endpoint — automatically G1-continuous, no
 // solver needed. The final short run to the apex is deliberately a
-// straight line, not another arc: a multifoil arch ends in a visible
-// point, not a smooth dome, so a small corner there is correct.
+// straight line, not another arc: both arches end in a visible point,
+// not a smooth dome, so a small corner there is correct.
 // ---------------------------------------------------------------------
 /** One side of a scalloped support line, base->apex. Returns the path
  * fragment AND the exact extent points of every semicircle drawn (each
  * one computed with the SAME sweepFlag used in the path, via
  * semicircleExtent, so the reported bbox can never disagree with what's
- * actually drawn). */
-function scallopSide(base, apex, breakpoints) {
+ * actually drawn). `outward` picks which side the cusps bulge — verified
+ * by rendering, not assumed, since SVG's arc sweep-flag doesn't behave
+ * symmetrically in an intuitive way without checking. */
+function scallopSide(base, apex, breakpoints, outward) {
 	const pts = [base, ...breakpoints.map((t) => lerp(base, apex, t))];
-	const sweepFlag = 1; // inward — verified by rendering, see README.md
+	const sweepFlag = outward ? 0 : 1;
 	let d = '';
 	let extent = [];
 	for (let i = 0; i < pts.length - 1; i++) {
@@ -416,15 +433,12 @@ function scallopSide(base, apex, breakpoints) {
 	return { d, extent };
 }
 
-/** Classic multifoil (inward-cusped) card frame. `breakpoints` are
- * fractions along the base->apex line where each cusp ends. */
-export function multifoilArchPanel(w, jamb, baseH, { lobes = 3 } = {}) {
-	const breakpoints = Array.from({ length: lobes - 1 }, (_, i) => (i + 1) / lobes);
+function scallopedArchPanel(w, jamb, baseH, breakpoints, outward) {
 	const hw = w / 2;
 	const apex = [hw, 0];
 	const baseR = [w, jamb], baseL = [0, jamb];
-	const sweepFlag = 1; // inward — same flag scallopSide uses, verified symmetric by rendering
-	const right = scallopSide(baseR, apex, breakpoints);
+	const sweepFlag = outward ? 0 : 1;
+	const right = scallopSide(baseR, apex, breakpoints, outward);
 	const leftPts = [apex, ...breakpoints.map((t) => lerp(baseL, apex, t)).reverse(), baseL];
 	let leftD = '';
 	let leftExtent = [];
@@ -435,6 +449,91 @@ export function multifoilArchPanel(w, jamb, baseH, { lobes = 3 } = {}) {
 		leftD += `A${fmt(r)} ${fmt(r)} 0 0 ${sweepFlag} ${fmt(to[0])} ${fmt(to[1])} `;
 		leftExtent = leftExtent.concat(semicircleExtent(from, to, sweepFlag));
 	}
+	const d = `M${fmt(w)} ${fmt(baseH)} L${fmt(w)} ${fmt(jamb)} ${right.d} ${leftD} L0 ${fmt(baseH)} Z`;
+	const bbox = mergeBbox(
+		bboxOf([[0, 0], [w, 0], [0, baseH], [w, baseH]]),
+		bboxOf([...right.extent, ...leftExtent])
+	);
+	return { d, bbox };
+}
+
+/** Classic multifoil (inward-cusped) card frame. `breakpoints` are
+ * fractions along the base->apex line where each cusp ends. */
+export function multifoilArchPanel(w, jamb, baseH, { lobes = 3 } = {}) {
+	const breakpoints = Array.from({ length: lobes - 1 }, (_, i) => (i + 1) / lobes);
+	return scallopedArchPanel(w, jamb, baseH, breakpoints, false);
+}
+
+/**
+ * A chain of arcs through a sequence of waypoints, each segment its own
+ * arcThroughBulge (stable, independently-sized/shaped) rather than a
+ * semicircle whose size is locked to its own chord length. This is what
+ * `keelArchPanel` needs and `scallopSide` above can't give it: a
+ * multi-cusp reference where each bump has its own scale (a semicircle's
+ * bulge is forced to exactly half its chord — too round, and every bump
+ * the same relative size — verified by rendering, not assumed, when a
+ * scallopSide-based attempt at this exact reference produced oversized,
+ * uniformly-round bumps that didn't match).
+ */
+function arcChain(waypoints, bulges) {
+	let d = '';
+	let extent = [];
+	const arcs = [];
+	for (let i = 0; i < waypoints.length - 1; i++) {
+		const from = waypoints[i], to = waypoints[i + 1];
+		const { center, radius } = arcThroughBulge(from, to, bulges[i]);
+		d += `${arcCmd(center[0], center[1], radius, from, to)} `;
+		extent = extent.concat(circleExtent(center[0], center[1], radius, from, to));
+		arcs.push({ center, radius });
+	}
+	return { d, extent, arcs };
+}
+
+/**
+ * Keel/Mughal cusped arch — matches the client's reference image: a
+ * vertical jamb, a larger lower bump, a smaller upper bump (with a
+ * shallow valley between them, not a direct bump-to-bump transition),
+ * then a sharp point. Four arcs per side along the base->apex line, each
+ * an independent `arcThroughBulge` so bump size and the valley's depth
+ * are tuned separately, not derived from chord geometry. `t` are the 3
+ * interior waypoint fractions (jamb->apex); `bulge` the 4 segments'
+ * curve amounts, all positive here — the visual convex/concave
+ * alternation (bump, valley, bump, finish) emerges from each segment's
+ * own direction along the winding jamb->apex path, NOT from alternating
+ * the bulge sign (confirmed by rendering: flipping any sign here breaks
+ * the silhouette, since arcThroughBulge's rotation is relative to each
+ * segment's own local direction, which already turns through the curve).
+ * Larger bulge = a FLATTER arc, smaller (toward 0) = closer to a full
+ * semicircle — counter-intuitive, easy to get backwards; verify by
+ * rendering rather than assuming which way a change should read.
+ */
+export function keelArchPanel(w, jamb, baseH, {
+	t = [0.38, 0.58, 0.83],
+	bulge = [0.3, 0.85, 0.4, 0.55],
+} = {}) {
+	const hw = w / 2;
+	const apex = [hw, 0];
+	const baseR = [w, jamb], baseL = [0, jamb];
+	const waypointsR = [baseR, ...t.map((f) => lerp(baseR, apex, f)), apex];
+	const right = arcChain(waypointsR, bulge);
+
+	// Left half: mirror every waypoint and every solved arc centre across
+	// x = hw, tracing apex->base (reverse order) — arcCmd's minor-arc pick
+	// is direction-agnostic so no bulge-sign bookkeeping is needed, only
+	// the geometry itself needs mirroring.
+	const mirrorX = (p) => [2 * hw - p[0], p[1]];
+	const waypointsL = waypointsR.map(mirrorX).reverse();
+	let leftD = '';
+	let leftExtent = [];
+	for (let i = right.arcs.length - 1; i >= 0; i--) {
+		const { center, radius } = right.arcs[i];
+		const from = waypointsL[right.arcs.length - 1 - i];
+		const to = waypointsL[right.arcs.length - i];
+		const c = mirrorX(center);
+		leftD += `${arcCmd(c[0], c[1], radius, from, to)} `;
+		leftExtent = leftExtent.concat(circleExtent(c[0], c[1], radius, from, to));
+	}
+
 	const d = `M${fmt(w)} ${fmt(baseH)} L${fmt(w)} ${fmt(jamb)} ${right.d} ${leftD} L0 ${fmt(baseH)} Z`;
 	const bbox = mergeBbox(
 		bboxOf([[0, 0], [w, 0], [0, baseH], [w, baseH]]),
