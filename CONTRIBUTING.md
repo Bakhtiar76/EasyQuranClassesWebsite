@@ -7,8 +7,7 @@ this file is just the day-to-day push/PR rule.
 
 **Never push directly to `main`.** `main` is production — a push to it auto-deploys the
 child theme to the live site via GitHub Actions (`.github/workflows/deploy.yml`). This isn't
-currently enforced by GitHub itself (branch protection needs a paid plan on a private repo —
-see `README-SETUP.md` §9 if you're curious why), so it's on us to just not do it. Treat it as
+currently enforced by GitHub itself (Private repo limitation). Treat it as
 a hard rule, not a suggestion.
 
 ## Day-to-day workflow
