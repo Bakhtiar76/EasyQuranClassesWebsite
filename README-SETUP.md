@@ -219,13 +219,16 @@ Adding a collaborator with push access means `main` is one `git push` away for t
 before onboarding a teammate:
 
 1. On GitHub → **Settings → Collaborators**, add them (or use a fork + PR workflow if you'd
-   rather they never have direct push access to the repo at all).
-2. **Settings → Branches → Add branch protection rule** for `main`: require a pull request
-   before merging (at minimum), and consider requiring your own review/approval on it. This
-   makes an accidental or unreviewed `main` push impossible for anyone, not just the new
-   collaborator.
-3. Tell them plainly: *day-to-day work happens on `feature/setup`; `main` is release-only and
-   protected — open a PR when a release is actually ready.*
+   rather they never have direct push access to the repo at all — see the plan-restriction
+   note below, which may make this the only real option for now).
+2. ~~Settings → Branches → Add branch protection rule~~ — **GitHub will refuse this.** Branch
+   protection (classic rules and the newer Rulesets alike) requires GitHub Pro/Team/Enterprise
+   on a **private** repository; GitHub Free only allows it on public repos. Confirmed via the
+   API against this repo (2026-09-08) — see the "Boundaries" section (§9) at the end of this
+   file for the full finding and the three real options. Until one is chosen, protection is
+   discipline-only: don't skip step 3.
+3. Tell them plainly: *day-to-day work happens on `feature/setup`; `main` is release-only —
+   nobody pushes to it directly, even though GitHub isn't currently enforcing that for us.*
 
 This only restricts *merging*; it does not touch `.github/workflows/deploy.yml` itself (out of
 scope for this pass — the workflow still fires on any push that does land on `main`, PR or not).
@@ -470,3 +473,18 @@ non-interactive equivalent:
 - `main` auto-deploys to production on every push (`.github/workflows/deploy.yml`, FTPS). With
   more than one person able to push, put a branch-protection rule on `main` requiring a PR
   (§3A) — don't rely on everyone remembering not to push there directly.
+  **Checked 2026-09-08: not currently possible on this repo.** Both the classic branch-protection
+  API and the newer Rulesets API return `403: "Upgrade to GitHub Pro or make this repository
+  public to enable this feature."` — GitHub Free only allows branch protection on *public*
+  repos; this repo is private. Confirmed via `gh api` with an authenticated, repo-**Admin**
+  account (`Bakhtiar76`) — not a permissions problem, a plan restriction. Real options, decision
+  deliberately left to the user (asked 2026-09-08, held off for now):
+  1. **GitHub Pro** (~$4/mo) — unlocks real protection on the private repo immediately.
+  2. **Make the repo public** — free, but every doc in it (including `CPANEL-WORKFLOW.md`,
+     `TASK-DEPLOY.md`) becomes world-readable.
+  3. **Fork + PR model, no paid plan** — give the collaborator **Read/Triage** only (no push
+     rights on this repo at all, to any branch); they work from a personal fork and open PRs
+     in; only an Admin can merge. Achieves "no direct push/merge" without needing GitHub's
+     protection feature.
+  Until one of these is chosen, `main` is protected by discipline only: both people work on
+  `feature/*`, nobody pushes to `main` directly, releases go out as described in §3A.
