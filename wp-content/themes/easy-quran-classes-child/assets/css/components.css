@@ -1134,11 +1134,10 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
    (see tools/graphics/gen-ornaments.mjs) — a mismatch here would get
    stretched by mask-size:100% 100%, reintroducing a subtler version of
    the clipping/distortion bug the arch rebuild fixed. --masked's curve
-   (ogeeArchPanel, lib/arches.mjs) is measured from the client's own
-   approved page mockup (Assests/WhatsApp Image 2026-09-04 at 4.23.19
-   PM.jpeg) — a plain single-curve ogee, not the wider four-centred/
-   horseshoe domes below (which stay parametric and do genuinely
-   overshoot their nominal box slightly). */
+   (ogeeArchPanel, lib/arches.mjs, called with a bespoke measured fit —
+   see that call site's comment) restores the original S-curve silhouette
+   at 307:459, not the wider four-centred/horseshoe domes below (which
+   stay parametric and do genuinely overshoot their nominal box slightly). */
 .eqc-arch-media--masked,
 .eqc-arch-media--fourcentred,
 .eqc-arch-media--horseshoe {
@@ -1146,7 +1145,7 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	border: none;
 	overflow: visible; /* the outline (below) deliberately extends past this box */
 }
-.eqc-arch-media--masked { aspect-ratio: 400 / 459; }
+.eqc-arch-media--masked { aspect-ratio: 307 / 459; }
 .eqc-arch-media--fourcentred { aspect-ratio: 329 / 389; }
 .eqc-arch-media--horseshoe { aspect-ratio: 327.198 / 349; }
 /* The mask lives on the <img> itself, not the container: a mask on a

@@ -240,6 +240,20 @@ For production release export, prefer serialization-safe WP-CLI search/replace e
 
 Run a dry-run first where applicable. The export form must not mutate the working local database.
 
+`tools/pages/*.php` (run via `wp --user=1 eval-file /tools/pages/<name>.php`)
+are the only sanctioned way to change a page's `_elementor_data` — they
+call helpers in `tools/elementor-helpers.php`, some of which (e.g.
+`eqc_divider_svg()`/`eqc_get_svg_asset()`, `inc/template-tags.php`) embed
+a *snapshot* of a generated SVG's current file content as a literal HTML
+string. Regenerating that SVG afterward does not change already-saved
+pages — only a fresh `eval-file` run does (see
+`tools/graphics/README.md`'s "some assets need the Elementor pages
+re-baked too" for the full mechanism and how this was diagnosed).
+**Always pass `--user=1`** — omitting it still prints `Success: Saved
+Elementor content for post #N`, but the save silently doesn't take;
+confirmed once by re-querying `_elementor_data` and finding old content
+still there after an apparently-successful run without it.
+
 ## Deployment Model
 Default release process:
 1. complete local WordPress/Elementor build;

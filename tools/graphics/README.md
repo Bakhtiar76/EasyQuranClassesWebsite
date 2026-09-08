@@ -22,6 +22,55 @@ own output). `scratch/` holds build intermediates and is gitignored —
 least once in the current checkout (same relationship `build-logo.mjs`
 has to `trace-logo.mjs`).
 
+### After regenerating: some assets need the Elementor pages re-baked too
+
+`mask-image`-consumed assets (`arch-mask.svg`, `fourcentred-*`,
+`horseshoe-*`, `mandorla-*`, `girih-lattice-*`, `corner-frame.svg`, …) are
+referenced by URL from `components.css` and are read fresh by the browser
+on every load — regenerating one takes effect immediately, no further
+step needed (past the theme's own `style.css` version bump for cache
+busting, already part of every commit here).
+
+**Divider/rosette/medallion assets are different.** `eqc_divider_svg()`
+and `eqc_get_svg_asset()` (`inc/template-tags.php`) are called from
+`tools/elementor-helpers.php`, which is only ever invoked from
+`tools/pages/*.php` — build-time PHP run once via `wp eval-file`, whose
+*output HTML string* (not a reference to the file) gets saved into the
+page's `_elementor_data`. Regenerating `divider-section.svg` (etc.) only
+changes what a *future* page-build would embed; every page's
+*already-saved* content keeps showing whatever was embedded the last time
+its script ran — confirmed the hard way once, by querying a live page's
+`_elementor_data` directly and finding the old star markup still sitting
+there, byte-for-byte, well after the source SVG had changed.
+
+So: after regenerating any asset consumed via `eqc_divider_svg()`/
+`eqc_get_svg_asset()`, re-run **every** `tools/pages/*.php` script (not
+just the page you think is affected — `eqc_section_heading_el()` embeds
+`divider('section')` and is used by every page's section headings) to
+refresh `_elementor_data`, then `wp elementor flush-css`:
+
+```
+for f in tools/pages/*.php; do
+  wp --user=1 eval-file "/$f"
+done
+wp elementor flush-css
+```
+
+**`--user=1` is required, not optional.** Without it, the script still
+prints `Success: Saved Elementor content for post #N` — but the save
+silently doesn't take, and the page keeps its old embedded content. This
+was mistaken for success once; only a direct `_elementor_data` re-query
+caught it. Verify with the same query rather than trusting the CLI's own
+"Success" line alone when it matters:
+
+```
+wp post meta get <ID> _elementor_data | grep -o '<some distinctive bit of the new SVG path data>'
+```
+
+Per CLAUDE.md, do not edit `_elementor_data` directly (raw SQL/meta
+writes) to work around this — re-running the sanctioned build script is
+the correct fix, not a shortcut around it.
+
 ## Logo
 
 Traced from `Assests/Logo/Logo2.jpeg` (the client-approved forest-green
@@ -98,12 +147,12 @@ entirely by a shared module built on one primitive:
   `aspect-ratio` must match the asset's own bbox ratio (documented per
   class in `components.css`).
 
-### The hero/photo arch: measured from the client's own mockup (`ogeeArchPanel`)
+### The hero/photo arch (`ogeeArchPanel`)
 
-The hero/photo arch (`arch-mask.svg`/`arch-outline.svg`/`arch-frame.svg`,
-`ogeeArchPanel` in `lib/arches.mjs`) went through **four** rejected
-attempts before converging — worth recording precisely, since each
-rejection pointed at a different, non-obvious mistake:
+The hero/photo arch (`arch-mask.svg`/`arch-outline.svg`/`arch-frame.svg`)
+went through **five** rejected attempts before converging — worth
+recording precisely, since each rejection pointed at a different,
+non-obvious mistake, and the last one is a real "don't do this again":
 
 1. A hand-tuned ogee (`nextTangentArc` solving a shoulder→apex
    transition) matched an earlier, different single-bump reference, but
@@ -114,26 +163,39 @@ rejection pointed at a different, non-obvious mistake:
    itself turned out to be the wrong thing to chase.
 3. **Bitmap-tracing that same icon reference exactly** (flood-fill +
    mirror-symmetrize + potrace, achieving 0.9966 IoU against it — the
-   technique is still in `lib/trace.mjs`, unused by this asset now) was
-   rejected too, and correctly so: it was a faithful reproduction of an
-   abstract vector icon, not of the client's actual approved page design.
-   DESIGN.md is explicit that client screenshots outrank this kind of
-   secondary reference, and the live result — a fairly ornate S-curve with
-   a small capital-circle detail, painted with a thick solid offset gold
-   band — read as "weird," not decent, next to the client's own mockup.
-4. **What actually worked**: measure the arch drawn in the client's own
-   approved page mockup (`Assests/WhatsApp Image 2026-09-04 at 4.23.19
-   PM.jpeg`) and fit a curve to *that*. Scanning the mockup for the
-   photo-vs-page-background boundary (robust against the JPEG noise a
-   gold-color-specific threshold hit once the arch line crossed busy photo
-   content) gave a clean half-width-vs-height profile from apex to
-   springline. A two-centred circular arc through the same apex/springline
-   endpoints — the obvious first guess — missed that profile by 4-5x the
-   error a direct least-squares cubic-bezier fit achieved (RMSE ≈10px on a
-   271px half-span), confirming the real curve is a plain designed bezier,
-   not a circle. `ogeeArchPanel`'s default `c1`/`c2` are that fitted
-   bezier's control points, and `riseFrac` is the measured rise÷half-span
-   ratio — none of the three numbers are guessed.
+   technique is still in `lib/trace.mjs`, unused by this asset now)
+   produced a smooth S-curve shoulder with a small capital-circle detail
+   near the jamb top, matching that icon precisely. This one was actually
+   correct — but was live with a thick, solid offset gold band (see
+   below), which read as "weird."
+4. **The mistake**: reading "make it thin and more decent, like [a
+   further client mockup]" as license to replace the *shape* too, not
+   just the line weight. The client's mockup (`Assests/WhatsApp Image
+   2026-09-04 at 4.23.19 PM.jpeg`) has a plainer single-curve silhouette;
+   fitting a bezier to *that* (still `ogeeArchPanel`, different `c1`/`c2`)
+   produced a real, working arch, but not the one the client actually
+   wanted kept — confirmed the hard way when the client said the shape
+   from step 3 "was fine," only the line needed thinning. Lesson: a
+   request to fix a rendering property (thickness) is not a request to
+   re-derive the geometry from a different reference, even when a "looks
+   more like this" comparison is offered alongside it — the two are
+   independent unless the user says both are wrong.
+5. **Recovery**: step 3's own source bitmap (`tools/graphics/reference/arch.png`,
+   itself traced from the client's `image1.png`) had already been deleted
+   as part of the step-4 detour, and neither file was ever committed —
+   gone for good, confirmed via `git log --all --diff-filter=A`. Rather
+   than ask the client to resend it, a Playwright screenshot taken
+   *earlier in the same session*, before the detour, already showed that
+   exact shape rendered live at 1440px. Scanning it for the arch's gold
+   color (not a plain background-difference scan — this page has its own
+   subtle repeating background texture that a naive scan picks up as
+   noise) gave a clean apex→springline profile, least-squares cubic-bezier
+   fit the same way as step 4 (RMSE ≈12px on a 314px half-span, ~4% —
+   the same order of accuracy every reference fit this way has landed at).
+   `ogeeArchPanel`'s current call site in `gen-ornaments.mjs` uses these
+   values — the function's own *default* parameters are still step 4's
+   mockup fit, documented there for reference, but nothing calls it with
+   those defaults now.
 
 A cubic bezier's curve always stays within the convex hull of its own 4
 control points, and here all 4 (apex, `c1`, `c2`, springline) lie within
@@ -141,14 +203,19 @@ the panel's own half-span×rise box by construction — so, same as the
 arc-based panels above, the bbox is exact with no overshoot possible,
 just via a different argument than `circleExtent`.
 
-**Thin outline, not a thick band:** the mockup's own gold line is a thin
-hairline sitting right at the photo's edge, not an offset band. So unlike
-`--fourcentred`/`--horseshoe` (which still reuse their `*-mask.svg` at
-`inset:-3%`, per the distortion bug documented below), `--masked`'s
-`::before` uses `arch-outline.svg` at `inset:0` — a thin stroke traced on
-`arch-mask.svg`'s own *unpadded* bbox (not `wrapArch`'s padded box), so it
-shares the identical coordinate frame and can't hit that same
-padding/inset mismatch.
+**Thin, open-bottomed outline, not a thick closed band:** `ogeeArchPanel`'s
+`d` deliberately has no trailing `Z`. Fill (`arch-mask.svg`, the photo
+clip) treats an open subpath as closed anyway, so that asset is unaffected
+— but a stroked render of the exact same `d` (`arch-outline.svg`) then
+does NOT draw a line across the base, reading as an open frame instead of
+a capped box. `.eqc-arch-media--masked::before` uses that outline at
+`inset:0` (not the old `inset:-3%` enlarged-solid-mask trick, which read
+as a thick offset band) — unlike `--fourcentred`/`--horseshoe`, which
+still reuse their `*-mask.svg` at `inset:-3%` per the distortion bug
+documented below. `arch-outline.svg` is stroked directly on
+`arch-mask.svg`'s own *unpadded* bbox (not `wrapArch`'s padded box), so
+it shares the identical coordinate frame as the mask and can't hit that
+same padding/inset mismatch.
 
 ### The rosette medallion: also traced (`trace-rosette.mjs`)
 

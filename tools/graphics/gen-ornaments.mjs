@@ -304,33 +304,56 @@ function sparklePath(cx, cy, r) {
 //    proportions here would distort on the live page — see README.md).
 // =====================================================================
 
-// Ogee/keel arch — matches the client's own approved page mockup
-// (see ogeeArchPanel's doc comment in lib/arches.mjs for the measurement
-// + bezier-fit derivation): a plain vertical jamb into one smooth curve
-// per side, thin single-line gold treatment, no capital-circle or
-// second-cusp detail. jamb (springline y, apex at 0 by construction of
-// the default riseFrac) and baseH keep the measured 271:336 half-span:
-// straight-jamb-height ratio (scaled to a tidy 400 width) so the curve's
-// own shape is preserved exactly, not stretched.
+// Ogee arch — restored to the client's originally-approved silhouette (a
+// smooth S-curve shoulder into a moderately blunt point), which an
+// intervening detour (rebuilding it as the plainer curve seen in
+// Assests/WhatsApp Image 2026-09-04 at 4.23.19 PM.jpeg) wrongly replaced
+// wholesale when only the outline's *thickness* needed fixing. That
+// mockup-fit detour is still ogeeArchPanel's own default parameterization
+// (see its doc comment) — this call site overrides it with a DIFFERENT
+// measured fit.
+//
+// The source bitmap for this shape (tools/graphics/reference/arch.png,
+// itself traced from the client's image1.png) was deleted along with the
+// rest of that now-unused trace pipeline during the detour, and neither
+// was ever committed — gone for good. Recovered anyway, without asking
+// for the file again: a Playwright screenshot taken earlier in the same
+// session, before the detour, already shows this exact shape rendered at
+// 1440px (.playwright-mcp/page-2026-09-08T10-15-43-116Z.png). Same
+// fitting method as ogeeArchPanel's own doc describes — color-threshold
+// boundary scan (this page has a subtle repeating background texture a
+// plain background-difference scan picked up as noise; a gold-specific
+// color threshold didn't), then least-squares cubic-bezier fit — measured
+// jamb half-width 314px, rise 278px (riseFrac 0.885), fit RMSE 12.4px
+// (3.9% of the half-width, in the same range as every other reference
+// fit this way). Verified by rendering this exact panel and overlaying it
+// (as a translucent mask) back onto that screenshot — the fitted curve
+// tracks the screenshot's own gold line closely along its whole length.
+//
+// w:baseH restored to 307:459 (the aspect-ratio already confirmed fine,
+// not the mockup's 400:459) — components.css's aspect-ratio matches.
 {
-	const w = 400, hw = w / 2, riseFrac = 1.0554, jambHeightFrac = 1.2399;
-	const jamb = Math.round(hw * riseFrac), baseH = jamb + Math.round(hw * jambHeightFrac);
-	const panel = ogeeArchPanel(w, jamb, baseH, { riseFrac });
+	const w = 307, hw = w / 2, riseFrac = 0.8855;
+	const c1 = [3.45 / 314, 23 / 278], c2 = [1, 165 / 278];
+	const jamb = Math.round(hw * riseFrac), baseH = 459;
+	const panel = ogeeArchPanel(w, jamb, baseH, { riseFrac, c1, c2 });
 	save('arch-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
 
-	// Thin outline: stroked directly on arch-mask's own exact bbox (pad 0,
-	// not wrapArch's padded box) so it shares the identical coordinate
-	// frame/viewBox as the mask — the fix for an earlier bug where a
-	// separately-padded outline asset, stretched via a CSS inset percentage
-	// that didn't match its own padding ratio, distorted the curve. A thin
-	// stroke's half-width poking a fraction of a unit past the bbox on a
-	// 400-wide canvas is visually inert.
+	// Thin, open-bottomed outline: stroked directly on arch-mask's own
+	// exact bbox (pad 0, not wrapArch's padded box) so it shares the
+	// identical coordinate frame/viewBox as the mask — the fix for an
+	// earlier bug where a separately-padded outline asset, stretched via a
+	// CSS inset percentage that didn't match its own padding ratio,
+	// distorted the curve. `panel.d` itself has no trailing "Z" (see
+	// ogeeArchPanel) — fill (the mask above) treats an open subpath as
+	// closed anyway, but this stroked render does NOT draw a line across
+	// the base, reading as an open-bottomed frame rather than a capped box.
 	save('arch-outline.svg', svgFromBbox(panel.bbox, `<path fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" d="${panel.d}"/>`, 0));
 
 	// Double-line frame: outline plus a second, uniformly inset copy
 	// (inset both axes, not just x, so the two lines stay concentric).
 	const inset = 14;
-	const inner = ogeeArchPanel(w - inset * 2, jamb - inset, baseH - inset * 2);
+	const inner = ogeeArchPanel(w - inset * 2, jamb - inset, baseH - inset * 2, { riseFrac, c1, c2 });
 	const unionBbox = {
 		minX: Math.min(panel.bbox.minX, inner.bbox.minX + inset),
 		minY: Math.min(panel.bbox.minY, inner.bbox.minY + inset),

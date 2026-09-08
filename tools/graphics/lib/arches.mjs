@@ -207,30 +207,28 @@ export function pointedArchPanel(w, jamb, baseH, opts = {}) {
 }
 
 /**
- * Ogee/keel arch (the hero/photo arch — `ogeeArchPanel`): a vertical
- * jamb into ONE smooth cubic-bezier curve per side, rising to a
- * moderately blunt point — no capital-circle detail, no S-curve
- * inflection, no second cusp. This is the client's own approved page
- * mockup's arch (`Assests/WhatsApp Image 2026-09-04 at 4.23.19 PM.jpeg`),
- * which per DESIGN.md outranks the abstract Flaticon-style icon reference
- * used earlier in this asset's history — an exact bitmap trace of that
- * icon (`lib/trace.mjs`'s flood-fill + mirror-symmetrize + potrace
- * pipeline, since removed along with its now-unused reference PNG) was a
- * faithful reproduction of the wrong reference, not what the live page
- * needed. See README.md's "hero/photo arch" section for the full history.
+ * Ogee arch: a vertical jamb into ONE smooth cubic-bezier curve per side
+ * (apex → `c2` → `c1` → springline), generic over `c1`/`c2`/`riseFrac` so
+ * it can be re-fit to whichever reference bitmap is currently authoritative
+ * — gen-ornaments.mjs's actual arch-mask/outline call site passes its own
+ * measured values, not these defaults; see that call site's own comment
+ * for which reference it's currently fit to and why (this asset's shape
+ * has changed reference more than once this project — recorded in
+ * README.md's "hero/photo arch" section, worth reading before changing
+ * either the defaults here or the call site).
  *
- * The default control points are MEASURED, not guessed: extracted by
- * scanning the mockup's own pixels for the photo-vs-background boundary
- * (immune to the JPEG noise a color-specific "is this gold" threshold hit
- * over busy photo content) to get a dx(dy) half-width profile from apex
- * to springline, then least-squares fitting a single cubic bezier to that
- * profile (RMSE ≈ 10px on a 271px half-span — a two-centred circular arc
- * through the same endpoints, tried first, missed by 4-5x that error,
- * confirming the real curve isn't a simple circular arc). `c1`/`c2` are
- * that bezier's two control points, as fractions of (halfSpan, rise) in a
- * frame with the apex at the origin — this is what makes the curve scale
- * cleanly to any panel size. `riseFrac` (rise ÷ halfSpan) was measured the
- * same way: 286px rise on a 271px half-span.
+ * `c1`/`c2` are the fitted bezier's two control points, as fractions of
+ * (halfSpan, rise) in a frame with the apex at the origin — this is what
+ * makes the curve scale cleanly to any panel size. `riseFrac` (rise ÷
+ * halfSpan) is measured the same way. Fitting method: scan the reference
+ * bitmap (or, when the source bitmap itself is gone, a saved screenshot
+ * that rendered it — see README.md) for its own boundary to get a dx(dy)
+ * half-width profile from apex to springline, then least-squares fit a
+ * single cubic bezier to that profile — reliably within ~4% RMSE of the
+ * jamb half-width on every reference tried so far. A two-centred circular
+ * arc through the same endpoints, tried once as a first guess, missed by
+ * 4-5x that error — confirming these curves are drawn freehand, not
+ * derived from a circle, so don't re-try that shortcut.
  *
  * Bbox is exact with no extra computation needed: a cubic bezier's curve
  * always stays within the convex hull of its 4 control points, and here
@@ -253,9 +251,15 @@ export function ogeeArchPanel(w, jamb, baseH, {
 	const P1r = ctrl(c1), P2r = ctrl(c2);
 	const mirrorX = (p) => [2 * hw - p[0], p[1]];
 	const P1l = mirrorX(P1r), P2l = mirrorX(P2r);
+	// Deliberately no trailing "Z": fill treats an open subpath as if
+	// closed by a straight line back to the start anyway (so arch-mask.svg,
+	// which needs fill, renders identically either way), but a stroked
+	// render of this same `d` (arch-outline.svg) then does NOT draw that
+	// closing line across the base — the frame reads as open at the
+	// bottom, not capped, matching the reference.
 	const d = `M${fmt(w)} ${fmt(baseH)} L${fmt(w)} ${fmt(jamb)} ` +
 		`C${fmt(P2r[0])} ${fmt(P2r[1])} ${fmt(P1r[0])} ${fmt(P1r[1])} ${fmt(apex[0])} ${fmt(apex[1])} ` +
-		`C${fmt(P1l[0])} ${fmt(P1l[1])} ${fmt(P2l[0])} ${fmt(P2l[1])} 0 ${fmt(jamb)} L0 ${fmt(baseH)} Z`;
+		`C${fmt(P1l[0])} ${fmt(P1l[1])} ${fmt(P2l[0])} ${fmt(P2l[1])} 0 ${fmt(jamb)} L0 ${fmt(baseH)}`;
 	const bbox = { minX: 0, minY: apexY, maxX: w, maxY: baseH };
 	return { d, bbox };
 }
