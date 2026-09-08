@@ -199,14 +199,21 @@ Git tracks custom code, Claude configuration, docs and reproducible local toolin
 
 **Branch policy (confirmed 2026-09-07):** `main` is production-deployment-only —
 it holds nothing but `wp-content/themes/easy-quran-classes-child/` (and
-`wp-content/plugins/easy-quran-classes-core/` if ever added) plus its own
-`.gitignore`, which lists every dev-only path so they can't be re-added by
-accident. All development, docs, `.claude/` configuration, local tooling,
-reference assets and tests live on `feature/*` branches (currently
-`feature/setup`). Never `git merge` a feature branch into `main` — that
-reintroduces the dev-only tree. Release by copying only the production
-paths across (`git checkout feature/setup -- wp-content/themes/easy-quran-classes-child`
-on `main`, then commit) — see `.claude/rules/git.md` for the exact flow.
+`wp-content/plugins/easy-quran-classes-core/` if ever added), its own
+`.gitignore` (which lists every dev-only path so they can't be re-added by
+accident), and `.github/workflows/` (the auto-deploy pipeline itself — it
+must live on `main` for GitHub Actions to trigger on push to `main`). All
+development, docs, `.claude/` configuration, local tooling, reference
+assets and tests live on `feature/*` branches (currently `feature/setup`).
+Never `git merge` a feature branch into `main` — that reintroduces the
+dev-only tree. Release by copying only the production paths across (`git
+checkout feature/setup -- wp-content/themes/easy-quran-classes-child` on
+`main`, then commit) — see `.claude/rules/git.md` for the exact flow.
+**When multiple sessions may share this working directory, do the actual
+`main` commit/push work in a separate `git worktree` (`git worktree add
+../<name> main`) instead of `git checkout main` here** — switching the
+shared checkout's branch would yank the floor out from under any other
+session with uncommitted `feature/setup` work in progress.
 
 Before commits:
 - inspect `git status`

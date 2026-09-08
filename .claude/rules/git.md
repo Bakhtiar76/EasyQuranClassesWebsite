@@ -4,12 +4,14 @@
 
 `main` is production-deployment-only. It contains **only**
 `wp-content/themes/easy-quran-classes-child/` (and
-`wp-content/plugins/easy-quran-classes-core/` if that plugin is ever added)
-plus `.gitignore`. Nothing else — no `.claude/`, no docs (`CLAUDE.md`,
-`DESIGN.md`, `CPANEL-WORKFLOW.md`, `TASK*.md`, `AGENTS.md`,
-`README-SETUP.md`, `TOOL-INVENTORY.md`), no `local/`, `tools/`, `tests/`,
-`Assests/` or `ref_website/`. `main`'s own `.gitignore` lists these paths so
-they are not re-added by accident.
+`wp-content/plugins/easy-quran-classes-core/` if that plugin is ever added),
+`.gitignore`, and `.github/workflows/` (the FTPS auto-deploy pipeline —
+must live on `main` for GitHub Actions to trigger on push to `main`).
+Nothing else — no `.claude/`, no docs (`CLAUDE.md`, `DESIGN.md`,
+`CPANEL-WORKFLOW.md`, `TASK*.md`, `AGENTS.md`, `README-SETUP.md`,
+`TOOL-INVENTORY.md`), no `local/`, `tools/`, `tests/`, `Assests/` or
+`ref_website/`. `main`'s own `.gitignore` lists these paths so they are not
+re-added by accident.
 
 All development happens on `feature/*` branches (currently `feature/setup`),
 which keep the full tree: docs, `.claude/` configuration, local dev tooling,
@@ -23,6 +25,15 @@ git checkout main
 git checkout feature/setup -- wp-content/themes/easy-quran-classes-child
 git commit -m "feat: <describe the change>"
 ```
+
+**If this working directory may be shared with another concurrent session**
+(check `git status`/`git log` for unexpected changes appearing between two
+consecutive checks — a sign another session is committing live in the same
+checkout), do not `git checkout main` here: that switches the branch for
+every session sharing this working tree at once and can destroy another
+session's in-progress uncommitted work. Use an isolated worktree instead:
+`git worktree add ../<some-name> main`, do the commit/push there, then
+`git worktree remove ../<some-name>` when done.
 
 Before commit:
 1. `git status`

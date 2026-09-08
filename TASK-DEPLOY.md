@@ -687,12 +687,26 @@ Verify:
 - caching/CDN
 - Lighthouse/performance
 
-Known local limitation to re-test on production: Rank Math's per-page
-`<title>`/meta-description output does not reach the rendered page on the
-local stack despite correct postmeta (see project memory
-`elementor-document-api-gotchas` point 17). A different PHP/server stack may
-not reproduce this — verify independently on production rather than
-assuming the local result carries over either way.
+**Resolved 2026-09-08**: the previously-documented Rank Math per-page
+`<title>`/meta-description gap (memory `elementor-document-api-gotchas`
+point 17) turned out not to be a PHP/server-stack quirk at all — Rank
+Math's setup wizard had simply never been completed on production
+(confirmed by every Rank Math admin page returning "Sorry, you are not
+allowed to access this page" and its menu link redirecting to
+`admin.php?page=rank-math-registration`). Completing the wizard (Easy mode;
+fixed two stale "(Local)" suffixes it surfaced in Website Name/Person-
+Organization Name copied over from the local DB export) fixed titles, meta
+descriptions, OG tags, AND the previously-404ing `sitemap_index.xml` in one
+pass — all three symptoms shared this one root cause. **Remaining gap,
+not yet resolved**: `<link rel="canonical">` is still absent site-wide on
+every page/post/homepage even after the wizard and a Permalinks
+re-save (local has it correctly on every page). Low urgency while
+`blog_public=0`/noindex keeps the site out of search results, but must be
+fixed before public launch to avoid duplicate-content ambiguity. Not yet
+root-caused — worth checking Rank Math's General/Advanced settings for
+canonical-specific toggles, or whether the Elementor Document API page-
+build scripts explicitly set an empty `rank_math_canonical` postmeta value
+that short-circuits the default-to-permalink fallback.
 
 If needed:
 - regenerate Elementor CSS/data (via wp-admin → Elementor → Tools →
