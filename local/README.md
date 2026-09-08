@@ -47,6 +47,22 @@ MSYS_NO_PATHCONV=1 docker compose -f local/docker-compose.yml --env-file local/.
 
 Copy `local/.env.example` to `local/.env` and adjust if needed — `local/.env` is gitignored (root `.gitignore`'s `.env` / `.env.*` patterns). These are local-only DB/admin credentials, never production values.
 
+`WP_ADMIN_USER` / `_PASSWORD` / `_EMAIL` are used by `wp core install`, which creates the local wp-admin account on first bring-up (change the password any time afterward with `wp user update admin --user_pass=...`). This step is now scripted — see "First-run bootstrap" below — so there is no need to run it by hand.
+
+## First-run bootstrap
+
+On a fresh clone (no WordPress data yet), one command does everything: start Docker, install WordPress core, install/activate plugins and the parent theme, import media from `local/media-staging/`, then run every `tools/00-04*.php` and `tools/pages/*.php` script.
+
+```powershell
+.\local\bootstrap.ps1
+```
+
+```bash
+./local/bootstrap.sh
+```
+
+Both are idempotent — safe to re-run after `docker compose down -v`, or any time to pick up new pages/media added since the last run. See `../README-SETUP.md` §3 for the full first-run procedure and §"Working with a teammate" for the multi-machine workflow this replaces.
+
 ## Volumes
 
 - `eqc_wp` (named volume) — WordPress core, plugins, uploads, DB-backed content. Not in Git; it's mutable local state.
