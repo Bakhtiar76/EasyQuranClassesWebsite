@@ -1,14 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 500" fill="none" aria-hidden="true" focusable="false">
-	<path stroke="currentColor" stroke-width="3" d="
-		M20,480
-		L20,180
-		C20,120 60,80 110,60
-		C140,48 170,20 200,20
-		C230,20 260,48 290,60
-		C340,80 380,120 380,180
-		L380,480
-		C380,492 372,500 360,500
-		L40,500
-		C28,500 20,492 20,480
-		Z"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" aria-hidden="true" viewBox="0 0 400 500"><path fill="none" stroke="currentColor" stroke-width="3" d="M400 500V190c68-72.2-64-159.6-200-190C264 30.4-68 117.8 0 190v310Z"/></svg>

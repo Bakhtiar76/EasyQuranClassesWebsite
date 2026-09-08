@@ -1,0 +1,12 @@
+{
+  "name": "eqc-graphics-tools",
+  "private": true,
+  "type": "module",
+  "description": "Local-only asset generation tooling for Easy Quran Classes (logo trace, ornament generator, icon sprite build). Not deployed; wp-content/themes/easy-quran-classes-child/assets/svg/ is the shipped output.",
+  "devDependencies": {
+    "potrace": "^2.1.8",
+    "svgo": "^4.1.0",
+    "lucide-static": "^1.42.0",
+    "simple-icons": "^16.30.0"
+  }
+}
