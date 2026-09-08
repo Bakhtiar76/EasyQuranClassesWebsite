@@ -501,13 +501,46 @@ verbatim) can recur anywhere a human manually typed a `(Local)`/`(Dev)`
 marker into a plugin setting during local build rather than a WordPress
 Post/Page field.
 
-**Remaining unresolved gap**: `<link rel="canonical">` is still completely
-absent from every page (homepage, pages, posts) even after the wizard and
-a Permalinks re-save — confirmed present and correct on local for the same
-pages, so this is a genuine production-only regression, not expected
-behavior. Low urgency while the site stays `noindex` (canonical has no
-effect on a page search engines won't index anyway), but must be
-root-caused and fixed before public launch — a missing canonical risks
-duplicate-content signals across `http`/`https`, apex/`www`, or
-trailing-slash variants once indexing is enabled. Not yet investigated
-past ruling out the wizard/permalinks as the fix.
+**Canonical tag — fully root-caused 2026-09-08, NOT a bug, no fix needed.**
+`<link rel="canonical">` is absent from every page on production while
+present on local. Root-caused by reading Rank Math's own source
+(`includes/frontend/class-head.php`) and confirming live hook state with a
+temporary, admin-gated, try/catch-wrapped debug mu-plugin (added and
+removed same session, per the established pattern) on **both**
+environments:
+
+- `Head::robots()` contains this, by design, citing a real SEO reference
+  (comment links to `seroundtable.com/google-noindex-rel-canonical-confusion-26079.html`):
+  ```php
+  // If a page is noindex, let's remove the canonical URL.
+  if ( isset( $robots['index'] ) && 'noindex' === $robots['index'] ) {
+      $this->remove_action( 'rank_math/head', 'canonical', 20 );
+      $this->remove_action( 'rank_math/head', 'adjacent_rel_links', 21 );
+  }
+  ```
+  And `Paper::respect_settings_for_robots()` unconditionally forces
+  `noindex` whenever `get_option('blog_public') == 0` — exactly this
+  site's current state. **This is intentional, documented Rank Math
+  behavior**: combining `noindex` with `rel=canonical` sends a genuinely
+  confusing signal to search engines, so Rank Math omits canonical rather
+  than ship both. It will start rendering automatically the moment the
+  client approves indexing and `blog_public` is flipped back to `1` — no
+  code change, no plugin setting, nothing to fix.
+- **Local was never a valid reference for this comparison** — a debug
+  dump of `rank_math()`'s own object showed only `version`/`db_version`
+  properties set; `rank_math()->frontend` and `rank_math()->head` are
+  **never instantiated on local at all** (`$wp_filter['rank_math/head']`
+  doesn't even exist as an object). Local's apparently-correct canonical
+  and robots meta tags are not coming from Rank Math — they're
+  **WordPress core's own native `rel_canonical()` and `wp_robots_noindex()`**
+  filling in because Rank Math's Frontend integration never loads there.
+  Title/meta description still looked right by coincidence of similar
+  output shape, but none of it was exercising Rank Math's real code path.
+  **Lesson: before treating local's SEO-plugin output as a trustworthy
+  reference again, verify `rank_math()->frontend`/`rank_math()->head` are
+  actually set** (e.g. `wp eval 'var_dump(get_object_vars(rank_math()));'`)
+  — don't assume matching visual output means the same code ran. Why
+  local's Rank Math never fully bootstraps was not chased further (lower
+  priority than the production question this was blocking), but is worth
+  investigating before relying on local for any other Rank Math behavior
+  check.

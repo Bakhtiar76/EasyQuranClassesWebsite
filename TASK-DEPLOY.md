@@ -697,16 +697,19 @@ allowed to access this page" and its menu link redirecting to
 fixed two stale "(Local)" suffixes it surfaced in Website Name/Person-
 Organization Name copied over from the local DB export) fixed titles, meta
 descriptions, OG tags, AND the previously-404ing `sitemap_index.xml` in one
-pass — all three symptoms shared this one root cause. **Remaining gap,
-not yet resolved**: `<link rel="canonical">` is still absent site-wide on
-every page/post/homepage even after the wizard and a Permalinks
-re-save (local has it correctly on every page). Low urgency while
-`blog_public=0`/noindex keeps the site out of search results, but must be
-fixed before public launch to avoid duplicate-content ambiguity. Not yet
-root-caused — worth checking Rank Math's General/Advanced settings for
-canonical-specific toggles, or whether the Elementor Document API page-
-build scripts explicitly set an empty `rank_math_canonical` postmeta value
-that short-circuits the default-to-permalink fallback.
+pass — all three symptoms shared this one root cause. **Canonical tag —
+fully resolved 2026-09-08, confirmed intentional Rank Math behavior, not a
+bug**: `<link rel="canonical">` is absent site-wide because Rank Math
+deliberately omits canonical on any page it computes as `noindex`
+(`Head::robots()`, citing a real SEO reference on noindex/canonical
+conflict), and `blog_public=0` forces every page to `noindex` via
+`Paper::respect_settings_for_robots()`. It will render automatically the
+moment the client approves indexing (`blog_public` back to `1`) — no fix
+required. Local's apparently-working canonical was **not** a valid
+reference: confirmed via debug dump that `rank_math()->frontend`/`->head`
+are never instantiated on local, so its canonical/robots tags come from
+WordPress core's own native fallback, not Rank Math — see
+`CPANEL-WORKFLOW.md` §19 for the full trace.
 
 If needed:
 - regenerate Elementor CSS/data (via wp-admin → Elementor → Tools →
@@ -988,8 +991,9 @@ Do not mark complete until:
 [x] responsive QA works (desktop + mobile emulation verified on production)
 [x] HTTPS/mixed-content clean
 [x] SEO URLs/indexing correct (sitemap + per-page titles/meta fixed
-    2026-09-08 — see `CPANEL-WORKFLOW.md` §19; canonical tag still missing
-    site-wide, tracked as a separate open item, low urgency while noindex)
+    2026-09-08 — see `CPANEL-WORKFLOW.md` §19; canonical tag absence is
+    confirmed intentional Rank Math behavior tied to noindex, not a defect
+    — resolves itself automatically once indexing is approved)
 [x] production performance checked
 [x] main contains clean production-ready project code
 [x] no secrets/DB/backups/uploads tracked
