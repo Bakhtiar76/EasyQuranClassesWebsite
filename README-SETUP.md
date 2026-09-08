@@ -4,6 +4,7 @@ How to get this repo from a fresh clone to a working local WordPress build envir
 with **both Claude Code and Codex** operational, on Windows.
 
 - Day-to-day rules live in **`CLAUDE.md`** (Claude Code) and **`AGENTS.md`** (Codex).
+- Day-to-day **git push / PR workflow** is **`CONTRIBUTING.md`** — read this before your first push.
 - Deep local-environment rationale is in **`CLAUDE.md` → "Local Environment"** and **`local/README.md`**.
 - Deployment is **`CPANEL-WORKFLOW.md`** (manual, no shell on the host).
 - What is installed and why: **`TOOL-INVENTORY.md`**.
@@ -178,6 +179,9 @@ cd tools/graphics && npm install && cd ../..   # logo/icon/ornament SVG generati
 ---
 
 ## 3A. Working with a teammate
+
+**Day-to-day git push / PR workflow is `CONTRIBUTING.md`** — short, dedicated, hand it to
+anyone joining before their first push. This section covers the one-time onboarding around it.
 
 **Do not hand off the repo as a ZIP.** It's already on GitHub, with full history and branches —
 a ZIP would throw both away and would risk bundling `.env`, `local/.env`, and anything under
