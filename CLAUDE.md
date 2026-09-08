@@ -41,6 +41,7 @@ Stack: **Docker Desktop**. Compose file: `local/docker-compose.yml`. Services: `
   - Repeated failed device-flow login attempts each register a new OAuth client server-side regardless of local outcome, capped by a WordPress transient (`_transient_novamira_oauth_dcr_0_<hash>`, cap 10) → `Error [rest_error]: Too many registrations`. Fix: delete that transient pair (`wp option delete _transient_novamira_oauth_dcr_0_<hash> _transient_timeout_novamira_oauth_dcr_0_<hash>`) or wait out its expiry. Stale rows in `wp_novamira_oauth_clients`/`_access_tokens`/`_auth_codes`/`_device_codes`/`_pending_authorizations` are safe to clear the same way (plugin housekeeping tables, not Elementor/serialized data) but are not themselves the limiter.
 - **WPVibe** (`vibe-ai` plugin) was installed by the user directly, then **deactivated** — it's a hosted cloud relay (`mcp.wpvibe.ai`) that cannot reach `localhost` and has no working path here without publicly tunnelling the dev machine. Left installed-but-inactive rather than deleted; `release-check` also asserts its absence from any release archive.
 - Production confirmed: `https://easyquranclasses.com` is empty (Mode A, no existing content to preserve) — see `CPANEL-WORKFLOW.md`.
+- **First-run bootstrap (added 2026-09-08):** `local/bootstrap.ps1` / `.sh` rebuild an entire local site from a fresh clone in one command — `wp core install`, plugins, parent theme, `local/media-staging/` import, then `tools/00-04*.php` and every `tools/pages/*.php`, via `tools/05-bootstrap.php`. Page builders resolve their target post by slug (`eqc_page_id()` in `tools/elementor-helpers.php`, mirrors `eqc_media_id()`) rather than a hardcoded ID, so the same scripts work on any machine's install order. See `README-SETUP.md` §3 / §3A for the full procedure and the multi-machine/teammate workflow.
 
 ### Codex parity (added 2026-09-07)
 
@@ -197,6 +198,24 @@ Before adding performance plugins, inspect hosting cache/CDN and local frontend 
 ## Git / GitHub
 Git tracks custom code, Claude configuration, docs and reproducible local tooling — not the mutable WordPress database/media state.
 
+**Branch policy (confirmed 2026-09-07):** `main` is production-deployment-only —
+it holds nothing but `wp-content/themes/easy-quran-classes-child/` (and
+`wp-content/plugins/easy-quran-classes-core/` if ever added), its own
+`.gitignore` (which lists every dev-only path so they can't be re-added by
+accident), and `.github/workflows/` (the auto-deploy pipeline itself — it
+must live on `main` for GitHub Actions to trigger on push to `main`). All
+development, docs, `.claude/` configuration, local tooling, reference
+assets and tests live on `feature/*` branches (currently `feature/setup`).
+Never `git merge` a feature branch into `main` — that reintroduces the
+dev-only tree. Release by copying only the production paths across (`git
+checkout feature/setup -- wp-content/themes/easy-quran-classes-child` on
+`main`, then commit) — see `.claude/rules/git.md` for the exact flow.
+**When multiple sessions may share this working directory, do the actual
+`main` commit/push work in a separate `git worktree` (`git worktree add
+../<name> main`) instead of `git checkout main` here** — switching the
+shared checkout's branch would yank the floor out from under any other
+session with uncommitted `feature/setup` work in progress.
+
 Before commits:
 - inspect `git status`
 - run `git diff --check`
@@ -222,6 +241,20 @@ For production release export, prefer serialization-safe WP-CLI search/replace e
 
 Run a dry-run first where applicable. The export form must not mutate the working local database.
 
+`tools/pages/*.php` (run via `wp --user=1 eval-file /tools/pages/<name>.php`)
+are the only sanctioned way to change a page's `_elementor_data` — they
+call helpers in `tools/elementor-helpers.php`, some of which (e.g.
+`eqc_divider_svg()`/`eqc_get_svg_asset()`, `inc/template-tags.php`) embed
+a *snapshot* of a generated SVG's current file content as a literal HTML
+string. Regenerating that SVG afterward does not change already-saved
+pages — only a fresh `eval-file` run does (see
+`tools/graphics/README.md`'s "some assets need the Elementor pages
+re-baked too" for the full mechanism and how this was diagnosed).
+**Always pass `--user=1`** — omitting it still prints `Success: Saved
+Elementor content for post #N`, but the save silently doesn't take;
+confirmed once by re-querying `_elementor_data` and finding old content
+still there after an apparently-successful run without it.
+
 ## Deployment Model
 Default release process:
 1. complete local WordPress/Elementor build;
@@ -240,6 +273,19 @@ Default release process:
 14. remove temporary installers/archives from public web root.
 
 The exact deployment variant depends on whether production is empty, a new WordPress install, or an existing live site. Read `CPANEL-WORKFLOW.md` before any release.
+
+**Confirmed gotchas from the first production migration (2026-09-07)**, full
+detail in `CPANEL-WORKFLOW.md` §8: (1) the standard `wp search-replace` URL
+migration misses Elementor's JSON-escaped URLs (`http:\/\/old` vs.
+`http://old`) — invisible locally, surfaces as mixed-content warnings on
+specific images/widgets after a real domain migration, needs a documented
+manual phpMyAdmin fix post-import; (2) `blog_public=0`'s authoritative
+enforcement is the `noindex` meta tag (always correctly wired), not
+`robots.txt` (a WP-core-refactor + Rank Math interaction leaves it
+permissive by default — cosmetic, not an indexing risk, but worth knowing);
+(3) never delete local credentials (e.g. an Application Password) directly
+to keep them out of a release export — that mutates the live local DB;
+exclude them from the export instead (`--skip-tables`).
 
 ## Verification
 A file change is not completion. Verify with the relevant combination of:

@@ -38,7 +38,7 @@ $hero = eqc_section(
 									array(
 										'image'        => array( 'id' => $boy_img, 'url' => wp_get_attachment_image_url( $boy_img, 'large' ) ),
 										'image_size'   => 'large',
-										'_css_classes' => 'eqc-arch-media',
+										'_css_classes' => 'eqc-arch-media eqc-arch-media--masked',
 									)
 								),
 							)
@@ -163,4 +163,4 @@ $faq = eqc_section(
 // message with nothing between them, reading as one duplicated block
 // rather than two intentional moments. See 11-about.php for the full note.
 
-eqc_save_elementor_page( 33, array( $hero, $who_suits, $experience, $pathway, $matching, $faq ) );
+eqc_save_elementor_page( eqc_page_id( 'online-quran-classes-for-kids' ), array( $hero, $who_suits, $experience, $pathway, $matching, $faq ) );

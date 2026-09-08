@@ -13,10 +13,20 @@ if ( ! defined( 'WP_CLI' ) ) {
 	exit( "Run via WP-CLI: wp eval-file /tools/02-demo-posts.php\n" );
 }
 
-/** Set a post's featured image by matching the source filename fragment (not post_name — see eqc_media_id() in tools/elementor-helpers.php). */
+/**
+ * Set a post's featured image by matching the source filename fragment (not
+ * post_name — see eqc_media_id() in tools/elementor-helpers.php, which this
+ * duplicates rather than requires, since this file is meant to run
+ * standalone). Ordered by post_id DESC for the same reason as
+ * eqc_media_id(): if a fragment matches more than one attachment (e.g. a
+ * legacy file and its re-imported replacement), the most recently imported
+ * match wins instead of an undefined LIMIT-1-with-no-ORDER-BY pick — this
+ * exact bug silently mis-set all 5 demo post thumbnails during a 2026-09-07
+ * WebP re-import, caught only during production QA.
+ */
 function eqc_set_demo_thumbnail( $post_id, $filename_fragment ) {
 	global $wpdb;
-	$thumb_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value LIKE %s LIMIT 1", '%' . $wpdb->esc_like( $filename_fragment ) . '%' ) );
+	$thumb_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value LIKE %s ORDER BY post_id DESC LIMIT 1", '%' . $wpdb->esc_like( $filename_fragment ) . '%' ) );
 	if ( $thumb_id ) {
 		set_post_thumbnail( $post_id, (int) $thumb_id );
 	}

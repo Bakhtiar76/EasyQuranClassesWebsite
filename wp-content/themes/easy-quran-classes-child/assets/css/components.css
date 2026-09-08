@@ -63,8 +63,8 @@ button:focus,
  * (300x150) — this rule is load-bearing, not cosmetic.
  */
 .eqc-icon {
-	width: 1.15em;
-	height: 1.15em;
+	width: 1.25em;
+	height: 1.25em;
 	display: inline-block;
 	flex: none;
 	vertical-align: -0.15em;
@@ -151,47 +151,36 @@ button:focus,
 	border: 0;
 }
 
-/* Ornate section-heading rule (short line - flower glyph - short line),
-   matching the client's own reference screenshots (Assests/) where every
-   H2 sits under this exact motif rather than a bare line. Used by
-   eqc_section_heading_el()/eqc_section_heading(); the plain .eqc-heading-rule
-   above stays as-is for the homepage hero, which only ever shows a plain
-   line under its H1. */
+/* Ornate section-heading rule — one self-contained inline SVG asset
+ * (divider-section.svg: hairline + diamond terminals + rosette medallion,
+ * see tools/graphics/gen-ornaments.mjs), matching the client's own
+ * reference screenshots (Assests/) where every H2 sits under this exact
+ * motif. This class used to ALSO carry the base `.eqc-heading-rule` class
+ * and inherited its `height:1px; background:linear-gradient(...)` — the
+ * div painted as a full-width flat gold bar with a tiny flower stranded
+ * near the left edge, not the centered line-diamond-rosette-diamond-line
+ * motif intended. Fixed at the source (eqc_section_heading_el() no longer
+ * emits the base class) and belt-and-braces here: this class is now fully
+ * self-contained regardless of what else is applied alongside it.
+ */
 .eqc-heading-rule--ornate {
 	display: flex;
-	align-items: center;
-	gap: 0.65em;
+	justify-content: flex-start;
 	width: 100%;
+	height: auto;
+	background: none;
 	margin-block: 1em;
 	color: var(--eqc-gold-500);
+	opacity: 0;
+	transform: scale(0.85);
+	transition: opacity var(--eqc-motion-slow) var(--eqc-ease-standard),
+		transform var(--eqc-motion-slow) var(--eqc-ease-standard);
 }
 .eqc-section-heading--center .eqc-heading-rule--ornate { justify-content: center; }
-.eqc-heading-rule--ornate::before,
-.eqc-heading-rule--ornate::after {
-	content: '';
-	flex: 0 1 clamp(28px, 5vw, 70px);
-	height: 1px;
-	background: currentColor;
-	transform-origin: center;
-	transform: scaleX(0);
-	transition: transform var(--eqc-motion-slow) var(--eqc-ease-standard);
-}
-.eqc-divider-flower {
-	width: 15px;
-	height: 15px;
-	flex: none;
-	color: var(--eqc-gold-500);
-	opacity: 0;
-	transition: opacity var(--eqc-motion-slow) var(--eqc-ease-standard);
-}
-html.eqc-js .is-visible .eqc-heading-rule--ornate::before,
-html.eqc-js .is-visible .eqc-heading-rule--ornate::after { transform: scaleX(1); }
-html.eqc-js .is-visible .eqc-divider-flower { opacity: 1; transition-delay: calc(var(--eqc-motion-slow) * 0.4); }
-html:not(.eqc-js) .eqc-heading-rule--ornate::before,
-html:not(.eqc-js) .eqc-heading-rule--ornate::after,
-html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
-.eqc-section--dark .eqc-heading-rule--ornate,
-.eqc-section--dark .eqc-divider-flower { color: var(--eqc-gold-300); }
+.eqc-divider-svg { width: clamp(180px, 22vw, 240px); height: auto; flex: none; }
+html.eqc-js .is-visible .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
+html:not(.eqc-js) .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
+.eqc-section--dark .eqc-heading-rule--ornate { color: var(--eqc-gold-300); }
 
 /* ---------- Buttons ----------
  * Two call sites share one visual language:
@@ -204,9 +193,24 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
  *    to re-skin the real link — this is the one deliberate override of
  *    Elementor's own button chrome (DESIGN.md §19: child-theme CSS is the
  *    approved place for reusable styling Elementor Free can't express).
+ *
+ * Root-cause fix (the "weird subset of button shape" behind every button on
+ * the site): every selector below used to be the BARE class, e.g. `.eqc-btn`
+ * — which matches BOTH the real `<a class="eqc-btn">` AND, on every
+ * Elementor button, the wrapper `<div class="eqc-btn ... elementor-widget-
+ * button">` that also carries the class. That wrapper then received full
+ * pill chrome (height, padding-inline, border, background) of its own, IN
+ * ADDITION to the inner `.elementor-button` anchor's copy via the compound
+ * selector — two overlapping pills of different sizes (the wrapper is wider
+ * by its own padding, and its baseline placement pushes the inner pill down
+ * a few px), worst on hover/press since transform applied to both. Element-
+ * qualifying every bare selector to `a.eqc-btn`/`button.eqc-btn` makes it
+ * physically impossible for a `<div>` wrapper to match, so the wrapper goes
+ * back to being pure invisible layout (below) and only the real link is
+ * ever painted as a button.
  */
 
-.eqc-btn,
+a.eqc-btn, button.eqc-btn,
 .elementor-widget-button.eqc-btn .elementor-button {
 	--_h: clamp(48px, 4vw, 56px);
 	display: inline-flex;
@@ -229,9 +233,10 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 		box-shadow var(--eqc-motion-base) var(--eqc-ease-standard);
 }
 
-/* The outer Elementor wrapper itself must stay a plain inline shrink-wrap
-   box (and not stretch to the container's cross-axis) so it doesn't add
-   its own block-level width/margin around the link. */
+/* The outer Elementor wrapper itself is layout-only — never chrome — and
+   stays a plain inline shrink-wrap box (not stretched to the container's
+   cross-axis) so it adds no block-level width/margin of its own around the
+   link. */
 .elementor-widget-button.eqc-btn {
 	display: inline-block;
 	align-self: center;
@@ -241,51 +246,61 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 /* Button groups that are explicitly left-aligned (e.g. a hero text column)
    opt back in by wrapping native buttons in a container with this class. */
 .eqc-align-start > .elementor-widget-button.eqc-btn { align-self: flex-start; }
+/* A button that must fill its container (e.g. a card footer) opts in here;
+   the wrapper stretches and the inner anchor (below) fills it in turn. */
+.elementor-widget-button.eqc-btn--block { display: block; align-self: stretch; width: 100%; }
+.elementor-widget-button.eqc-btn--block .elementor-button { width: 100%; }
 
-.eqc-btn:hover,
-.elementor-widget-button.eqc-btn .elementor-button:hover { transform: translateY(-2px); }
-.eqc-btn:active,
-.elementor-widget-button.eqc-btn .elementor-button:active { transform: translateY(0); }
-.eqc-btn:focus-visible,
+a.eqc-btn:hover, button.eqc-btn:hover,
+.elementor-widget-button.eqc-btn .elementor-button:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 10px 22px rgba(20, 35, 27, 0.16);
+}
+a.eqc-btn:active, button.eqc-btn:active,
+.elementor-widget-button.eqc-btn .elementor-button:active {
+	transform: translateY(0);
+	box-shadow: none;
+}
+a.eqc-btn:focus-visible, button.eqc-btn:focus-visible,
 .elementor-widget-button.eqc-btn .elementor-button:focus-visible {
 	outline: 3px solid var(--eqc-gold-500);
 	outline-offset: 2px;
 }
 
-.eqc-btn--primary,
+a.eqc-btn--primary, button.eqc-btn--primary,
 .elementor-widget-button.eqc-btn--primary .elementor-button {
 	background: var(--eqc-green-800);
 	color: var(--eqc-white);
 }
-.eqc-btn--primary:hover,
+a.eqc-btn--primary:hover, button.eqc-btn--primary:hover,
 .elementor-widget-button.eqc-btn--primary .elementor-button:hover { background: var(--eqc-green-700); }
 
-.eqc-btn--bronze,
+a.eqc-btn--bronze, button.eqc-btn--bronze,
 .elementor-widget-button.eqc-btn--bronze .elementor-button {
 	background: var(--eqc-bronze-700);
 	color: var(--eqc-white);
 }
-.eqc-btn--bronze:hover,
+a.eqc-btn--bronze:hover, button.eqc-btn--bronze:hover,
 .elementor-widget-button.eqc-btn--bronze .elementor-button:hover { background: var(--eqc-bronze-600); }
 
-.eqc-btn--secondary,
+a.eqc-btn--secondary, button.eqc-btn--secondary,
 .elementor-widget-button.eqc-btn--secondary .elementor-button {
 	background: transparent;
 	color: var(--eqc-green-800);
 	border-color: var(--eqc-border-strong);
 }
-.eqc-btn--secondary:hover,
+a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 .elementor-widget-button.eqc-btn--secondary .elementor-button:hover { background: var(--eqc-surface); }
 
-.eqc-section--dark .eqc-btn--secondary,
-.eqc-footer-cta .eqc-btn--secondary,
+.eqc-section--dark a.eqc-btn--secondary,
+.eqc-footer-cta a.eqc-btn--secondary,
 .eqc-section--dark .elementor-widget-button.eqc-btn--secondary .elementor-button,
 .eqc-footer-cta .elementor-widget-button.eqc-btn--secondary .elementor-button {
 	color: var(--eqc-cream-100);
 	border-color: rgba(247, 243, 236, 0.4);
 }
-.eqc-section--dark .eqc-btn--secondary:hover,
-.eqc-footer-cta .eqc-btn--secondary:hover,
+.eqc-section--dark a.eqc-btn--secondary:hover,
+.eqc-footer-cta a.eqc-btn--secondary:hover,
 .eqc-section--dark .elementor-widget-button.eqc-btn--secondary .elementor-button:hover,
 .eqc-footer-cta .elementor-widget-button.eqc-btn--secondary .elementor-button:hover { background: rgba(255, 255, 255, 0.08); }
 
@@ -296,36 +311,6 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	align-items: center;
 }
 
-/* Full-width card-footer button (course cards, etc.) — an explicit
-   deviation from the reference's arrow-only card CTA per direct user
-   request ("make the course panels complete as a button"). Overrides the
-   base .eqc-btn widget-wrapper rule above, which centers/shrink-wraps by
-   default.
-   The base .eqc-btn / .eqc-btn--variant rules apply full pill chrome
-   (border, background, fixed height) to BOTH the outer widget wrapper
-   (bare class match) and the nested .elementor-button anchor (compound
-   selector) — normally invisible because the wrapper's width:auto makes
-   it hug the anchor exactly, so the two pills coincide pixel-for-pixel.
-   Stretching only the wrapper to 100% breaks that coincidence and exposes
-   two different-sized nested pills, so the wrapper's own copy of the
-   chrome must be neutralized here, leaving only the (now 100%-wide)
-   inner anchor visible. */
-.elementor-widget-button.eqc-btn--block {
-	display: block;
-	align-self: stretch;
-	width: 100%;
-	height: auto;
-	border: none;
-	background: none;
-	padding-inline: 0;
-	margin-top: auto;
-	padding-top: 1.25rem;
-}
-.eqc-btn--block,
-.elementor-widget-button.eqc-btn--block .elementor-button {
-	width: 100%;
-}
-
 /* ---------- Cards ---------- */
 
 .eqc-card {
@@ -334,6 +319,12 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	border-radius: var(--eqc-radius-card);
 	box-shadow: var(--eqc-shadow-card);
 	padding: clamp(1.25rem, 1rem + 1vw, 2rem);
+	/* Flex column so `.eqc-card__foot { margin-top: auto }` (below) can pin
+	   a divider/CTA to the same baseline across a row regardless of how
+	   much copy sits above it — the general fix for cards whose footer
+	   rule/arrow drifted up or down depending on content length. */
+	display: flex;
+	flex-direction: column;
 	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard),
 		box-shadow var(--eqc-motion-base) var(--eqc-ease-standard);
 }
@@ -343,15 +334,41 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	box-shadow: var(--eqc-shadow-card-hover);
 }
 
+/* Shared "pin to card bottom" convention — apply to whatever a card's last
+   row is (a divider + CTA, a facts box, tag chips) so it lands on the same
+   baseline as its siblings in a grid row no matter how long the copy above
+   it runs. */
+.eqc-card__foot { margin-top: auto; }
+
 .eqc-grid {
 	display: grid;
 	gap: var(--eqc-grid-gap);
 }
 
-.eqc-grid--courses { grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); }
-.eqc-grid--teachers { grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr)); }
+/* When a grid item is an Elementor HTML widget (eqc_html()) rather than a
+   Container, `.eqc-card` sits ONE LEVEL INSIDE the actual grid cell, so CSS
+   Grid's implicit row-stretch never reaches it — the card just shrink-wraps
+   its own content instead of matching its row siblings (the uneven "How It
+   Works" / pathway step cards). Stretching the widget wrapper itself into a
+   flex container fixes every such row site-wide. */
+.eqc-grid > .elementor-widget-html { display: flex; }
+.eqc-grid > .elementor-widget-html > .eqc-card { flex: 1 1 auto; width: 100%; }
+
+/* Course/teacher grids: an explicit 3/2/1 column count (not auto-fit),
+   matching DESIGN.md §16 and the client reference exactly — auto-fit was
+   packing 4-5 narrow cards per row instead of the intended 3, which is what
+   read as "no symmetry" (courses wrapping 4-then-2). */
+.eqc-grid--courses,
+.eqc-grid--teachers { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 61.25rem) {
+	.eqc-grid--courses,
+	.eqc-grid--teachers { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 36rem) {
+	.eqc-grid--courses,
+	.eqc-grid--teachers { grid-template-columns: 1fr; }
+}
 .eqc-grid--pricing { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
-.eqc-grid--testimonials { grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); }
 .eqc-grid--blog { grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr)); }
 .eqc-grid--2col { grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr)); }
 .eqc-grid--trust { grid-template-columns: repeat(auto-fit, minmax(min(220px, 100%), 1fr)); }
@@ -426,6 +443,25 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	font-weight: 700;
 }
 .eqc-card--course p { margin-block: 0.8em; }
+/* Small centered rosette rule under the level label, matching the
+   reference's own divider-card motif between the level and the description
+   (Assests/…4.23.19 PM (2).jpeg). */
+.eqc-card-divider { color: var(--eqc-gold-500); margin-block: 0.2em; }
+.eqc-card-divider svg { width: 100%; height: auto; display: block; }
+
+/* Whole-card link: a "stretched link" pattern — one real, invisible anchor
+   sized to the entire card via inset:0, sitting above the decorative
+   content (z-index:2 vs. content's z-index:1) so the full panel is
+   clickable/tappable, exactly like the reference's course cards, while the
+   circular chevron below stays a purely decorative (non-nested) affordance.
+   This is the correct reading of "make the course panels complete as a
+   button": the whole panel IS the button, not a full-width bar under it. */
+.eqc-card-link {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	text-decoration: none;
+}
 
 .eqc-arrow-btn {
 	display: inline-flex;
@@ -451,14 +487,54 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 
 /* Teacher card */
 .eqc-card--teacher { text-align: center; position: relative; }
+/* Mandorla (pointed-oval) frame, replacing a plain circle — matches the
+   client reference's arch-family photo treatment rather than a generic
+   avatar shape. Aspect-ratio matches mandorla-mask.svg's own true bbox
+   (249:330.994, see tools/graphics/gen-ornaments.mjs) so mask-size:100%
+   100% doesn't stretch it; the border becomes a mask-shaped outline
+   layer instead of a round border, since border-radius can't follow an
+   arbitrary silhouette. */
 .eqc-card--teacher .eqc-teacher-photo,
 .eqc-card--teacher .eqc-teacher-photo-widget {
-	width: clamp(120px, 30%, 160px);
-	aspect-ratio: 1;
+	position: relative;
+	width: clamp(110px, 28%, 150px);
+	aspect-ratio: 249 / 330.994;
 	margin-inline: auto;
-	border-radius: 50%;
-	overflow: hidden;
-	border: 3px solid var(--eqc-gold-300);
+}
+/* The mask lives on the <img>, not this container: masking a parent
+   clips its entire subtree (including a differently-sized pseudo-element)
+   to that one shape, which would clip the outline below right back down
+   to the photo's own silhouette instead of letting it trace just outside
+   it (see the .eqc-arch-media--masked comment above for the full case
+   that surfaced this). */
+.eqc-card--teacher .eqc-teacher-photo img,
+.eqc-card--teacher .eqc-teacher-photo-widget img {
+	-webkit-mask-image: url('../svg/mandorla-mask.svg');
+	mask-image: url('../svg/mandorla-mask.svg');
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+}
+/* Reuses the exact same mandorla-mask.svg shape as the photo (not
+   mandorla-outline.svg's stroke render) for the same reason documented on
+   .eqc-arch-media--masked::before above — a thin stroke's own padding
+   doesn't match how much bigger this layer is enlarged via `inset`,
+   which distorts it. `::before` (behind the photo, not `::after` on top)
+   so only the sliver outside the smaller photo shows. */
+.eqc-card--teacher .eqc-teacher-photo::before,
+.eqc-card--teacher .eqc-teacher-photo-widget::before {
+	content: '';
+	position: absolute;
+	inset: -4%;
+	background-color: var(--eqc-gold-300);
+	-webkit-mask-image: url('../svg/mandorla-mask.svg');
+	mask-image: url('../svg/mandorla-mask.svg');
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	pointer-events: none;
 }
 /* Small "seal" badge overlapping the bottom of the photo, matching the
    reference teacher cards (Assests/). Pulled up with a negative margin
@@ -541,8 +617,13 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	margin: 0 0 1em;
 }
 
-/* Pricing card */
-.eqc-card--pricing { text-align: center; position: relative; }
+/* Pricing card — rebuilt against the reference (Assests/…4.23.20 PM.jpeg):
+   a dark medallion overlapping the top edge, a notched frequency ribbon,
+   gold star bullets and a price row closing in a decorative circular
+   arrow, all card panel — replacing the earlier plain calendar glyph +
+   checklist that read as "too plain, no contrast" against the client's own
+   scalloped/framed treatment. */
+.eqc-card--pricing { text-align: center; position: relative; padding-top: 3.4rem; overflow: visible; }
 .eqc-card--pricing--featured {
 	border-color: var(--eqc-gold-500);
 	box-shadow: 0 18px 40px rgba(169, 130, 53, 0.18);
@@ -559,57 +640,100 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	}
 	.eqc-card--pricing--featured:hover { transform: scale(1.07) translateY(-3px); }
 }
-/* Gold scalloped icon badge above the frequency pill, matching the
-   reference pricing cards (Assests/) — same masked-rosette technique as
-   the course-card index badge above. */
-.eqc-pricing-icon {
-	position: relative;
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-	width: 3.4em;
-	height: 3.4em;
-	margin-bottom: 0.9em;
-	color: var(--eqc-green-800);
-	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard);
-}
-.eqc-pricing-icon::before {
+/* Soft all-over sparkle field, featured plan only — the extra bit of
+   contrast/shine the user asked for on the "Recommended" card. Real
+   content is boosted to z-index:1 (below) so it always paints above this. */
+.eqc-card--pricing--featured::before {
 	content: '';
 	position: absolute;
 	inset: 0;
 	background-color: var(--eqc-gold-500);
-	opacity: 0.18;
-	-webkit-mask-image: url('../svg/rosette.svg');
-	mask-image: url('../svg/rosette.svg');
-	-webkit-mask-size: 100% 100%;
-	mask-size: 100% 100%;
+	opacity: 0.45;
+	-webkit-mask-image: url('../svg/sparkle-dust.svg');
+	mask-image: url('../svg/sparkle-dust.svg');
+	-webkit-mask-size: cover;
+	mask-size: cover;
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	pointer-events: none;
 	z-index: 0;
 }
-.eqc-pricing-icon .eqc-icon { position: relative; z-index: 1; width: 1.4em; height: 1.4em; }
-.eqc-card--pricing:hover .eqc-pricing-icon { transform: scale(1.08) rotate(6deg); }
-.eqc-pricing-badge {
+.eqc-card--pricing--featured > * { position: relative; z-index: 1; }
+/* Re-assert the stretched card-link's higher z-index (its own rule lives
+   far earlier in this file, in the course-card section, so on the tied
+   specificity above it would otherwise lose the cascade to the featured
+   card's own later `> *` rule and stop covering the icon/badge areas). */
+.eqc-card--pricing .eqc-card-link { z-index: 2; }
+/* Dark medallion overlapping the card's top edge (replaces the earlier
+   small calendar glyph sitting inline above the ribbon). A plain solid
+   circle, not a masked rosette: rosette.svg/rosette-12.svg are stroke-only
+   outlines (fill:none) — used as a mask they only paint their thin 1.4px
+   stroke line, leaving everything else (including a white icon meant to
+   sit "inside" the medallion) invisible against the card's own light
+   surface. A solid disc plus a rosette-12 ring drawn ON TOP as a real
+   inline SVG (currentColor follows the gold ring color correctly, unlike
+   an externally-masked one) gives the genuinely solid, scalloped-edge
+   badge the reference shows. */
+.eqc-pricing-icon {
 	position: absolute;
-	top: -14px;
+	top: -1.9rem;
 	left: 50%;
 	transform: translateX(-50%);
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 3.8em;
+	height: 3.8em;
+	border-radius: 50%;
+	background: var(--eqc-green-800);
+	box-shadow: 0 0 0 4px var(--eqc-surface), 0 6px 14px rgba(20, 35, 27, 0.3);
+	z-index: 2;
+	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+.eqc-pricing-icon-ring {
+	position: absolute;
+	inset: -0.4em;
+	color: var(--eqc-gold-500);
+	pointer-events: none;
+	z-index: 0;
+}
+.eqc-pricing-icon-ring svg { width: 100%; height: 100%; }
+.eqc-pricing-icon .eqc-icon { position: relative; z-index: 1; width: 1.6em; height: 1.6em; color: var(--eqc-white); }
+.eqc-card--pricing:hover .eqc-pricing-icon { transform: translateX(-50%) scale(1.08) rotate(6deg); }
+/* Corner "Recommended" ribbon tag — a diagonal flag near the top-right
+   corner, matching the reference's ribbon tab instead of a centered pill
+   floating above the card. z-index above .eqc-card-link (2) so it's never
+   swallowed by the card's own click target. */
+.eqc-pricing-badge {
+	position: absolute;
+	top: 1.1rem;
+	right: -2.3rem;
+	width: 8.5rem;
+	transform: rotate(45deg);
 	background: var(--eqc-gold-500);
 	color: var(--eqc-green-900);
 	font-size: var(--eqc-fs-small);
 	font-weight: 700;
 	letter-spacing: 0.04em;
 	text-transform: uppercase;
-	padding: 0.35em 1em;
-	border-radius: var(--eqc-radius-pill);
+	text-align: center;
+	padding: 0.35em 0;
+	box-shadow: 0 4px 10px rgba(169, 130, 53, 0.35);
+	z-index: 3;
 }
 .eqc-pricing-freq {
-	display: inline-block;
+	display: block;
 	background: var(--eqc-green-800);
 	color: var(--eqc-white);
 	border-radius: var(--eqc-radius-pill);
-	padding: 0.5em 1.4em;
+	padding: 0.65em 1.4em;
 	font-weight: 700;
-	margin-block: 0.75em 1.1em;
+	letter-spacing: 0.02em;
+	box-shadow: 0 6px 16px rgba(20, 35, 27, 0.2);
+	margin-block: 1.9em 1em;
 }
+.eqc-pricing-divider { color: var(--eqc-gold-500); width: fit-content; margin: 0 auto 1em; }
+.eqc-pricing-divider svg { display: block; width: 78px; height: auto; }
 .eqc-pricing-list {
 	list-style: none;
 	margin: 0 0 1.2em;
@@ -620,17 +744,27 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	gap: 0.55em;
 }
 .eqc-pricing-list li { display: flex; gap: 0.6em; align-items: flex-start; font-size: var(--eqc-fs-small); }
+.eqc-pricing-bullet { flex: none; width: 0.75em; height: 0.75em; margin-top: 0.35em; color: var(--eqc-gold-500); }
 .eqc-pricing-price {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 0.75em;
+}
+.eqc-pricing-price-figure {
 	font-family: var(--eqc-font-display);
 	font-size: 2.25rem;
 	color: var(--eqc-heading);
 	display: flex;
 	align-items: baseline;
-	justify-content: center;
 	gap: 0.35em;
-	margin-bottom: 1em;
 }
 .eqc-pricing-price small { font-family: var(--eqc-font-body); font-size: var(--eqc-fs-small); color: var(--eqc-muted); font-weight: 600; }
+/* The circular arrow closing the price row is purely decorative — the
+   card's whole surface is the real CTA (.eqc-card-link, see the
+   course-card comment above), so it never nests inside another link.
+   Its hover/active reaction already comes from the generic
+   `.eqc-card:hover .eqc-arrow-btn` rule further up this file. */
 
 /* Pricing inclusion strip — a circular icon badge per item with thin
    dividers between them, matching the reference's "icon | icon | icon"
@@ -679,7 +813,7 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	mask-size: 100% 100%;
 	z-index: 0;
 }
-.eqc-inclusion-icon .eqc-icon { position: relative; z-index: 1; width: 1.2em; height: 1.2em; }
+.eqc-inclusion-icon .eqc-icon { position: relative; z-index: 1; width: 1.5em; height: 1.5em; }
 /* Below this width items stack one per row (auto-fit wrapping would leave
    a stray border-inline-start on whichever item starts a new row), so the
    side dividers become unreliable — switch to a top rule instead. */
@@ -693,26 +827,34 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	.eqc-inclusion-item:first-child { border-top: none; padding-top: 0; }
 }
 
-/* Testimonial card */
-.eqc-card--testimonial { position: relative; padding-top: 3.5rem; }
-.eqc-testimonial-photo {
+/* Testimonial card — centered avatar overlapping the top edge with the
+   quote badge on its lower-right (matching Assests/…4.23.26 PM (1).jpeg),
+   replacing the previous two independently-positioned absolute elements
+   that didn't track each other and sat off to one side. */
+.eqc-card--testimonial { position: relative; text-align: center; padding-top: 3.5rem; }
+.eqc-testimonial-avatar-wrap {
+	position: absolute;
+	top: -2.4rem;
+	left: 50%;
+	transform: translateX(-50%);
 	width: 84px;
 	height: 84px;
+}
+.eqc-testimonial-photo {
+	width: 100%;
+	height: 100%;
 	border-radius: 50%;
 	overflow: hidden;
-	position: absolute;
-	top: -2.2rem;
-	left: 1.5rem;
 	border: 3px solid var(--eqc-surface);
 	box-shadow: var(--eqc-shadow-card);
 }
 .eqc-testimonial-photo img { width: 100%; height: 100%; object-fit: cover; }
 .eqc-testimonial-quote-mark {
 	position: absolute;
-	top: -1rem;
-	left: 5.4rem;
-	width: 2.2em;
-	height: 2.2em;
+	bottom: -0.2em;
+	right: -0.2em;
+	width: 2em;
+	height: 2em;
 	border-radius: 50%;
 	background: var(--eqc-green-800);
 	color: var(--eqc-white);
@@ -720,53 +862,135 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	align-items: center;
 	justify-content: center;
 	font-family: var(--eqc-font-display);
+	border: 2px solid var(--eqc-surface);
 }
 /* h3 here for correct heading hierarchy (see .eqc-card--teacher h3 above). */
 .eqc-card--testimonial h3 { margin-block: 0 0.1em; font-size: var(--eqc-fs-h4); font-weight: 600; font-family: var(--eqc-font-body); }
 .eqc-testimonial-location {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 0.4em;
 	color: var(--eqc-muted);
 	font-size: var(--eqc-fs-small);
-	margin-bottom: 0.8em;
+	margin-bottom: 0.4em;
 }
+.eqc-testimonial-divider { color: var(--eqc-gold-500); width: fit-content; margin: 0.5em auto 0.9em; }
+.eqc-testimonial-divider svg { display: block; width: 90px; height: auto; }
+/* Bordered stat strip closing the card, matching the reference's boxed
+   "Expert Tutors · Monthly Tracking · Personalised Focus" footer instead of
+   a bare border-top divider — pinned to the card bottom via .eqc-card__foot
+   (passed as this widget's _css_classes) so it aligns across a row
+   regardless of how long each quote runs. */
 .eqc-testimonial-tags {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.6em;
+	justify-content: center;
+	gap: 0.4em 1.3em;
 	margin-top: 1.1em;
-	padding-top: 1.1em;
-	border-top: 1px solid var(--eqc-border);
+	padding: 0.85em 1em;
+	background: var(--eqc-cream-50);
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-control);
 	font-size: var(--eqc-fs-small);
-	color: var(--eqc-muted);
+	font-weight: 600;
+	color: var(--eqc-heading);
 }
 .eqc-testimonial-tags span { display: inline-flex; align-items: center; gap: 0.4em; }
+.eqc-testimonial-tags .eqc-icon { color: var(--eqc-bronze-600); }
 
-/* Testimonial slider — 3 slides of 3 cards, dot-navigated (see
-   initTestimonialSlider() in eqc.js). No autoplay: user-controlled,
-   avoids the accessibility/motion-sensitivity issues of an auto-advancing
-   carousel. */
-.eqc-testimonial-slider { overflow: hidden; }
-.eqc-testimonial-track {
+/* Generic one-card-at-a-time carousel — shared by the testimonials section
+   and the homepage teacher row (see initCarousel() in eqc.js), matching the
+   arrow+dot reference pattern (Assests/…4.23.27 PM.jpeg). N cards visible
+   at once via the track's --_visible custom property (responsive above).
+   Auto-advances every ~6s, pauses on hover/focus, and never starts under
+   prefers-reduced-motion (motion.css). Markup: .eqc-carousel >
+   .eqc-carousel-viewport > .eqc-carousel-track > (cards), plus sibling
+   .eqc-carousel-arrow buttons and an .eqc-slider-dots row. */
+.eqc-carousel { position: relative; padding-inline: clamp(0px, 2vw, 2.75em); }
+.eqc-carousel-viewport { overflow: hidden; }
+.eqc-carousel-track {
+	/* !important on display/flex-wrap: Elementor's own container default is
+	   flex-wrap:wrap, which this single-row sliding track can never allow —
+	   at desktop (3 visible) 3 items' percentage widths happened to just
+	   barely fit one row by floating-point luck, masking the bug, but at
+	   1-visible mobile widths every card is 100% wide and wraps onto its
+	   own row, stacking all 9 cards vertically instead of sliding. */
+	display: flex !important;
+	flex-wrap: nowrap !important;
+	gap: var(--eqc-grid-gap);
 	transition: transform var(--eqc-motion-slow) var(--eqc-ease-standard);
 	will-change: transform;
+	--_visible: 3;
 }
-/* Sizing only — .eqc-grid/.eqc-grid--testimonials (already on this same
-   element, see 10-home.php) supply display:grid, gap and columns. */
-.eqc-testimonial-slide {
-	flex: 0 0 100%;
-	min-width: 100%;
+@media (max-width: 61.25rem) { .eqc-carousel-track { --_visible: 2; } }
+@media (max-width: 36rem) { .eqc-carousel-track { --_visible: 1; } }
+/* !important: each card here is an Elementor Container in its own right
+   (eqc_container() in eqc_carousel()/eqc_teacher_card()/etc.), and
+   Elementor's own generated per-element CSS gives every "e-con" child a
+   flex-basis of its own (observed: flex-basis: auto with implicit grow),
+   at a specificity this plain child-combinator selector cannot beat by
+   source order alone — without !important all 9 testimonial cards were
+   observed shrinking to fit one single row (~114px each) instead of
+   showing 3 at a time. Same class of override as .eqc-form-wrap's Fluent
+   Forms rules above (DESIGN.md §19: child-theme CSS is the approved place
+   to override chrome a plugin/widget doesn't expose a control for). */
+.eqc-carousel-track > * {
+	flex: 0 0 calc((100% - (var(--_visible) - 1) * var(--eqc-grid-gap)) / var(--_visible)) !important;
+	min-width: 0;
+}
+.eqc-carousel-arrow {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 2.75em;
+	height: 2.75em;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 50%;
+	border: 1px solid var(--eqc-border-strong);
+	background: var(--eqc-surface);
+	color: var(--eqc-green-800);
+	cursor: pointer;
+	z-index: 2;
+	transition: background-color var(--eqc-motion-base) var(--eqc-ease-standard),
+		color var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+.eqc-carousel-arrow:hover,
+.eqc-carousel-arrow:focus-visible { background: var(--eqc-green-800); color: var(--eqc-white); }
+.eqc-carousel-arrow:disabled { opacity: 0.35; cursor: default; background: var(--eqc-surface); color: var(--eqc-green-800); }
+.eqc-carousel-arrow--prev { left: 0; }
+.eqc-carousel-arrow--next { right: 0; }
+.eqc-carousel-arrow--prev .eqc-icon { transform: rotate(180deg); }
+@media (max-width: 30rem) {
+	.eqc-carousel-arrow { display: none; }
 }
 .eqc-slider-dots { display: flex; justify-content: center; gap: 0.6rem; margin-top: clamp(1.5rem, 1.2rem + 1vw, 2.25rem); }
+/* Button itself is a 24px tap target (Lighthouse/axe target-size minimum;
+   DESIGN.md's 44px guidance would make the visible dot look oversized) —
+   the small 10px dot users actually see is a ::before centered inside it,
+   so appearance is unchanged while the clickable area grows. */
 .eqc-slider-dot {
+	width: 24px;
+	height: 24px;
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	border: none;
+	padding: 0;
+	background: transparent;
+	cursor: pointer;
+}
+.eqc-slider-dot::before {
+	content: '';
 	width: 10px;
 	height: 10px;
 	border-radius: 50%;
-	border: none;
-	padding: 0;
 	background: var(--eqc-border-strong);
-	cursor: pointer;
 	transition: background-color var(--eqc-motion-base) var(--eqc-ease-standard), transform var(--eqc-motion-base) var(--eqc-ease-standard);
 }
-.eqc-slider-dot.is-active { background: var(--eqc-bronze-600); transform: scale(1.35); }
+.eqc-slider-dot.is-active::before { background: var(--eqc-bronze-600); transform: scale(1.35); }
 .eqc-slider-dot:focus-visible { outline: 3px solid var(--eqc-gold-500); outline-offset: 3px; }
 
 /* Placeholder testimonial slide — mirrors .eqc-card--teacher-stub's visual
@@ -862,8 +1086,8 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 }
 .eqc-trust-tile .eqc-icon {
 	flex: none;
-	width: 1.9em;
-	height: 1.9em;
+	width: 2.1em;
+	height: 2.1em;
 	color: var(--eqc-green-800);
 	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard);
 }
@@ -888,7 +1112,7 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 		border-color var(--eqc-motion-base) var(--eqc-ease-standard);
 }
 .eqc-chip:hover { transform: translateY(-2px); border-color: var(--eqc-gold-300); }
-.eqc-chip .eqc-icon { color: var(--eqc-bronze-600); }
+.eqc-chip .eqc-icon { width: 1.35em; height: 1.35em; color: var(--eqc-bronze-600); }
 
 /* ---------- Arch media ---------- */
 
@@ -906,17 +1130,80 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	overflow: hidden;
 	border: 1px solid var(--eqc-border);
 }
-.eqc-arch-media--masked {
-	-webkit-mask-image: url('../svg/arch-mask.svg');
-	mask-image: url('../svg/arch-mask.svg');
-	-webkit-mask-size: 100% 100%;
-	mask-size: 100% 100%;
-	-webkit-mask-repeat: no-repeat;
-	mask-repeat: no-repeat;
+/* Each masked variant's aspect-ratio matches its own SVG's true bbox
+   (see tools/graphics/gen-ornaments.mjs) — a mismatch here would get
+   stretched by mask-size:100% 100%, reintroducing a subtler version of
+   the clipping/distortion bug the arch rebuild fixed. --masked's curve
+   (ogeeArchPanel, lib/arches.mjs, called with a bespoke measured fit —
+   see that call site's comment) restores the original S-curve silhouette
+   at 307:459, not the wider four-centred/horseshoe domes below (which
+   stay parametric and do genuinely overshoot their nominal box slightly). */
+.eqc-arch-media--masked,
+.eqc-arch-media--fourcentred,
+.eqc-arch-media--horseshoe {
 	border-radius: 0;
 	border: none;
+	overflow: visible; /* the outline (below) deliberately extends past this box */
 }
-.eqc-arch-media:not(.eqc-arch-media--masked)::before {
+.eqc-arch-media--masked { aspect-ratio: 307 / 459; }
+.eqc-arch-media--fourcentred { aspect-ratio: 329 / 389; }
+.eqc-arch-media--horseshoe { aspect-ratio: 327.198 / 349; }
+/* The mask lives on the <img> itself, not the container: a mask on a
+   parent clips its ENTIRE rendered subtree (including any differently
+   sized/positioned pseudo-element) to that one shape, so an outline meant
+   to extend outside the photo's own silhouette would have been clipped
+   right back down to it — exactly what produced a confusing double-cusp
+   overlap instead of a clean frame when this lived on the container. */
+.eqc-arch-media--masked img,
+.eqc-arch-media--fourcentred img,
+.eqc-arch-media--horseshoe img {
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+}
+.eqc-arch-media--masked img { -webkit-mask-image: url('../svg/arch-mask.svg'); mask-image: url('../svg/arch-mask.svg'); }
+.eqc-arch-media--fourcentred img { -webkit-mask-image: url('../svg/fourcentred-mask.svg'); mask-image: url('../svg/fourcentred-mask.svg'); }
+.eqc-arch-media--horseshoe img { -webkit-mask-image: url('../svg/horseshoe-mask.svg'); mask-image: url('../svg/horseshoe-mask.svg'); }
+/* Offset gold outline outside the photo, matching the four-centred/
+   horseshoe reference's visible arch line. Deliberately reuses the exact
+   SAME *-mask.svg shape as the photo above (not a *-outline.svg stroke
+   render): a stroke's own padding is only ~1% of the shape's size, but
+   this layer is enlarged ~6-8% via `inset` — stretching that thin,
+   barely-padded stroke onto a box that much bigger distorted its
+   curvature into a soft, wrong-shaped "blob" (confirmed against a live
+   screenshot). Reusing the identical mask on a uniformly bigger box is a
+   mathematically exact scaled-up copy of the same silhouette, so it can't
+   distort. `::before` (not `::after`, and no z-index) so it paints BEHIND
+   the photo in normal document order — only the sliver that peeks out
+   past the smaller photo on top is visible, reading as a clean outline. */
+.eqc-arch-media--masked::before,
+.eqc-arch-media--fourcentred::before,
+.eqc-arch-media--horseshoe::before {
+	content: '';
+	position: absolute;
+	inset: -3%;
+	background-color: var(--eqc-gold-500);
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	pointer-events: none;
+}
+/* --masked is the exception: the client's own mockup shows a thin single
+   gold hairline sitting right AT the photo's edge, not a thick offset
+   band. inset:0 (same box as the photo, no enlargement) + arch-outline.svg
+   (a thin stroke traced on arch-mask's own exact, unpadded bbox — see
+   gen-ornaments.mjs — so it shares the identical coordinate frame and
+   can't suffer the padding/inset mismatch distortion described above). */
+.eqc-arch-media--masked::before {
+	inset: 0;
+	-webkit-mask-image: url('../svg/arch-outline.svg');
+	mask-image: url('../svg/arch-outline.svg');
+}
+.eqc-arch-media--fourcentred::before { -webkit-mask-image: url('../svg/fourcentred-mask.svg'); mask-image: url('../svg/fourcentred-mask.svg'); }
+.eqc-arch-media--horseshoe::before { -webkit-mask-image: url('../svg/horseshoe-mask.svg'); mask-image: url('../svg/horseshoe-mask.svg'); }
+.eqc-arch-media:not(.eqc-arch-media--masked):not(.eqc-arch-media--fourcentred):not(.eqc-arch-media--horseshoe)::before {
 	content: '';
 	position: absolute;
 	inset: 0;
@@ -1022,15 +1309,40 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
  * section carrying `eqc-section--ornamented` gets them positioned and
  * layered correctly regardless of what else it contains. */
 
-/* 8-point star tile (same family as assets/svg/divider-flower.svg and
-   lattice-corner.svg — a real Rub el Hizb / Andalusian star-lattice motif,
-   not a placeholder diamond grid). Adjacent tiles' star points nearly
-   meet, the classic interlocking look of this pattern family. */
+/* Honeycomb hex tile (assets/svg/hex-tessellation.svg — a genuine
+ * seamless tiling, generated by tools/graphics/gen-ornaments.mjs) as a
+ * mask over a solid gold fill, rather than a hardcoded-color data-URI
+ * background-image. Two fixes over the previous version: (1) the old
+ * inline SVG polygon didn't actually interlock edge-to-edge — adjacent
+ * tiles' points fell short of touching, reading as scattered asterisks
+ * rather than a lattice; (2) the color was hardcoded (#B9974C) into the
+ * data URI itself, so it couldn't follow --eqc-gold-500 or adapt for dark
+ * sections — a mask inherits background-color like every other ornament
+ * in this file.
+ */
 .eqc-section--textured {
-	background-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20width='100'%20height='100'%20viewBox='0%200%20100%20100'%3E%3Cpolygon%20fill='none'%20stroke='%23B9974C'%20stroke-opacity='0.16'%20stroke-width='1'%20points='50,4%2057.27,32.45%2082.53,17.47%2067.55,42.73%2096,50%2067.55,57.27%2082.53,82.53%2057.27,67.55%2050,96%2042.73,67.55%2017.47,82.53%2032.45,57.27%204,50%2032.45,42.73%2017.47,17.47%2042.73,32.45'/%3E%3C/svg%3E");
-	background-repeat: repeat;
-	background-size: 100px 100px;
+	position: relative;
 }
+.eqc-section--textured::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background-color: var(--eqc-gold-500);
+	opacity: 0.1;
+	-webkit-mask-image: url('../svg/hex-tessellation.svg');
+	mask-image: url('../svg/hex-tessellation.svg');
+	-webkit-mask-size: 52px 90px;
+	mask-size: 52px 90px;
+	-webkit-mask-repeat: repeat;
+	mask-repeat: repeat;
+	pointer-events: none;
+	z-index: 0;
+}
+/* Slightly softer than the original 0.14/0.1 pass now that the corner
+   arabesque brackets carry more of each section's ornamental weight,
+   matching the client reference's near-invisible all-over texture. */
+.eqc-section--dark.eqc-section--textured::before { background-color: var(--eqc-gold-300); opacity: 0.07; }
+.eqc-section--textured > .e-con { position: relative; z-index: 1; }
 
 .eqc-section--ornamented { position: relative; overflow: hidden; }
 /* Elementor renders every nested Container (eqc_inner, grids, etc.) as a
@@ -1045,8 +1357,8 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 	background-color: var(--eqc-gold-600);
 	-webkit-mask-image: url('../svg/lattice-corner.svg');
 	mask-image: url('../svg/lattice-corner.svg');
-	-webkit-mask-size: 100% 100%;
-	mask-size: 100% 100%;
+	-webkit-mask-size: contain;
+	mask-size: contain;
 	-webkit-mask-repeat: no-repeat;
 	mask-repeat: no-repeat;
 	opacity: 0.22;
@@ -1056,20 +1368,42 @@ html:not(.eqc-js) .eqc-divider-flower { transform: scaleX(1); opacity: 1; }
 /* lattice-corner.svg is drawn dense at its own top-right corner (see the
    asset's own comment), so .eqc-corner-motif--tr needs no transform and
    --bl's 180deg rotation naturally maps that dense corner to bottom-left.
-   The asset already bakes in a per-star opacity fade (0.95 down to 0.1),
-   so this element-level opacity is a second, smaller multiplier on top —
-   deliberately higher than DESIGN.md §9's 3-10% baseline per explicit user
-   feedback that the previous motif read as "boring and dull" at that
-   strength; the fade keeps the far corner still light. */
+   The asset is a genuine arabesque bracket (concentric arcs + rosette +
+   finial, girih fill clipped to a curved wedge) rather than a lattice
+   field cropped to a square — its own radial-gradient mask fades alpha to
+   true zero well inside the canvas, so this element-level opacity is a
+   second, smaller multiplier on top — deliberately higher than
+   DESIGN.md §9's 3-10% baseline per explicit user feedback that the
+   previous motif read as "boring and dull" at that strength. */
 .eqc-corner-motif--tr { top: 0; right: 0; }
 .eqc-corner-motif--bl { bottom: 0; left: 0; transform: rotate(180deg); }
 .eqc-section--dark .eqc-corner-motif { background-color: var(--eqc-gold-300); opacity: 0.5; }
+/* Smaller pair for a nested panel (e.g. .eqc-pricing-panel below) rather
+   than a full section — the reference's arches sit tight against the
+   pricing panel's own corners, not spread across the whole section. */
+.eqc-corner-motif--sm { width: clamp(70px, 8vw, 130px); height: clamp(70px, 8vw, 130px); opacity: 0.3; }
 /* Slow ambient drift (reuses the CTA drift keyframe from motion.css) so the
    ornament reads as gently alive rather than a static watermark. */
 html.eqc-js .eqc-corner-motif { animation: eqc-drift 24s var(--eqc-ease-soft) infinite alternate; }
 
-.eqc-divider-row { display: flex; align-items: center; justify-content: center; gap: 0.75em; color: var(--eqc-gold-500); margin-block: 1.2em; }
-.eqc-divider-row .eqc-divider-line { height: 1px; width: clamp(30px, 6vw, 90px); background: currentColor; }
+/* Framed white panel wrapping the pricing cards + inclusion strip — the
+   "background arches, color contrast" the plain flat pricing section was
+   missing (matches Assests/…4.23.20 PM.jpeg's own bordered panel). */
+.eqc-pricing-panel {
+	/* No overflow:hidden here (deliberately, unlike .eqc-section--ornamented):
+	   the featured card's scale(1.07) growth and its medallion's overhang
+	   above the first row would risk getting clipped this close to the
+	   panel edge. The corner motifs' own opacity already fades to zero well
+	   inside their canvas (see the .eqc-corner-motif comment), so leaving
+	   this visible costs nothing visually. */
+	position: relative;
+	background: var(--eqc-surface);
+	border: 1px solid var(--eqc-gold-300);
+	border-radius: var(--eqc-radius-panel);
+	box-shadow: var(--eqc-shadow-card);
+	padding: clamp(2.25rem, 1.5rem + 3vw, 4rem);
+}
+.eqc-pricing-panel > .e-con { position: relative; z-index: 1; }
 
 /* ---------- Section heading block ---------- */
 

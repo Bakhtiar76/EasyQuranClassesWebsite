@@ -183,35 +183,131 @@
 		} );
 	}
 
-	/* ---------- Testimonial slider ----------
-	 * Dot-navigated, no autoplay (user-controlled — avoids the
-	 * accessibility/motion-sensitivity issues of an auto-advancing
-	 * carousel). Structure: .eqc-testimonial-slider > .eqc-testimonial-track
-	 * (the sliding element) containing .eqc-testimonial-slide children,
-	 * plus a sibling .eqc-slider-dots row of buttons.
+	/* ---------- Carousel ----------
+	 * One-card-at-a-time auto-advancing carousel, shared by the homepage
+	 * teacher row and the testimonials section (see eqc_carousel() in
+	 * tools/elementor-helpers.php and .eqc-carousel* in components.css).
+	 * Structure: .eqc-carousel > .eqc-carousel-arrow--prev/next (siblings,
+	 * absolutely positioned) + .eqc-carousel-viewport > .eqc-carousel-track
+	 * (the sliding flex row) + .eqc-slider-dots (built here, since the
+	 * number of "pages" depends on how many cards are visible at once,
+	 * which changes per breakpoint).
+	 *
+	 * Auto-advances every 6s, pauses while the pointer or focus is inside
+	 * the carousel, and never starts under prefers-reduced-motion.
 	 */
-	function initTestimonialSlider() {
-		document.querySelectorAll( '.eqc-testimonial-slider' ).forEach( function ( slider ) {
-			var track = slider.querySelector( '.eqc-testimonial-track' );
-			var dots = slider.querySelectorAll( '.eqc-slider-dot' );
-			if ( ! track || ! dots.length ) {
+	function initCarousel() {
+		document.querySelectorAll( '.eqc-carousel' ).forEach( function ( carousel ) {
+			var track = carousel.querySelector( '.eqc-carousel-track' );
+			var dotsWrap = carousel.querySelector( '.eqc-slider-dots' );
+			var prevBtn = carousel.querySelector( '.eqc-carousel-arrow--prev' );
+			var nextBtn = carousel.querySelector( '.eqc-carousel-arrow--next' );
+			var cardCount = track ? track.children.length : 0;
+			if ( ! track || ! cardCount ) {
 				return;
 			}
 
-			function goTo( index ) {
-				track.style.transform = 'translateX(-' + ( index * 100 ) + '%)';
-				dots.forEach( function ( dot, i ) {
-					var isActive = i === index;
-					dot.classList.toggle( 'is-active', isActive );
-					dot.setAttribute( 'aria-selected', isActive ? 'true' : 'false' );
+			var index = 0;
+			var pageCount = 1;
+			var autoplayId = null;
+
+			function visibleCount() {
+				var v = parseInt( window.getComputedStyle( track ).getPropertyValue( '--_visible' ), 10 );
+				return v || 1;
+			}
+
+			function buildDots() {
+				pageCount = Math.max( 1, cardCount - visibleCount() + 1 );
+				if ( ! dotsWrap ) {
+					return;
+				}
+				dotsWrap.innerHTML = '';
+				for ( var i = 0; i < pageCount; i++ ) {
+					var dot = document.createElement( 'button' );
+					dot.type = 'button';
+					dot.className = 'eqc-slider-dot';
+					dot.setAttribute( 'role', 'tab' );
+					dot.setAttribute( 'aria-label', 'Show slide ' + ( i + 1 ) + ' of ' + pageCount );
+					( function ( slideIndex ) {
+						dot.addEventListener( 'click', function () {
+							goTo( slideIndex );
+						} );
+					} )( i );
+					dotsWrap.appendChild( dot );
+				}
+			}
+
+			function render() {
+				if ( index > pageCount - 1 ) {
+					index = pageCount - 1;
+				}
+				track.style.transform = 'translateX(-' + ( index * ( 100 / visibleCount() ) ) + '%)';
+				if ( dotsWrap ) {
+					Array.prototype.forEach.call( dotsWrap.children, function ( dot, i ) {
+						var isActive = i === index;
+						dot.classList.toggle( 'is-active', isActive );
+						dot.setAttribute( 'aria-selected', isActive ? 'true' : 'false' );
+					} );
+				}
+				if ( prevBtn ) {
+					prevBtn.disabled = index <= 0;
+				}
+				if ( nextBtn ) {
+					nextBtn.disabled = index >= pageCount - 1;
+				}
+			}
+
+			function goTo( i ) {
+				index = Math.max( 0, Math.min( i, pageCount - 1 ) );
+				render();
+			}
+
+			if ( prevBtn ) {
+				prevBtn.addEventListener( 'click', function () {
+					goTo( index - 1 );
+				} );
+			}
+			if ( nextBtn ) {
+				nextBtn.addEventListener( 'click', function () {
+					goTo( index + 1 );
 				} );
 			}
 
-			dots.forEach( function ( dot, i ) {
-				dot.addEventListener( 'click', function () {
-					goTo( i );
-				} );
+			function stopAutoplay() {
+				if ( autoplayId ) {
+					window.clearInterval( autoplayId );
+					autoplayId = null;
+				}
+			}
+			function startAutoplay() {
+				if ( reduceMotion || autoplayId || pageCount <= 1 ) {
+					return;
+				}
+				autoplayId = window.setInterval(
+					function () {
+						goTo( index >= pageCount - 1 ? 0 : index + 1 );
+					},
+					6000
+				);
+			}
+
+			carousel.addEventListener( 'mouseenter', stopAutoplay );
+			carousel.addEventListener( 'mouseleave', startAutoplay );
+			carousel.addEventListener( 'focusin', stopAutoplay );
+			carousel.addEventListener( 'focusout', function ( e ) {
+				if ( ! carousel.contains( e.relatedTarget ) ) {
+					startAutoplay();
+				}
 			} );
+
+			window.addEventListener( 'resize', function () {
+				buildDots();
+				render();
+			} );
+
+			buildDots();
+			render();
+			startAutoplay();
 		} );
 	}
 
@@ -250,7 +346,7 @@
 		initHeaderScrollState();
 		initScrollReveal();
 		initCountUp();
-		initTestimonialSlider();
+		initCarousel();
 		initFaqAccordion();
 	}
 

@@ -79,4 +79,4 @@ $form_section = eqc_section(
 	)
 );
 
-eqc_save_elementor_page( 32, array( $hero, $what_happens, $form_section ) );
+eqc_save_elementor_page( eqc_page_id( 'free-trial' ), array( $hero, $what_happens, $form_section ) );

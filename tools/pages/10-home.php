@@ -117,7 +117,7 @@ $about = eqc_section(
 									array(
 										'image'        => array( 'id' => $about_img, 'url' => wp_get_attachment_image_url( $about_img, 'large' ) ),
 										'image_size'   => 'large',
-										'_css_classes' => 'eqc-arch-media',
+										'_css_classes' => 'eqc-arch-media eqc-arch-media--masked',
 									)
 								),
 							)
@@ -234,7 +234,7 @@ $teachers = eqc_section(
 			'',
 			array_merge(
 				array( eqc_section_heading_el( 'Our Qualified Teachers', 'Learn from dedicated <span style="color:var(--eqc-bronze-700)">Quran teachers</span>' ) ),
-				array( eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--teachers', 'flex_direction' => 'row' ), $teacher_cards ) ),
+				array( eqc_carousel( $teacher_cards, __( 'Teacher slides', 'easy-quran-classes' ) ) ),
 				array(
 					eqc_container(
 						array( 'css_classes' => 'eqc-btn-group', 'flex_direction' => 'row', 'content_position' => 'center' ),
@@ -257,15 +257,21 @@ $pricing_cards = array();
 foreach ( $plans as $p ) {
 	$pricing_cards[] = eqc_pricing_card( $p[0], $p[1], 'month', $p[2], $trial_url, $p[3] );
 }
-$pricing = eqc_section(
-	'eqc-section eqc-section--cream eqc-section--textured eqc-section--ornamented',
+$pricing_panel = eqc_container(
+	array( 'css_classes' => 'eqc-pricing-panel', 'flex_direction' => 'column' ),
 	array(
-		eqc_section_ornaments(),
+		eqc_section_ornaments( 'eqc-corner-motif--sm' ),
+		eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--pricing', 'flex_direction' => 'row' ), $pricing_cards ),
+	)
+);
+$pricing = eqc_section(
+	'eqc-section eqc-section--cream',
+	array(
 		eqc_inner(
 			'',
-			array_merge(
-				array( eqc_section_heading_el( 'Pricing', 'Simple monthly pricing, <span style="color:var(--eqc-bronze-700)">no hidden fees</span>' ) ),
-				array( eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--pricing', 'flex_direction' => 'row' ), $pricing_cards ) )
+			array(
+				eqc_section_heading_el( 'Pricing', 'Simple monthly pricing, <span style="color:var(--eqc-bronze-700)">no hidden fees</span>' ),
+				$pricing_panel,
 			)
 		),
 	)
@@ -284,28 +290,22 @@ foreach ( $testi_data as $i => $t ) {
 	}
 	$testi_cards[] = eqc_testimonial_card( $testi_ids[ $i ], $t[0], $t[1], $t[2], array( 'certificate' => 'Expert Tutors', 'chart-up' => 'Progress Tracking' ) );
 }
-// 3x3 sliding carousel: slide 1 holds the 3 real, client-verified reviews;
-// slides 2-3 are clearly-marked placeholder stubs (never fabricated
-// quotes/names — see eqc_testimonial_card_stub()) so the carousel reads as
-// a real, filled-out feature rather than 6 invented reviews.
-$testi_slide_1 = eqc_container( array( 'css_classes' => 'eqc-testimonial-slide eqc-grid eqc-grid--testimonials', 'flex_direction' => 'row' ), $testi_cards );
-$testi_slide_2 = eqc_container(
-	array( 'css_classes' => 'eqc-testimonial-slide eqc-grid eqc-grid--testimonials', 'flex_direction' => 'row' ),
-	array( eqc_testimonial_card_stub(), eqc_testimonial_card_stub(), eqc_testimonial_card_stub() )
+// Cards advance one at a time, 3 visible on desktop (see eqc_carousel()):
+// the 3 real, client-verified reviews first, then clearly-marked
+// placeholder stubs (never fabricated quotes/names — see
+// eqc_testimonial_card_stub()) so the carousel reads as a real, filled-out
+// feature rather than a handful of invented reviews.
+$testi_all_cards = array_merge(
+	$testi_cards,
+	array(
+		eqc_testimonial_card_stub(),
+		eqc_testimonial_card_stub(),
+		eqc_testimonial_card_stub(),
+		eqc_testimonial_card_stub(),
+		eqc_testimonial_card_stub(),
+		eqc_testimonial_card_stub(),
+	)
 );
-$testi_slide_3 = eqc_container(
-	array( 'css_classes' => 'eqc-testimonial-slide eqc-grid eqc-grid--testimonials', 'flex_direction' => 'row' ),
-	array( eqc_testimonial_card_stub(), eqc_testimonial_card_stub(), eqc_testimonial_card_stub() )
-);
-$testi_track = eqc_container( array( 'css_classes' => 'eqc-testimonial-track', 'flex_direction' => 'row' ), array( $testi_slide_1, $testi_slide_2, $testi_slide_3 ) );
-$testi_dots  = eqc_html(
-	'<div class="eqc-slider-dots" role="tablist" aria-label="' . esc_attr__( 'Testimonial slides', 'easy-quran-classes' ) . '">'
-	. '<button type="button" class="eqc-slider-dot is-active" data-slide-index="0" role="tab" aria-selected="true" aria-label="' . esc_attr__( 'Show testimonials 1 to 3', 'easy-quran-classes' ) . '"></button>'
-	. '<button type="button" class="eqc-slider-dot" data-slide-index="1" role="tab" aria-selected="false" aria-label="' . esc_attr__( 'Show testimonials 4 to 6', 'easy-quran-classes' ) . '"></button>'
-	. '<button type="button" class="eqc-slider-dot" data-slide-index="2" role="tab" aria-selected="false" aria-label="' . esc_attr__( 'Show testimonials 7 to 9', 'easy-quran-classes' ) . '"></button>'
-	. '</div>'
-);
-$testi_slider = eqc_container( array( 'css_classes' => 'eqc-testimonial-slider', 'flex_direction' => 'column' ), array( $testi_track, $testi_dots ) );
 
 $testimonials = eqc_section(
 	'eqc-section eqc-section--surface eqc-section--ornamented',
@@ -315,7 +315,7 @@ $testimonials = eqc_section(
 			'',
 			array(
 				eqc_section_heading_el( 'What Our Families Say', 'Trusted by families, <span style="color:var(--eqc-gold-600)">loved by students</span>', true ),
-				$testi_slider,
+				eqc_carousel( $testi_all_cards, __( 'Testimonial slides', 'easy-quran-classes' ) ),
 			)
 		),
 	)
@@ -361,6 +361,6 @@ $blog_section = eqc_section(
 );
 
 eqc_save_elementor_page(
-	24,
+	eqc_page_id( 'home' ),
 	array( $hero, $trust, $about, $courses, $how_it_works, $teachers, $pricing, $testimonials, $faq, $blog_section )
 );

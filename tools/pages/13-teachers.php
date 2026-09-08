@@ -108,4 +108,4 @@ $expect = eqc_section(
 // message with nothing between them, reading as one duplicated block
 // rather than two intentional moments. See 11-about.php for the full note.
 
-eqc_save_elementor_page( 27, array( $hero, $grid, $matching, $expect ) );
+eqc_save_elementor_page( eqc_page_id( 'teachers' ), array( $hero, $grid, $matching, $expect ) );

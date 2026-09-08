@@ -27,7 +27,20 @@
 }
 
 .eqc-logo { display: flex; align-items: center; min-width: 0; }
-.eqc-logo img { max-height: clamp(36px, 3.4vw, 52px); width: auto; }
+/* Vector mark + live text, replacing the previous raster <img> (traced
+   from Assests/Logo/Logo2.jpeg — see tools/graphics/README.md): crisp at
+   any size, and inheriting `color` means one asset serves both the header
+   (dark green) and the dark footer CTA (gold) with no separate "mono"
+   file, unlike the old fixed-color PNG/WebP. */
+.eqc-logo-link {
+	display: flex;
+	align-items: center;
+	gap: 0.6em;
+	min-width: 0;
+	text-decoration: none;
+	color: var(--eqc-green-800);
+}
+.eqc-logo-mark { height: clamp(36px, 3.4vw, 52px); width: auto; flex: none; }
 .eqc-logo-text {
 	font-family: var(--eqc-font-display);
 	font-size: clamp(1.1rem, 1vw + 0.7rem, 1.4rem);
@@ -224,7 +237,12 @@
 	line-height: 1.25;
 }
 .eqc-footer-about p { color: var(--eqc-muted); max-width: 42ch; }
-.eqc-logo--footer img { max-height: 56px; margin-bottom: 1rem; }
+/* .eqc-footer-about sits on the light .eqc-footer background (cream), not
+   the dark .eqc-footer-cta panel above it — the logo here uses the same
+   dark-on-light treatment as the header, just larger; a gold/cream color
+   (right for the dark CTA panel) would be near-invisible here. */
+.eqc-logo--footer { margin-bottom: 1rem; }
+.eqc-logo--footer .eqc-logo-mark { height: 56px; }
 
 .eqc-footer-social { display: flex; gap: 0.6rem; margin-top: 1.1rem; }
 .eqc-social-icon {

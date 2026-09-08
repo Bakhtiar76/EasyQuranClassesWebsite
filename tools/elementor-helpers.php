@@ -174,12 +174,17 @@ function eqc_button( $text, $url, $classes = '' ) {
  * Matches on the attached file path (_wp_attached_file), not post_name —
  * `wp media import --title="..."` derives post_name from the given title,
  * not the source filename, so a post_name match would silently miss.
+ *
+ * Ordered by post_id DESC: if a fragment matches more than one attachment
+ * (e.g. a legacy 'foo.jpg' and its re-imported 'foo.webp' replacement both
+ * contain the fragment 'foo'), the most recently imported match wins
+ * instead of an undefined LIMIT-1-with-no-ORDER-BY pick.
  */
 function eqc_media_id( $slug_fragment ) {
 	global $wpdb;
 	$id = $wpdb->get_var(
 		$wpdb->prepare(
-			"SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value LIKE %s LIMIT 1",
+			"SELECT post_id FROM {$wpdb->postmeta} WHERE meta_key = '_wp_attached_file' AND meta_value LIKE %s ORDER BY post_id DESC LIMIT 1",
 			'%' . $wpdb->esc_like( $slug_fragment ) . '%'
 		)
 	);
@@ -187,6 +192,26 @@ function eqc_media_id( $slug_fragment ) {
 		WP_CLI::warning( "eqc_media_id(): no attachment found for '{$slug_fragment}'." );
 	}
 	return $id ? (int) $id : 0;
+}
+
+/**
+ * Look up a page's post ID by its slug, so `tools/pages/*.php` builders
+ * never hardcode a numeric post ID that only happens to be correct on the
+ * machine that first created the site. `00-site-setup.php` creates pages
+ * with `wp_insert_post()`, whose returned ID depends on install order/
+ * history — a literal ID baked into a builder script would resolve to a
+ * different (or no) page on a second machine.
+ *
+ * Errors out (rather than silently creating anything) when the page is
+ * missing, since page creation is `00-site-setup.php`'s job, not a page
+ * builder's.
+ */
+function eqc_page_id( $slug ) {
+	$page = get_page_by_path( $slug );
+	if ( ! $page ) {
+		WP_CLI::error( "eqc_page_id(): no page found for slug '{$slug}'. Run 'wp eval-file /tools/00-site-setup.php' first." );
+	}
+	return (int) $page->ID;
 }
 
 /**
@@ -209,26 +234,17 @@ function eqc_icon_str( $name, $class = '' ) {
  * .eqc-section--ornamented in components.css. Pass as the FIRST element in
  * an eqc_section()'s children array; the CSS handles layering so real
  * content always paints above it regardless of what that content is.
+ *
+ * @param string $modifier Optional extra class (e.g. 'eqc-corner-motif--sm'
+ *                          for the smaller pair used inside a nested panel
+ *                          like .eqc-pricing-panel).
  */
-function eqc_section_ornaments() {
+function eqc_section_ornaments( $modifier = '' ) {
+	$extra = $modifier ? ' ' . $modifier : '';
 	return eqc_html(
-		'<span class="eqc-corner-motif eqc-corner-motif--tr" aria-hidden="true"></span>'
-		. '<span class="eqc-corner-motif eqc-corner-motif--bl" aria-hidden="true"></span>'
+		'<span class="eqc-corner-motif eqc-corner-motif--tr' . esc_attr( $extra ) . '" aria-hidden="true"></span>'
+		. '<span class="eqc-corner-motif eqc-corner-motif--bl' . esc_attr( $extra ) . '" aria-hidden="true"></span>'
 	);
-}
-
-/**
- * Small inline divider-flower glyph (assets/svg/divider-flower.svg),
- * inlined directly rather than referenced as an <img>/mask so `currentColor`
- * follows the surrounding gold tone — the centerpiece of the ornate
- * section-heading rule (see eqc_section_heading_el()).
- */
-function eqc_divider_flower_svg() {
-	return '<svg class="eqc-divider-flower" viewBox="0 0 32 32" fill="none" aria-hidden="true" focusable="false"><path d="M16 4 L18 13 L27 11 L20 17 L27 21 L18 19 L16 28 L14 19 L5 21 L12 17 L5 11 L14 13 Z" stroke="currentColor" stroke-width="1.3"/></svg>';
-}
-
-function eqc_icon_link( $icon, $url, $label, $classes = 'eqc-arrow-btn' ) {
-	return eqc_html( sprintf( '<a class="%s" href="%s" aria-label="%s">%s</a>', esc_attr( $classes ), esc_url( $url ), esc_attr( $label ), eqc_icon_str( $icon ) ) );
 }
 
 /**
@@ -236,19 +252,32 @@ function eqc_icon_link( $icon, $url, $label, $classes = 'eqc-arrow-btn' ) {
  * with the numbered badge + arrow as decorative HTML, but title/level/
  * description as native Heading/Text-Editor widgets so an admin edits
  * them as plain text in Elementor — no code involved.
+ *
+ * The whole panel is the button (round-3 fix — round 2's full-width "Learn
+ * More" bar doubled the button chrome; see the .eqc-card-link comment in
+ * components.css): a stretched invisible anchor covers the entire card,
+ * and the circular arrow is a purely decorative, non-nested affordance
+ * matching the client reference.
  */
 function eqc_course_card( $number, $title, $level, $description, $link, $reveal_index = 0 ) {
+	$label = sprintf(
+		/* translators: %s: course title, read by screen readers only — the card has no other visible link text. */
+		__( 'Learn more about %s', 'easy-quran-classes' ),
+		wp_strip_all_tags( $title )
+	);
 	return eqc_container(
 		array(
 			'css_classes'    => 'eqc-card eqc-card--course',
 			'flex_direction' => 'column',
 		),
 		array(
+			eqc_html( '<a class="eqc-card-link" href="' . esc_url( $link ) . '" aria-label="' . esc_attr( $label ) . '"></a>' ),
 			eqc_html( '<span class="eqc-card-index"><span class="eqc-card-index-num">' . esc_html( $number ) . '</span></span>' ),
 			eqc_heading( $title, 'h3' ),
 			eqc_html( '<p class="eqc-card-level">' . esc_html( $level ) . '</p>' ),
+			eqc_html( '<div class="eqc-card-divider">' . eqc_divider_svg( 'card' ) . '</div>' ),
 			eqc_text( '<p>' . wp_kses_post( $description ) . '</p>' ),
-			eqc_button( __( 'Learn More', 'easy-quran-classes' ), $link, 'eqc-btn--secondary eqc-btn--block' ),
+			eqc_html( '<span class="eqc-arrow-btn" aria-hidden="true">' . eqc_icon_str( 'arrow-right' ) . '</span>', 'eqc-card__foot' ),
 		)
 	);
 }
@@ -284,8 +313,8 @@ function eqc_teacher_card( $attachment_id, $name, $role, $facts ) {
 			),
 			eqc_html( '<span class="eqc-teacher-seal" aria-hidden="true">' . eqc_icon_str( 'book-open' ) . '</span>' ),
 			eqc_heading( $name, 'h3' ),
-			eqc_html( '<p class="eqc-teacher-role">' . esc_html( $role ) . '</p>' ),
-			eqc_html( $facts_html ),
+			eqc_html( '<p class="eqc-teacher-role">' . esc_html( $role ) . '</p><div class="eqc-teacher-divider">' . eqc_divider_svg( 'dot' ) . '</div>' ),
+			eqc_html( $facts_html, 'eqc-card__foot' ),
 		)
 	);
 }
@@ -315,28 +344,44 @@ function eqc_teacher_card_stub( $slot_label = 'Teacher Name' ) {
 }
 
 /**
- * Pricing card (DESIGN.md §16 Pricing Card).
+ * Pricing card (DESIGN.md §16 Pricing Card). Whole panel is the CTA — same
+ * stretched-link pattern as eqc_course_card() — closing in a decorative
+ * circular arrow rather than a separate full "Choose Plan" pill, matching
+ * the reference (Assests/…4.23.20 PM.jpeg).
  *
  * @param array $features Plain-text feature list.
  */
 function eqc_pricing_card( $frequency, $price, $unit, $features, $link, $featured = false ) {
-	$features_html = '<ul class="eqc-pricing-list">';
+	$star           = eqc_get_svg_asset( 'star-8-filled', 'eqc-pricing-bullet' );
+	$features_html  = '<ul class="eqc-pricing-list">';
 	foreach ( $features as $feature ) {
-		$features_html .= '<li>' . eqc_icon_str( 'check' ) . '<span>' . esc_html( $feature ) . '</span></li>';
+		$features_html .= '<li>' . $star . '<span>' . esc_html( $feature ) . '</span></li>';
 	}
 	$features_html .= '</ul>';
 
 	$classes = 'eqc-card eqc-card--pricing' . ( $featured ? ' eqc-card--pricing--featured' : '' );
+	$label   = sprintf(
+		/* translators: %s: plan frequency, e.g. "3 Days/Week" — read by screen readers only. */
+		__( 'Choose the %s plan', 'easy-quran-classes' ),
+		wp_strip_all_tags( $frequency )
+	);
 
-	$children = array();
+	$children   = array();
+	$children[] = eqc_html( '<a class="eqc-card-link" href="' . esc_url( $link ) . '" aria-label="' . esc_attr( $label ) . '"></a>' );
 	if ( $featured ) {
 		$children[] = eqc_html( '<span class="eqc-pricing-badge">' . esc_html__( 'Recommended', 'easy-quran-classes' ) . '</span>' );
 	}
-	$children[] = eqc_html( '<span class="eqc-pricing-icon">' . eqc_icon_str( 'calendar' ) . '</span>' );
+	$children[] = eqc_html(
+		'<span class="eqc-pricing-icon"><span class="eqc-pricing-icon-ring" aria-hidden="true">' . eqc_get_svg_asset( 'rosette-12' ) . '</span>' . eqc_icon_str( 'calendar' ) . '</span>'
+	);
 	$children[] = eqc_html( '<span class="eqc-pricing-freq">' . esc_html( $frequency ) . '</span>' );
+	$children[] = eqc_html( '<div class="eqc-pricing-divider">' . eqc_divider_svg( 'accent' ) . '</div>' );
 	$children[] = eqc_html( $features_html );
-	$children[] = eqc_html( '<p class="eqc-pricing-price">$' . esc_html( $price ) . '<small>/ ' . esc_html( $unit ) . '</small></p>' );
-	$children[] = eqc_button( __( 'Choose Plan', 'easy-quran-classes' ), $link, $featured ? 'eqc-btn--bronze' : 'eqc-btn--primary' );
+	$children[] = eqc_html(
+		'<p class="eqc-pricing-price"><span class="eqc-pricing-price-figure">$' . esc_html( $price ) . '<small>/ ' . esc_html( $unit ) . '</small></span>'
+		. '<span class="eqc-arrow-btn" aria-hidden="true">' . eqc_icon_str( 'arrow-right' ) . '</span></p>',
+		'eqc-card__foot'
+	);
 
 	return eqc_container(
 		array(
@@ -369,14 +414,14 @@ function eqc_testimonial_card( $attachment_id, $name, $location, $quote, $tags =
 		),
 		array(
 			eqc_html(
-				'<div class="eqc-testimonial-photo">' . wp_get_attachment_image( $attachment_id, 'eqc-testimonial' ) . '</div>'
-				. '<div class="eqc-testimonial-quote-mark">' . eqc_icon_str( 'quote' ) . '</div>',
-				'eqc-static-wrap'
+				'<div class="eqc-testimonial-avatar-wrap"><div class="eqc-testimonial-photo">' . wp_get_attachment_image( $attachment_id, 'eqc-testimonial' ) . '</div>'
+				. '<div class="eqc-testimonial-quote-mark">' . eqc_icon_str( 'quote' ) . '</div></div>'
 			),
 			eqc_heading( $name, 'h3' ),
 			eqc_html( '<p class="eqc-testimonial-location">' . eqc_icon_str( 'map-pin' ) . ' ' . esc_html( $location ) . '</p>' ),
+			eqc_html( '<div class="eqc-testimonial-divider">' . eqc_divider_svg( 'dot' ) . '</div>' ),
 			eqc_text( '<p>' . esc_html( $quote ) . '</p>' ),
-			eqc_html( $tags_html ),
+			eqc_html( $tags_html, 'eqc-card__foot' ),
 		)
 	);
 }
@@ -399,6 +444,46 @@ function eqc_testimonial_card_stub() {
 			eqc_html( '<div class="eqc-testimonial-stub-avatar">' . eqc_icon_str( 'quote' ) . '</div>' ),
 			eqc_heading( __( 'Add a Testimonial', 'easy-quran-classes' ), 'h3' ),
 			eqc_html( '<p class="eqc-testimonial-stub-note">' . esc_html__( 'A real family review will go here once received.', 'easy-quran-classes' ) . '</p>' ),
+		)
+	);
+}
+
+/**
+ * A one-card-at-a-time auto-advancing carousel (arrows + dots) — shared by
+ * the homepage teacher row and the testimonials section rather than
+ * duplicating the wiring twice. See initCarousel() in eqc.js and
+ * .eqc-carousel* in components.css for the behavior/sizing this markup
+ * contract expects.
+ *
+ * @param array  $cards      Card elements; each becomes one track item.
+ * @param string $aria_label Accessible label for the dot tablist.
+ */
+function eqc_carousel( $cards, $aria_label ) {
+	$dots = '';
+	foreach ( $cards as $i => $card ) {
+		$dots .= sprintf(
+			'<button type="button" class="eqc-slider-dot%s" data-slide-index="%d" role="tab" aria-selected="%s" aria-label="%s"></button>',
+			0 === $i ? ' is-active' : '',
+			$i,
+			0 === $i ? 'true' : 'false',
+			/* translators: %d: slide number. */
+			esc_attr( sprintf( __( 'Show slide %d', 'easy-quran-classes' ), $i + 1 ) )
+		);
+	}
+
+	$track    = eqc_container( array( 'css_classes' => 'eqc-carousel-track', 'flex_direction' => 'row' ), $cards );
+	$viewport = eqc_container( array( 'css_classes' => 'eqc-carousel-viewport', 'flex_direction' => 'column' ), array( $track ) );
+
+	return eqc_container(
+		array(
+			'css_classes'    => 'eqc-carousel',
+			'flex_direction' => 'column',
+		),
+		array(
+			eqc_html( '<button type="button" class="eqc-carousel-arrow eqc-carousel-arrow--prev" aria-label="' . esc_attr__( 'Previous', 'easy-quran-classes' ) . '">' . eqc_icon_str( 'chevron-right' ) . '</button>' ),
+			$viewport,
+			eqc_html( '<button type="button" class="eqc-carousel-arrow eqc-carousel-arrow--next" aria-label="' . esc_attr__( 'Next', 'easy-quran-classes' ) . '">' . eqc_icon_str( 'chevron-right' ) . '</button>' ),
+			eqc_html( '<div class="eqc-slider-dots" role="tablist" aria-label="' . esc_attr( $aria_label ) . '">' . $dots . '</div>' ),
 		)
 	);
 }
@@ -431,6 +516,14 @@ function eqc_page_hero( $eyebrow, $title, $intro, $icon = 'book-open' ) {
  * — the page-building equivalent of the theme's eqc_section_heading()
  * template tag (which echoes PHP for header.php-style templates and can't
  * be used inside an elements array passed to Document::save()).
+ *
+ * The rule is the generated divider-section.svg (hairline + diamond
+ * terminals + rosette medallion, see tools/graphics/gen-ornaments.mjs) as
+ * one self-contained inline asset — fixes a real bug where this div
+ * previously carried BOTH `eqc-heading-rule` and `eqc-heading-rule--ornate`,
+ * so it inherited the plain rule's `height:1px; background:linear-gradient`
+ * as well as the ornate modifier, painting as a full-width flat gold bar
+ * with the old tiny flower glyph stranded near the left edge inside it.
  */
 function eqc_section_heading_el( $eyebrow, $heading, $centered = false ) {
 	$class = 'eqc-stack eqc-section-heading' . ( $centered ? ' eqc-section-heading--center' : '' );
@@ -439,7 +532,7 @@ function eqc_section_heading_el( $eyebrow, $heading, $centered = false ) {
 		$html .= '<span class="eqc-eyebrow">' . esc_html( $eyebrow ) . '</span>';
 	}
 	$html .= '<h2>' . wp_kses_post( $heading ) . '</h2>';
-	$html .= '<div class="eqc-heading-rule eqc-heading-rule--ornate">' . eqc_divider_flower_svg() . '</div>';
+	$html .= '<div class="eqc-heading-rule--ornate">' . eqc_divider_svg( 'section' ) . '</div>';
 	$html .= '</div>';
 	return eqc_html( $html );
 }

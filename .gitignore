@@ -65,3 +65,6 @@ tmp/
 Thumbs.db
 .vscode/
 .idea/
+
+# Playwright MCP session artifacts (screenshots/logs from ad-hoc QA)
+.playwright-mcp/

@@ -108,7 +108,7 @@ html.eqc-js .eqc-cta-ornament {
 	}
 	.eqc-cta-ornament,
 	.eqc-corner-motif { animation: none; }
-	.eqc-testimonial-track { transition: none; }
+	.eqc-carousel-track { transition: none; }
 	.eqc-btn:hover,
 	.eqc-card:hover,
 	.eqc-card:hover .eqc-card-index,

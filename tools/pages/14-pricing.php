@@ -38,17 +38,18 @@ foreach ( $inclusions as $inc ) {
 }
 $inclusion_html .= '</div>';
 
-$pricing_section = eqc_section(
-	'eqc-section eqc-section--surface eqc-section--ornamented',
+$pricing_panel = eqc_container(
+	array( 'css_classes' => 'eqc-pricing-panel', 'flex_direction' => 'column' ),
 	array(
-		eqc_section_ornaments(),
-		eqc_inner(
-			'',
-			array(
-				eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--pricing', 'flex_direction' => 'row' ), $pricing_cards ),
-				eqc_html( $inclusion_html ),
-			)
-		),
+		eqc_section_ornaments( 'eqc-corner-motif--sm' ),
+		eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--pricing', 'flex_direction' => 'row' ), $pricing_cards ),
+		eqc_html( $inclusion_html ),
+	)
+);
+$pricing_section = eqc_section(
+	'eqc-section eqc-section--surface',
+	array(
+		eqc_inner( '', array( $pricing_panel ) ),
 	)
 );
 
@@ -94,4 +95,4 @@ $faq = eqc_section(
 // message with nothing between them, reading as one duplicated block
 // rather than two intentional moments. See 11-about.php for the full note.
 
-eqc_save_elementor_page( 28, array( $hero, $pricing_section, $guidance, $faq ) );
+eqc_save_elementor_page( eqc_page_id( 'pricing' ), array( $hero, $pricing_section, $guidance, $faq ) );

@@ -4,6 +4,7 @@ How to get this repo from a fresh clone to a working local WordPress build envir
 with **both Claude Code and Codex** operational, on Windows.
 
 - Day-to-day rules live in **`CLAUDE.md`** (Claude Code) and **`AGENTS.md`** (Codex).
+- Day-to-day **git push / PR workflow** is **`CONTRIBUTING.md`** — read this before your first push.
 - Deep local-environment rationale is in **`CLAUDE.md` → "Local Environment"** and **`local/README.md`**.
 - Deployment is **`CPANEL-WORKFLOW.md`** (manual, no shell on the host).
 - What is installed and why: **`TOOL-INVENTORY.md`**.
@@ -63,8 +64,21 @@ cp .env.example .env
 ```
 
 Fill in `EQC_PROD_DOMAIN`, `EQC_STAGING_DOMAIN`, `EQC_CPANEL_URL`, `EQC_CPANEL_USER`,
-`EQC_WP_PATH`, `EQC_WP_ADMIN_URL` when you get to deployment. There is **no SSH** — any
-`EQC_SSH_*` keys are vestigial; leave them blank.
+`EQC_WP_PATH`, `EQC_WP_ADMIN_URL` when you get to deployment. This file is **read by nothing in
+the repo** — it exists purely as a human-readable reference for `CPANEL-WORKFLOW.md`. There is
+**no SSH**; do not add SSH/key variables here at all — see the boundary below.
+
+**What does NOT belong in this file:** cPanel/FTP passwords, private keys, `.pub` files, or any
+other real credential. `.env` is gitignored and blocked from Claude Code's Read/Bash tools
+(`.claude/settings.json`, `.claude/hooks/guard-bash.mjs`), but that only protects it from being
+read back out through this tool — it does nothing to protect it on disk, in an editor's recent-
+files list, in a screen share, or in whatever backs up this machine. The FTPS auto-deploy
+pipeline (`.github/workflows/deploy.yml`) already sources its credentials the correct way — from
+**GitHub Actions Secrets** (`FTP_SERVER`, `FTP_USERNAME`, `FTP_PASSWORD`), never from a file in
+the working tree. Follow the same pattern for anything else: real secrets go in a password
+manager or GitHub Secrets; this file stays reference metadata only. If you've put real
+credentials here, move them out, then diff `.env` against the annotated `.env.example` and
+delete anything the example doesn't call for.
 
 ### 2.3 Windows User environment variables
 
@@ -115,16 +129,135 @@ MSYS_NO_PATHCONV=1 docker compose -f local/docker-compose.yml --env-file local/.
   run --rm wpcli db export /backups/checkpoint.sql
 ```
 
-### First-run scaffolding (only on an empty site)
+### First-run bootstrap (only on an empty site)
 
-```bash
-.\local\wp.ps1 eval-file /tools/00-site-setup.php     # identity, 10-page sitemap, menus, logo
-.\local\wp.ps1 --user=1 eval-file /tools/01-elementor-kit.php   # Elementor global colors/fonts
-.\local\wp.ps1 eval-file /tools/02-demo-posts.php     # 3 marked demo blog posts
+WordPress core, plugins, the parent theme and media are **not** in Git — only the child theme,
+`tools/`, `local/media-staging/` and docs are (see "Working with a teammate" below for why).
+One script rebuilds all of it, in the right order, on any fresh clone:
+
+```powershell
+.\local\bootstrap.ps1
 ```
 
-All three are idempotent. Page builders live in `tools/pages/*.php` and go through
-Elementor's `Document::save()` (never a raw `_elementor_data` write).
+```bash
+./local/bootstrap.sh
+```
+
+This runs `wp core install` (using `WP_ADMIN_*` from `local/.env`), installs and activates
+Elementor / Fluent Forms / Rank Math SEO and the `hello-elementor` parent theme, imports every
+`.webp` in `local/media-staging/`, then runs — each as its own fresh WP-CLI process, in order —
+`tools/00-site-setup.php`, `01-elementor-kit.php`, `02-demo-posts.php`, `03-fluentforms.php`,
+`04-seo-meta.php`, and every `tools/pages/*.php` builder. Page builders go through Elementor's
+own `Document::save()` (never a raw `_elementor_data` write). Both scripts are **idempotent**
+— safe to re-run after `docker compose down -v`, or any time to pick up new pages/media.
+
+Verified end-to-end (2026-09-08) against a disposable, isolated Docker Compose project (its own
+`-p` name and volumes, a spare host port, torn down with `down -v` afterward — the real
+`local_eqc_wp` / `local_eqc_db` volumes were never touched): 15 media attachments imported, 10
+pages created and built, both plugins-with-forms present, all 7 `tests/visual/sweep.mjs`
+viewports passing, HTTP 200 on `/` and a built page.
+
+If you only need one piece by hand (e.g. re-running just the SEO meta after editing it), each
+script's own file header documents its exact standalone invocation — e.g.:
+
+```bash
+.\local\wp.ps1 --user=1 eval-file /tools/pages/14-pricing.php
+```
+
+`tools/05-bootstrap.php` is what `local/bootstrap.ps1`/`.sh` actually runs; read it before
+changing the install order.
+
+### Also needed for visual QA / asset tooling
+
+Two subfolders carry their own `package.json`; install once per machine:
+
+```bash
+cd tests/visual && npm install && cd ../..     # Playwright viewport sweep (project-local, not global)
+cd tools/graphics && npm install && cd ../..   # logo/icon/ornament SVG generation (local-only, not deployed)
+```
+
+---
+
+## 3A. Working with a teammate
+
+**Day-to-day git push / PR workflow is `CONTRIBUTING.md`** — short, dedicated, hand it to
+anyone joining before their first push. This section covers the one-time onboarding around it.
+
+**Do not hand off the repo as a ZIP.** It's already on GitHub, with full history and branches —
+a ZIP would throw both away and would risk bundling `.env`, `local/.env`, and anything under
+`local/backups/`, none of which belong outside this machine. Clone the repo instead:
+
+```bash
+git clone https://github.com/Bakhtiar76/EasyQuranClassesWebsite.git
+cd EasyQuranClassesWebsite
+git checkout feature/setup
+```
+
+**Why a plain clone looks "broken" at first:** the WordPress database and media library are
+deliberately **not** in Git (`CLAUDE.md` "Architecture" — "the full local WordPress site/
+database is not represented by Git alone"). Only the child theme, `tools/`, docs, `.claude/`
+config and `local/media-staging/` travel with the repo; everything else — pages, Elementor
+content, plugin settings, the media library — lives in Docker's `eqc_wp`/`eqc_db` volumes on
+whichever machine created them. A fresh clone is *supposed* to start with an empty WordPress.
+Run `.\local\bootstrap.ps1` / `./local/bootstrap.sh` (§3 above) to rebuild it from the repo —
+that is the fix, not anything wrong with the clone.
+
+**Branch discipline (already in `.claude/rules/git.md` — restated here because it matters more
+with two people in the repo):**
+
+- Both of you work on `feature/*` branches (currently `feature/setup`). That branch carries the
+  full dev tree: docs, `.claude/`, `local/`, `tools/`, `tests/`.
+- `main` holds **only** the production paths (the child theme, `.gitignore`, `.github/
+  workflows/`) — never merge a feature branch into it; that reintroduces every dev-only path
+  `main` was deliberately pruned of. Releases copy just the theme folder across — see
+  `.claude/rules/git.md` for the exact `git checkout feature/setup -- wp-content/themes/...`
+  flow.
+- If you're both in the **same working directory** (rare, but e.g. remote pairing on one
+  machine), never `git checkout main` there — it switches the branch out from under whoever
+  else has uncommitted `feature/setup` work. Use `git worktree add ../release main` instead.
+  On separate machines/clones this doesn't apply.
+
+**A push to `main` is a production deploy.** `.github/workflows/deploy.yml` FTPS-deploys the
+child theme to `easyquranclasses.com` on every push to `main`, using GitHub Actions Secrets.
+Adding a collaborator with push access means `main` is one `git push` away for them too, so
+before onboarding a teammate:
+
+1. On GitHub → **Settings → Collaborators**, add them (or use a fork + PR workflow if you'd
+   rather they never have direct push access to the repo at all — see the plan-restriction
+   note below, which may make this the only real option for now).
+2. ~~Settings → Branches → Add branch protection rule~~ — **GitHub will refuse this.** Branch
+   protection (classic rules and the newer Rulesets alike) requires GitHub Pro/Team/Enterprise
+   on a **private** repository; GitHub Free only allows it on public repos. Confirmed via the
+   API against this repo (2026-09-08) — see the "Boundaries" section (§9) at the end of this
+   file for the full finding and the three real options. Until one is chosen, protection is
+   discipline-only: don't skip step 3.
+3. Tell them plainly: *day-to-day work happens on `feature/setup`; `main` is release-only —
+   nobody pushes to it directly, even though GitHub isn't currently enforcing that for us.*
+
+This only restricts *merging*; it does not touch `.github/workflows/deploy.yml` itself (out of
+scope for this pass — the workflow still fires on any push that does land on `main`, PR or not).
+
+### Snapshot handoff (when you need to hand over your *exact* current state)
+
+The scripted bootstrap above gives a teammate an equivalent site, not a byte-for-byte copy — new
+demo posts get new IDs, timestamps differ, etc. If you specifically need them to reproduce a bug
+against your exact data, export a snapshot instead:
+
+```bash
+MSYS_NO_PATHCONV=1 docker compose -f local/docker-compose.yml --env-file local/.env \
+  run --rm wpcli db export /backups/handoff.sql
+```
+
+Then zip `wp-content/uploads/` from inside the `eqc_wp` volume (it's not bind-mounted, so copy
+it out via a throwaway container, e.g. `docker run --rm -v local_eqc_wp:/wp -v
+"${PWD}/local/backups:/out" alpine tar -C /wp -czf /out/uploads.tar.gz wp-content/uploads`).
+
+Send `local/backups/handoff.sql` and `uploads.tar.gz` to your teammate **out-of-band** (not
+through Git, not pasted into chat/an issue) — they import with `wp db import` and extract the
+archive into their own `eqc_wp` volume. Treat both files as sensitive the whole time: the SQL
+dump contains your local wp-admin password hash and any Application Passwords you've created.
+Delete them from `local/backups/` once the handoff is done — that folder is gitignored but not
+automatically cleaned up.
 
 ---
 
@@ -261,6 +394,7 @@ codex "run: docker compose -f local/docker-compose.yml ps"     # approve the esc
 | 6 | `pwsh tools/codex/setup-codex.ps1 -Verify` | `PARITY OK`, exit 0 |
 | 7 | `codex mcp list` (outside a sandbox) | `novamira-localhost`, `chrome-devtools`, `context7` all `enabled` |
 | 8 | Claude Code: Novamira ability discovery via `.mcp.json` | abilities list returns |
+| 9 | `.\local\bootstrap.ps1` / `./local/bootstrap.sh` on a fresh clone (empty `eqc_wp` volume) | exits 0; 10 pages + Privacy Policy, 15 attachments, both plugins/theme active, all `tests/visual/sweep.mjs` viewports pass |
 
 ---
 
@@ -276,6 +410,9 @@ Everything below was hit during setup. Symptom → cause → fix.
 | `wp-cli` can't write to uploads/plugins ("permission denied") | The CLI image (`wordpress:cli-php8.3`) is Alpine (`www-data`=82); the Apache image is Debian (`www-data`=33) and owns the `eqc_wp` volume. | The `wpcli` service pins `user: "33:33"` in the compose file. Don't remove it. |
 | Application Passwords / OAuth refused over `http://localhost` | WordPress core blocks them on plain HTTP unless the environment is declared local. | `WORDPRESS_CONFIG_EXTRA` in the compose file sets `WP_ENVIRONMENT_TYPE=local`. |
 | From Git Bash, a `/backups/x.sql` argument becomes `C:/Program Files/Git/backups/x.sql` | MSYS auto-rewrites `/`-leading args into Windows paths. | Prefix the command with `MSYS_NO_PATHCONV=1`. (PowerShell is unaffected.) |
+| A second machine's `tools/pages/*.php` builders errored with "No Elementor document for post #28", or silently overwrote the wrong page | Every builder used to call `eqc_save_elementor_page()` with a literal post ID (`24`–`33`). Those IDs are an artifact of *this* machine's insert order (`wp_insert_post()` in `00-site-setup.php`) — nothing guarantees a second install produces the same numbers. | Fixed 2026-09-08: builders now resolve the ID by slug via `eqc_page_id()` (`tools/elementor-helpers.php`, mirrors the existing `eqc_media_id()` pattern). Confirmed a no-op on this machine (all nine resolved to their old literal values) before landing. |
+| `01-elementor-kit.php` (or any script needing a plugin) fails with "Elementor is not loaded" when run right after activating the plugin | WordPress loads active plugins once, at the very start of a PHP process. Activating Elementor via `WP_CLI::runcommand()` happens in a spawned **subprocess** — it updates the `active_plugins` DB option, but never `include`s Elementor's code into the *parent* script's still-running process. A plain `require` of the next script inherits that same stale, plugin-not-loaded process. | `tools/05-bootstrap.php` runs every downstream `tools/*.php` script as its **own fresh subprocess** (`eqc_run_step()`), not a `require` — each one starts with an up-to-date `active_plugins` option. Found and fixed while verification-testing the bootstrap script; see its inline comment. |
+| Media import skipped `eqc-logo.webp`, only `eqc-logo-mark.webp` got imported | `eqc_media_id()` does a substring `LIKE` match; checking "already imported?" with the bare filename fragment `eqc-logo` also matches the *already-imported* `eqc-logo-mark.webp`, so the bootstrap script wrongly concluded `eqc-logo.webp` didn't need importing. `00-site-setup.php`'s own logo lookup already works around this by matching the *full filename with extension* — the bootstrap script's import-loop didn't, until fixed. | `tools/05-bootstrap.php` now checks `eqc_media_id( basename( $path ) )` (full filename incl. `.webp`), not the bare fragment. Found and fixed the same verification pass as above. |
 
 ### Novamira
 
@@ -313,6 +450,10 @@ Everything below was hit during setup. Symptom → cause → fix.
 
 ## 8. Manual steps that cannot be scripted
 
+Everything about first-run WordPress itself — core install, plugins, parent theme, media,
+pages — is now one command (§3 "First-run bootstrap"). What's left here genuinely has no
+non-interactive equivalent:
+
 - Install Docker Desktop + enable the WSL2 backend; start it before any site command.
 - `claude` login, and `codex login` (ChatGPT auth).
 - `/plugin marketplace add` + install the Claude Code plugins (§4.1).
@@ -333,3 +474,21 @@ Everything below was hit during setup. Symptom → cause → fix.
 - No generic cPanel / SSH / filesystem / database MCP servers (`.claude/rules/security.md`).
 - Git: short natural one-line commit messages, no AI-attribution trailers, no push without
   authorization (`.claude/rules/git.md`).
+- `main` auto-deploys to production on every push (`.github/workflows/deploy.yml`, FTPS). With
+  more than one person able to push, put a branch-protection rule on `main` requiring a PR
+  (§3A) — don't rely on everyone remembering not to push there directly.
+  **Checked 2026-09-08: not currently possible on this repo.** Both the classic branch-protection
+  API and the newer Rulesets API return `403: "Upgrade to GitHub Pro or make this repository
+  public to enable this feature."` — GitHub Free only allows branch protection on *public*
+  repos; this repo is private. Confirmed via `gh api` with an authenticated, repo-**Admin**
+  account (`Bakhtiar76`) — not a permissions problem, a plan restriction. Real options, decision
+  deliberately left to the user (asked 2026-09-08, held off for now):
+  1. **GitHub Pro** (~$4/mo) — unlocks real protection on the private repo immediately.
+  2. **Make the repo public** — free, but every doc in it (including `CPANEL-WORKFLOW.md`,
+     `TASK-DEPLOY.md`) becomes world-readable.
+  3. **Fork + PR model, no paid plan** — give the collaborator **Read/Triage** only (no push
+     rights on this repo at all, to any branch); they work from a personal fork and open PRs
+     in; only an Admin can merge. Achieves "no direct push/merge" without needing GitHub's
+     protection feature.
+  Until one of these is chosen, `main` is protected by discipline only: both people work on
+  `feature/*`, nobody pushes to `main` directly, releases go out as described in §3A.
