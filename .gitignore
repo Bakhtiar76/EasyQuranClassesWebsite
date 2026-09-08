@@ -1,6 +1,8 @@
 # main = production-ready code only (wp-content/themes/easy-quran-classes-child/
-# and, if ever added, wp-content/plugins/easy-quran-classes-core/). Local
-# tooling, Claude/AI configuration, project docs and reference assets live
+# and, if ever added, wp-content/plugins/easy-quran-classes-core/), plus
+# .github/workflows/ (the auto-deploy pipeline itself, which must live on
+# main for GitHub Actions to trigger on push to main). Local tooling,
+# Claude/AI configuration, project docs and reference assets live
 # on the development branch, never here.
 .claude/
 local/
