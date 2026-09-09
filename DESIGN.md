@@ -167,7 +167,7 @@ Recommended weights:
 | Token | Size | Weight | Line Height | Usage |
 |---|---:|---:|---:|---|
 | Display XL | clamp(52px, 5vw, 76px) | 400 | 1.02 | rare hero/display use |
-| H1 | clamp(38px, 3.55vw, 79px) | 400 | 1.08 | page hero |
+| H1 | 53.7u (79px @1920) | 400 | 1.08 | page hero |
 | H2 | clamp(38px, 3.4vw, 54px) | 400 | 1.10 | major section title |
 | H3 | 28–34px | 400/600 | 1.18 | cards/subsections |
 | H4 | 21–24px | 600 | 1.25 | card headings |
@@ -192,9 +192,11 @@ Do not reduce body copy below 16px on mobile.
 ### Global Widths
 
 ```css
---eqc-content-max: 1708px;
---eqc-content-narrow: 820px;
---eqc-text-max: 680px;
+--eqc-u: clamp(0.72px, 0.0765vw, 1.607px);   /* 1 unit = 1px on the reference canvas */
+--eqc-content-w: 85.6%;
+--eqc-content-max: calc(1119 * var(--eqc-u));   /* 1644px @1920 */
+--eqc-content-narrow: calc(558 * var(--eqc-u));
+--eqc-text-max: calc(463 * var(--eqc-u));
 ```
 
 > **Updated from the client reference, 2026-09-09** (`claude-opus-5`, design
@@ -217,6 +219,28 @@ Do not reduce body copy below 16px on mobile.
 >
 > Only ratios measured *within a single* reference file are meaningful: the
 > section JPEGs are crops at different zoom levels (`QA/LESSONS.md` #11).
+
+> **Superseded by the proportional scale system, 2026-09-09** (`claude-opus-5`
+> — `QA/design-review/home.md` "Proportional scale system").
+>
+> The px values in the tables above are no longer the source of truth. The
+> client's design is **proportional**: every dimension in `Assests/*.jpeg` is a
+> fixed fraction of the viewport, measured on a 1307px canvas. `tokens.css`
+> defines `--eqc-u` as one pixel on that canvas, and every size token is
+> `calc(<measured native px> * var(--eqc-u))`. The px figures shown here are
+> what those resolve to at 1920.
+>
+> Measured type, in native units: H1 53.7, body-l 16.6, body 13.6, small 11.6,
+> xsmall 10.3, button 11.2, eyebrow 8.85 — all derived by **glyph width**
+> against the reference's own line widths, never from assumed font metrics.
+>
+> Two deliberate departures from pure proportion, both under
+> TASK-DESIGN-PARITY.md §2A: the unit is capped at 1.607 (~2100px) so a 2560px
+> display does not get 32px body copy, and below 1100px the type floors out at
+> readable minimums (§6's 16px body rule) while layout keeps scaling. The
+> floors are applied in a media query, not as `max()` on the token, because
+> they sit above the reference's own small-role sizes and would otherwise
+> change the rendering at the reference width itself.
 
 ### Section Spacing
 

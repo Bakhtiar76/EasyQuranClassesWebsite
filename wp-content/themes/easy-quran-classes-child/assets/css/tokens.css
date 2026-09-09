@@ -46,25 +46,42 @@
 	--eqc-font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 	--eqc-font-arabic: 'Noto Naskh Arabic', 'Traditional Arabic', serif;
 
-	/* Fluid type scale */
-	--eqc-fs-display-xl: clamp(2.6rem, 1.4rem + 4.4vw, 4.75rem);
-	/* H1 size measured off Home.jpeg by LINE WIDTH, not by assumed font
-	   metrics: the hero's second line "with Personal Guidance" spans 560px on
-	   the 1307px canvas = 823px at 1920, and that same string in DM Serif
-	   Display needs 897px at 86px, so the reference size is 86 x 823/897 =
-	   ~79px. An earlier estimate from ascender height gave 86px and was wrong
-	   - glyph-width measurement uses the real font metrics, an assumed
-	   ascender ratio does not. The build's old 66px is what forced the hero
-	   H1 onto a third line. See home.md finding 4. */
-	--eqc-fs-h1: clamp(2.375rem, 1.3rem + 3.55vw, 4.9375rem);
-	--eqc-fs-h2: clamp(2rem, 1.35rem + 2.4vw, 3.375rem);
-	--eqc-fs-h3: clamp(1.75rem, 1.5rem + 1vw, 2.125rem);
-	--eqc-fs-h4: clamp(1.3125rem, 1.2rem + 0.4vw, 1.5rem);
-	--eqc-fs-body-l: 1.125rem;
-	--eqc-fs-body: 1rem;
-	--eqc-fs-small: 0.875rem;
-	--eqc-fs-eyebrow: 0.8125rem;
-	--eqc-fs-button: 0.9375rem;
+	/* ------------------------------------------------------------------
+	 * THE REFERENCE UNIT
+	 *
+	 * The client's design is proportional: every dimension in Assests/*.jpeg
+	 * is a fixed fraction of the viewport, not a fixed pixel size. So one
+	 * unit here == one pixel on the 1307px-wide Home.jpeg canvas, and any
+	 * measurement taken off a reference image is transcribed directly as
+	 * `calc(<measured px> * var(--eqc-u))`.
+	 *
+	 * 0.0765vw is 100/1307. At 1307px wide -> 1.0; at 1920 -> 1.469; at 2100
+	 * -> 1.607 and held; at 390 -> the 0.72 floor.
+	 *
+	 * The floor and ceiling are the two places this design is NOT the
+	 * reference, and both are deliberate (TASK-DESIGN-PARITY.md 2A): without
+	 * a floor the type would fall to ~12px on a phone, and without a ceiling
+	 * a 2560px display would get 32px body copy and read as zoomed in.
+	 *
+	 * Mixing units is what broke the previous pass: the tokens that were
+	 * fluid scaled correctly while the fixed-px ones did not, so a correct
+	 * 79px H1 sat above 18px body text. Keep every size token on this unit.
+	 * ------------------------------------------------------------------ */
+	--eqc-u: clamp(0.72px, 0.0765vw, 1.607px);
+
+	/* Fluid type scale — native px on the reference canvas, measured by
+	   glyph width (LESSONS #12), not by assumed font metrics. */
+	--eqc-fs-display-xl: calc(51.7 * var(--eqc-u));
+	--eqc-fs-h1: calc(53.7 * var(--eqc-u));      /* hero H1 */
+	--eqc-fs-h2: calc(36.8 * var(--eqc-u));      /* refined per section */
+	--eqc-fs-h3: calc(23.1 * var(--eqc-u));
+	--eqc-fs-h4: calc(16.3 * var(--eqc-u));
+	--eqc-fs-body-l: calc(16.6 * var(--eqc-u));  /* hero body */
+	--eqc-fs-body: calc(13.6 * var(--eqc-u));    /* trust tile title, hero eyebrow */
+	--eqc-fs-small: calc(11.6 * var(--eqc-u));   /* trust tile caption */
+	--eqc-fs-xsmall: calc(10.3 * var(--eqc-u));  /* feature card labels */
+	--eqc-fs-eyebrow: calc(8.85 * var(--eqc-u)); /* uppercase section label */
+	--eqc-fs-button: calc(11.2 * var(--eqc-u));
 
 	/* Layout — DESIGN.md §7
 	 * --eqc-content-max is measured, not chosen. In Home.jpeg (1307px canvas)
@@ -79,9 +96,14 @@
 	 * 1708px; the 24px against the trust panel's 1620 is the panel's own inset. See QA/design-review/home.md finding 1.
 	 * Only ratios measured WITHIN one reference file are meaningful — the
 	 * section JPEGs are crops at different zoom levels (LESSONS #11). */
-	--eqc-content-max: 1708px;
-	--eqc-content-narrow: 820px;
-	--eqc-text-max: 680px;
+	/* The content column is a PROPORTION, not a px cap. Measured on
+	   Home.jpeg: the hero runs from the H1's left edge x105 to the arch's
+	   outer right edge x1224 = 1119 of 1307 = 85.6%. As a px cap it was
+	   correct only at 1920 and ran near full-bleed at 1307/1440. */
+	--eqc-content-w: 85.6%;
+	--eqc-content-max: calc(1119 * var(--eqc-u));
+	--eqc-content-narrow: calc(558 * var(--eqc-u));
+	--eqc-text-max: calc(463 * var(--eqc-u));
 
 	/* Site chrome — header bar and footer panels.
 	 * These deliberately do NOT use --eqc-content-max. In the client
@@ -99,16 +121,29 @@
 	--eqc-logo-mark-size: clamp(44px, 22px + 4.4vw, 106px);
 	--eqc-radius-chrome: clamp(22px, 1rem + 1.4vw, 44px);
 
-	--eqc-section-space: clamp(2.75rem, 2rem + 3vw, 6.5rem);
-	--eqc-gutter: clamp(1rem, 0.6rem + 1.6vw, 2rem);
-	--eqc-grid-gap: clamp(1rem, 0.75rem + 1vw, 1.875rem);
-	--eqc-stack-gap: clamp(0.75rem, 0.6rem + 0.6vw, 1.25rem);
+	--eqc-section-space: calc(70 * var(--eqc-u));
+	--eqc-gutter: calc(22 * var(--eqc-u));
+	--eqc-grid-gap: calc(22 * var(--eqc-u));   /* feature-card gap, measured */
+	--eqc-stack-gap: calc(14 * var(--eqc-u));
+
+	/* Hero component boxes, measured on Home.jpeg (native px):
+	   eyebrow pill 251x44, feature card 126x58 gap 22, buttons 218x58 and
+	   235x56 gap 13, avatars 40 diameter on a 36.75 pitch (8% overlap),
+	   trust panel 1104x178 at x109. */
+	--eqc-control-h: calc(58 * var(--eqc-u));
+	--eqc-eyebrow-h: calc(44 * var(--eqc-u));
+	--eqc-card-h: calc(58 * var(--eqc-u));
+	--eqc-avatar: calc(40 * var(--eqc-u));
+	--eqc-avatar-overlap: calc(-3.25 * var(--eqc-u));
+	--eqc-icon-sm: calc(15 * var(--eqc-u));
+	--eqc-icon-md: calc(21 * var(--eqc-u));
+	--eqc-icon-lg: calc(30 * var(--eqc-u));
 
 	/* Radius — DESIGN.md §7 */
-	--eqc-radius-control: 11px;
-	--eqc-radius-card: 18px;
-	--eqc-radius-panel: 28px;
-	--eqc-radius-media: 32px;
+	--eqc-radius-control: calc(8 * var(--eqc-u));
+	--eqc-radius-card: calc(12 * var(--eqc-u));
+	--eqc-radius-panel: calc(19 * var(--eqc-u));
+	--eqc-radius-media: calc(22 * var(--eqc-u));
 	--eqc-radius-pill: 999px;
 
 	/* Elevation — DESIGN.md §8 */
@@ -123,4 +158,41 @@
 	--eqc-motion-stagger: 70ms;
 	--eqc-ease-standard: cubic-bezier(.22, 1, .36, 1);
 	--eqc-ease-soft: cubic-bezier(.16, 1, .3, 1);
+}
+
+/* ----------------------------------------------------------------------
+ * Below the reference canvas, stop scaling type down.
+ *
+ * The reference is a wide-canvas design and several of its roles are small
+ * even at full size (13.6px tile titles, 10.3px card labels on the 1307px
+ * canvas). Scaling those proportionally to a 390px phone gives 9.8px and
+ * 7.4px — unreadable, and below DESIGN.md §6's "never under 16px for body
+ * copy on mobile". The reference shows no mobile layout at all, so this is
+ * ours to design (TASK-DESIGN-PARITY.md §2A).
+ *
+ * Layout keeps scaling with --eqc-u; only the type floors out. The floors
+ * are deliberately ABOVE the reference's own small-role sizes, so they must
+ * not apply at or above the reference width — hence the media query rather
+ * than a max() on the token itself, which would change the 1307px rendering
+ * this whole pass exists to match.
+ * ---------------------------------------------------------------------- */
+@media (max-width: 1100px) {
+	:root {
+		--eqc-fs-h1: max(34px, calc(53.7 * var(--eqc-u)));
+		--eqc-fs-h2: max(28px, calc(36.8 * var(--eqc-u)));
+		--eqc-fs-h3: max(22px, calc(23.1 * var(--eqc-u)));
+		--eqc-fs-h4: max(18px, calc(16.3 * var(--eqc-u)));
+		--eqc-fs-body-l: max(17px, calc(16.6 * var(--eqc-u)));
+		--eqc-fs-body: max(16px, calc(13.6 * var(--eqc-u)));
+		--eqc-fs-small: max(14px, calc(11.6 * var(--eqc-u)));
+		--eqc-fs-xsmall: max(13px, calc(10.3 * var(--eqc-u)));
+		--eqc-fs-eyebrow: max(12px, calc(8.85 * var(--eqc-u)));
+		--eqc-fs-button: max(15px, calc(11.2 * var(--eqc-u)));
+	}
+	/* Controls and the avatar row need real minimums too: a 44px tap target
+	   is the floor, not a preference. */
+	.eqc-btn, a.eqc-btn, button.eqc-btn,
+	.elementor-widget-button.eqc-btn .elementor-button { --_h: max(48px, calc(58 * var(--eqc-u))); }
+	.eqc-hero-trust .eqc-avatar-stack img { --_avatar: max(38px, calc(40 * var(--eqc-u))); }
+	.eqc-chip--card { min-height: max(56px, calc(58 * var(--eqc-u))); }
 }

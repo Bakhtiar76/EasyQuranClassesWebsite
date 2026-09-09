@@ -106,11 +106,14 @@ button:focus,
 .eqc-section--dark h2,
 .eqc-section--dark h3 { color: var(--eqc-white) !important; }
 
+/* The content column is the reference's own 85.6% band, held once --eqc-u
+   reaches its ceiling so the design stops growing past ~2100px. No inline
+   padding: the 85.6% box IS the column the reference measures, so padding
+   here would inset the content a second time. */
 .eqc-container {
-	width: 100%;
-	max-width: var(--eqc-content-max);
+	width: min(calc(1119 * var(--eqc-u)), calc(100% - 2 * var(--eqc-gutter)));
 	margin-inline: auto;
-	padding-inline: var(--eqc-gutter);
+	padding: 0;
 	box-sizing: border-box;
 }
 
@@ -212,14 +215,14 @@ html:not(.eqc-js) .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
 
 a.eqc-btn, button.eqc-btn,
 .elementor-widget-button.eqc-btn .elementor-button {
-	--_h: clamp(48px, 4vw, 56px);
+	--_h: calc(58 * var(--eqc-u));
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	gap: 0.6em;
+	gap: calc(10 * var(--eqc-u));
 	height: var(--_h);
 	width: auto;
-	padding-inline: 1.5em;
+	padding-inline: calc(53 * var(--eqc-u));
 	border-radius: var(--eqc-radius-pill);
 	font-family: var(--eqc-font-body);
 	font-size: var(--eqc-fs-button);
@@ -307,7 +310,7 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 .eqc-btn-group {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.9rem;
+	gap: calc(13 * var(--eqc-u));
 	align-items: center;
 }
 
@@ -1092,8 +1095,32 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard);
 }
 .eqc-trust-tile:hover .eqc-icon { transform: scale(1.12) rotate(-6deg); }
-.eqc-trust-tile-title { margin: 0 0 0.15em; font-size: var(--eqc-fs-body); font-weight: 700; color: var(--eqc-heading); }
+.eqc-trust-tile-title { margin: 0 0 calc(3 * var(--eqc-u)); font-size: var(--eqc-fs-body); font-weight: 700; color: var(--eqc-heading); }
 .eqc-trust-tile p { margin: 0; font-size: var(--eqc-fs-small); color: var(--eqc-muted); }
+
+/* The reference's trust strip is a white rounded PANEL sitting on the hero's
+   cream ground (x109-1212, y750-927 native = 1104x178), not tiles rendered
+   straight onto a section background. Its own class so the about section's
+   stat row, which reuses .eqc-grid--trust, is not restyled with it. */
+.eqc-trust-panel {
+	background: var(--eqc-white);
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-panel);
+	box-shadow: var(--eqc-shadow-card);
+	min-height: calc(178 * var(--eqc-u));
+	width: calc(1104 * var(--eqc-u));
+	max-width: 100%;
+	margin-inline: auto;
+	padding: calc(26 * var(--eqc-u)) calc(30 * var(--eqc-u));
+	align-items: center;
+}
+.eqc-trust-panel .eqc-trust-tile { padding-inline: calc(14 * var(--eqc-u)); }
+.eqc-trust-panel .eqc-trust-tile .eqc-icon { width: var(--eqc-icon-lg); height: var(--eqc-icon-lg); }
+/* Sits directly under the hero on the same ground: 20 native px above the
+   panel, 3 below it. */
+.eqc-section--truststrip { padding-block: calc(2 * var(--eqc-u)) calc(3 * var(--eqc-u)); background: var(--eqc-cream-100); }
+.eqc-section--truststrip > .e-con,
+.eqc-section--truststrip .eqc-container { padding-block: 0; padding-inline: 0; }
 /* Full-height hairlines between the four columns, as the reference shows
    (finding 13). Applied to the tile rather than the grid so it survives the
    auto-fit reflow: the rule is suppressed on any tile that starts a row,
@@ -1136,7 +1163,7 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 .eqc-chip-row--cards {
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
-	gap: 0.75rem;
+	gap: var(--eqc-grid-gap);
 	align-items: stretch;
 	width: 100%;
 }
@@ -1146,21 +1173,24 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 @media (max-width: 400px) {
 	.eqc-chip-row--cards { grid-template-columns: 1fr; }
 }
+/* Card measured 126x58 native, four across on a 22 gap. */
 .eqc-chip--card {
 	background: var(--eqc-white);
 	border-color: transparent;
 	border-radius: var(--eqc-radius-card);
 	box-shadow: var(--eqc-shadow-card);
-	padding: 0.85em 1em;
-	gap: 0.7em;
+	min-height: var(--eqc-card-h);
+	padding: 0 calc(11 * var(--eqc-u));
+	gap: calc(9 * var(--eqc-u));
 	align-items: center;
+	font-size: var(--eqc-fs-xsmall);
 }
 /* Icons here read as dark, near-filled marks in the reference. Only the
    COLOUR is matched — DESIGN.md §11 forbids mixing icon families, so the
    shared Lucide outline sprite stays. */
 .eqc-chip--card .eqc-icon {
-	width: 1.7em;
-	height: 1.7em;
+	width: var(--eqc-icon-md);
+	height: var(--eqc-icon-md);
 	color: var(--eqc-heading);
 	flex: none;
 }
@@ -1172,56 +1202,60 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 /* The reference's hero eyebrow is sentence case in a white pill with the
    icon in its own circular cream chip — not the shared uppercase,
    letterspaced eyebrow used for section labels (finding 8). */
+/* Pill measured 251x44 native at x105 y195; the circular chip is 34 across. */
 .eqc-eyebrow--hero {
 	text-transform: none;
 	letter-spacing: 0;
 	font-size: var(--eqc-fs-body);
 	font-weight: 600;
 	background: var(--eqc-white);
-	gap: 0.7em;
-	padding: 0.4em 1.35em 0.4em 0.4em;
+	gap: calc(9 * var(--eqc-u));
+	height: var(--eqc-eyebrow-h);
+	padding: 0 calc(12 * var(--eqc-u)) 0 calc(5 * var(--eqc-u));
 }
 .eqc-eyebrow-chip {
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	width: 2.1em;
-	height: 2.1em;
+	width: calc(34 * var(--eqc-u));
+	height: calc(34 * var(--eqc-u));
 	border-radius: 50%;
 	background: var(--eqc-cream-100);
 	flex: none;
 }
-.eqc-eyebrow-chip .eqc-icon { width: 1.1em; height: 1.1em; color: var(--eqc-heading); }
+.eqc-eyebrow-chip .eqc-icon { width: var(--eqc-icon-sm); height: var(--eqc-icon-sm); color: var(--eqc-heading); }
 
 /* Gold rule with a diamond terminal at each end, under the H1. Width from
    the reference: 141px on a 1307px canvas -> 207px at 1920 (finding 5). */
 .eqc-hero-rule { color: var(--eqc-gold-500); line-height: 0; }
-.eqc-hero-rule .eqc-divider-svg { width: clamp(120px, 10.8vw, 207px); }
+.eqc-hero-rule .eqc-divider-svg { width: calc(141 * var(--eqc-u)); }
 
 /* Five overlapping avatars, then five gold stars above a single trust line. */
+/* Avatars measured 40 across on a 36.75 pitch - an 8% overlap, not the 28%
+   this previously used. Block runs x104-290, trust text starts x308. */
 .eqc-hero-trust {
 	display: flex;
 	align-items: center;
-	gap: 1rem;
+	gap: calc(18 * var(--eqc-u));
 	flex-wrap: wrap;
 }
 .eqc-hero-trust .eqc-avatar-stack img {
-	--_avatar: clamp(34px, 18px + 1.4vw, 46px);
-	border-width: 2px;
-	margin-inline-start: calc(var(--_avatar) * -0.28);
+	--_avatar: var(--eqc-avatar);
+	border-width: calc(2 * var(--eqc-u));
+	margin-inline-start: var(--eqc-avatar-overlap);
 }
-.eqc-hero-trust-text { display: flex; flex-direction: column; gap: 0.15em; }
+.eqc-hero-trust-text { display: flex; flex-direction: column; gap: calc(2 * var(--eqc-u)); }
 .eqc-hero-trust-text > span:last-child {
-	font-size: var(--eqc-fs-small);
+	font-size: calc(14.2 * var(--eqc-u));
 	font-weight: 600;
 	color: var(--eqc-text);
 }
-.eqc-star-row { display: inline-flex; gap: 0.12em; color: var(--eqc-gold-500); }
+.eqc-star-row { display: inline-flex; gap: calc(2 * var(--eqc-u)); color: var(--eqc-gold-500); }
 /* The sprite's star is an outline glyph whose own path carries fill="none";
    a presentation attribute on the inner path beats a fill inherited from the
    <svg>, so the fill has to be set on the path itself to get the reference's
    solid gold stars. Stroke is dropped so the filled shape keeps its weight. */
-.eqc-star-row .eqc-icon { width: 1.05em; height: 1.05em; }
+.eqc-star-row .eqc-icon { width: calc(15 * var(--eqc-u)); height: calc(15 * var(--eqc-u)); }
 .eqc-star-row .eqc-icon path,
 .eqc-star-row .eqc-icon polygon { fill: currentColor; stroke: none; }
 
@@ -1240,7 +1274,10 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 .eqc-hero-grid,
 .eqc-hero-grid > .eqc-hero-text,
 .eqc-hero-grid > .eqc-hero-media { padding-inline: 0; }
-.eqc-hero-grid { gap: clamp(1rem, 1.1vw, 21px); align-items: center; }
+/* Reference: arch y127-747, text ink y195-730. The text is not centred on
+   the arch - it sits 68 native px below the arch's tip. */
+.eqc-hero-grid { gap: calc(14 * var(--eqc-u)); align-items: flex-start; }
+.eqc-hero-grid > .eqc-hero-text { padding-block-start: calc(68 * var(--eqc-u)); }
 .eqc-hero-grid > .eqc-hero-text { flex: 1 1 50.5%; }
 .eqc-hero-grid > .eqc-hero-media { flex: 1 1 48.2%; }
 @media (max-width: 900px) {
@@ -1349,7 +1386,7 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	border-radius: 0;
 	border: none;
 	overflow: visible;
-	aspect-ratio: 559 / 629;
+	aspect-ratio: 537 / 620;
 }
 .eqc-arch-media--keel img {
 	-webkit-mask-image: url('../svg/keel-arch-mask.svg');
@@ -1504,8 +1541,11 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	opacity: 0.1;
 	-webkit-mask-image: url('../svg/hex-tessellation.svg');
 	mask-image: url('../svg/hex-tessellation.svg');
-	-webkit-mask-size: 52px 90px;
-	mask-size: 52px 90px;
+	/* Cell measured at 52x90 native; as fixed px it stayed the same size
+	   while everything around it scaled, so at 1920 the weave read ~31% too
+	   dense against the reference. */
+	-webkit-mask-size: calc(52 * var(--eqc-u)) calc(90 * var(--eqc-u));
+	mask-size: calc(52 * var(--eqc-u)) calc(90 * var(--eqc-u));
 	-webkit-mask-repeat: repeat;
 	mask-repeat: repeat;
 	pointer-events: none;
@@ -1645,3 +1685,57 @@ textarea:focus-visible,
 	outline: 3px solid var(--eqc-gold-500);
 	outline-offset: 2px;
 }
+
+/* Hero section: the reference opens the hero immediately under the header —
+   the arch's tip (y127 native) sits level with the header bar's lower edge,
+   so there is no top padding at all. The previous --tight padding pushed the
+   whole column 119px down at 1920. Bottom padding is 0 too: the trust panel
+   that follows carries its own 20-unit offset. */
+.eqc-section--hero {
+	padding-block: 0;
+	margin-block-start: calc(-27 * var(--eqc-u));
+}
+.eqc-section--hero > .e-con,
+.eqc-section--hero .eqc-container,
+.eqc-section--hero .eqc-hero-grid,
+.eqc-section--hero .eqc-hero-media { padding-block: 0; padding-inline: 0; }
+
+/* Hero column rhythm. Reference ink gaps down the column measure 33 / 26 / 27
+   / 30 / 24 / 32 native px; as flex box-gaps (leading already inside each
+   box) that lands at 22 units. */
+.eqc-hero-text { gap: calc(22 * var(--eqc-u)); }
+a.eqc-btn .eqc-icon, button.eqc-btn .eqc-icon,
+.elementor-widget-button.eqc-btn .elementor-button .eqc-icon {
+	width: var(--eqc-icon-md);
+	height: var(--eqc-icon-md);
+}
+
+/* Inside the reference's trust panel the four tiles are NOT cards: they are
+   plain columns separated by full-height hairlines. Measured on Home.jpeg —
+   icon 34 across at x155, text block x218-330 (112 wide), which is what wraps
+   both the title and the caption onto two lines. Constraining that text width
+   is what reproduces the reference's line breaks; without it the title fits on
+   one line and the tile reads completely differently. */
+.eqc-trust-panel .eqc-trust-tile {
+	background: none;
+	border: 0;
+	border-radius: 0;
+	padding: 0 calc(20 * var(--eqc-u));
+	gap: calc(14 * var(--eqc-u));
+	align-items: flex-start;
+}
+/* No max-width here. The reference's four tiles break at points no single
+   width can reproduce ("Your child's safety is | our top priority" wraps at
+   ~105 native while "Recognize your progress | with achievement" runs to
+   ~150), so the breaks are carried in the copy via eqc_trust_tile()'s "|"
+   separator - content, not styling, per TASK-DESIGN-PARITY.md 2. */
+.eqc-trust-panel .eqc-trust-tile .eqc-icon {
+	width: calc(34 * var(--eqc-u));
+	height: calc(34 * var(--eqc-u));
+}
+.eqc-trust-panel .eqc-trust-tile:hover { transform: none; box-shadow: none; }
+/* Hairlines run the full height of the panel's content box, as in the
+   reference; the shared .eqc-grid--trust rule only draws a plain edge. */
+.eqc-trust-panel > * + * { border-inline-start: 1px solid var(--eqc-border); }
+.eqc-trust-panel .eqc-trust-tile-title { line-height: 1.3; }
+.eqc-trust-panel .eqc-trust-tile p { line-height: 1.45; }

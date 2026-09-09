@@ -537,15 +537,28 @@ function eqc_section_heading_el( $eyebrow, $heading, $centered = false ) {
 	return eqc_html( $html );
 }
 
-/** Trust/benefit tile (small icon + heading + description). */
+/**
+ * Trust/benefit tile (small icon + heading + description).
+ *
+ * A "|" in either string is an explicit line break, transcribed from the
+ * reference. The four tiles in Home.jpeg's trust strip break at points no
+ * single max-width can reproduce - "Your child's safety is | our top
+ * priority" wraps at ~105 native px while "Recognize your progress | with
+ * achievement" runs to ~150 - so the break is content, not styling, exactly
+ * as TASK-DESIGN-PARITY.md 2 describes. Callers that pass no "|" are
+ * unaffected and wrap naturally.
+ */
 function eqc_trust_tile( $icon, $title, $description ) {
+	$lines = static function ( $text ) {
+		return implode( '<br>', array_map( 'esc_html', array_map( 'trim', explode( '|', $text ) ) ) );
+	};
 	// A styled paragraph, not a heading: these tiles are minor benefit
 	// labels, not real subsections, so making them headings would skip a
 	// level wherever they sit between an H1/H2 and the page's next real
 	// H2/H3 (DESIGN.md §22 wants no skipped heading levels).
 	return eqc_html(
 		'<div class="eqc-trust-tile">' . eqc_icon_str( $icon, 'eqc-icon' )
-		. '<div><p class="eqc-trust-tile-title">' . esc_html( $title ) . '</p><p>' . esc_html( $description ) . '</p></div></div>'
+		. '<div><p class="eqc-trust-tile-title">' . $lines( $title ) . '</p><p>' . $lines( $description ) . '</p></div></div>'
 	);
 }
 

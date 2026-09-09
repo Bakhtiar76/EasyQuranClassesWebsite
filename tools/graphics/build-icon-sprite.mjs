@@ -25,7 +25,7 @@ const LUCIDE_MAP = {
 	shield: 'ShieldCheck',
 	headset: 'Headset',
 	globe: 'Globe',
-	certificate: 'Award',
+	certificate: 'FileBadge2',
 	'book-open': 'BookOpen',
 	mail: 'Mail',
 	'map-pin': 'MapPin',
@@ -86,11 +86,15 @@ for (const [id, lucideName] of Object.entries(LUCIDE_MAP)) {
 	if (!src) throw new Error(`Lucide icon not found: ${lucideName} (for eqc-icon-${id})`);
 	const inner = extractInner(src);
 	const cleaned = optimizeFragment(inner, '0 0 24 24');
-	// Lucide ships 2px stroke on a 24x24 grid; DESIGN.md §11 specifies
-	// 1.75px for this project's icon family — override at the symbol
-	// level so every eqc-icon-* stays visually consistent regardless of
-	// source library, exactly as the hand-drawn sprite did.
-	symbols += `\t\t<symbol id="eqc-icon-${id}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round">${cleaned}</symbol>\n\n`;
+	// Lucide ships 2px stroke on a 24x24 grid. DESIGN.md §11 specified
+	// 1.75px, but the client reference draws its UI icons noticeably
+	// heavier — several are solid silhouettes (the hero feature cards'
+	// person and users marks) rather than outlines. Filling them would mean
+	// two icon styles on one row, which §11 forbids, so the family stays
+	// outline and matches the reference's WEIGHT instead at 2.1px. That is
+	// the closest single-family reading of the reference; see
+	// QA/design-review/home.md.
+	symbols += `\t\t<symbol id="eqc-icon-${id}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round">${cleaned}</symbol>\n\n`;
 }
 
 for (const [id, siName] of Object.entries(BRAND_MAP)) {

@@ -233,3 +233,125 @@ Known remaining deltas in the two sections that were done, all P2/P3:
 | 15 | Hero photo framing differs from the reference (different source image) | The photograph itself, not the mask — the silhouette matches. Logged in `QA/IMAGE-BRIEF.md` |
 | 16 | Arch foil depths are a measured fit, not an exact reconstruction | RMSE 4.19px stated above; closing the last hairline needs the full potrace-and-fit pipeline from §5.1 |
 | 17 | Trust-strip panel does not overlap the section boundary below | Reference shows a slight overlap; deferred with the section-rhythm pass that owns vertical spacing |
+
+---
+
+## Proportional scale system (`claude-opus-5`, 2026-09-09)
+
+The user reported the hero still deviated in "positioning, sizing, formatting,
+layout, icons, backgrounds, BG patterns". A matched-scale overlay
+(`tools/graphics/scratch/compare.mjs`, which scales the reference to the build's
+width and stacks the two) confirmed it and showed one root cause.
+
+**The reference is a proportional design captured at 1307px wide** — every
+dimension in it is a fixed fraction of the viewport. The build's tokens were a
+*mix*: the values the previous pass touched (H1, content column, arch, chrome)
+had been converted to correct proportional values; everything still on fixed px
+had not moved. That is worse than uniformly wrong — a correct 79px H1 above 18px
+body text reads as broken in a way neither value does alone.
+
+Measured at 1920 before this pass:
+
+| Element | Reference @1920 | Build | Delta |
+|---|---|---|---|
+| Body text ink width | 623px | 460px | −26% (font 24.4 vs 18) |
+| Header bottom → hero start | ~0 | 119px gap | +119 |
+| Eyebrow top | y279 | y454 | +175 |
+| Trust panel top | y1121 | y1338 | +217 |
+| Background pattern cell | 76×132 | 52×90 fixed | −31%, didn't scale |
+
+At 1307px the build was *worse* than at 1920 (H1 on three lines, content near
+full-bleed) because `--eqc-content-max` was a px cap rather than a proportion.
+
+### The unit
+
+```css
+--eqc-u: clamp(0.72px, 0.0765vw, 1.607px);   /* 100/1307 */
+```
+
+One unit is one pixel on the reference canvas. Any measurement taken off a
+reference image is transcribed directly as `calc(<measured px> * var(--eqc-u))`.
+At 1307 → 1.0; at 1920 → 1.469; held at 1.607 from ~2100 up; floored at 0.72.
+The floor and ceiling are the two places this is deliberately *not* the
+reference (§2A): unbounded scaling would give a 2560px display 32px body copy,
+and unbounded shrinking would give a phone 7px labels.
+
+Every size token now derives from it — type scale, section spacing, gutters,
+grid gaps, radii, control heights, icon sizes, avatar diameter, and the
+background pattern's cell. Measured type, in native units: H1 53.7, body-l 16.6,
+body 13.6, small 11.6, xsmall 10.3, button 11.2. All derived by **glyph width**
+against the reference's own line widths, not assumed font metrics (LESSONS #12).
+
+### Result — landmark deltas at 1920
+
+Expected = reference native × 1.469. Target ±8px.
+
+| Landmark | x | y | w | h |
+|---|---|---|---|---|
+| content column | +0 | — | +0 | — |
+| hero arch | −4 | +1 | +4 | +4 |
+| eyebrow pill | +0 | +3 | +7 | +0 |
+| gold rule | +0 | — | +0 | — |
+| feature card | −4 | −4 | −2 | +0 |
+| primary button | **+9** | −4 | −3 | +0 |
+| secondary button | +6 | −8 | +5 | +3 |
+| avatar | +2 | −8 | +0 | +0 |
+| trust panel | +6 | +5 | +0 | +0 |
+
+**Worst 9px, mean 2.9px, 31 of 32 checks inside ±8.** Before this pass the worst
+was 144px. `x` is compared against a *centred* column because the reference
+screenshot's own margins are asymmetric (105 left / 83 right) — it includes a
+scrollbar, so its raw x is an artefact rather than a design intent.
+
+### Other fixes in this pass
+
+- **Trust strip** is now the reference's white rounded panel (1104×178 native)
+  with hairline-separated columns, not four bordered cards on a section
+  background. Its own `.eqc-trust-panel` class so the about section's stat row,
+  which reuses `.eqc-grid--trust`, is untouched.
+- **Trust tile line breaks** are carried in the copy, not by a max-width.
+  No single width reproduces both "Your child's safety is | our top priority"
+  (~105 native) and "Recognize your progress | with achievement" (~150), so
+  `eqc_trust_tile()` now treats `|` as an explicit break — the break is content,
+  per §2. Backward compatible: callers without a `|` wrap naturally.
+- **Icons.** `certificate` was Lucide `Award` (a ribbon); the reference draws a
+  document with a seal, so it is now `FileBadge2`. Sprite stroke weight raised
+  1.75 → 2.1: the reference's UI icons are markedly heavier and several are
+  solid silhouettes, but filling them would put two icon styles on one row,
+  which `DESIGN.md` §11 forbids — matching the weight is the closest
+  single-family reading.
+- **Background pattern** now scales with the design instead of staying 52×90px.
+
+### Mobile — designed, not matched
+
+The reference shows no mobile layout, so this is ours (§2A). Scaling its type
+proportionally to 390px gives 9.8px body and 7.4px labels — unreadable, and
+below `DESIGN.md` §6's 16px floor. Below 1100px the type therefore stops
+scaling down and floors out, while layout keeps scaling. The floors sit *above*
+the reference's own small-role sizes, so they are applied in a media query
+rather than as `max()` on the token — a `max()` would have changed the 1307px
+rendering this pass exists to match.
+
+### Verification
+
+- Landmark table above; `worstDelta` 9, `meanAbsDelta` 2.9, 32 checks.
+- Matched-scale overlays at **1920 and 1307**. The 1307 case is the proof the
+  system works: before this pass the build was badly wrong there.
+- Sweep at 1920/1440/1024/768/390 plus the 380–1900 scan (39 widths): no
+  horizontal overflow, 0 console errors, 0 page errors, 0 asset errors, 0
+  images missing `alt`, `h1Count` 1.
+- **Chrome regression guard passed**: header bar measures 1791×149 at y40,
+  identical to Codex's fitted geometry, despite the whole token set being
+  re-expressed.
+- Contrast all AA, lowest 5.74:1 (tile title/caption on white).
+- Focus rings 2/2 on hero controls, no tap target under 44px, 0 decorative SVGs
+  exposed to the accessibility tree, H1 accessible name intact.
+- PHP lint clean on `10-home.php`, `elementor-helpers.php`, `functions.php`.
+
+### Still not done
+
+Home's remaining seven sections — about, courses, pricing, teachers,
+testimonials, blog, final CTA — are **not** reviewed. They inherit the new
+scale and have changed appearance; each needs its own measured pass against its
+own reference image. The other nine pages likewise shift with the token change
+and are not re-reviewed here.

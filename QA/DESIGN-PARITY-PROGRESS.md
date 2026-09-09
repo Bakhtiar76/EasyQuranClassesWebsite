@@ -10,7 +10,7 @@ Local target: `http://localhost`; branch: `feature/setup`. Supervisor: Codex; bo
 - [x] Extend existing screenshot harness; create one-command page rebuild/flush/sweep loop (PHP/JS syntax verified; first actual rebuild verification pending).
 - [x] Capture all routes at 1920/1440/1024/768/390 before presentation changes, including Lighthouse baseline.
 - [x] Global chrome: measured review, reuse plan, implementation, iterations, responsive/a11y/performance evidence (checkpoint being recorded).
-- [~] Home: hero + trust strip measured, implemented, iterated and verified (`claude-opus-5`). Sections 3-10 (about, courses, pricing, teachers, testimonials, blog, final CTA) still to review against their own reference images.
+- [~] Home: hero + trust strip matched to the reference within 9px worst / 2.9px mean across 32 landmark checks (`claude-opus-5`), on a new proportional scale system (`--eqc-u`, one unit = one px on the 1307px reference canvas). Sections 3-10 (about, courses, pricing, teachers, testimonials, blog, final CTA) still to review against their own reference images.
 - [ ] Courses: review/build/verify/commit.
 - [ ] Pricing: review/build/verify/commit.
 - [ ] Teachers: review/build/verify/commit.
@@ -71,3 +71,10 @@ worth a second opinion — all flagged `[claude-opus-5 — review]` in
    pricing pass finds the same symmetric form.
 
 **Resume point:** Home sections 3-10, then line 14 (Courses). `main` untouched.
+
+
+## Scale system note (2026-09-09, `claude-opus-5`)
+
+`--eqc-u` in `tokens.css` now drives every size token. A value measured off a reference image is written `calc(<native px> * var(--eqc-u))` and is correct at every width — which is what makes the remaining seven sections a transcription job rather than seven rounds of guess-and-check.
+
+**This touches every page, not just Home.** The other nine pages inherit the new scale, have changed appearance, and are NOT re-reviewed. Expect to re-check them after Home is finished.

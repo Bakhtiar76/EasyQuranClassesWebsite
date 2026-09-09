@@ -40,7 +40,7 @@ foreach ( $hero_avatar_ids as $avatar_id ) {
 // No --ornamented: the reference's hero ground is plain cream with the fine
 // allover texture only, no girih corner watermark (home.md finding 11).
 $hero = eqc_section(
-	'eqc-section eqc-section--tight eqc-section--cream eqc-section--textured',
+	'eqc-section eqc-section--hero eqc-section--cream eqc-section--textured',
 	array(
 		eqc_inner(
 			'',
@@ -110,19 +110,19 @@ $hero = eqc_section(
 
 // ------------------------------------------------------- 2. TRUST STRIP
 $trust = eqc_section(
-	'eqc-section eqc-section--tight eqc-section--surface',
+	'eqc-section eqc-section--truststrip',
 	array(
 		eqc_inner(
 			'',
 			array(
 				eqc_container(
-					array( 'css_classes' => 'eqc-grid eqc-grid--trust', 'flex_direction' => 'row' ),
+					array( 'css_classes' => 'eqc-grid eqc-grid--trust eqc-trust-panel', 'flex_direction' => 'row' ),
 					array(
-						eqc_trust_tile( 'shield', 'Safe & Secure Learning', "Your child's safety is our top priority" ),
-						eqc_trust_tile( 'headset', 'Support 7 Days A Week', "We're here to help anytime you need" ),
+						eqc_trust_tile( 'shield', 'Safe & Secure | Learning', "Your child's safety is | our top priority" ),
+						eqc_trust_tile( 'headset', 'Support 7 Days | A Week', "We're here to help | anytime you need" ),
 						// "20+ Countries" is an unverified client claim - register entry.
-						eqc_trust_tile( 'globe', 'Students from 20+ Countries', 'A global community of Quran learners' ),
-						eqc_trust_tile( 'certificate', 'Certificates Available', 'Recognize your progress with achievement' ),
+						eqc_trust_tile( 'globe', 'Students from | 20+ Countries', 'A global community | of Quran learners' ),
+						eqc_trust_tile( 'certificate', 'Certificates | Available', 'Recognize your progress | with achievement' ),
 					)
 				),
 			)
