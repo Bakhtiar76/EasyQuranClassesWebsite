@@ -109,16 +109,17 @@ Not a gap: `chevron-left` has no symbol of its own, but the design's previous
 buttons are `chevron-right` rotated 180°, which is exactly what
 `components.css` already does (`.eqc-nav-btn:first-child .eqc-icon`).
 
-Still outstanding: the **ornaments**. They ship as standalone SVGs from
-`gen-ornaments.mjs`, not as sprite symbols, and several do not match — the
-rosettes are geometric star-polygons where the design draws rounded floral
-lobes, `divider-diamond` is a hollow diamond where the design has a solid
-four-point sparkle, and `pricing-corner.svg`'s inner edge is a staircase where
-the design has a smooth scalloped curve. Those are not fixed here: divider and
-rosette SVGs are embedded as literal markup into `_elementor_data` at page
-build time, so changing them also requires re-running every
-`tools/pages/*.php` (see the "some assets need the Elementor pages re-baked
-too" note in `tools/graphics/README.md`).
+**Ornament gaps resolved 2026-09-09.** The generic geometric-star reuse and
+the AI reference's excessive flower variation were replaced by one coherent
+two-level family in `gen-ornaments.mjs`: `rosette-reviews.svg` is the layered
+signature motif and `rosette-simple.svg` is its reduced outline. Curved
+four-point sparkles replace the old
+hollow pricing diamond; the course number badge is an unfilled scalloped
+outline; pricing bullets/benefit frames are scalloped; and the pricing
+medallion's cream/gold outer shell is derived from the approved alphabet
+cartouche contour. All page builders were then re-run with `--user=1` and
+Elementor CSS was flushed. See `QA/GRAPHICS-PARITY.md` and
+`QA/icon-parity/collage-14.png` for the mapping and final comparison.
 
 ## Provenance
 

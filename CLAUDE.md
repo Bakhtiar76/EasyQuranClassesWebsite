@@ -260,6 +260,18 @@ Elementor content for post #N`, but the save silently doesn't take;
 confirmed once by re-querying `_elementor_data` and finding old content
 still there after an apparently-successful run without it.
 
+### Graphics parity memory
+
+Before changing an icon, divider, rosette, cartouche, corner texture or SVG
+mask, read `QA/GRAPHICS-PARITY.md`. The 98 reference crops are audited in
+`QA/icon-parity/`; the icon sprite has 57 verified symbols. The AI-generated
+references' incidental flower variations are normalized into one signature
+`rosette-reviews.svg` plus one reduced `rosette-simple.svg`. Do not add a new
+one-off rosette for each screenshot. The pricing medallion/eyebrow shells share
+the approved `cartouche-alphabet` contour. After changing embedded SVGs, run
+the documented all-page rebuild with `--user=1` and regenerate the parity
+evidence; blank raw element captures are invalid evidence.
+
 ## Deployment Model
 Default release process:
 1. complete local WordPress/Elementor build;

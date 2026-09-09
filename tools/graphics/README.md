@@ -14,6 +14,7 @@ node build-logo.mjs        # composes the 4 logo SVG variants from that trace
 node trace-rosette.mjs     # traces reference/rosette.png -> scratch/rosette-traced.json
 node gen-ornaments.mjs     # generates all ornament/arch/divider assets (reads rosette-traced.json)
 node build-icon-sprite.mjs # regenerates inc/icon-sprite.php from Lucide + Simple Icons
+node render-icon-parity.mjs # refreshes QA/icon-parity comparison images
 ```
 
 Re-run any script after editing it; each is idempotent (overwrites its
@@ -217,15 +218,17 @@ documented below. `arch-outline.svg` is stroked directly on
 it shares the identical coordinate frame as the mask and can't hit that
 same padding/inset mismatch.
 
-### The rosette medallion: also traced (`trace-rosette.mjs`)
+### Rosette and divider families
 
-`rosette.svg`, `divider-medallion.svg` and the centre medallion in
-`divider-section.svg`/`divider-card.svg` are the client's 8-fold girih
-star (`reference/rosette.png` — a small 8-point star void at the centre,
-surrounded by 8 interlacing lens/kite petals), replacing the previous
-plain `{8/3}` star (`starPolygonPath`). Same reasoning as the arch: this
-specific woven interlace is real geometry to reproduce exactly, not
-something to re-derive by eye.
+`rosette.svg` and `divider-medallion.svg` are the client's traced 8-fold
+girih star (`reference/rosette.png`) and remain generic library assets. The
+AI-generated page references vary their flowers excessively, so the live
+site deliberately normalizes them into one professional two-level family:
+`rosette-reviews.svg` is the layered twelve-fold signature motif selected
+from the strongest reference, while `rosette-simple.svg` keeps the same
+outer contour with a reduced centre ring for compact outline contexts.
+Section/closing ornaments use the signature; about/card/eyebrow ornaments use
+the simple form. Do not reintroduce one-off flower files for every crop.
 
 Unlike the arch, this trace does **not** run `fillFromBorder` — the
 centre star and the gaps between petals are meant to stay holes, and
@@ -253,15 +256,28 @@ right bar), the rosette trace is verified against that same-image
 1px-shift noise floor, not a flat number — and confirmed visually
 side-by-side against the reference (`scratch/gallery.html`).
 
-`rosette-12.svg` (a decorative ring at `.eqc-pricing-icon-ring`, no
-12-fold reference exists) and `star-8-filled.svg` (the pricing bullet,
-rendered too small — ~12px — for the rosette's interior weave to read)
-use `girihRosettePath` (`lib/geometry.mjs`) instead: a parametric
+`rosette-12.svg` and `star-8-filled.svg` remain general-purpose generated
+assets. The live pricing card instead uses `pricing-bullet.svg` and the
+three-piece `pricing-medallion-{shell-mask,mask,frame}.svg` family because
+the supplied pricing crop is explicit. General-purpose assets use
+`girihRosettePath` (`lib/geometry.mjs`): a parametric
 tip→shoulder→valley kite construction whose three radius/angle ratios
 were measured off the SAME averaged, symmetrized `reference/rosette.png`
 landmarks, generalized honestly to other fold counts (12) or filled as an
 outer silhouette only (8, for the tiny bullet) rather than guessed from
 scratch.
+
+The pricing medallion shell and pricing eyebrow frame are intentionally
+derived from `closedCartouche()`, the same cusped construction that generates
+`cartouche-alphabet-mask.svg`. This is the approved shared contour identified
+in the client reference, not a separate hand-drawn approximation. The dark
+inner badge stays a 12-lobed scallop and the calendar remains a sprite icon.
+
+Divider variants are also semantic: `section` (course flower + terminal
+diamonds), `about` (outlined curved sparkle), `card` (tiny scallop), `teacher`
+(filled gear + rule), `reviews` (pointed flower), `diamond` (filled pricing
+sparkle), `price` (price-row hairlines), `accent`, `dot`, `rule` and `eyebrow`.
+Do not collapse these back to one generic ornament.
 
 **CSS masking gotcha worth remembering:** `mask-image` on a parent clips
 its *entire* rendered subtree, including a differently-sized or
@@ -278,7 +294,7 @@ and `.eqc-card--teacher .eqc-teacher-photo-widget` in `components.css`.
 `mandorla-*`, `multifoil-*`, `quatrefoil-*`, `mihrab-finial-*`,
 `hex-tessellation` and `girih-lattice-*` are consumed via CSS `mask-image`
 (only their alpha coverage matters — recoloring means changing the
-consumer's `background-color`, not the SVG). The 5 `divider-*` assets are
+consumer's `background-color`, not the SVG). The `divider-*` assets are
 the exception: they're inlined directly as HTML so `currentColor` follows
 the surrounding text/gold color, since dividers sit inline in text flow
 rather than as a full-bleed background layer.

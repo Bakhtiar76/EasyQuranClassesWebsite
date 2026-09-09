@@ -98,6 +98,52 @@ function scallopedSealPath(cx, cy, r, folds = 12, depth = 3.2) {
 	}
 	return d + 'Z';
 }
+
+/** A soft four-point sparkle. The reference dividers use concave curves,
+ * not a rotated square, so the shoulders pull back toward the centre. */
+function curvedSparklePath(cx, cy, rx, ry = rx) {
+	const sx = rx * 0.24, sy = ry * 0.24;
+	return `M${fmt(cx)} ${fmt(cy - ry)}` +
+		`C${fmt(cx + sx)} ${fmt(cy - sy)} ${fmt(cx + sx)} ${fmt(cy - sy)} ${fmt(cx + rx)} ${fmt(cy)}` +
+		`C${fmt(cx + sx)} ${fmt(cy + sy)} ${fmt(cx + sx)} ${fmt(cy + sy)} ${fmt(cx)} ${fmt(cy + ry)}` +
+		`C${fmt(cx - sx)} ${fmt(cy + sy)} ${fmt(cx - sx)} ${fmt(cy + sy)} ${fmt(cx - rx)} ${fmt(cy)}` +
+		`C${fmt(cx - sx)} ${fmt(cy - sy)} ${fmt(cx - sx)} ${fmt(cy - sy)} ${fmt(cx)} ${fmt(cy - ry)}Z`;
+}
+
+/** One ring of almond petals, used to build the distinct small floral
+ * ornaments visible in the supplied section crops. */
+function petalRing(cx, cy, radius, petals = 8, spread = 0.34, angleOffset = -Math.PI / 2) {
+	let body = '';
+	for (let i = 0; i < petals; i++) {
+		const a = angleOffset + i * Math.PI * 2 / petals;
+		const tip = polar(cx, cy, radius, a);
+		const left = polar(cx, cy, radius * 0.48, a - spread);
+		const right = polar(cx, cy, radius * 0.48, a + spread);
+		body += `<path d="M${fmt(cx)} ${fmt(cy)}C${fmt(left[0])} ${fmt(left[1])} ${fmt(tip[0])} ${fmt(tip[1])} ${fmt(tip[0])} ${fmt(tip[1])}C${fmt(tip[0])} ${fmt(tip[1])} ${fmt(right[0])} ${fmt(right[1])} ${fmt(cx)} ${fmt(cy)}Z"/>`;
+	}
+	return body;
+}
+
+function floralRosette(cx, cy, outer, { petals = 8, inner = 0.58, centre = 0.12, angleOffset = -Math.PI / 2 } = {}) {
+	return `<g fill="none" stroke="currentColor" stroke-width="1.15" stroke-linejoin="round">` +
+		petalRing(cx, cy, outer, petals, 0.34, angleOffset) +
+		(inner > 0 ? petalRing(cx, cy, outer * inner, petals, 0.4, angleOffset + Math.PI / petals) : '') +
+		`<circle cx="${fmt(cx)}" cy="${fmt(cy)}" r="${fmt(outer * centre)}"/></g>`;
+}
+
+/** The site's signature rosette, selected from the testimonial reference.
+ * Major ornaments use the layered version; compact contexts use the same
+ * twelve-fold outer contour with only a centre ring. */
+function signatureRosette(cx, cy, outer, simple = false) {
+	const stroke = simple ? 1.2 : 1.05;
+	let body = `<path fill="none" stroke="currentColor" stroke-width="${stroke}" stroke-linejoin="round" d="${girihRosettePath(cx, cy, outer, 12)}"/>`;
+	if (simple) {
+		body += `<circle cx="${fmt(cx)}" cy="${fmt(cy)}" r="${fmt(outer * 0.2)}" fill="none" stroke="currentColor" stroke-width="${stroke}"/>`;
+	} else {
+		body += floralRosette(cx, cy, outer * 0.68, { petals: 12, inner: 0, centre: 0.12 });
+	}
+	return body;
+}
 {
 	const d = scallopedSealPath(32, 32, 28);
 	save('seal-filled.svg', svgWrap(64, 64, `<path fill="currentColor" d="${d}"/>`, 'aria-hidden="true" focusable="false"'));
@@ -128,6 +174,16 @@ function scallopedSealPath(cx, cy, r, folds = 12, depth = 3.2) {
 {
 	save('divider-medallion.svg', svgWrap(32, 32, tracedRosette(16, 16, 14), 'aria-hidden="true" focusable="false"'));
 }
+
+// One professional rosette family: the testimonial flower is the signature
+// version, and a reduced drawing of that SAME twelve-fold contour covers
+// compact/simple-outline contexts. Do not proliferate reference artefacts
+// into unrelated one-off flower styles.
+save('rosette-reviews.svg', svgWrap(48, 48, signatureRosette(24, 24, 20.5), 'aria-hidden="true" focusable="false"'));
+save('rosette-simple.svg', svgWrap(48, 48, signatureRosette(24, 24, 17.5, true), 'aria-hidden="true" focusable="false"'));
+save('pricing-bullet.svg', svgWrap(24, 24,
+	`<path fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" d="${scallopedSealPath(12, 12, 7.8, 8, 1.8)}"/>`,
+	'aria-hidden="true" focusable="false"'));
 
 // =====================================================================
 // 2. Girih lattice — true interlocking star-and-cross tessellation.
@@ -417,6 +473,29 @@ for (const [name, w, h, cap] of [['child', 246, 423, 123], ['alphabet', 276, 300
 	save(`cartouche-${name}-frame.svg`, svgWrap(w, h, closedCartouche(w, h, cap, 1.5, true) + closedCartouche(w, h, cap, 5.5, true), 'aria-hidden="true" focusable="false"'));
 }
 
+// pricing.jpeg repeats the alphabet cartouche's cusped outer contour around
+// a dark scalloped calendar medallion. Keep the contour mathematically tied
+// to that approved cartouche instead of approximating it with another seal.
+{
+	const w = 72, h = 76, cap = 38;
+	const inner = scallopedSealPath(w / 2, h / 2, 27, 12, 3.2);
+	save('pricing-medallion-shell-mask.svg', svgWrap(w, h, closedCartouche(w, h, cap, 1.5), 'aria-hidden="true" focusable="false"'));
+	save('pricing-medallion-mask.svg', svgWrap(w, h, `<path fill="#fff" d="${inner}"/>`, 'aria-hidden="true" focusable="false"'));
+	save('pricing-medallion-frame.svg', svgWrap(w, h,
+		closedCartouche(w, h, cap, 1.5, true) + closedCartouche(w, h, cap, 5, true) +
+		`<path fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round" d="${inner}"/>`,
+		'aria-hidden="true" focusable="false"'));
+}
+
+// The pricing eyebrow is the same closed cusped frame rotated horizontally.
+// A single reference family now controls both shapes, as the client artwork
+// does, while allowing each to keep its measured aspect ratio.
+{
+	const w = 260, h = 54;
+	const body = `<g transform="translate(${w} 0) rotate(90)">${closedCartouche(h, w, h / 2, 2, true)}</g>`;
+	save('pricing-eyebrow-frame.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
+}
+
 // Four-centred (Persian/Timurid) arch — course/pricing card media frames.
 // Its bbox comes out essentially exact (0..w, 0..baseH) at these
 // proportions, but it's still wrapped via wrapArch() rather than a fixed
@@ -556,11 +635,8 @@ function quatrefoilPath(size) {
 //    flow and pick up the surrounding gold/cream color.
 // =====================================================================
 
-// divider-section: the main fix. A centered hairline with diamond
-// terminals and a rosette medallion at the center — replaces the broken
-// eqc-heading-rule--ornate (see components.css). The medallion is the
-// same traced rosette as divider-medallion.svg/rosette.svg (see §1),
-// not the plain spikedRosettePath star this divider used before.
+// divider-section: the intricate floral centre from courses.jpeg, with
+// the tiny diamond terminal visible at each end of its two hairlines.
 {
 	const w = 240, h = 32, cy = 16;
 	const diamond = (cx) => regularPolygonPath(cx, cy, 3.2, 4, 0);
@@ -573,9 +649,16 @@ function quatrefoilPath(size) {
 		`<g fill="currentColor">` +
 		`<path d="${diamond(w / 2 - lineLen - 16)}"/>` +
 		`<path d="${diamond(w / 2 + lineLen + 16)}"/>` +
-		`</g>` +
-		tracedRosette(w / 2, cy, 11);
+		`</g>` + signatureRosette(w / 2, cy, 12);
 	save('divider-section.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
+}
+
+// Home2.jpeg uses a quieter eight-petal flower above the heading and a
+// curved four-point ornament between the lower rule segments.
+{
+	const w = 240, h = 24, cx = w / 2, cy = h / 2;
+	const body = `<g fill="none" stroke="currentColor" stroke-width="1"><path d="M0 ${cy}H${cx - 12}M${cx + 12} ${cy}H${w}"/><path d="${curvedSparklePath(cx, cy, 6, 8)}"/></g>`;
+	save('divider-about.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 
 // divider-eyebrow: short flanking rules around an eyebrow label (drawn as
@@ -588,15 +671,14 @@ function quatrefoilPath(size) {
 	save('divider-eyebrow.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 
-// divider-card: short in-card rule with a small central rosette (same
-// traced shape as divider-section.svg's medallion, smaller).
+// divider-card: the tiny scalloped flower used inside each course card.
 {
 	const w = 140, h = 20, cy = 10;
 	const lineLen = 46;
 	const body =
 		`<line x1="${fmt(w / 2 - lineLen - 10)}" y1="${cy}" x2="${fmt(w / 2 - 10)}" y2="${cy}" stroke="currentColor" stroke-width="1"/>` +
 		`<line x1="${fmt(w / 2 + 10)}" y1="${cy}" x2="${fmt(w / 2 + lineLen + 10)}" y2="${cy}" stroke="currentColor" stroke-width="1"/>` +
-		tracedRosette(w / 2, cy, 7);
+		signatureRosette(w / 2, cy, 6.4, true);
 	save('divider-card.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 
@@ -610,14 +692,38 @@ function quatrefoilPath(size) {
 	save('divider-dot.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 
-// divider-accent: left-aligned short rule with a single diamond.
+// divider-accent: left-aligned short rule with the soft four-point sparkle
+// used by the pricing cards.
 {
 	const w = 90, h = 8, cy = 4;
-	const diamond = regularPolygonPath(4, cy, 3.4, 4, 0);
 	const body =
-		`<path fill="currentColor" d="${diamond}"/>` +
+		`<path fill="currentColor" d="${curvedSparklePath(4, cy, 3.6, 3.8)}"/>` +
 		`<line x1="12" y1="${cy}" x2="${w}" y2="${cy}" stroke="currentColor" stroke-width="1"/>`;
 	save('divider-accent.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
+}
+
+// Teachers.jpeg starts its rule with a small filled floral gear.
+{
+	const w = 120, h = 14, cy = 7;
+	const body = `<path fill="currentColor" d="${scallopedSealPath(7, cy, 5.2, 10, 1.25)}"/><line x1="18" y1="${cy}" x2="${w}" y2="${cy}" stroke="currentColor" stroke-width="1"/>`;
+	save('divider-teacher.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
+}
+
+// Reviews.jpeg has its own pointed twelve-fold flower rather than the
+// courses ornament.
+{
+	const w = 240, h = 32, cx = w / 2, cy = h / 2;
+	const body = `<path d="M0 ${cy}H${cx - 17}M${cx + 17} ${cy}H${w}" fill="none" stroke="currentColor" stroke-width="1"/>` +
+		signatureRosette(cx, cy, 13.5);
+	save('divider-reviews.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
+}
+
+// Hairline above each pricing-card price, centred on the same curved
+// sparkle used by the reference.
+{
+	const w = 240, h = 14, cx = w / 2, cy = h / 2;
+	const body = `<path d="M0 ${cy}H${cx - 9}M${cx + 9} ${cy}H${w}" fill="none" stroke="currentColor" stroke-width="1"/><path fill="none" stroke="currentColor" stroke-width="1" d="${curvedSparklePath(cx, cy, 4.5, 4.5)}"/>`;
+	save('divider-price.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 
 // divider-rule: diamond - rule - diamond, the hero's gold rule under the H1.
@@ -637,10 +743,10 @@ function quatrefoilPath(size) {
 	save('divider-rule.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 
-// pricing.jpeg uses a single central diamond between two hairlines.
+// pricing.jpeg uses a solid curved sparkle between two hairlines.
 {
 	const w = 240, h = 16, cx = w / 2, cy = h / 2;
-	const body = `<g fill="none" stroke="currentColor" stroke-width="1"><path d="M0 ${cy}H${cx - 12}M${cx + 12} ${cy}H${w}"/><path d="${regularPolygonPath(cx, cy, 5, 4, 0)}"/></g>`;
+	const body = `<path d="M0 ${cy}H${cx - 12}M${cx + 12} ${cy}H${w}" fill="none" stroke="currentColor" stroke-width="1"/><path fill="currentColor" d="${curvedSparklePath(cx, cy, 5.5, 7)}"/>`;
 	save('divider-diamond.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 

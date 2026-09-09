@@ -405,15 +405,14 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 /* Faint rosette ring behind the number, echoing the scalloped badge shape
    in the client's reference course cards — see components.css note above
    .eqc-corner-motif for why this ships as a mask rather than an <img>. */
-.eqc-card--course .eqc-card-index { border: 0; }
+.eqc-card--course .eqc-card-index { border: 0; color: var(--eqc-gold-700); }
 .eqc-card--course .eqc-card-index::before {
 	content: '';
 	position: absolute;
 	inset: 0;
-	background-color: var(--eqc-bronze-600);
-	opacity: 0.12;
-	-webkit-mask-image: url('../svg/seal-filled.svg');
-	mask-image: url('../svg/seal-filled.svg');
+	background-color: var(--eqc-gold-500);
+	-webkit-mask-image: url('../svg/seal-outline.svg');
+	mask-image: url('../svg/seal-outline.svg');
 	-webkit-mask-size: 100% 100%;
 	mask-size: 100% 100%;
 	z-index: 0;
@@ -638,16 +637,8 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
    specificity above it would otherwise lose the cascade to the featured
    card's own later `> *` rule and stop covering the icon/badge areas). */
 .eqc-card--pricing .eqc-card-link { z-index: 2; }
-/* Dark medallion overlapping the card's top edge (replaces the earlier
-   small calendar glyph sitting inline above the ribbon). A plain solid
-   circle, not a masked rosette: rosette.svg/rosette-12.svg are stroke-only
-   outlines (fill:none) — used as a mask they only paint their thin 1.4px
-   stroke line, leaving everything else (including a white icon meant to
-   sit "inside" the medallion) invisible against the card's own light
-   surface. A solid disc plus a rosette-12 ring drawn ON TOP as a real
-   inline SVG (currentColor follows the gold ring color correctly, unlike
-   an externally-masked one) gives the genuinely solid, scalloped-edge
-   badge the reference shows. */
+/* Dark scalloped calendar medallion inside the cusped cream-and-gold shell
+   reused from the approved alphabet cartouche geometry. */
 .eqc-pricing-icon {
 	position: absolute;
 	top: -1.9rem;
@@ -667,20 +658,27 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 .eqc-pricing-icon::after {
 	content: '';
 	position: absolute;
-	mask: url('../svg/seal-filled.svg') center / 100% 100% no-repeat;
 	pointer-events: none;
 }
-.eqc-pricing-icon::before { inset: -3px; background: var(--eqc-surface); }
-.eqc-pricing-icon::after { inset: 0; background: var(--eqc-green-800); }
+.eqc-pricing-icon::before {
+	inset: -0.42em;
+	background: var(--eqc-surface);
+	mask: url('../svg/pricing-medallion-shell-mask.svg') center / 100% 100% no-repeat;
+}
+.eqc-pricing-icon::after {
+	inset: -0.42em;
+	background: var(--eqc-green-800);
+	mask: url('../svg/pricing-medallion-mask.svg') center / 100% 100% no-repeat;
+}
 .eqc-pricing-icon-ring {
 	position: absolute;
-	inset: -0.3em;
+	inset: -0.42em;
 	color: var(--eqc-gold-500);
 	pointer-events: none;
 	z-index: 1;
 }
 .eqc-pricing-icon-ring svg { width: 100%; height: 100%; }
-.eqc-pricing-icon .eqc-icon { position: relative; z-index: 1; width: 1.6em; height: 1.6em; color: var(--eqc-white); }
+.eqc-pricing-icon .eqc-icon { position: relative; z-index: 2; width: 1.6em; height: 1.6em; color: var(--eqc-white); }
 .eqc-card--pricing:hover .eqc-pricing-icon { transform: translateX(-50%) scale(1.08) rotate(6deg); }
 /* Corner "Recommended" ribbon tag — a diagonal flag near the top-right
    corner, matching the reference's ribbon tab instead of a centered pill
@@ -727,6 +725,8 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 }
 .eqc-pricing-list li { display: flex; gap: 0.6em; align-items: flex-start; font-size: var(--eqc-fs-small); }
 .eqc-pricing-bullet { flex: none; width: 0.75em; height: 0.75em; margin-top: 0.35em; color: var(--eqc-gold-500); }
+.eqc-pricing-price-divider { width: 100%; color: var(--eqc-gold-500); line-height: 0; margin-block-start: auto; }
+.eqc-pricing-price-divider .eqc-divider-svg { display: block; width: 100%; height: auto; }
 .eqc-pricing-price {
 	display: flex;
 	align-items: center;
@@ -1732,7 +1732,7 @@ a.eqc-btn .eqc-icon, button.eqc-btn .eqc-icon,
 	position: absolute;
 	inset: 0;
 	background: var(--eqc-gold-500);
-	opacity: 0.16;
+	opacity: 0.1;
 	mask-image: linear-gradient(90deg, #000 0%, #000 12%, transparent 48%), url('../svg/girih-lattice-fine.svg');
 	mask-size: 100% 100%, calc(44 * var(--eqc-u)) calc(44 * var(--eqc-u));
 	mask-repeat: no-repeat, repeat;
@@ -2027,7 +2027,7 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 	   tinting a mask -- a mask can only ever be one flat colour, and the
 	   reference corner is two. */
 	background: url('../svg/corner-ornament.svg') top left / contain no-repeat;
-	opacity: 0.9;
+	opacity: 0.38;
 	pointer-events: none;
 	z-index: 0;
 }
@@ -2102,11 +2102,18 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 .eqc-benefit { display: flex; align-items: center; gap: calc(14 * var(--eqc-u)); padding-inline: calc(18 * var(--eqc-u)); }
 .eqc-benefit + .eqc-benefit { border-inline-start: 1px solid var(--eqc-border); }
 .eqc-benefit__disc {
-	display: inline-flex; align-items: center; justify-content: center; flex: none;
+	display: inline-flex; align-items: center; justify-content: center; flex: none; position: relative;
 	width: calc(52 * var(--eqc-u)); height: calc(52 * var(--eqc-u));
-	border-radius: 50%; background: var(--eqc-cream-100); border: 1px solid var(--eqc-border-strong);
+	background: none;
 }
-.eqc-benefit__disc .eqc-icon { width: calc(26 * var(--eqc-u)); height: calc(26 * var(--eqc-u)); color: var(--eqc-green-800); }
+.eqc-benefit__disc::before,
+.eqc-benefit__disc::after {
+	content: ''; position: absolute; inset: 0;
+	mask: url('../svg/seal-filled.svg') center / 100% 100% no-repeat;
+}
+.eqc-benefit__disc::before { background: var(--eqc-gold-500); }
+.eqc-benefit__disc::after { inset: calc(1.2 * var(--eqc-u)); background: var(--eqc-cream-50); }
+.eqc-benefit__disc .eqc-icon { position: relative; z-index: 1; width: calc(26 * var(--eqc-u)); height: calc(26 * var(--eqc-u)); color: var(--eqc-green-800); }
 .eqc-benefit__label { font-size: var(--eqc-fs-small); line-height: 1.35; color: var(--eqc-heading); }
 @media (max-width: 61.25rem) {
 	.eqc-benefits { grid-template-columns: repeat(2, 1fr); row-gap: calc(18 * var(--eqc-u)); }
@@ -2117,8 +2124,36 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 	.eqc-benefit + .eqc-benefit { border-inline-start: 0; }
 }
 
-/* Centred pill eyebrow with a rosette, as pricing.jpeg draws it. */
-.eqc-eyebrow--rosette { align-self: center; width: auto; border-color: var(--eqc-gold-300); }
+/* Centred cusped cartouche eyebrow with its small rosette, as pricing.jpeg
+   draws it. The frame shares the same generated contour family as the
+   pricing medallions and alphabet photo cartouche. */
+.eqc-eyebrow--rosette {
+	align-self: center;
+	position: relative;
+	width: calc(186 * var(--eqc-u));
+	min-height: calc(39 * var(--eqc-u));
+	justify-content: center;
+	gap: calc(10 * var(--eqc-u));
+	border: 0;
+	border-radius: 0;
+	background: none;
+}
+.eqc-eyebrow--rosette::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: var(--eqc-gold-600);
+	mask: url('../svg/pricing-eyebrow-frame.svg') center / 100% 100% no-repeat;
+	pointer-events: none;
+}
+.eqc-eyebrow--rosette::before {
+	content: '';
+	width: calc(18 * var(--eqc-u));
+	height: calc(18 * var(--eqc-u));
+	background: var(--eqc-gold-600);
+	mask: url('../svg/rosette-simple.svg') center / contain no-repeat;
+	flex: none;
+}
 
 /* The pricing panel was insetting the card grid by ~44u a side; in the
    reference the cards span the full 1119u content column, same as the

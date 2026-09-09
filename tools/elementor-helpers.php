@@ -363,7 +363,7 @@ function eqc_teacher_card_stub( $slot_label = 'Teacher Name' ) {
  * @param array $features Plain-text feature list.
  */
 function eqc_pricing_card( $frequency, $price, $unit, $features, $link, $featured = false ) {
-	$star           = eqc_get_svg_asset( 'seal-outline', 'eqc-pricing-bullet' );
+	$star           = eqc_get_svg_asset( 'pricing-bullet', 'eqc-pricing-bullet' );
 	$features_html  = '<ul class="eqc-pricing-list">';
 	foreach ( $features as $feature ) {
 		$features_html .= '<li>' . $star . '<span>' . esc_html( $feature ) . '</span></li>';
@@ -383,11 +383,12 @@ function eqc_pricing_card( $frequency, $price, $unit, $features, $link, $feature
 		$children[] = eqc_html( '<span class="eqc-pricing-badge">' . esc_html__( 'Recommended', 'easy-quran-classes' ) . '</span>' );
 	}
 	$children[] = eqc_html(
-		'<span class="eqc-pricing-icon"><span class="eqc-pricing-icon-ring" aria-hidden="true">' . eqc_get_svg_asset( 'seal-outline' ) . '</span>' . eqc_icon_str( 'calendar' ) . '</span>'
+		'<span class="eqc-pricing-icon"><span class="eqc-pricing-icon-ring" aria-hidden="true">' . eqc_get_svg_asset( 'pricing-medallion-frame' ) . '</span>' . eqc_icon_str( 'calendar' ) . '</span>'
 	);
 	$children[] = eqc_html( '<span class="eqc-pricing-freq eqc-pricing-banner">' . esc_html( $frequency ) . '</span>' );
 	$children[] = eqc_html( '<div class="eqc-pricing-divider">' . eqc_divider_svg( 'accent' ) . '</div>' );
 	$children[] = eqc_html( $features_html );
+	$children[] = eqc_html( '<div class="eqc-pricing-price-divider">' . eqc_divider_svg( 'price' ) . '</div>' );
 	$children[] = eqc_html(
 		'<p class="eqc-pricing-price"><span class="eqc-pricing-price-figure">$' . esc_html( $price ) . '</span>'
 		. '<span class="eqc-pricing-unit">' . esc_html( $unit ) . '</span>'
