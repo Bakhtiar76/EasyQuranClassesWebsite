@@ -154,7 +154,7 @@ $about = eqc_section(
 								eqc_html(
 									'<div class="eqc-about-collage">'
 									. '<figure class="eqc-about-collage__main eqc-arch-media eqc-arch-media--keel">'
-									. wp_get_attachment_image( $about_img, 'large', false, array( 'alt' => 'An illuminated Quran opened to a decorated page' ) )
+									. wp_get_attachment_image( $about_img, 'large', false, array( 'alt' => 'An open Quran beside a sunlit window' ) )
 									. '</figure>'
 									. '<figure class="eqc-about-collage__child eqc-arch-media eqc-arch-media--keel">'
 									. wp_get_attachment_image( eqc_media_id( 'about-child-reading-quran' ), 'medium_large', false, array( 'alt' => 'A young student reading from the Quran' ) )
@@ -224,37 +224,6 @@ $courses = eqc_section(
 			array_merge(
 				array( eqc_section_heading_el( 'Our Courses', 'Choose the course that <br>matches where <span style="color:var(--eqc-bronze-700)">you are today</span>', false, 'eqc-eyebrow--plain', 'book-open' ) ),
 				array( eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--courses', 'flex_direction' => 'row' ), $course_cards ) )
-			)
-		),
-	)
-);
-
-// ------------------------------------------------------- 5. HOW IT WORKS
-$steps = array(
-	array( 'calendar', 'Request a Free Trial', 'Tell us the student\'s age, level and availability.' ),
-	array( 'users', 'Share Level & Availability', "We'll confirm details and preferred timing." ),
-	array( 'person', 'Get Matched with a Teacher', 'A suitable qualified teacher is assigned to you.' ),
-	array( 'chart-up', 'Begin Classes & Review Progress', 'Start learning and track progress over time.' ),
-);
-$step_cards = array();
-foreach ( $steps as $i => $s ) {
-	$step_cards[] = eqc_html(
-		'<div class="eqc-card" style="text-align:center;">'
-		. '<span class="eqc-card-index">' . ( $i + 1 ) . '</span>'
-		. '<div style="margin-top:0.8em;color:var(--eqc-green-800);">' . eqc_icon_str( $s[0] ) . '</div>'
-		. '<h3 style="margin:0.5em 0 0.3em;font-size:var(--eqc-fs-h4);font-family:var(--eqc-font-body);font-weight:600;">' . esc_html( $s[1] ) . '</h3>'
-		. '<p style="margin:0;color:var(--eqc-muted);font-size:var(--eqc-fs-small);">' . esc_html( $s[2] ) . '</p>'
-		. '</div>'
-	);
-}
-$how_it_works = eqc_section(
-	'eqc-section eqc-section--cream',
-	array(
-		eqc_inner(
-			'',
-			array_merge(
-				array( eqc_section_heading_el( 'How It Works', 'From first message to first class' ) ),
-				array( eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--trust', 'flex_direction' => 'row' ), $step_cards ) )
 			)
 		),
 	)
@@ -383,23 +352,7 @@ foreach ( $testi_data as $i => $t ) {
 	}
 	$testi_cards[] = eqc_testimonial_card( $testi_ids[ $i ], $t[0], $t[1], $t[2], array( 'graduation-cap' => 'Expert Tutors', 'check' => 'Monthly Tracking', 'chart-up' => 'Personalised Focus' ) );
 }
-// Cards advance one at a time, 3 visible on desktop (see eqc_carousel()):
-// the 3 real, client-verified reviews first, then clearly-marked
-// placeholder stubs (never fabricated quotes/names — see
-// eqc_testimonial_card_stub()) so the carousel reads as a real, filled-out
-// feature rather than a handful of invented reviews.
-$testi_all_cards = array_merge(
-	$testi_cards,
-	array(
-		eqc_testimonial_card_stub(),
-		eqc_testimonial_card_stub(),
-		eqc_testimonial_card_stub(),
-		eqc_testimonial_card_stub(),
-		eqc_testimonial_card_stub(),
-		eqc_testimonial_card_stub(),
-	)
-);
-
+// Reference quotes are unverified staging content; see QA/PLACEHOLDER-REGISTER.md.
 $testimonials = eqc_section(
 	'eqc-section eqc-section--testimonials eqc-section--surface eqc-section--ornamented',
 	array(
@@ -409,32 +362,7 @@ $testimonials = eqc_section(
 			array(
 				eqc_section_heading_el( 'What Our Families Say', 'Trusted by Families <br><span style="color:var(--eqc-gold-600)">Loved by Students</span>', true, 'eqc-eyebrow--plain', 'quote' ),
 				eqc_text( '<p>We are honoured to be part of hundreds of families&rsquo; journey. <br>Here&rsquo;s what they have to say about their experience with us.</p>', 'eqc-testimonials-intro' ),
-				eqc_carousel( $testi_all_cards, __( 'Testimonial slides', 'easy-quran-classes' ) ),
-			)
-		),
-	)
-);
-
-// ------------------------------------------------------- 9. FAQ PREVIEW
-$faq_preview_items = array(
-	array( 'Can beginners start from zero?', 'Yes. Noorani Qaida starts from the Arabic alphabet itself, with no prior reading ability assumed.' ),
-	array( 'How does the free trial work?', 'Tell us the student\'s age, level and availability, and we match a suitable teacher for one trial class before any commitment.' ),
-	array( 'Are timings flexible?', "Yes. Classes are scheduled around the times that work for your family, not a fixed institutional timetable." ),
-);
-$faq = eqc_section(
-	'eqc-section eqc-section--cream',
-	array(
-		eqc_inner(
-			'eqc-container--narrow',
-			array_merge(
-				array( eqc_section_heading_el( 'FAQ', 'Common questions, answered', true ) ),
-				array( eqc_faq_group( '', $faq_preview_items ) ),
-				array(
-					eqc_container(
-						array( 'css_classes' => 'eqc-btn-group', 'flex_direction' => 'row', 'content_position' => 'center' ),
-						array( eqc_button( __( 'View All FAQs', 'easy-quran-classes' ), home_url( '/faq/' ), 'eqc-btn--primary' ) )
-					),
-				)
+				eqc_carousel( $testi_cards, __( 'Testimonial slides', 'easy-quran-classes' ) ),
 			)
 		),
 	)
@@ -456,5 +384,5 @@ $blog_section = eqc_section(
 
 eqc_save_elementor_page(
 	eqc_page_id( 'home' ),
-	array( $hero, $trust, $about, $courses, $how_it_works, $teachers, $pricing, $testimonials, $faq, $blog_section )
+	array( $hero, $trust, $about, $courses, $pricing, $teachers, $testimonials, $blog_section )
 );

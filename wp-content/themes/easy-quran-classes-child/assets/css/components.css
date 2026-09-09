@@ -490,54 +490,20 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 
 /* Teacher card */
 .eqc-card--teacher { text-align: center; position: relative; }
-/* Mandorla (pointed-oval) frame, replacing a plain circle — matches the
-   client reference's arch-family photo treatment rather than a generic
-   avatar shape. Aspect-ratio matches mandorla-mask.svg's own true bbox
-   (249:330.994, see tools/graphics/gen-ornaments.mjs) so mask-size:100%
-   100% doesn't stretch it; the border becomes a mask-shaped outline
-   layer instead of a round border, since border-radius can't follow an
-   arbitrary silhouette. */
+/* Teachers.jpeg uses a smooth ellipse with a cream gap and a thin gold ring. */
 .eqc-card--teacher .eqc-teacher-photo,
 .eqc-card--teacher .eqc-teacher-photo-widget {
 	position: relative;
-	width: clamp(110px, 28%, 150px);
-	aspect-ratio: 249 / 330.994;
+	width: min(98%, calc(181 * var(--eqc-u)));
+	aspect-ratio: 244 / 262;
 	margin-inline: auto;
 }
-/* The mask lives on the <img>, not this container: masking a parent
-   clips its entire subtree (including a differently-sized pseudo-element)
-   to that one shape, which would clip the outline below right back down
-   to the photo's own silhouette instead of letting it trace just outside
-   it (see the .eqc-arch-media--masked comment above for the full case
-   that surfaced this). */
 .eqc-card--teacher .eqc-teacher-photo img,
 .eqc-card--teacher .eqc-teacher-photo-widget img {
-	-webkit-mask-image: url('../svg/mandorla-mask.svg');
-	mask-image: url('../svg/mandorla-mask.svg');
-	-webkit-mask-size: 100% 100%;
-	mask-size: 100% 100%;
-	-webkit-mask-repeat: no-repeat;
-	mask-repeat: no-repeat;
-}
-/* Reuses the exact same mandorla-mask.svg shape as the photo (not
-   mandorla-outline.svg's stroke render) for the same reason documented on
-   .eqc-arch-media--masked::before above — a thin stroke's own padding
-   doesn't match how much bigger this layer is enlarged via `inset`,
-   which distorts it. `::before` (behind the photo, not `::after` on top)
-   so only the sliver outside the smaller photo shows. */
-.eqc-card--teacher .eqc-teacher-photo::before,
-.eqc-card--teacher .eqc-teacher-photo-widget::before {
-	content: '';
-	position: absolute;
-	inset: -4%;
-	background-color: var(--eqc-gold-300);
-	-webkit-mask-image: url('../svg/mandorla-mask.svg');
-	mask-image: url('../svg/mandorla-mask.svg');
-	-webkit-mask-size: 100% 100%;
-	mask-size: 100% 100%;
-	-webkit-mask-repeat: no-repeat;
-	mask-repeat: no-repeat;
-	pointer-events: none;
+	border-radius: 50%;
+	border: calc(3 * var(--eqc-u)) solid var(--eqc-surface);
+	outline: calc(1.4 * var(--eqc-u)) solid var(--eqc-gold-500);
+	object-fit: cover;
 }
 /* Small "seal" badge overlapping the bottom of the photo, matching the
    reference teacher cards (Assests/). Pulled up with a negative margin
@@ -566,7 +532,7 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	transition: transform var(--eqc-motion-slow) var(--eqc-ease-soft);
 }
 .eqc-card--teacher:hover .eqc-teacher-photo img,
-.eqc-card--teacher:hover .eqc-teacher-photo-widget img { transform: scale(1.06); }
+.eqc-card--teacher:hover .eqc-teacher-photo-widget img { transform: none; }
 /* h3 here for correct heading hierarchy (H2 section title -> H3 card
    title, no skipped level) while keeping the compact card-title size. */
 .eqc-card--teacher h3 { margin-block: 0.9em 0.1em; font-size: var(--eqc-fs-h4); font-weight: 600; font-family: var(--eqc-font-body); }
@@ -1386,15 +1352,15 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	border-radius: 0;
 	border: none;
 	overflow: visible;
-	aspect-ratio: 537 / 620;
+	aspect-ratio: 559 / 629;
 }
 .eqc-arch-media--keel img {
 	-webkit-mask-image: url('../svg/keel-arch-mask.svg');
 	mask-image: url('../svg/keel-arch-mask.svg');
 	-webkit-mask-repeat: no-repeat;
 	mask-repeat: no-repeat;
-	-webkit-mask-size: 95.72% 95.72%;
-	mask-size: 95.72% 95.72%;
+	-webkit-mask-size: 95.7066% 96.1844%;
+	mask-size: 95.7066% 96.1844%;
 	-webkit-mask-position: center;
 	mask-position: center;
 }
@@ -2038,9 +2004,19 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 	padding-inline: 0;
 }
 .eqc-teachers-aside { gap: calc(18 * var(--eqc-u)); }
+.eqc-section--teachers { padding-block: calc(44 * var(--eqc-u)); }
+.eqc-teachers-aside .eqc-eyebrow {
+	font-size: calc(13.3 * var(--eqc-u));
+	letter-spacing: 0;
+	border-radius: var(--eqc-radius-control);
+	padding: calc(8 * var(--eqc-u));
+	white-space: nowrap;
+}
+.eqc-teachers-aside .elementor-widget-text-editor { font-size: max(16px, calc(12 * var(--eqc-u))); }
+.eqc-teachers-split > .eqc-teachers-cards { padding-block-start: calc(40 * var(--eqc-u)); }
 /* This heading sits in a 268u column and is correspondingly smaller than the
    other sections' — measured 209u of ink for "Learn From". */
-.eqc-section--teachers .eqc-teachers-aside h2 { font-size: calc(40.6 * var(--eqc-u)); line-height: 1.16; }
+.eqc-section--teachers .eqc-teachers-aside h2 { font-size: calc(35.8 * var(--eqc-u)); line-height: 1.16; }
 .eqc-teachers-rule { color: var(--eqc-gold-500); line-height: 0; }
 .eqc-teachers-rule .eqc-divider-svg { width: calc(120 * var(--eqc-u)); }
 .eqc-teachers-features { display: flex; flex-direction: column; gap: calc(10 * var(--eqc-u)); }
@@ -2090,26 +2066,26 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
    "View Profile" pill stays inside the card. */
 .eqc-section--teachers .eqc-card--teacher {
 	overflow: visible;
-	margin-block-start: calc(56 * var(--eqc-u));
+	margin-block-start: calc(142 * var(--eqc-u));
 	/* The 112u oval is 149u tall and starts 56u above the card, so its base
 	   lands 93u down; content has to clear that plus the badge. */
 	padding-block-start: calc(104 * var(--eqc-u));
 }
 .eqc-section--teachers .eqc-card--teacher .eqc-teacher-photo-widget {
 	position: absolute;
-	inset-block-start: calc(-56 * var(--eqc-u));
+	inset-block-start: calc(-142 * var(--eqc-u));
 	inset-inline: 0;
-	width: calc(112 * var(--eqc-u));
+	width: 98%;
 	margin-inline: auto;
 	z-index: 2;
 }
 .eqc-section--teachers .eqc-card--teacher .eqc-teacher-seal {
 	position: absolute;
-	inset-block-start: calc(46 * var(--eqc-u));
+	inset-block-start: calc(30 * var(--eqc-u));
 	inset-inline: 0;
-	margin-inline: auto;
-	width: calc(34 * var(--eqc-u));
-	height: calc(34 * var(--eqc-u));
+	margin: 0 auto;
+	width: calc(44 * var(--eqc-u));
+	height: calc(44 * var(--eqc-u));
 	z-index: 3;
 }
 .eqc-section--teachers .eqc-card--teacher h3 {

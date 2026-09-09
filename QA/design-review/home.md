@@ -663,3 +663,25 @@ the measured fix rather than left in place on the assumption it helped.
 raised: it runs hero → trust → about → courses → **pricing → teachers** →
 testimonials, with **no** "how it works" and **no** FAQ section. That remains a
 user decision, not something to action unprompted.
+
+## Supervisor re-audit — 2026-09-09, HEAD f60e0a8
+
+The earlier completion claims above are superseded by this audit. Home is **not accepted**. Current evidence: `QA/supervisor-review/home/` (1920 and 390).
+
+| ID | Section | Reference | Current defect | Severity | Fix and reuse |
+|---|---|---|---|---|---|
+| S1 | Order | Courses → pricing → teachers → reviews → blog | Teachers precede pricing; extra How It Works and FAQ blocks add 2,019px at 1920 | P0 | Remove extra Home composition blocks and reorder existing variables in 10-home.php; dedicated FAQ remains |
+| S2 | Teachers | Smooth ellipse, 244×262 native, nearly card width | Pointed 164×218 portrait inside 270px card | P1 | Reuse teacher photo widget; CSS ellipse and separate cream/gold rings |
+| S3 | Icons | Filled person/group/shield/cap silhouettes alongside outline utility icons | Blanket outline substitutions justified by family consistency | P1 | Original filled variants on the existing sprite grid; retain outline roles where reference shows them |
+| S4 | Texture | Seamless subtle geometric texture | Flat-top hex polygons on pointy-top spacing overlap | P1 | Correct orientation in existing gen-ornaments.mjs |
+| S5 | Corners | Opposed corner motifs | Translation keyframes erase bottom-left 180° rotation | P1 | Independent translate animation preserves rotation |
+| S6 | Motion | Reference silent; reduced motion must be respected | More-specific animation selector defeats reduced-motion override | P1 | Match selector specificity, verify computed animation-name |
+| S7 | Hero arch | 559×629 shared frame coordinates | CSS uses 537/620 and identical x/y inset percentages | P2 | Use actual SVG ratio and separate 24/559, 24/629 photo inset proportions |
+| S8 | Reviews | Three supplied staging quotes | Six extra stub cards and false comment claiming client verification | P0 | Remove invented empty slides, retain registered reference quotes |
+| S9 | Teacher typography | Single-line eyebrow, three-line title | Eyebrow wraps to two lines, title four; aside drives 1,396px section | P1 | Measure role-specific type and available width; reuse tokens/classes |
+| S10 | About collage | Three images with distinct silhouettes | Alphabet panel missing; Quran alt describes a different photo | P1 | Original vector alphabet panel using existing Arabic font and quatrefoil, accurate alt |
+| S11 | Pipeline | Documented commands work after checkout | Relative paths depend on caller directory; trace scratch missing | P1 | Module-relative paths and mkdir in existing generators |
+
+Ordered plan: repair deterministic geometry/motion and Home order; correct icon roles and teacher anatomy; restore missing collage panel and reference-specific backgrounds; recapture and measure all Home sections; verify five widths, intermediate widths, keyboard, reduced motion, console, images and Lighthouse. Rebuild all nine page scripts after shared inline graphics changes. No completion assertion until rendered comparisons resolve P0/P1.
+
+Improvised: original licensed/generated photographs remain per the user's explicit instruction. Filled reference roles use original paths in the existing sprite, not a second icon package. Reduced-motion corrections protect accessibility. Reference desktop spacing is adapted when required for readable mobile content.

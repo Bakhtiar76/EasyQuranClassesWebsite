@@ -36,7 +36,7 @@ import {
 	cuspedArchPanel,
 } from './lib/arches.mjs';
 
-const rosetteTrace = JSON.parse(readFileSync('tools/graphics/scratch/rosette-traced.json', 'utf8'));
+const rosetteTrace = JSON.parse(readFileSync(new URL('./scratch/rosette-traced.json', import.meta.url), 'utf8'));
 
 /** Place the traced 8-fold rosette (centered at its own origin, see
  * trace-rosette.mjs) at (cx, cy) scaled so its outer radius becomes r. */
@@ -52,12 +52,12 @@ function tracedRosette(cx, cy, r) {
 // overwrites it in place, so every existing CSS `url('../svg/NAME.svg')`
 // mask reference keeps working unchanged — only genuinely new shapes get
 // new filenames.
-const OUT = 'wp-content/themes/easy-quran-classes-child/assets/svg';
+const OUT = new URL('../../wp-content/themes/easy-quran-classes-child/assets/svg/', import.meta.url);
 mkdirSync(OUT, { recursive: true });
 
 function save(name, svg) {
 	const { data } = optimize(svg, { multipass: true, plugins: ['preset-default'] });
-	writeFileSync(`${OUT}/${name}`, data);
+	writeFileSync(new URL(name, OUT), data);
 	console.log(name.padEnd(30), data.length, 'bytes');
 }
 
@@ -252,7 +252,7 @@ for (const [name, a] of [['fine', 34], ['dense', 52]]) {
 		const xOffset = row % 2 !== 0 ? tileW / 2 : 0;
 		for (let col = -1; col <= 1; col++) {
 			const x = col * tileW + xOffset;
-			body += `<path d="${regularPolygonPath(x, y, s, 6, 0)}"/>`;
+			body += `<path d="${regularPolygonPath(x, y, s, 6, -Math.PI / 2)}"/>`;
 		}
 	}
 	save('hex-tessellation.svg', svgWrap(tileW, tileH, `<g fill="none" stroke="currentColor" stroke-width="1">${body}</g>`, 'aria-hidden="true" focusable="false"'));
@@ -626,4 +626,4 @@ function quatrefoilPath(size) {
 	save('divider-rule.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 
-console.log('\nAll ornament assets generated to', OUT);
+console.log('\nAll ornament assets generated to', OUT.href);
