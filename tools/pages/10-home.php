@@ -373,7 +373,7 @@ $pricing = eqc_section(
 // ------------------------------------------------------- 8. TESTIMONIALS
 $testi_data = array(
 	array( 'Aisha Khan', 'Lahore, Pakistan', 'My daughter has improved so much in her Quran recitation and Tajweed. The teachers are patient and very supportive.' ),
-	array( 'Mohammed Rizwan', 'Hyderabad, India', 'Very organized classes and flexible timings. My son looks forward to every session.' ),
+	array( 'Mohammed Rizwan', 'Hyderabad, India', 'Very organized classes and flexible timings. My son looks forward to every session. JazakAllah for the amazing support!' ),
 	array( 'Abduallah Omar', 'Nairobi, Kenya', 'The best online Quran academy we have found. My kids are learning with confidence and we can see real improvement.' ),
 );
 $testi_cards = array();
@@ -381,7 +381,7 @@ foreach ( $testi_data as $i => $t ) {
 	if ( ! $testi_ids[ $i ] ) {
 		continue;
 	}
-	$testi_cards[] = eqc_testimonial_card( $testi_ids[ $i ], $t[0], $t[1], $t[2], array( 'certificate' => 'Expert Tutors', 'chart-up' => 'Progress Tracking' ) );
+	$testi_cards[] = eqc_testimonial_card( $testi_ids[ $i ], $t[0], $t[1], $t[2], array( 'graduation-cap' => 'Expert Tutors', 'check' => 'Monthly Tracking', 'chart-up' => 'Personalised Focus' ) );
 }
 // Cards advance one at a time, 3 visible on desktop (see eqc_carousel()):
 // the 3 real, client-verified reviews first, then clearly-marked
@@ -401,13 +401,14 @@ $testi_all_cards = array_merge(
 );
 
 $testimonials = eqc_section(
-	'eqc-section eqc-section--surface eqc-section--ornamented',
+	'eqc-section eqc-section--testimonials eqc-section--surface eqc-section--ornamented',
 	array(
 		eqc_section_ornaments(),
 		eqc_inner(
 			'',
 			array(
-				eqc_section_heading_el( 'What Our Families Say', 'Trusted by families, <span style="color:var(--eqc-gold-600)">loved by students</span>', true ),
+				eqc_section_heading_el( 'What Our Families Say', 'Trusted by Families<br><span style="color:var(--eqc-gold-600)">Loved by Students</span>', true, 'eqc-eyebrow--plain', 'quote' ),
+				eqc_text( '<p>We are honoured to be part of hundreds of families&rsquo; journey.<br>Here&rsquo;s what they have to say about their experience with us.</p>', 'eqc-testimonials-intro' ),
 				eqc_carousel( $testi_all_cards, __( 'Testimonial slides', 'easy-quran-classes' ) ),
 			)
 		),

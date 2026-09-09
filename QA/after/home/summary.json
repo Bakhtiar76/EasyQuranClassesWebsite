@@ -1,14 +1,10 @@
 {
-  "generatedAt": "2026-09-09T07:08:22.838Z",
+  "generatedAt": "2026-09-09T07:11:48.377Z",
   "baseUrl": "http://localhost",
   "widths": [
-    1920,
-    1440,
-    1024,
-    768,
-    390
+    1920
   ],
-  "scan": "380-1900:40",
+  "scan": null,
   "routes": [
     {
       "route": "/",

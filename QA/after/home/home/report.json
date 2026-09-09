@@ -1,7 +1,7 @@
 {
   "route": "/",
   "url": "http://localhost/",
-  "generatedAt": "2026-09-09T07:08:22.839Z",
+  "generatedAt": "2026-09-09T07:11:48.378Z",
   "viewports": [
     {
       "name": "desktop-1920x1080",
@@ -11,46 +11,6 @@
       "status": 200,
       "finalUrl": "http://localhost/",
       "scrollWidth": 1920,
-      "overflow": false
-    },
-    {
-      "name": "desktop-1440x900",
-      "width": 1440,
-      "height": 900,
-      "screenshot": "desktop-1440x900.png",
-      "status": 200,
-      "finalUrl": "http://localhost/",
-      "scrollWidth": 1440,
-      "overflow": false
-    },
-    {
-      "name": "laptop-sm-1024x768",
-      "width": 1024,
-      "height": 768,
-      "screenshot": "laptop-sm-1024x768.png",
-      "status": 200,
-      "finalUrl": "http://localhost/",
-      "scrollWidth": 1024,
-      "overflow": false
-    },
-    {
-      "name": "tablet-768x1024",
-      "width": 768,
-      "height": 1024,
-      "screenshot": "tablet-768x1024.png",
-      "status": 200,
-      "finalUrl": "http://localhost/",
-      "scrollWidth": 768,
-      "overflow": false
-    },
-    {
-      "name": "mobile-390x844",
-      "width": 390,
-      "height": 844,
-      "screenshot": "mobile-390x844.png",
-      "status": 200,
-      "finalUrl": "http://localhost/",
-      "scrollWidth": 390,
       "overflow": false
     }
   ],
@@ -137,7 +97,7 @@
     },
     {
       "level": 2,
-      "text": "Trusted by families, loved by students"
+      "text": "Trusted by FamiliesLoved by Students"
     },
     {
       "level": 3,
@@ -214,13 +174,7 @@
   "pageErrors": [],
   "assetErrors": [],
   "blockedRequests": [],
-  "scan": {
-    "min": 380,
-    "max": 1900,
-    "step": 40,
-    "checked": 39,
-    "overflows": []
-  },
+  "scan": null,
   "failures": 0,
   "warnings": 0
 }

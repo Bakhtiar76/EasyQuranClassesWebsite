@@ -530,3 +530,24 @@ page / asset errors, 0 images missing `alt`, one H1.
 60u, Pricing 51u, Teachers 40.6u. Each was derived against its own independently
 anchored reference, and the spread tracks the width of the column each heading
 sits in — a designed hierarchy, not measurement drift.
+
+---
+
+## Section 7 — Testimonials (`Reviews.jpeg`, `claude-opus-5`)
+
+Calibration: **s = 1.313** — cards span x50–1519 = 1469px = 1119u.
+
+| # | Reference shows | Build did | Sev | Fix |
+|---|---|---|---|---|
+| R1 | Heading in **bold sans**, not the display serif — the only section that does this | DM Serif Display | P1 | Manrope 800 at the measured 48.4u |
+| R2 | Two lines, title case, second line gold: "Trusted by Families / Loved by Students" | One line, sentence case | P1 (§2) | transcribed with the break |
+| R3 | Two-line intro paragraph under the ornament | Absent | P0 | transcribed |
+| R4 | Circular avatar **overlapping the card's top edge**, dark-green quote badge at its lower right | Avatar inside the card | P1 | absolute at −54u; 108u diameter (matches exactly) |
+| R5 | Cream inset strip of **three** mini-features, hairline-separated | Two tags, no strip | P0 | three, in the reference's own spelling ("Personalised Focus") |
+| R6 | Rizwan's quote ends "JazakAllah for the amazing support!" | Sentence dropped | P0 (§2) | restored |
+| R7 | Name in bold sans | Display serif | P2 | body font |
+
+Verified: sweep clean at 1920; avatar 108u against the reference's 108u.
+
+Remaining: the eyebrow's flanking rules (reference draws rule–icon–label–rule);
+the carousel constrains cards to 332u against the reference's 354u.

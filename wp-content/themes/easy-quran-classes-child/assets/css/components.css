@@ -2124,3 +2124,71 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 	text-align: start;
 }
 .eqc-section--teachers .eqc-teacher-profile { width: 100%; box-sizing: border-box; }
+
+/* ---------- Testimonials section (Reviews.jpeg) ---------- */
+
+/* Reviews.jpeg calibrates at s=1.313 (cards x50-1519 = 1469px = 1119u).
+   Unlike every other section, this heading is set in BOLD SANS, not the
+   display serif — measured 420u of ink for "Trusted by Families" at 48.4u. */
+.eqc-section--testimonials .eqc-section-heading h2 {
+	font-family: var(--eqc-font-body);
+	font-weight: 800;
+	font-size: calc(48.4 * var(--eqc-u));
+	line-height: 1.16;
+}
+.eqc-testimonials-intro { text-align: center; font-size: calc(13.5 * var(--eqc-u)); color: var(--eqc-text); line-height: 1.7; }
+.eqc-section--testimonials .eqc-card--testimonial {
+	width: calc(354 * var(--eqc-u));
+	max-width: 100%;
+	min-height: calc(330 * var(--eqc-u));
+	margin-block-start: calc(54 * var(--eqc-u));
+	padding: calc(64 * var(--eqc-u)) calc(22 * var(--eqc-u)) calc(18 * var(--eqc-u));
+	overflow: visible;
+	text-align: center;
+}
+/* Circular avatar riding the card's top edge with the quote badge at its
+   lower right, as the reference draws it. */
+.eqc-section--testimonials .eqc-testimonial-avatar-wrap {
+	position: absolute;
+	inset-block-start: calc(-54 * var(--eqc-u));
+	inset-inline: 0;
+	margin-inline: auto;
+	width: calc(108 * var(--eqc-u));
+	height: calc(108 * var(--eqc-u));
+	z-index: 2;
+}
+.eqc-section--testimonials .eqc-testimonial-photo,
+.eqc-section--testimonials .eqc-testimonial-photo img {
+	width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+}
+.eqc-section--testimonials .eqc-testimonial-photo { border: calc(3 * var(--eqc-u)) solid var(--eqc-gold-300); box-sizing: border-box; }
+.eqc-section--testimonials .eqc-testimonial-quote-mark {
+	position: absolute; inset-block-end: calc(-2 * var(--eqc-u)); inset-inline-end: calc(-4 * var(--eqc-u));
+	width: calc(38 * var(--eqc-u)); height: calc(38 * var(--eqc-u));
+	border-radius: 50%; background: var(--eqc-green-800); color: var(--eqc-white);
+	display: flex; align-items: center; justify-content: center;
+}
+.eqc-section--testimonials .eqc-testimonial-quote-mark .eqc-icon { width: calc(16 * var(--eqc-u)); height: calc(16 * var(--eqc-u)); }
+.eqc-section--testimonials .eqc-card--testimonial h3 { font-family: var(--eqc-font-body); font-weight: 700; font-size: calc(19.5 * var(--eqc-u)); }
+.eqc-section--testimonials .eqc-testimonial-location { font-size: calc(12 * var(--eqc-u)); color: var(--eqc-gold-700); justify-content: center; }
+.eqc-section--testimonials .eqc-card--testimonial p { font-size: calc(12.5 * var(--eqc-u)); line-height: 1.7; }
+
+/* Cream inset strip of three mini-features, 324 x 64u, hairline-separated. */
+.eqc-section--testimonials .eqc-testimonial-tags {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	width: 100%;
+	min-height: calc(64 * var(--eqc-u));
+	margin-block-start: auto;
+	background: var(--eqc-cream-50);
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-control);
+	padding: calc(9 * var(--eqc-u)) 0;
+}
+.eqc-section--testimonials .eqc-testimonial-tags > span {
+	display: flex; flex-direction: column; align-items: center; gap: calc(5 * var(--eqc-u));
+	font-size: calc(9.5 * var(--eqc-u)); color: var(--eqc-text); text-align: center;
+	padding-inline: calc(6 * var(--eqc-u));
+}
+.eqc-section--testimonials .eqc-testimonial-tags > span + span { border-inline-start: 1px solid var(--eqc-border); }
+.eqc-section--testimonials .eqc-testimonial-tags .eqc-icon { width: calc(21 * var(--eqc-u)); height: calc(21 * var(--eqc-u)); color: var(--eqc-gold-700); }
