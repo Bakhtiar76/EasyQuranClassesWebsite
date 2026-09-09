@@ -293,6 +293,13 @@
 
 			function buildDots() {
 				pageCount = Math.max( 1, cardCount - visibleCount() + 1 );
+				// With every card already on screen there is nothing to page
+				// to: both arrows sit permanently disabled and the dot strip
+				// shows a single dot. Reviews.jpeg draws no arrows for this
+				// reason. Marking the carousel static lets CSS drop the whole
+				// control set, and it comes back on its own as soon as the
+				// card count or the visible count makes paging real.
+				carousel.classList.toggle( 'eqc-carousel--static', pageCount <= 1 );
 				if ( ! dotsWrap ) {
 					return;
 				}

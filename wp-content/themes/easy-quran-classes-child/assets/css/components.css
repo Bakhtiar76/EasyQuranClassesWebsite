@@ -2262,6 +2262,17 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 /* Teachers.jpeg puts this pill's circular arrow AFTER the label, unlike the
    about-section CTAs which lead with theirs. Scoped so those are untouched. */
 .eqc-teachers-controls .eqc-btn--icon-disc { flex-direction: row-reverse; }
+
+/* A carousel with nothing to page to hides its controls (see eqc.js
+   buildDots) and reclaims the inline padding they reserved -- that padding
+   is what held the testimonial cards 22px narrower than Reviews.jpeg. */
+.eqc-carousel--static .eqc-carousel-arrow,
+.eqc-carousel--static .eqc-slider-dots { display: none; }
+/* Hiding the controls leaves their Elementor widget wrappers in the flow at
+   zero height, but each one still draws a 20px container gap either side --
+   30px above the track and 70px below it. Collapsing the gap removes both;
+   the track is the only visible child left. */
+.eqc-carousel--static { padding-inline: 0; padding-block: 0; gap: 0; }
 .eqc-teachers-nav { display: flex; gap: calc(9 * var(--eqc-u)); }
 .eqc-nav-btn {
 	width: calc(42 * var(--eqc-u)); height: calc(42 * var(--eqc-u));
@@ -2359,7 +2370,7 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 	font-family: var(--eqc-font-body);
 	font-weight: 800;
 	font-size: var(--eqc-fs-h2-sans);
-	line-height: 1.16;
+	line-height: 1.05;
 }
 .eqc-testimonials-intro { text-align: center; font-size: var(--eqc-fs-body); color: var(--eqc-text); line-height: 1.6; }
 .eqc-section--testimonials .eqc-card--testimonial {
@@ -2416,6 +2427,11 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 .eqc-section--testimonials .eqc-testimonial-tags {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
+	/* The cells are divided by hairline borders, not by a gap. The base
+	   .eqc-testimonial-tags rule is a flex row with `gap: 0.4em 1.3em`, and
+	   that 1.3em survived the switch to grid as an 18.8px column gap -- 38px
+	   off the three cells, which wrapped "Personalised Focus" to two lines. */
+	gap: 0;
 	width: 100%;
 	min-height: calc(64 * var(--eqc-u));
 	margin-block-start: auto;
@@ -2423,14 +2439,32 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 	border: 1px solid var(--eqc-border);
 	border-radius: var(--eqc-radius-control);
 	padding: calc(9 * var(--eqc-u)) 0;
+	/* Reviews.jpeg insets this strip 19u from the card edge while the quote
+	   above it is inset 48u, so the strip is deliberately wider than the text
+	   column. At the card's own padding each cell was 108px against a 120px
+	   label and all three labels wrapped to two lines. */
+	margin-inline: calc(-8 * var(--eqc-u));
+	width: auto;
 }
 .eqc-section--testimonials .eqc-testimonial-tags > span {
 	display: flex; flex-direction: column; align-items: center; gap: calc(5 * var(--eqc-u));
 	font-size: var(--eqc-fs-xsmall); color: var(--eqc-text); text-align: center;
-	padding-inline: calc(6 * var(--eqc-u));
+	padding-inline: calc(2 * var(--eqc-u));
 }
 .eqc-section--testimonials .eqc-testimonial-tags > span + span { border-inline-start: 1px solid var(--eqc-border); }
 .eqc-section--testimonials .eqc-testimonial-tags .eqc-icon { width: calc(21 * var(--eqc-u)); height: calc(21 * var(--eqc-u)); color: var(--eqc-gold-700); }
+/* Measured against Reviews.jpeg: the quote sets on a 1.42 line-height (ours
+   inherited the 1.7 body leading and ran 13px tall over three lines), the
+   name is a 17.9u role rather than the 14.7u h4 it shared with the teacher
+   card, and the mini-feature label needs its own tight leading. */
+.eqc-section--testimonials .eqc-card--testimonial .elementor-widget-text-editor p { line-height: 1.45; }
+.eqc-section--testimonials .eqc-card--testimonial h3 { font-size: var(--eqc-fs-h3); }
+.eqc-section--testimonials .eqc-testimonial-tags > span { line-height: 1.25; }
+/* Reviews.jpeg drops the avatar 10px below the intro; the container row gap
+   plus the track padding put it 62px below. */
+.eqc-section--testimonials .eqc-carousel { margin-block-start: calc(-22 * var(--eqc-u)); }
+.eqc-section--testimonials .eqc-carousel--static .eqc-carousel-track { padding-block: 0; }
+.eqc-section--testimonials .eqc-card--testimonial { margin-block-start: calc(46 * var(--eqc-u)); }
 
 /* ---------- Blog section (Blogs.jpeg) ---------- */
 
