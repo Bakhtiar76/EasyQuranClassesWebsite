@@ -132,7 +132,7 @@
 	   measurement error of both). QA/LESSONS.md #29. */
 	--eqc-fs-h2-courses: clamp(30px, calc(60 * var(--eqc-u)), 97px);
 	--eqc-fs-h2-sans: clamp(26px, calc(47 * var(--eqc-u)), 76px);
-	--eqc-fs-h2-compact: clamp(24px, calc(40.6 * var(--eqc-u)), 66px);
+	--eqc-fs-h2-compact: clamp(24px, calc(39 * var(--eqc-u)), 63px);
 	--eqc-fs-h3: clamp(19px, calc(17.97 * var(--eqc-u)), 26px);      /* course/blog card title */
 	--eqc-fs-h4: clamp(17px, calc(14.7 * var(--eqc-u)), 20px);
 	/* The course card title is DM Serif and measurably LARGER than the blog

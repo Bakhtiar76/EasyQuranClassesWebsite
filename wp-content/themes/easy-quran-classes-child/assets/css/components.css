@@ -183,7 +183,13 @@ button:focus,
 		transform var(--eqc-motion-slow) var(--eqc-ease-standard);
 }
 .eqc-section-heading--center .eqc-heading-rule--ornate { justify-content: center; }
-.eqc-divider-svg { width: clamp(180px, 22vw, 240px); height: auto; flex: none; }
+/* A divider must never be wider than the wrapper it is placed in. This was
+   a bare clamp() with no relation to its container, so every divider without
+   an explicit width override rendered at 240px -- inside a 183px teacher card
+   that overflowed the card edge by 57px and read as a rule running across the
+   gap into the next card. width:100% sizes it to the slot; the clamp stays as
+   the ceiling for the wide, free-standing rules. */
+.eqc-divider-svg { width: 100%; max-width: clamp(180px, 22vw, 240px); height: auto; flex: none; }
 html.eqc-js .is-visible .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
 html:not(.eqc-js) .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
 .eqc-section--dark .eqc-heading-rule--ornate { color: var(--eqc-gold-300); }
@@ -2209,8 +2215,8 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 
 /* Two-column split, not the full-width carousel this replaced. The reference's
    content column decomposes exactly: left 268u + gap 51u + cards 800u = 1119u. */
-.eqc-teachers-split { gap: calc(51 * var(--eqc-u)); align-items: stretch; padding-inline: 0; }
-.eqc-teachers-split > .eqc-teachers-aside { flex: 0 0 calc(268 * var(--eqc-u)); padding-inline: 0; }
+.eqc-teachers-split { gap: calc(45 * var(--eqc-u)); align-items: stretch; padding-inline: 0; }
+.eqc-teachers-split > .eqc-teachers-aside { flex: 0 0 calc(275 * var(--eqc-u)); padding-inline: 0; }
 .eqc-teachers-split > .eqc-teachers-cards {
 	flex: 1 1 auto;
 	display: grid;
@@ -2244,9 +2250,18 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 .eqc-teachers-features { display: flex; flex-direction: column; gap: calc(8 * var(--eqc-u)); }
 .eqc-teachers-features .eqc-trust-tile { padding: calc(10 * var(--eqc-u)) calc(13 * var(--eqc-u)); gap: calc(11 * var(--eqc-u)); align-items: center; }
 .eqc-teachers-features .eqc-trust-tile-title { font-size: var(--eqc-fs-body); font-weight: 700; }
-.eqc-teachers-features .eqc-trust-tile p { font-size: var(--eqc-fs-small); }
+/* Teachers.jpeg sets this caption on ONE line inside a 257u text column. At
+   --eqc-fs-small it measured 273px in a 260px column, wrapped, and added a
+   third row to every tile -- 84px on the aside, which is the tallest element
+   in this section and therefore what sets the card height (QA/LESSONS.md #40).
+   The reference implies ~11px here; we hold 13px, an Improvised departure for
+   legibility (TASK-DESIGN-PARITY.md 2A). */
+.eqc-teachers-features .eqc-trust-tile p { font-size: var(--eqc-fs-xsmall); }
 .eqc-teachers-features .eqc-icon { width: calc(24 * var(--eqc-u)); height: calc(24 * var(--eqc-u)); }
 .eqc-teachers-controls { gap: calc(14 * var(--eqc-u)); align-items: center; padding-inline: 0; }
+/* Teachers.jpeg puts this pill's circular arrow AFTER the label, unlike the
+   about-section CTAs which lead with theirs. Scoped so those are untouched. */
+.eqc-teachers-controls .eqc-btn--icon-disc { flex-direction: row-reverse; }
 .eqc-teachers-nav { display: flex; gap: calc(9 * var(--eqc-u)); }
 .eqc-nav-btn {
 	width: calc(42 * var(--eqc-u)); height: calc(42 * var(--eqc-u));
@@ -2256,7 +2271,12 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 }
 .eqc-nav-btn:first-child .eqc-icon { transform: rotate(180deg); }
 .eqc-nav-btn .eqc-icon { width: calc(18 * var(--eqc-u)); height: calc(18 * var(--eqc-u)); }
-.eqc-btn--sm { --_h: max(44px, calc(38 * var(--eqc-u))); padding-inline: calc(18 * var(--eqc-u)); font-size: var(--eqc-fs-small); }
+/* The base button rule is written as `a.eqc-btn, button.eqc-btn, ...` (0,1,1),
+   so a plain `.eqc-btn--sm` (0,1,0) modifier lost every cascade and the small
+   button kept the full 53u inline padding -- 65px a side, which pushed the
+   "View All Teachers" pill to 305px inside a 337px column. The modifier has to
+   carry the same element+class weight as the rule it modifies. */
+a.eqc-btn--sm, button.eqc-btn--sm, .eqc-btn--sm { --_h: max(44px, calc(38 * var(--eqc-u))); padding-inline: calc(18 * var(--eqc-u)); font-size: var(--eqc-fs-small); }
 .eqc-btn--sm.eqc-btn--icon-disc .eqc-icon { padding: calc(5 * var(--eqc-u)); }
 
 /* Card: 187 x 394u, oval portrait overlapping the top edge. */
@@ -2296,7 +2316,7 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 	   and sits from -120 to +43 relative to the card's top edge, so it
 	   intrudes 43px — about 50u. The old 104u came from an assumed oval
 	   height and left ~46px of dead space inside every card. */
-	padding-block-start: calc(58 * var(--eqc-u));
+	padding-block-start: calc(98 * var(--eqc-u));
 }
 .eqc-section--teachers .eqc-card--teacher .eqc-teacher-photo-widget {
 	position: absolute;
