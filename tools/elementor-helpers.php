@@ -374,11 +374,12 @@ function eqc_pricing_card( $frequency, $price, $unit, $features, $link, $feature
 	$children[] = eqc_html(
 		'<span class="eqc-pricing-icon"><span class="eqc-pricing-icon-ring" aria-hidden="true">' . eqc_get_svg_asset( 'rosette-12' ) . '</span>' . eqc_icon_str( 'calendar' ) . '</span>'
 	);
-	$children[] = eqc_html( '<span class="eqc-pricing-freq">' . esc_html( $frequency ) . '</span>' );
+	$children[] = eqc_html( '<span class="eqc-pricing-freq eqc-pricing-banner">' . esc_html( $frequency ) . '</span>' );
 	$children[] = eqc_html( '<div class="eqc-pricing-divider">' . eqc_divider_svg( 'accent' ) . '</div>' );
 	$children[] = eqc_html( $features_html );
 	$children[] = eqc_html(
-		'<p class="eqc-pricing-price"><span class="eqc-pricing-price-figure">$' . esc_html( $price ) . '<small>/ ' . esc_html( $unit ) . '</small></span>'
+		'<p class="eqc-pricing-price"><span class="eqc-pricing-price-figure">$' . esc_html( $price ) . '</span>'
+		. '<span class="eqc-pricing-unit">' . esc_html( $unit ) . '</span>'
 		. '<span class="eqc-arrow-btn" aria-hidden="true">' . eqc_icon_str( 'arrow-right' ) . '</span></p>',
 		'eqc-card__foot'
 	);
@@ -595,6 +596,18 @@ function eqc_about_stat( $icon, $label, $value ) {
 		. '<span class="eqc-about-stat__disc">' . eqc_icon_str( $icon ) . '</span>'
 		. '<span class="eqc-about-stat__label">' . esc_html( $label ) . '</span>'
 		. '<span class="eqc-about-stat__value">' . esc_html( $value ) . '</span>'
+		. '</div>';
+}
+
+/**
+ * One tile in the pricing benefits strip: a rosette-framed icon disc and a
+ * two-line label. "|" is an explicit line break, as in eqc_trust_tile().
+ */
+function eqc_benefit_tile( $icon, $label ) {
+	$lines = implode( '<br>', array_map( 'esc_html', array_map( 'trim', explode( '|', $label ) ) ) );
+	return '<div class="eqc-benefit">'
+		. '<span class="eqc-benefit__disc">' . eqc_icon_str( $icon ) . '</span>'
+		. '<span class="eqc-benefit__label">' . $lines . '</span>'
 		. '</div>';
 }
 

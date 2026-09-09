@@ -295,15 +295,20 @@ $teachers = eqc_section(
 );
 
 // ------------------------------------------------------- 7. PRICING
+// Five features per plan in the reference, not four. Prices and class counts
+// are unverified client claims - QA/PLACEHOLDER-REGISTER.md.
+$plan_features = array( '30 Minutes Each Class', '%d Classes Per Month', 'Expert Tutors', 'Monthly Tracking', 'Personalized Focus' );
 $plans = array(
-	array( '2 Days/Week', 39, array( '30 Minutes Each Class', '8 Classes Per Month', 'Expert Tutors', 'Monthly Tracking' ), false ),
-	array( '3 Days/Week', 45, array( '30 Minutes Each Class', '12 Classes Per Month', 'Expert Tutors', 'Monthly Tracking' ), false ),
-	array( '4 Days/Week', 59, array( '30 Minutes Each Class', '16 Classes Per Month', 'Expert Tutors', 'Monthly Tracking' ), false ),
-	array( '5 Days/Week', 69, array( '30 Minutes Each Class', '20 Classes Per Month', 'Expert Tutors', 'Monthly Tracking' ), true ),
+	array( '2 Days/Week', 39, 8, false ),
+	array( '3 Days/Week', 45, 12, false ),
+	array( '4 Days/Week', 59, 16, false ),
+	array( '5 Days/Week', 69, 20, true ),
 );
 $pricing_cards = array();
 foreach ( $plans as $p ) {
-	$pricing_cards[] = eqc_pricing_card( $p[0], $p[1], 'month', $p[2], $trial_url, $p[3] );
+	$features = $plan_features;
+	$features[1] = sprintf( $plan_features[1], $p[2] );
+	$pricing_cards[] = eqc_pricing_card( $p[0], $p[1], 'Month', $features, $trial_url, $p[3] );
 }
 $pricing_panel = eqc_container(
 	array( 'css_classes' => 'eqc-pricing-panel', 'flex_direction' => 'column' ),
@@ -313,13 +318,22 @@ $pricing_panel = eqc_container(
 	)
 );
 $pricing = eqc_section(
-	'eqc-section eqc-section--cream',
+	'eqc-section eqc-section--pricing eqc-section--cream',
 	array(
 		eqc_inner(
 			'',
 			array(
-				eqc_section_heading_el( 'Pricing', 'Simple monthly pricing, <span style="color:var(--eqc-bronze-700)">no hidden fees</span>' ),
+				eqc_section_heading_el( 'Pricing', 'Simple monthly pricing,<br>no hidden fees', true, 'eqc-eyebrow--rosette' ),
 				$pricing_panel,
+				// White strip of four benefits under the cards, hairline-separated.
+				eqc_html(
+					'<div class="eqc-benefits">'
+					. eqc_benefit_tile( 'users', 'Qualified | Male & Female Tutors' )
+					. eqc_benefit_tile( 'book-open', 'One-on-One | Live Classes' )
+					. eqc_benefit_tile( 'clock', 'Flexible | Schedule' )
+					. eqc_benefit_tile( 'shield', 'Safe & Supportive | Learning Environment' )
+					. '</div>'
+				),
 			)
 		),
 	)

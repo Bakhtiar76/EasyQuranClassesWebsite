@@ -1908,3 +1908,115 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 	margin-inline-start: calc(10 * var(--eqc-u));
 	flex: none;
 }
+
+/* ---------- Pricing section (pricing.jpeg) ---------- */
+
+/* pricing.jpeg calibrates at s=1.345: its card row and benefits strip both
+   span 1505px = the 1119u content column. Cards 262u on a 31u gap. */
+.eqc-grid--pricing { grid-template-columns: repeat(4, 1fr); gap: calc(31 * var(--eqc-u)); }
+@media (max-width: 61.25rem) { .eqc-grid--pricing { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 36rem) { .eqc-grid--pricing { grid-template-columns: 1fr; } }
+.eqc-card--pricing { min-height: calc(343 * var(--eqc-u)); padding: calc(20 * var(--eqc-u)); gap: calc(6 * var(--eqc-u)); }
+
+/* This heading measures 545u for its first line against the courses section's
+   604u for a same-length string — the reference genuinely sets it smaller, so
+   it carries its own size rather than moving the shared token. */
+.eqc-section--pricing .eqc-section-heading h2 { font-size: calc(51 * var(--eqc-u)); }
+
+/* Dark-green banner with chamfered ends holding "N Days/Week", 207 x 54u. */
+.eqc-pricing-banner {
+	display: block;
+	width: calc(207 * var(--eqc-u));
+	max-width: 100%;
+	margin-inline: auto;
+	padding: calc(11 * var(--eqc-u)) calc(16 * var(--eqc-u));
+	background: var(--eqc-green-800);
+	color: var(--eqc-white);
+	font-family: var(--eqc-font-display);
+	font-size: calc(24 * var(--eqc-u));
+	text-align: center;
+	line-height: 1.15;
+	clip-path: polygon(calc(14 * var(--eqc-u)) 0, calc(100% - 14 * var(--eqc-u)) 0, 100% 50%, calc(100% - 14 * var(--eqc-u)) 100%, calc(14 * var(--eqc-u)) 100%, 0 50%);
+}
+
+/* Price row: figure, cream unit pill, dark-green arrow disc. */
+.eqc-pricing-price { display: flex; align-items: center; gap: calc(12 * var(--eqc-u)); margin: 0; }
+.eqc-pricing-price-figure { font-family: var(--eqc-font-display); font-size: calc(44 * var(--eqc-u)); color: var(--eqc-heading); line-height: 1; }
+.eqc-pricing-unit {
+	background: var(--eqc-cream-100);
+	border-radius: var(--eqc-radius-pill);
+	padding: calc(6 * var(--eqc-u)) calc(13 * var(--eqc-u));
+	font-size: calc(12 * var(--eqc-u));
+	color: var(--eqc-text);
+}
+.eqc-card--pricing .eqc-arrow-btn {
+	margin-inline-start: auto;
+	width: calc(46 * var(--eqc-u));
+	height: calc(46 * var(--eqc-u));
+	background: var(--eqc-green-800);
+	color: var(--eqc-white);
+	border-color: var(--eqc-green-800);
+}
+
+/* Benefits strip: 1120 x 96u, four hairline-separated tiles. */
+.eqc-benefits {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	align-items: center;
+	width: 100%;
+	min-height: calc(96 * var(--eqc-u));
+	margin-block-start: calc(24 * var(--eqc-u));
+	padding: calc(16 * var(--eqc-u)) calc(20 * var(--eqc-u));
+	background: var(--eqc-white);
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-panel);
+	box-shadow: var(--eqc-shadow-card);
+}
+.eqc-benefit { display: flex; align-items: center; gap: calc(14 * var(--eqc-u)); padding-inline: calc(18 * var(--eqc-u)); }
+.eqc-benefit + .eqc-benefit { border-inline-start: 1px solid var(--eqc-border); }
+.eqc-benefit__disc {
+	display: inline-flex; align-items: center; justify-content: center; flex: none;
+	width: calc(52 * var(--eqc-u)); height: calc(52 * var(--eqc-u));
+	border-radius: 50%; background: var(--eqc-cream-100); border: 1px solid var(--eqc-border-strong);
+}
+.eqc-benefit__disc .eqc-icon { width: calc(26 * var(--eqc-u)); height: calc(26 * var(--eqc-u)); color: var(--eqc-green-800); }
+.eqc-benefit__label { font-size: calc(13 * var(--eqc-u)); line-height: 1.35; color: var(--eqc-heading); }
+@media (max-width: 61.25rem) {
+	.eqc-benefits { grid-template-columns: repeat(2, 1fr); row-gap: calc(18 * var(--eqc-u)); }
+	.eqc-benefit:nth-child(odd) { border-inline-start: 0; }
+}
+@media (max-width: 36rem) {
+	.eqc-benefits { grid-template-columns: 1fr; }
+	.eqc-benefit + .eqc-benefit { border-inline-start: 0; }
+}
+
+/* Centred pill eyebrow with a rosette, as pricing.jpeg draws it. */
+.eqc-eyebrow--rosette { align-self: center; width: auto; border-color: var(--eqc-gold-300); }
+
+/* The pricing panel was insetting the card grid by ~44u a side; in the
+   reference the cards span the full 1119u content column, same as the
+   benefits strip beneath them. */
+.eqc-pricing-panel { padding-inline: 0; }
+.eqc-pricing-panel > .e-con { padding-inline: 0; }
+/* Feature rows are the bulk of the card's height; the reference runs them
+   tighter (card 343u against our 406u). */
+.eqc-pricing-list { gap: calc(7 * var(--eqc-u)); margin: 0; }
+.eqc-pricing-list li { font-size: calc(13 * var(--eqc-u)); line-height: 1.35; gap: calc(9 * var(--eqc-u)); }
+.eqc-card--pricing .eqc-pricing-divider { margin-block: calc(4 * var(--eqc-u)); }
+
+/* pricing.jpeg rides the RECOMMENDED label as a horizontal tab on the card's
+   top-right corner, not a diagonal corner ribbon. */
+.eqc-pricing-badge {
+	transform: none;
+	inset-block-start: calc(-16 * var(--eqc-u));
+	inset-inline-end: calc(-6 * var(--eqc-u));
+	inset-inline-start: auto;
+	border-radius: var(--eqc-radius-pill);
+	padding: calc(6 * var(--eqc-u)) calc(16 * var(--eqc-u));
+	font-size: calc(11 * var(--eqc-u));
+	letter-spacing: 0.1em;
+	white-space: nowrap;
+}
+/* The reference sets the four cards straight on the section ground; the
+   enclosing panel frame is ours, not the design's. */
+.eqc-pricing-panel { background: none; border: 0; box-shadow: none; }

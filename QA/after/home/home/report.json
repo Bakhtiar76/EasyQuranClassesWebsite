@@ -1,7 +1,7 @@
 {
   "route": "/",
   "url": "http://localhost/",
-  "generatedAt": "2026-09-09T06:52:35.327Z",
+  "generatedAt": "2026-09-09T06:59:20.410Z",
   "viewports": [
     {
       "name": "desktop-1920x1080",
@@ -133,7 +133,7 @@
     },
     {
       "level": 2,
-      "text": "Simple monthly pricing, no hidden fees"
+      "text": "Simple monthly pricing,no hidden fees"
     },
     {
       "level": 2,

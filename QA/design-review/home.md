@@ -455,3 +455,51 @@ page / asset errors, 0 images missing `alt`, one H1.
 
 Remaining: the section's closing centred divider (473 × 48u) and the large
 corner girih watermarks are not yet matched to the reference's size/placement.
+
+---
+
+## Section 5 — Pricing (`pricing.jpeg`, `claude-opus-5`)
+
+Calibration: **s = 1.345** — anchored by the card row and the benefits strip
+both spanning 1505px, i.e. the 1119u content column. (Confirmed after the fact:
+the rebuilt benefits strip measures 1119u against the reference's 1120u.)
+
+| # | Reference shows | Build did | Sev | Fix |
+|---|---|---|---|---|
+| P1 | Heading **centred**, both lines dark green, explicit break | Left-aligned, "no hidden fees" in bronze, natural wrap | P0 | centred; single colour; `<br>` |
+| P2 | Heading line 1 545u — smaller than the courses heading's 604u | shared 60u h2 | P2 | per-section 51u override (see note) |
+| P3 | **Five** feature rows per plan, incl. "Personalized Focus" | Four | P0 (§2) | fifth added |
+| P4 | Frequency in a dark-green **chamfered banner** 207 × 54u | Plain text | P1 | `.eqc-pricing-banner` with `clip-path` |
+| P5 | Price + a cream **"Month" pill** + dark-green arrow disc | `$39/ month` as a slashed suffix, outlined arrow | P1 | `.eqc-pricing-unit` pill; green disc |
+| P6 | White **benefits strip** below the cards, 1120 × 96u, four hairline-separated tiles | **Absent entirely** | P0 | `.eqc-benefits` + `eqc_benefit_tile()` |
+| P7 | Cards span the full content column | Grid inset ~44u a side by the panel | P1 | panel padding zeroed → card 256u vs 262u |
+| P8 | RECOMMENDED as a horizontal tab on the top-right corner | Diagonal corner ribbon | P2 | tab geometry |
+| P9 | Cards sit straight on the section ground | Enclosing panel frame | P2 | panel background/border removed |
+
+**Note on P2.** This heading measures 545u for a 23-character first line where
+the courses heading measures 604u for a 22-character one — after both were
+scaled by their own independent anchors. Rather than move the shared token
+(which courses corroborates to within 0.3%), Pricing carries its own size. Two
+sections legitimately differing is the same pattern as About's display heading.
+
+Verified: sweep at five viewports + the 380–1900 scan, no overflow, 0 console /
+page / asset errors, 0 images missing `alt`, one H1.
+
+Remaining: the section's ornate gold corner frames, and the plan badge should
+float fully clear of the card's top edge rather than overlapping it.
+
+---
+
+## Section order — a finding that needs a decision
+
+The build's Home page runs: hero → trust → about → courses → **how it works** →
+**teachers** → **pricing** → testimonials → **FAQ** → blog.
+
+`TASK-DESIGN-PARITY.md` §10 and the reference set give: hero → trust → about →
+courses → **pricing** → **teachers** → testimonials → blog → final CTA.
+
+So the build has **two sections the reference does not contain** ("From first
+message to first class", and the FAQ accordion), and **pricing/teachers are
+swapped**. Removing or reordering sections deletes working content and changes
+the page's argument, so it is not something to do unprompted — raised for the
+user rather than actioned.
