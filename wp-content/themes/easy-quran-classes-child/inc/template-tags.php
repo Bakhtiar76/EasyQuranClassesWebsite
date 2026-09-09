@@ -100,7 +100,57 @@ function eqc_divider_svg( $variant, $class = '' ) {
  * @return string
  */
 function eqc_logo_mark_svg( $class = '' ) {
-	return eqc_get_svg_asset( 'logo/eqc-logo-mark', trim( 'eqc-logo-mark ' . $class ) );
+	$svg = eqc_get_svg_asset( 'logo/eqc-logo-mark', trim( 'eqc-logo-mark ' . $class ) );
+	if ( ! $svg ) {
+		return '';
+	}
+	// The asset file carries aria-label="Easy Quran Classes". Every call site
+	// pairs the mark with live text that already says the same thing (the
+	// lockup below) or is purely ornamental (the footer medallion), so the
+	// label would only duplicate the link name — hide the mark from
+	// assistive tech at the point of use rather than in the generated asset.
+	return preg_replace( '/<svg /', '<svg aria-hidden="true" focusable="false" ', $svg, 1 );
+}
+
+/**
+ * The full brand lockup as a home link: the mark, "EASY QURAN" on one line,
+ * and a letterspaced "CLASSES" between two short gold rules below it —
+ * the two-line wordmark the client reference uses in both the header and
+ * the footer (Assests/Home.jpeg, Assests/End.jpeg).
+ *
+ * Both lines are live text driven by the WordPress site title (the last
+ * word becomes the ruled sub-line), so the brand name is still owned by
+ * Settings > General and stays selectable, translatable and searchable
+ * instead of being baked into an image. A single-word site title simply
+ * renders without the sub-line.
+ *
+ * Shared by header.php and footer.php so the two can never drift apart.
+ *
+ * @param string $class Extra classes appended to "eqc-logo-link".
+ * @return string
+ */
+function eqc_logo_lockup( $class = '' ) {
+	$name  = trim( wp_strip_all_tags( get_bloginfo( 'name', 'display' ) ) );
+	$words = $name ? preg_split( '/\s+/', $name ) : array();
+	$sub   = count( $words ) > 1 ? array_pop( $words ) : '';
+	$main  = implode( ' ', $words );
+
+	// Preserve a real word separator between the two display lines so the
+	// link's accessible name comes directly from its visible text.
+	$html  = '<a class="' . esc_attr( trim( 'eqc-logo-link ' . $class ) ) . '" href="' . esc_url( home_url( '/' ) ) . '" rel="home">';
+	$html .= eqc_logo_mark_svg();
+	$html .= '<span class="eqc-logo-lockup">';
+	$html .= '<span class="eqc-logo-name">' . esc_html( $main ) . '</span> ';
+	if ( $sub ) {
+		$html .= '<span class="eqc-logo-sub">'
+			. '<span class="eqc-logo-rule" aria-hidden="true"></span>'
+			. '<span class="eqc-logo-sub-text">' . esc_html( $sub ) . '</span>'
+			. '<span class="eqc-logo-rule" aria-hidden="true"></span>'
+			. '</span>';
+	}
+	$html .= '</span></a>';
+
+	return $html;
 }
 
 /**
@@ -145,15 +195,26 @@ function eqc_render_blog_cards( $posts ) {
 		$ribbon    = ! empty( $cats ) ? '<span class="eqc-blog-ribbon">' . esc_html( $cats[0]->name ) . '</span>' : '';
 		$thumb     = has_post_thumbnail( $post ) ? get_the_post_thumbnail( $post, 'eqc-blog-card' ) : '';
 
+		// Blogs.jpeg puts a white date chip (calendar icon, day, month) over the
+		// image's top-left corner, and the category as plain gold caps above the
+		// title - not a ribbon on the image.
+		$chip = '<span class="eqc-blog-date">' . eqc_get_icon_html( 'calendar' )
+			. '<span class="eqc-blog-date__day">' . esc_html( get_the_date( 'j', $post ) ) . '</span>'
+			. '<span class="eqc-blog-date__mon">' . esc_html( strtoupper( get_the_date( 'M', $post ) ) ) . '</span></span>';
+		$category = ! empty( $cats ) ? '<span class="eqc-blog-category">' . esc_html( $cats[0]->name ) . '</span>' : '';
+
 		$html .= '<article class="eqc-card eqc-card--blog" data-eqc-reveal data-eqc-reveal-index="' . min( $i, 3 ) . '">';
-		$html .= '<a class="eqc-blog-media" href="' . esc_url( $permalink ) . '">' . $thumb . $ribbon . '</a>';
+		// aria-hidden + tabindex -1: the title and "Read More" links below already
+		// point here, so exposing the image as a third unnamed link would add
+		// a nameless tab stop for no gain.
+		$html .= '<a class="eqc-blog-media" href="' . esc_url( $permalink ) . '" tabindex="-1" aria-hidden="true">' . $thumb . '</a>' . $chip;
 		$html .= '<div class="eqc-blog-body">';
-		$html .= '<div class="eqc-blog-meta">' . $cat_name . esc_html( get_the_date( '', $post ) ) . '</div>';
+		$html .= $category;
 		$html .= '<h3><a href="' . esc_url( $permalink ) . '" style="text-decoration:none;color:inherit;">' . esc_html( get_the_title( $post ) ) . '</a></h3>';
 		$html .= '<p class="eqc-blog-excerpt">' . esc_html( wp_trim_words( get_the_excerpt( $post ), 18 ) ) . '</p>';
 		/* translators: %s: post title, read by screen readers only — the visible link text stays the short "Read More". */
 		$read_more_label = sprintf( __( 'Read more: %s', 'easy-quran-classes' ), get_the_title( $post ) );
-		$html           .= '<a class="eqc-read-more" href="' . esc_url( $permalink ) . '" aria-label="' . esc_attr( $read_more_label ) . '">' . esc_html__( 'Read More', 'easy-quran-classes' ) . ' ' . eqc_get_icon_html( 'arrow-right' ) . '</a>';
+		$html           .= '<a class="eqc-read-more" href="' . esc_url( $permalink ) . '" aria-label="' . esc_attr( $read_more_label ) . '">' . esc_html__( 'Read More', 'easy-quran-classes' ) . '<span class="eqc-read-more__disc" aria-hidden="true">' . eqc_get_icon_html( 'chevrons-right' ) . '</span>' . '</a>';
 		$html .= '</div></article>';
 	}
 	$html .= '</div>';

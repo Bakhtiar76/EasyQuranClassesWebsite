@@ -308,3 +308,5 @@ converge.
 ship **filled** as their real logos — a deliberate exception to
 DESIGN.md §11's one-outline-family rule, since outline-tracing a brand
 mark (the previous WhatsApp glyph) is exactly what read as broken.
+
+The reference uses Twitter's bird mark. Its CC0 Simple Icons9.21.0 source is vendored in twitter-reference.svg; the generator reads it alongside the installed brand icons.

@@ -100,6 +100,7 @@ These are the working tokens, validated against both the confirmed logo and the 
   --eqc-green-700: #24503B;
   --eqc-brand-green: #006B3D;
 
+  --eqc-gold-700: #6F551C; /* Small gold text on cream: AA contrast. */
   --eqc-gold-600: #A98235;
   --eqc-gold-500: #B9974C;
   --eqc-gold-300: #D9C48D;
@@ -161,40 +162,96 @@ Recommended weights:
 - Manrope: 400, 500, 600, 700
 - Noto Naskh Arabic: 400, 600 only if Arabic content requires it
 
-### Type Scale — Desktop
+### Type Scale
 
-| Token | Size | Weight | Line Height | Usage |
+Type does **not** ride `--eqc-u` linearly. Every role is
+`clamp(floor, calc(n * var(--eqc-u)), ceiling)`, where `n` is the size in px
+at the 1600px reference width. The floor guarantees legibility at any width
+*continuously*; the ceiling stops headings ballooning on a 2560px display.
+
+There is no separate mobile table and no floor media query — the clamp is the
+floor at every width. A breakpoint-bounded floor only holds on one side of the
+breakpoint, which is what left a 6px discontinuity at exactly 1100px and
+mainstream laptops (1101–1600) unfloored. See QA/LESSONS.md #36, #38.
+
+| Token | Floor | @1600 | Ceiling | Usage |
 |---|---:|---:|---:|---|
-| Display XL | clamp(52px, 5vw, 76px) | 400 | 1.02 | rare hero/display use |
-| H1 | clamp(46px, 4.2vw, 66px) | 400 | 1.06 | page hero |
-| H2 | clamp(38px, 3.4vw, 54px) | 400 | 1.10 | major section title |
-| H3 | 28–34px | 400/600 | 1.18 | cards/subsections |
-| H4 | 21–24px | 600 | 1.25 | card headings |
-| Body L | 18px | 400 | 1.75 | hero/about intro |
-| Body | 16px | 400 | 1.7 | standard copy |
-| Small | 14px | 500 | 1.55 | metadata/labels |
-| Eyebrow | 14–15px | 700 | 1.3 | uppercase section label |
-| Button | 15–16px | 600 | 1 | buttons |
+| Display XL | 34px | 52px | 60px | About section heading |
+| H1 | 32px | 46px | 54px | page hero |
+| H2 | 28px | 44px | 52px | major section title |
+| H2 compact | 24px | 34px | 40px | heading in a narrow column (teachers) |
+| H3 | 19px | 22px | 26px | course/blog card title |
+| H4 | 17px | 18px | 20px | card headings |
+| Body L | 17px | 17.5px | 19px | hero/about intro |
+| Body | 15px | 15.5px | 17px | standard copy, card body |
+| Small | 14px | 14.5px | 16px | metadata/labels |
+| XSmall | 13px | 13px | 14px | smallest label role |
+| Eyebrow | 12px | 13.5px | 15px | uppercase section label |
+| Button | 15px | 15px | 17px | buttons |
+| Price | 30px | 38px | 44px | pricing card figure |
 
-### Mobile Type Scale
+**Heading-to-body ratio must stay between 2.5 and 3.2.** At 1600 it is 2.84.
+It was 5.0 when type shared the layout unit, which is what made the page read
+as simultaneously oversized and unreadable.
 
-- H1: 38–46px
-- H2: 32–38px
-- H3: 25–29px
-- Body: 16px
-- Small: 13–14px
-
-Do not reduce body copy below 16px on mobile.
+**Never set `font-size` as a bare `calc()` on `--eqc-u`.** 33 rules did, which
+is how ten roles reached 7.6–9.4px on a 390px phone while every contrast check
+passed. Use the tokens so a size cannot escape its floor.
 
 ## 7. Layout System
 
 ### Global Widths
 
 ```css
---eqc-content-max: 1240px;
---eqc-content-narrow: 820px;
---eqc-text-max: 680px;
+--eqc-u: clamp(0.70px, 0.0625vw, 1.32px);    /* 1 unit = 1px on the 1600px reference screen */
+--eqc-content-w: 85.6%;
+--eqc-content-max: calc(1119 * var(--eqc-u));   /* 1343px @1920 */
+--eqc-content-narrow: calc(558 * var(--eqc-u));
+--eqc-text-max: calc(463 * var(--eqc-u));
 ```
+
+> **Updated from the client reference, 2026-09-09** (`claude-opus-5`, design
+> parity pass — `QA/design-review/home.md` findings 1 and 4).
+>
+> `--eqc-content-max` was 1240px in this document and 1400px in `tokens.css`;
+> neither matched the reference. Measured on `Home.jpeg` (1307px canvas), the
+> hero's content column runs from the H1's left edge x105 to the arch's outer
+> right edge x1224 — 1119px, i.e. 85.6% of the canvas, or **1644px at 1920**.
+> `.eqc-container` is `border-box` with `--eqc-gutter` padding inside, so the
+> token carries 1644 + 2x32 = **1708px**. The trust panel gives a slightly
+> tighter 1620px; the difference is that panel's own inset.
+>
+> The H1 cap rose from 66px to **79px**, derived from glyph width rather than
+> assumed font metrics: the hero's second line spans 823px at 1920 in the
+> reference, and that string in DM Serif Display needs 897px at 86px, so the
+> reference size is 86 x 823/897 ~ 79px. At 66px the hero H1 wrapped to three
+> lines where the reference has two — and in this design the line break is
+> load-bearing, because string length is what sets the column geometry.
+>
+> Only ratios measured *within a single* reference file are meaningful: the
+> section JPEGs are crops at different zoom levels (`QA/LESSONS.md` #11).
+
+> **Superseded by the proportional scale system, 2026-09-09** (`claude-opus-5`
+> — `QA/design-review/home.md` "Proportional scale system").
+>
+> The px values in the tables above are no longer the source of truth. The
+> client's design is **proportional**: every dimension in `Assests/*.jpeg` is a
+> fixed fraction of the viewport, measured on a 1307px canvas. `tokens.css`
+> defines `--eqc-u` as one pixel on that canvas, and every size token is
+> `calc(<measured native px> * var(--eqc-u))`. The px figures shown here are
+> what those resolve to at 1920.
+>
+> Measured type, in native units: H1 53.7, body-l 16.6, body 13.6, small 11.6,
+> xsmall 10.3, button 11.2, eyebrow 8.85 — all derived by **glyph width**
+> against the reference's own line widths, never from assumed font metrics.
+>
+> Two deliberate departures from pure proportion, both under
+> TASK-DESIGN-PARITY.md §2A: the unit is capped at 1.607 (~2100px) so a 2560px
+> display does not get 32px body copy, and below 1100px the type floors out at
+> readable minimums (§6's 16px body rule) while layout keeps scaling. The
+> floors are applied in a media query, not as `max()` on the token, because
+> they sit above the reference's own small-role sizes and would otherwise
+> change the rendering at the reference width itself.
 
 ### Section Spacing
 
@@ -375,6 +432,8 @@ Forms keeps "required" as the server-side backstop.
 
 ## 14. Header
 
+Parity implementation (2026-09-09): shared chrome spans94% of the viewport, capped at1810px. Header bar scales64–150px; the approved vector mark accompanies a two-line live wordmark. Six links are Home, About Us, Courses, Teachers, Pricing, Contact Us; the separate gift CTA reads FREE TRIAL. The drawer is used below1024px, traps focus, makes the background inert and clears its state when resized to desktop. The header compacts on scroll. Fonts are bundled locally with their OFL licences.
+
 Desktop header should follow the client reference direction:
 
 - white/surface rounded container
@@ -406,6 +465,10 @@ FAQ and Blog may live in a secondary route, footer, or expanded navigation depen
 - drawer must be keyboard accessible
 
 ## 15. Footer
+
+Parity implementation follows `Assests/End.jpeg`: a dark CTA with a two-line white/gold heading and three-line paragraph, one white rounded action capsule containing four avatars, a count circle and gold button. It remains two columns from1120px. The cream footer panel has three ruled columns (brand/about, contact, two columns of four quick links), then a dark copyright bar with an overlapping logo medallion. The footer grid stacks below1024px. Small gold text uses gold700; decorative gold retains the reference palette. Missing social URLs render noninteractive labelled marks. Photography sources and fictional portrait status are documented in QA/ASSET-SOURCES.md.
+
+TASK-DESIGN-PARITY.md explicitly permits exact unverified reference claims on the local staging site. Every such string belongs in QA/PLACEHOLDER-REGISTER.md and requires clearance before production; this local task exception supersedes the general prohibition below during parity work only.
 
 Footer should combine the client reference's strong dark-green identity with a clean information hierarchy.
 

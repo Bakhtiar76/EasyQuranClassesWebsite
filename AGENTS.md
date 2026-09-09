@@ -59,10 +59,19 @@ Registered globally in `~/.codex/config.toml` by `tools/codex/setup-codex.ps1`:
 | `novamira-localhost` | WordPress control plane for the **local** site — PHP eval incl. `$wpdb`, WP-CLI, filesystem R/W, Elementor `Document::save()`. Launched via `tools/codex/novamira-mcp.cmd` so the Application Password is never written into config. Local only — never production. |
 | `chrome-devtools` | Screenshots, console, network, Lighthouse against `http://localhost/`. Backs the `visual-qa` and `performance-audit` skills. |
 | `context7` | Live WordPress / Elementor / PHP library docs. No auth. |
+| `playwright` | Accessibility-tree snapshots, form filling, keyboard/focus checks, multi-tab flows against `http://localhost/`. Runs `--isolated` (throwaway profile, never touches your Chrome session) and `--blocked-origins` the production domain. Complements `chrome-devtools`, which stays the tool for network, console, Lighthouse and performance traces. |
 
-Codex's bundled `browser@openai-bundled` and `computer-use` plugins are already enabled and are
-the interactive browser-automation path; the scripted path is `node tests/visual/sweep.mjs`
+Codex's bundled `browser@openai-bundled` and `computer-use` plugins are also enabled as the
+general interactive browser path; the scripted path is `node tests/visual/sweep.mjs`
 (project-local 7-viewport runner — prefix with `MSYS_NO_PATHCONV=1` in Git Bash).
+
+Pick deliberately: `playwright` for *interacting with and asserting on* the page (a11y tree,
+tab order, form submission), `chrome-devtools` for *measuring* it (computed styles, network,
+Lighthouse), `sweep.mjs` for repeatable multi-viewport screenshot runs.
+
+The `--blocked-origins` guard on `playwright` is defence-in-depth, not a security boundary
+(Playwright's own docs note it does not affect redirects). The rule stands on its own: never
+point any browser tool at `easyquranclasses.com`.
 
 ### Project skills
 

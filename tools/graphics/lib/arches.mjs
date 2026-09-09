@@ -432,3 +432,99 @@ export function multifoilArchPanel(w, jamb, baseH, { lobes = 3 } = {}) {
 	const breakpoints = Array.from({ length: lobes - 1 }, (_, i) => (i + 1) / lobes);
 	return scallopedArchPanel(w, jamb, baseH, breakpoints, false);
 }
+
+/** Keel / Mughal arch — the OUTWARD-cusped half of the same scalloped
+ * support-line construction: a vertical jamb, `bumps` stacked lobes that
+ * bulge away from the arch, then a sharp point. The construction was
+ * already written and documented in the header comment above ("the
+ * keel/Mughal arch below") but only the inward variant was ever exported.
+ *
+ * NOTE: this even-semicircle form does NOT fit the client's Home.jpeg hero
+ * arch — see cuspedArchPanel below for the measured profile and why. Kept
+ * because it is the natural companion to multifoilArchPanel and the
+ * general form of the same construction. */
+export function keelArchPanel(w, jamb, baseH, { bumps = 2, breakpoints } = {}) {
+	const bp = breakpoints ?? Array.from({ length: bumps }, (_, i) => (i + 1) / (bumps + 1));
+	return scallopedArchPanel(w, jamb, baseH, bp, true);
+}
+
+// ---------------------------------------------------------------------
+// Measured cusped keel arch — the client's actual hero silhouette.
+//
+// Why this is not scallopedArchPanel: that construction draws SEMIcircles
+// on chords of the straight base->apex line, so the profile necessarily
+// returns to that line at every cusp and each lobe's depth is exactly half
+// its chord. The reference does neither. Measured off Assests/Home.jpeg by
+// per-row background difference (tools/graphics/scratch/silhouette.mjs;
+// numbers in QA/design-review/home.md finding 2):
+//
+//   arch box x684-1243, y120-749 -> 559x629, aspect 0.8887
+//   vertical jamb begins y411    -> jamb/baseH 0.4626
+//   three outward lobes, peak horizontal deviation from the straight
+//   base->apex line 25.8 / 54.7 / 38.2px, with the CUSPS BETWEEN THEM
+//   still 24.5 and 26.1px clear of that line — i.e. the lobes sit on an
+//   underlying bulged curve, not on the chord — and lobe depth/chord
+//   ratios of 0.265 / 0.40 / 0.31 where a semicircle would give 0.50.
+//
+// So the profile is specified directly by its measured cusp points plus a
+// per-segment sagitta, and each segment is a circular arc through two
+// known points with a known bulge: r = (c^2/4 + s^2) / 2s, centre on the
+// perpendicular bisector at (r - s) inward from the chord midpoint. The
+// cusp junctions are deliberately NOT tangent-continuous — a cusp is a
+// visible corner, which is the whole point of the shape, so the
+// nextTangentArc solver is not wanted here.
+//
+// Coordinates are fractions of w (x) and baseH (y) from the apex, so the
+// shape scales to any box at the measured aspect ratio.
+// ---------------------------------------------------------------------
+
+/** Circular arc command from `from` to `to` bulging `sag` (perpendicular,
+ * in the direction of `outward`) — both points and the bulge are known, so
+ * the radius and centre are fully determined. */
+function bulgedArc(from, to, sag, outwardSign) {
+	const chord = sub(to, from), c = len(chord);
+	if (!(sag > 1e-6)) return { d: `L${fmt(to[0])} ${fmt(to[1])} `, extent: [to] };
+	const r = (c * c / 4 + sag * sag) / (2 * sag);
+	const mid = lerp(from, to, 0.5);
+	// perpendicular to the chord; outwardSign picks which side bulges.
+	const n = scale([-chord[1] / c, chord[0] / c], outwardSign);
+	const centre = sub(add(mid, scale(n, sag)), scale(n, r));
+	const crest = add(mid, scale(n, sag));
+	return { d: arcCmd(centre[0], centre[1], r, from, to) + ' ', extent: [from, to, crest] };
+}
+
+/** Measured three-lobe cusped keel arch (the Home.jpeg hero). `stops` are
+ * [x/w, y/baseH] cusp points from the apex down the LEFT side, `sagittae`
+ * the perpendicular bulge of each segment as a fraction of w. Defaults are
+ * the measured fit; override to fit a different reference. */
+export function cuspedArchPanel(w, jamb, baseH, {
+	// left-side cusps, base -> apex (x fraction of w, y fraction of baseH)
+	stops = [[0.0000, 0.4626], [0.0751, 0.3498], [0.2397, 0.1908], [0.4365, 0.0477]],
+	sagittae = [0.0130, 0.0363, 0.0218],
+} = {}) {
+	const hw = w / 2, apex = [hw, 0];
+	const P = stops.map(([fx, fy]) => [fx * w, fy * baseH]);
+	const mirror = (p) => [w - p[0], p[1]];
+
+	// Left side: base corner up through each cusp, then a straight run to
+	// the point (the reference's final run measures 0.4-5.0px off straight).
+	let leftD = '', extent = [...P];
+	for (let i = 0; i < P.length - 1; i++) {
+		const seg = bulgedArc(P[i], P[i + 1], sagittae[i] * w, -1);
+		leftD += seg.d; extent = extent.concat(seg.extent);
+	}
+	leftD += `L${fmt(apex[0])} ${fmt(apex[1])} `;
+
+	// Right side mirrored: apex down through the mirrored cusps to the base.
+	const R = P.map(mirror).reverse();
+	let rightD = `L${fmt(R[0][0])} ${fmt(R[0][1])} `; // mirror of the left's straight run off the point
+	for (let i = 0; i < R.length - 1; i++) {
+		const seg = bulgedArc(R[i], R[i + 1], sagittae[sagittae.length - 1 - i] * w, -1);
+		rightD += seg.d; extent = extent.concat(seg.extent);
+	}
+	rightD += `L${fmt(w)} ${fmt(baseH)} `;
+
+	const d = `M0 ${fmt(baseH)} L${fmt(P[0][0])} ${fmt(P[0][1])} ${leftD}${rightD}Z`;
+	const bbox = mergeBbox(bboxOf([[0, 0], [w, 0], [0, baseH], [w, baseH]]), bboxOf(extent));
+	return { d, bbox };
+}

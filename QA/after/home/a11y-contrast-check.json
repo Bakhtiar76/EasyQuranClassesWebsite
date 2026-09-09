@@ -1,0 +1,116 @@
+{
+  "page": "http://localhost/ (home)",
+  "section": "hero + trust strip",
+  "viewport": "1920x1080",
+  "run_by": "claude-opus-5",
+  "date": "2026-09-09",
+  "method": "computed styles read off the rendered page via Playwright; contrast uses each element's real inherited background, not an assumed one",
+  "wcag_aa_threshold": {
+    "normal_text": 4.5,
+    "large_text": 3.0
+  },
+  "contrast": [
+    {
+      "label": "hero eyebrow",
+      "fontPx": 20,
+      "ratio": 6.04,
+      "pass": true
+    },
+    {
+      "label": "hero H1",
+      "fontPx": 79,
+      "ratio": 11.24,
+      "pass": true
+    },
+    {
+      "label": "hero body",
+      "fontPx": 24,
+      "ratio": 8.57,
+      "pass": true
+    },
+    {
+      "label": "feature card line 1",
+      "fontPx": 15,
+      "ratio": 16.33,
+      "pass": true
+    },
+    {
+      "label": "feature card line 2",
+      "fontPx": 15,
+      "ratio": 9.47,
+      "pass": true
+    },
+    {
+      "label": "hero trust line",
+      "fontPx": 21,
+      "ratio": 8.57,
+      "pass": true
+    },
+    {
+      "label": "trust tile title",
+      "fontPx": 17,
+      "ratio": 5.74,
+      "pass": true
+    },
+    {
+      "label": "trust tile caption",
+      "fontPx": 17,
+      "ratio": 5.74,
+      "pass": true
+    },
+    {
+      "label": "secondary button",
+      "fontPx": 16,
+      "ratio": 11.24,
+      "pass": true
+    },
+    {
+      "label": "primary button",
+      "fontPx": 16,
+      "ratio": 7.88,
+      "pass": true
+    }
+  ],
+  "lowest_ratio": 5.74,
+  "accessibility": {
+    "h1_count": 1,
+    "h1_accessible_name": "Learn Quran Online with Personal Guidance",
+    "h1_rendered_lines": 2,
+    "decorative_svgs_exposed_to_a11y_tree": 0,
+    "hero_focusables_with_visible_focus_ring": "2 of 2",
+    "tap_targets_under_44px": 0,
+    "star_row_aria_hidden": true,
+    "star_row_note": "decorative: the five stars are aria-hidden so no rating is announced, because no verified aggregate rating exists yet (see QA/PLACEHOLDER-REGISTER.md)",
+    "hero_image_alt": "Child following along on a laptop during a live online Quran class with a male teacher",
+    "images_missing_alt": 0
+  },
+  "sweep": {
+    "viewports": [
+      1920,
+      1440,
+      1024,
+      768,
+      390
+    ],
+    "intermediate_scan": "380-1900 step 40 (39 widths)",
+    "horizontal_overflow": "none",
+    "console_errors": 0,
+    "page_errors": 0,
+    "asset_errors": 0,
+    "also_verified_at": "1307 (the reference's own canvas width) via matched-scale overlay"
+  },
+  "pass": "proportional scale system",
+  "parity": {
+    "method": "reference native px x 1.469, compared to the live 1920 render; x compared against a centred column because the reference capture's own margins are asymmetric (scrollbar)",
+    "checks": 32,
+    "worst_delta_px": 9,
+    "mean_abs_delta_px": 2.9,
+    "outside_tolerance": 1,
+    "tolerance_px": 8,
+    "before_this_pass": {
+      "worst_delta_px": 144
+    },
+    "chrome_regression_guard": "header bar 1791x149 @ y40 - identical to Codex's fitted geometry after the whole token set was re-expressed"
+  },
+  "not_verified": "Lighthouse - the chrome-devtools MCP server still refuses to start (a browser from the earlier Codex session holds its profile). No script or network weight was added; the only new assets are SVG masks and sprite symbols already referenced inline."
+}

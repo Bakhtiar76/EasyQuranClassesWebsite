@@ -11,7 +11,7 @@ body {
 	color: var(--eqc-text);
 	font-family: var(--eqc-font-body);
 	font-size: var(--eqc-fs-body);
-	line-height: 1.7;
+	line-height: 1.62;
 }
 
 h1, h2, h3, .eqc-display {
@@ -106,12 +106,18 @@ button:focus,
 .eqc-section--dark h2,
 .eqc-section--dark h3 { color: var(--eqc-white) !important; }
 
+/* The content column is the reference's own 85.6% band, held once --eqc-u
+   reaches its ceiling so the design stops growing past ~2100px. No inline
+   padding: the 85.6% box IS the column the reference measures, so padding
+   here would inset the content a second time. */
 .eqc-container {
-	width: 100%;
-	max-width: var(--eqc-content-max);
+	width: min(calc(1119 * var(--eqc-u)), calc(100% - 2 * var(--eqc-gutter)));
 	margin-inline: auto;
-	padding-inline: var(--eqc-gutter);
+	padding: 0;
 	box-sizing: border-box;
+	/* Elementor's kit sets a flat 20px container gap, the only spacing in the
+	   vertical stack that never scaled with the design. */
+	row-gap: calc(22 * var(--eqc-u));
 }
 
 .eqc-container--narrow { max-width: var(--eqc-content-narrow); }
@@ -176,7 +182,7 @@ button:focus,
 	width: 100%;
 	height: auto;
 	background: none;
-	margin-block: 1em;
+	margin-block: 0.4em;
 	color: var(--eqc-gold-500);
 	opacity: 0;
 	transform: scale(0.85);
@@ -224,14 +230,15 @@ html:not(.eqc-js) .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
 
 a.eqc-btn, button.eqc-btn,
 .elementor-widget-button.eqc-btn .elementor-button {
-	--_h: clamp(48px, 4vw, 56px);
+	/* max(), not a media query: the 44px tap floor applies at every width. */
+	--_h: max(48px, calc(58 * var(--eqc-u)));
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	gap: 0.6em;
+	gap: calc(10 * var(--eqc-u));
 	height: var(--_h);
 	width: auto;
-	padding-inline: 1.5em;
+	padding-inline: calc(53 * var(--eqc-u));
 	border-radius: var(--eqc-radius-pill);
 	font-family: var(--eqc-font-body);
 	font-size: var(--eqc-fs-button);
@@ -339,7 +346,7 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 .eqc-btn-group {
 	display: flex;
 	flex-wrap: wrap;
-	gap: 0.9rem;
+	gap: calc(13 * var(--eqc-u));
 	align-items: center;
 }
 
@@ -561,54 +568,20 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 
 /* Teacher card */
 .eqc-card--teacher { text-align: center; position: relative; }
-/* Mandorla (pointed-oval) frame, replacing a plain circle — matches the
-   client reference's arch-family photo treatment rather than a generic
-   avatar shape. Aspect-ratio matches mandorla-mask.svg's own true bbox
-   (249:330.994, see tools/graphics/gen-ornaments.mjs) so mask-size:100%
-   100% doesn't stretch it; the border becomes a mask-shaped outline
-   layer instead of a round border, since border-radius can't follow an
-   arbitrary silhouette. */
+/* Teachers.jpeg uses a smooth ellipse with a cream gap and a thin gold ring. */
 .eqc-card--teacher .eqc-teacher-photo,
 .eqc-card--teacher .eqc-teacher-photo-widget {
 	position: relative;
-	width: clamp(110px, 28%, 150px);
-	aspect-ratio: 249 / 330.994;
+	width: min(98%, calc(181 * var(--eqc-u)));
+	aspect-ratio: 244 / 262;
 	margin-inline: auto;
 }
-/* The mask lives on the <img>, not this container: masking a parent
-   clips its entire subtree (including a differently-sized pseudo-element)
-   to that one shape, which would clip the outline below right back down
-   to the photo's own silhouette instead of letting it trace just outside
-   it (see the .eqc-arch-media--masked comment above for the full case
-   that surfaced this). */
 .eqc-card--teacher .eqc-teacher-photo img,
 .eqc-card--teacher .eqc-teacher-photo-widget img {
-	-webkit-mask-image: url('../svg/mandorla-mask.svg');
-	mask-image: url('../svg/mandorla-mask.svg');
-	-webkit-mask-size: 100% 100%;
-	mask-size: 100% 100%;
-	-webkit-mask-repeat: no-repeat;
-	mask-repeat: no-repeat;
-}
-/* Reuses the exact same mandorla-mask.svg shape as the photo (not
-   mandorla-outline.svg's stroke render) for the same reason documented on
-   .eqc-arch-media--masked::before above — a thin stroke's own padding
-   doesn't match how much bigger this layer is enlarged via `inset`,
-   which distorts it. `::before` (behind the photo, not `::after` on top)
-   so only the sliver outside the smaller photo shows. */
-.eqc-card--teacher .eqc-teacher-photo::before,
-.eqc-card--teacher .eqc-teacher-photo-widget::before {
-	content: '';
-	position: absolute;
-	inset: -4%;
-	background-color: var(--eqc-gold-300);
-	-webkit-mask-image: url('../svg/mandorla-mask.svg');
-	mask-image: url('../svg/mandorla-mask.svg');
-	-webkit-mask-size: 100% 100%;
-	mask-size: 100% 100%;
-	-webkit-mask-repeat: no-repeat;
-	mask-repeat: no-repeat;
-	pointer-events: none;
+	border-radius: 50%;
+	border: calc(3 * var(--eqc-u)) solid var(--eqc-surface);
+	outline: calc(1.4 * var(--eqc-u)) solid var(--eqc-gold-500);
+	object-fit: cover;
 }
 /* Small "seal" badge overlapping the bottom of the photo, matching the
    reference teacher cards (Assests/). Pulled up with a negative margin
@@ -637,7 +610,7 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	transition: transform var(--eqc-motion-slow) var(--eqc-ease-soft);
 }
 .eqc-card--teacher:hover .eqc-teacher-photo img,
-.eqc-card--teacher:hover .eqc-teacher-photo-widget img { transform: scale(1.06); }
+.eqc-card--teacher:hover .eqc-teacher-photo-widget img { transform: none; }
 /* h3 here for correct heading hierarchy (H2 section title -> H3 card
    title, no skipped level) while keeping the compact card-title size. */
 .eqc-card--teacher h3 { margin-block: 0.9em 0.1em; font-size: var(--eqc-fs-h4); font-weight: 600; font-family: var(--eqc-font-body); }
@@ -1188,8 +1161,40 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard);
 }
 .eqc-trust-tile:hover .eqc-icon { transform: scale(1.12) rotate(-6deg); }
-.eqc-trust-tile-title { margin: 0 0 0.15em; font-size: var(--eqc-fs-body); font-weight: 700; color: var(--eqc-heading); }
-.eqc-trust-tile p { margin: 0; font-size: var(--eqc-fs-small); color: var(--eqc-muted); }
+.eqc-trust-tile-title { margin: 0 0 calc(3 * var(--eqc-u)); font-size: var(--eqc-fs-body); font-weight: 700; color: var(--eqc-heading); }
+.eqc-trust-tile p { margin: 0; font-size: var(--eqc-fs-small); color: var(--eqc-muted); line-height: 1.42; }
+
+/* The reference's trust strip is a white rounded PANEL sitting on the hero's
+   cream ground (x109-1212, y750-927 native = 1104x178), not tiles rendered
+   straight onto a section background. Its own class so the about section's
+   stat row, which reuses .eqc-grid--trust, is not restyled with it. */
+.eqc-trust-panel {
+	background: var(--eqc-white);
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-panel);
+	box-shadow: var(--eqc-shadow-card);
+	min-height: calc(178 * var(--eqc-u));
+	width: calc(1104 * var(--eqc-u));
+	max-width: 100%;
+	margin-inline: auto;
+	padding: calc(26 * var(--eqc-u)) calc(30 * var(--eqc-u));
+	align-items: center;
+}
+.eqc-trust-panel .eqc-trust-tile { padding-inline: calc(14 * var(--eqc-u)); }
+.eqc-trust-panel .eqc-trust-tile .eqc-icon { width: var(--eqc-icon-lg); height: var(--eqc-icon-lg); }
+/* Sits directly under the hero on the same ground: 20 native px above the
+   panel, 3 below it. */
+.eqc-section--truststrip { padding-block: calc(2 * var(--eqc-u)) calc(3 * var(--eqc-u)); background: var(--eqc-cream-100); }
+.eqc-section--truststrip > .e-con,
+.eqc-section--truststrip .eqc-container { padding-block: 0; padding-inline: 0; }
+/* Full-height hairlines between the four columns, as the reference shows
+   (finding 13). Applied to the tile rather than the grid so it survives the
+   auto-fit reflow: the rule is suppressed on any tile that starts a row,
+   which is what `:first-child` alone could not do once the row wraps. */
+.eqc-grid--trust > * + * { border-inline-start: 1px solid var(--eqc-border); }
+@media (max-width: 900px) {
+	.eqc-grid--trust > * + * { border-inline-start: 0; }
+}
 
 /* Chips (hero benefit chips) */
 .eqc-chip-row { display: flex; flex-wrap: wrap; gap: 0.7rem; }
@@ -1209,6 +1214,145 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 }
 .eqc-chip:hover { transform: translateY(-2px); border-color: var(--eqc-gold-300); }
 .eqc-chip .eqc-icon { width: 1.35em; height: 1.35em; color: var(--eqc-bronze-600); }
+
+/* --cards: the hero's own form in Home.jpeg — four WHITE cards on one row,
+   icon left of a two-line label, rather than one-line pills that wrap to a
+   second row. Auto-fit rather than a fixed repeat(4) so the row reflows to
+   2x2 and then stacks below desktop, where the reference is silent
+   (QA/design-review/home.md finding 7). */
+/* Explicit column counts rather than repeat(auto-fit, minmax(min(150px,1fr)))
+   — auto-fit resolved inconsistently here: the grid settled at 2 columns
+   while its Elementor widget wrapper kept the height of the 4-row single
+   column layout (290px for 158px of cards), leaving a large dead gap above
+   the buttons on mobile. Fixed counts are deterministic and also let the
+   desktop row match the reference's four-across exactly. */
+.eqc-chip-row--cards {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: var(--eqc-grid-gap);
+	align-items: stretch;
+	width: 100%;
+}
+@media (max-width: 1180px) {
+	.eqc-chip-row--cards { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 400px) {
+	.eqc-chip-row--cards { grid-template-columns: 1fr; }
+}
+/* Card measured 126x58 native, four across on a 22 gap. */
+.eqc-chip--card {
+	background: var(--eqc-white);
+	border-color: transparent;
+	border-radius: var(--eqc-radius-card);
+	box-shadow: var(--eqc-shadow-card);
+	min-height: var(--eqc-card-h);
+	padding: 0 calc(11 * var(--eqc-u));
+	gap: calc(9 * var(--eqc-u));
+	align-items: center;
+	font-size: var(--eqc-fs-xsmall);
+}
+/* Icons here read as dark, near-filled marks in the reference. Only the
+   COLOUR is matched — DESIGN.md §11 forbids mixing icon families, so the
+   shared Lucide outline sprite stays. */
+.eqc-chip--card .eqc-icon {
+	width: var(--eqc-icon-md);
+	height: var(--eqc-icon-md);
+	color: var(--eqc-heading);
+	flex: none;
+}
+.eqc-chip-label { display: flex; flex-direction: column; line-height: 1.35; }
+.eqc-chip--card .eqc-chip-label > span { font-weight: 500; color: var(--eqc-text); }
+
+/* ---------- Hero eyebrow, rule and trust row ---------- */
+
+/* The reference's hero eyebrow is sentence case in a white pill with the
+   icon in its own circular cream chip — not the shared uppercase,
+   letterspaced eyebrow used for section labels (finding 8). */
+/* Pill measured 251x44 native at x105 y195; the circular chip is 34 across. */
+.eqc-eyebrow--hero {
+	text-transform: none;
+	letter-spacing: 0;
+	font-size: var(--eqc-fs-body);
+	font-weight: 600;
+	background: var(--eqc-white);
+	gap: calc(9 * var(--eqc-u));
+	height: var(--eqc-eyebrow-h);
+	padding: 0 calc(12 * var(--eqc-u)) 0 calc(5 * var(--eqc-u));
+}
+.eqc-eyebrow-chip {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: calc(34 * var(--eqc-u));
+	height: calc(34 * var(--eqc-u));
+	border-radius: 50%;
+	background: var(--eqc-cream-100);
+	flex: none;
+}
+.eqc-eyebrow-chip .eqc-icon { width: var(--eqc-icon-sm); height: var(--eqc-icon-sm); color: var(--eqc-heading); }
+
+/* Gold rule with a diamond terminal at each end, under the H1. Width from
+   the reference: 141px on a 1307px canvas -> 207px at 1920 (finding 5). */
+.eqc-hero-rule { color: var(--eqc-gold-500); line-height: 0; }
+.eqc-hero-rule .eqc-divider-svg { width: calc(141 * var(--eqc-u)); }
+
+/* Five overlapping avatars, then five gold stars above a single trust line. */
+/* Avatars measured 40 across on a 36.75 pitch - an 8% overlap, not the 28%
+   this previously used. Block runs x104-290, trust text starts x308. */
+.eqc-hero-trust {
+	display: flex;
+	align-items: center;
+	gap: calc(18 * var(--eqc-u));
+	flex-wrap: wrap;
+}
+.eqc-hero-trust .eqc-avatar-stack img {
+	--_avatar: var(--eqc-avatar);
+	border-width: calc(2 * var(--eqc-u));
+	margin-inline-start: var(--eqc-avatar-overlap);
+}
+.eqc-hero-trust-text { display: flex; flex-direction: column; gap: calc(2 * var(--eqc-u)); }
+.eqc-hero-trust-text > span:last-child {
+	font-size: var(--eqc-fs-body);
+	font-weight: 600;
+	color: var(--eqc-text);
+}
+.eqc-star-row { display: inline-flex; gap: calc(2 * var(--eqc-u)); color: var(--eqc-gold-500); }
+/* The sprite's star is an outline glyph whose own path carries fill="none";
+   a presentation attribute on the inner path beats a fill inherited from the
+   <svg>, so the fill has to be set on the path itself to get the reference's
+   solid gold stars. Stroke is dropped so the filled shape keeps its weight. */
+.eqc-star-row .eqc-icon { width: calc(15 * var(--eqc-u)); height: calc(15 * var(--eqc-u)); }
+.eqc-star-row .eqc-icon path,
+.eqc-star-row .eqc-icon polygon { fill: currentColor; stroke: none; }
+
+/* ---------- Hero grid ---------- */
+
+/* Measured off Home.jpeg: text column x105-670 (830px at 1920), gap 14
+   (21px), media x684-1224 (793px) — 50.5% / 48.2% of the 1644px content
+   column, not the 50/50 Elementor defaults to. The 25px this hands back to
+   the text column is exactly what lets the H1 keep the reference's two-line
+   break instead of spilling "Guidance" onto a third line (finding 4). */
+/* Elementor gives every container 10px of inline padding. Nested two deep
+   that is 40px off the hero's usable width, which is exactly what kept the
+   H1's second line 24px short of fitting and spilled "Guidance" onto a third
+   line. Zeroed here so the measured column widths are the real ones; the
+   page's own gutter still comes from .eqc-container. */
+.eqc-hero-grid,
+.eqc-hero-grid > .eqc-hero-text,
+.eqc-hero-grid > .eqc-hero-media { padding-inline: 0; }
+/* Reference: arch y127-747, text ink y195-730. The text is not centred on
+   the arch - it sits 68 native px below the arch's tip. */
+.eqc-hero-grid { gap: calc(14 * var(--eqc-u)); align-items: flex-start; }
+.eqc-hero-grid > .eqc-hero-text { padding-block-start: calc(68 * var(--eqc-u)); }
+@media (max-width: 64rem) {
+	.eqc-hero-grid > .eqc-hero-text { padding-block-start: calc(20 * var(--eqc-u)); }
+}
+.eqc-hero-grid > .eqc-hero-text { flex: 1 1 50.5%; }
+.eqc-hero-grid > .eqc-hero-media { flex: 1 1 48.2%; }
+@media (max-width: 900px) {
+	.eqc-hero-grid > .eqc-hero-text,
+	.eqc-hero-grid > .eqc-hero-media { flex-basis: 100%; }
+}
 
 /* ---------- Arch media ---------- */
 
@@ -1299,7 +1443,46 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 }
 .eqc-arch-media--fourcentred::before { -webkit-mask-image: url('../svg/fourcentred-mask.svg'); mask-image: url('../svg/fourcentred-mask.svg'); }
 .eqc-arch-media--horseshoe::before { -webkit-mask-image: url('../svg/horseshoe-mask.svg'); mask-image: url('../svg/horseshoe-mask.svg'); }
-.eqc-arch-media:not(.eqc-arch-media--masked):not(.eqc-arch-media--fourcentred):not(.eqc-arch-media--horseshoe)::before {
+/* --keel: the hero's own silhouette (Home.jpeg). Unlike every variant above
+   it needs TWO gold contours with a cream gap between them, so it uses
+   keel-arch-frame.svg (both lines, generated with pad 0 so its outer
+   contour shares keel-arch-mask.svg's exact coordinate frame — the
+   padding/inset mismatch warned about above) and shrinks the PHOTO's mask
+   to 95.72% instead, i.e. 100% - 2 x the measured 2.14% inset. The gap
+   that opens up shows the section's own cream ground, which is what the
+   reference shows between its two lines. */
+.eqc-arch-media--keel {
+	border-radius: 0;
+	border: none;
+	overflow: visible;
+	aspect-ratio: 559 / 629;
+}
+.eqc-arch-media--keel img {
+	-webkit-mask-image: url('../svg/keel-arch-mask.svg');
+	mask-image: url('../svg/keel-arch-mask.svg');
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: 95.7066% 96.1844%;
+	mask-size: 95.7066% 96.1844%;
+	-webkit-mask-position: center;
+	mask-position: center;
+}
+.eqc-arch-media--keel::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background-color: var(--eqc-gold-500);
+	-webkit-mask-image: url('../svg/keel-arch-frame.svg');
+	mask-image: url('../svg/keel-arch-frame.svg');
+	-webkit-mask-repeat: no-repeat;
+	mask-repeat: no-repeat;
+	-webkit-mask-size: 100% 100%;
+	mask-size: 100% 100%;
+	pointer-events: none;
+	z-index: 2;
+}
+
+.eqc-arch-media:not(.eqc-arch-media--masked):not(.eqc-arch-media--fourcentred):not(.eqc-arch-media--horseshoe):not(.eqc-arch-media--keel)::before {
 	content: '';
 	position: absolute;
 	inset: 0;
@@ -1599,8 +1782,11 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	opacity: 0.1;
 	-webkit-mask-image: url('../svg/hex-tessellation.svg');
 	mask-image: url('../svg/hex-tessellation.svg');
-	-webkit-mask-size: 52px 90px;
-	mask-size: 52px 90px;
+	/* Cell measured at 52x90 native; as fixed px it stayed the same size
+	   while everything around it scaled, so at 1920 the weave read ~31% too
+	   dense against the reference. */
+	-webkit-mask-size: calc(52 * var(--eqc-u)) calc(90 * var(--eqc-u));
+	mask-size: calc(52 * var(--eqc-u)) calc(90 * var(--eqc-u));
 	-webkit-mask-repeat: repeat;
 	mask-repeat: repeat;
 	pointer-events: none;
@@ -1669,13 +1855,16 @@ html.eqc-js .eqc-corner-motif { animation: eqc-drift 24s var(--eqc-ease-soft) in
 	border: 1px solid var(--eqc-gold-300);
 	border-radius: var(--eqc-radius-panel);
 	box-shadow: var(--eqc-shadow-card);
-	padding: clamp(2.25rem, 1.5rem + 3vw, 4rem);
+	/* Was clamp(2.25rem, 1.5rem + 3vw, 4rem) on all four sides — 64px of
+	   vertical inset inside a section that already pads 77px. The panel is a
+	   frame around the cards, not a second section. */
+	padding: calc(26 * var(--eqc-u)) clamp(1rem, 0.5rem + 1.6vw, 2.25rem);
 }
 .eqc-pricing-panel > .e-con { position: relative; z-index: 1; }
 
 /* ---------- Section heading block ---------- */
 
-.eqc-section-heading { max-width: var(--eqc-content-narrow); }
+/* max-width now set from the measured reference further down. */
 .eqc-section-heading--center {
 	max-width: var(--eqc-content-narrow);
 	margin-inline: auto;
@@ -1740,3 +1929,696 @@ textarea:focus-visible,
 	outline: 3px solid var(--eqc-gold-500);
 	outline-offset: 2px;
 }
+
+/* Hero section: the reference opens the hero immediately under the header —
+   the arch's tip (y127 native) sits level with the header bar's lower edge,
+   so there is no top padding at all. The previous --tight padding pushed the
+   whole column 119px down at 1920. Bottom padding is 0 too: the trust panel
+   that follows carries its own 20-unit offset. */
+.eqc-section--hero {
+	padding-block: 0;
+	margin-block-start: calc(-27 * var(--eqc-u));
+}
+.eqc-section--hero > .e-con,
+.eqc-section--hero .eqc-container,
+.eqc-section--hero .eqc-hero-grid,
+.eqc-section--hero .eqc-hero-media { padding-block: 0; padding-inline: 0; }
+
+/* Hero column rhythm. Reference ink gaps down the column measure 33 / 26 / 27
+   / 30 / 24 / 32 native px; as flex box-gaps (leading already inside each
+   box) that lands at 22 units. */
+.eqc-hero-text { gap: calc(22 * var(--eqc-u)); }
+a.eqc-btn .eqc-icon, button.eqc-btn .eqc-icon,
+.elementor-widget-button.eqc-btn .elementor-button .eqc-icon {
+	width: var(--eqc-icon-md);
+	height: var(--eqc-icon-md);
+}
+
+/* Inside the reference's trust panel the four tiles are NOT cards: they are
+   plain columns separated by full-height hairlines. Measured on Home.jpeg —
+   icon 34 across at x155, text block x218-330 (112 wide), which is what wraps
+   both the title and the caption onto two lines. Constraining that text width
+   is what reproduces the reference's line breaks; without it the title fits on
+   one line and the tile reads completely differently. */
+.eqc-trust-panel .eqc-trust-tile {
+	background: none;
+	border: 0;
+	border-radius: 0;
+	padding: 0 calc(20 * var(--eqc-u));
+	gap: calc(14 * var(--eqc-u));
+	align-items: flex-start;
+}
+/* No max-width here. The reference's four tiles break at points no single
+   width can reproduce ("Your child's safety is | our top priority" wraps at
+   ~105 native while "Recognize your progress | with achievement" runs to
+   ~150), so the breaks are carried in the copy via eqc_trust_tile()'s "|"
+   separator - content, not styling, per TASK-DESIGN-PARITY.md 2. */
+.eqc-trust-panel .eqc-trust-tile .eqc-icon {
+	width: calc(34 * var(--eqc-u));
+	height: calc(34 * var(--eqc-u));
+}
+.eqc-trust-panel .eqc-trust-tile:hover { transform: none; box-shadow: none; }
+/* Hairlines run the full height of the panel's content box, as in the
+   reference; the shared .eqc-grid--trust rule only draws a plain edge. */
+.eqc-trust-panel > * + * { border-inline-start: 1px solid var(--eqc-border); }
+.eqc-trust-panel .eqc-trust-tile-title { line-height: 1.3; }
+.eqc-trust-panel .eqc-trust-tile p { line-height: 1.45; }
+
+/* ---------- About section (Home2.jpeg) ---------- */
+
+/* Right column measured 608 of the 1119u content column (54.3%); the collage
+   fills the rest and deliberately BLEEDS left of the column, running to x95
+   against the column's own left edge at x317. That overflow is the
+   composition, not an accident, so the media column is allowed to exceed its
+   track rather than being clipped to it. */
+.eqc-about-grid { gap: calc(21 * var(--eqc-u)); align-items: center; }
+.eqc-about-grid > .eqc-about-media { flex: 0 1 45.7%; min-width: 0; }
+.eqc-about-grid > .eqc-about-text { flex: 0 0 54.3%; min-width: 0; }
+.eqc-about-grid,
+.eqc-about-grid > .eqc-about-media,
+.eqc-about-grid > .eqc-about-text { padding-inline: 0; }
+.eqc-about-text { gap: calc(26 * var(--eqc-u)); }
+
+/* Ornament rail across the top of the column - the reference uses this
+   instead of the pill eyebrow the other sections carry. */
+.eqc-about-rail { width: 100%; color: var(--eqc-gold-500); line-height: 0; }
+.eqc-about-rail .eqc-divider-svg { width: 100%; height: auto; }
+/* Small centred ornament under the heading. */
+.eqc-about-rule { color: var(--eqc-gold-500); line-height: 0; align-self: center; }
+.eqc-about-rule .eqc-divider-svg { width: calc(140 * var(--eqc-u)); }
+
+/* The heading is a display size, larger than the other sections' h2, and is
+   a single colour - the reference gives it no bronze tail. */
+.eqc-display-heading,
+h2.eqc-display-heading { font-size: var(--eqc-fs-display-xl); line-height: 1.12; color: var(--eqc-heading); }
+
+/* Stats: label above value, each icon in a rosette-framed disc, full-height
+   hairlines between the three. */
+.eqc-about-stats {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	width: 100%;
+	align-items: start;
+}
+.eqc-about-stat {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: calc(7 * var(--eqc-u));
+	text-align: center;
+	padding-inline: calc(12 * var(--eqc-u));
+}
+.eqc-about-stat + .eqc-about-stat { border-inline-start: 1px solid var(--eqc-border); }
+.eqc-about-stat__disc {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: calc(56 * var(--eqc-u));
+	height: calc(56 * var(--eqc-u));
+	border-radius: 50%;
+	background: var(--eqc-cream-100);
+	border: 1px solid var(--eqc-border-strong);
+	margin-block-end: calc(4 * var(--eqc-u));
+}
+.eqc-about-stat__disc .eqc-icon { width: calc(26 * var(--eqc-u)); height: calc(26 * var(--eqc-u)); color: var(--eqc-gold-700); }
+.eqc-about-stat__label { font-size: var(--eqc-fs-small); color: var(--eqc-muted); }
+.eqc-about-stat__value { font-family: var(--eqc-font-body); font-size: var(--eqc-fs-h3); font-weight: 700; color: var(--eqc-heading); }
+
+/* Collage: the large Quran page offset right, with the child overlapping its
+   lower left. The figure margin reset must come BEFORE the main's auto
+   margin — the other way round it cancelled it, the main sat flush left and
+   covered the child exactly, which read as a missing image. */
+.eqc-about-collage { position: relative; width: 100%; }
+.eqc-about-collage figure { margin: 0; }
+.eqc-about-collage__main { width: 82%; margin-inline: auto 0; }
+.eqc-about-collage__child {
+	position: absolute;
+	left: 0;
+	bottom: calc(-6 * var(--eqc-u));
+	width: 38%;
+	z-index: 3;
+}
+
+/* Dark-green CTA with its icon in a filled disc, as the reference draws
+   "More About Us". Reuses the shared .eqc-btn box; only the skin differs. */
+a.eqc-btn--green, .eqc-btn--green {
+	background: var(--eqc-green-800);
+	color: var(--eqc-white);
+	border-color: var(--eqc-green-800);
+}
+a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--eqc-green-900); }
+.eqc-btn--icon-disc .eqc-icon {
+	box-sizing: content-box;
+	padding: calc(7 * var(--eqc-u));
+	border-radius: 50%;
+	background: var(--eqc-gold-500);
+	color: var(--eqc-green-900);
+}
+
+@media (max-width: 900px) {
+	.eqc-about-grid > .eqc-about-media,
+	.eqc-about-grid > .eqc-about-text { flex-basis: 100%; }
+	.eqc-about-collage__main { width: 100%; }
+	.eqc-about-collage__child { width: 42%; }
+}
+
+/* ---------- Courses section (courses.jpeg) ---------- */
+
+/* Cards measured 313u wide on an 88u gap, three across (3x313 + 2x88 = 1115
+   against the 1119u content column). The shared --eqc-grid-gap is 22u, which
+   is the hero's feature-card gap, so this section carries its own. */
+/* Row gap and column gap differ in the reference: columns sit 88u apart,
+   but row 1 ends at y571 and row 2 starts at y588 - a 17u row gap. Applying
+   the column value to both axes added 71u of dead space between the rows. */
+.eqc-grid--courses { gap: calc(17 * var(--eqc-u)) calc(88 * var(--eqc-u)); }
+.eqc-card--course {
+	min-height: calc(284 * var(--eqc-u));
+	padding: calc(22 * var(--eqc-u)) calc(24 * var(--eqc-u));
+	gap: calc(5 * var(--eqc-u));
+}
+.eqc-card--course p { font-size: var(--eqc-fs-body); line-height: 1.55; }
+.eqc-card--course .eqc-card-level { font-size: var(--eqc-fs-small); }
+.eqc-card--course .eqc-card-divider .eqc-divider-svg { width: calc(113 * var(--eqc-u)); }
+.eqc-card--course .eqc-arrow-btn {
+	width: calc(50 * var(--eqc-u));
+	height: calc(50 * var(--eqc-u));
+}
+.eqc-card--course .eqc-card-index { width: calc(58 * var(--eqc-u)); height: calc(51 * var(--eqc-u)); }
+
+/* The section heading block was capped at --eqc-content-narrow (558u), which
+   forced the reference's two-line heading onto three lines. Its longest line
+   measures 707u, so the block needs room for that plus its own leading. */
+.eqc-section-heading { max-width: calc(760 * var(--eqc-u)); }
+.eqc-section-heading--center { max-width: calc(820 * var(--eqc-u)); margin-inline: auto; }
+/* Left-aligned ornate divider under the heading, 359u in the reference. */
+.eqc-heading-rule--ornate .eqc-divider-svg { width: calc(240 * var(--eqc-u)); }
+
+/* Bare section label: gold icon + letterspaced caps, no pill. courses.jpeg
+   draws it this way; pricing and teachers keep the outlined pill, so this is
+   a variant rather than a change to the shared .eqc-eyebrow. */
+.eqc-eyebrow--plain {
+	background: none;
+	border: 0;
+	padding: 0;
+	color: var(--eqc-gold-700);
+	align-self: flex-start;
+	width: auto;
+	gap: calc(19 * var(--eqc-u));
+}
+.eqc-eyebrow--plain .eqc-icon {
+	width: calc(37 * var(--eqc-u));
+	height: calc(37 * var(--eqc-u));
+	color: var(--eqc-gold-600);
+}
+.eqc-section-heading--center .eqc-eyebrow--plain { align-self: center; }
+
+/* Our render of the heading's second line runs ~10% wider than the
+   reference's for the same string and size, so the block needs the extra
+   room to keep the reference's two-line break rather than spilling to three. */
+.eqc-section-heading { max-width: calc(820 * var(--eqc-u)); }
+
+/* Card content is denser in the reference: 284u total against our 418u, most
+   of the excess being inter-element gaps rather than type size. */
+.eqc-card--course .eqc-card-level { margin: 0; line-height: 1.3; }
+.eqc-card--course h3 { line-height: 1.2; margin: 0; }
+
+/* The reference pins the course card's arrow to the bottom RIGHT, and pairs
+   the index badge with a short rule to its right. */
+.eqc-card--course .eqc-card__foot { align-self: flex-end; }
+.eqc-card--course .eqc-card-index { display: inline-flex; align-items: center; }
+.eqc-card--course .eqc-card-index::after {
+	content: '';
+	width: calc(18 * var(--eqc-u));
+	height: 1px;
+	background: var(--eqc-gold-600);
+	margin-inline-start: calc(10 * var(--eqc-u));
+	flex: none;
+}
+
+/* ---------- Pricing section (pricing.jpeg) ---------- */
+
+/* pricing.jpeg calibrates at s=1.345: its card row and benefits strip both
+   span 1505px = the 1119u content column. Cards 262u on a 31u gap. */
+.eqc-grid--pricing { grid-template-columns: repeat(4, 1fr); gap: calc(31 * var(--eqc-u)); }
+@media (max-width: 61.25rem) { .eqc-grid--pricing { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 36rem) { .eqc-grid--pricing { grid-template-columns: 1fr; } }
+.eqc-card--pricing { min-height: calc(343 * var(--eqc-u)); padding: calc(20 * var(--eqc-u)); gap: calc(6 * var(--eqc-u)); }
+
+/* This heading measures 545u for its first line against the courses section's
+   604u for a same-length string — the reference genuinely sets it smaller, so
+   it carries its own size rather than moving the shared token. */
+.eqc-section--pricing .eqc-section-heading h2 { font-size: var(--eqc-fs-h2); }
+
+/* Dark-green banner with chamfered ends holding "N Days/Week", 207 x 54u. */
+.eqc-pricing-banner {
+	display: block;
+	width: calc(207 * var(--eqc-u));
+	max-width: 100%;
+	margin-inline: auto;
+	padding: calc(11 * var(--eqc-u)) calc(16 * var(--eqc-u));
+	background: var(--eqc-green-800);
+	color: var(--eqc-white);
+	font-family: var(--eqc-font-display);
+	font-size: var(--eqc-fs-h4);
+	text-align: center;
+	line-height: 1.15;
+	clip-path: polygon(calc(14 * var(--eqc-u)) 0, calc(100% - 14 * var(--eqc-u)) 0, 100% 50%, calc(100% - 14 * var(--eqc-u)) 100%, calc(14 * var(--eqc-u)) 100%, 0 50%);
+}
+
+/* Price row: figure, cream unit pill, dark-green arrow disc. */
+.eqc-pricing-price { display: flex; align-items: center; gap: calc(12 * var(--eqc-u)); margin: 0; }
+.eqc-pricing-price-figure { font-family: var(--eqc-font-display); font-size: var(--eqc-fs-price); color: var(--eqc-heading); line-height: 1; }
+.eqc-pricing-unit {
+	background: var(--eqc-cream-100);
+	border-radius: var(--eqc-radius-pill);
+	padding: calc(6 * var(--eqc-u)) calc(13 * var(--eqc-u));
+	font-size: var(--eqc-fs-small);
+	color: var(--eqc-text);
+}
+.eqc-card--pricing .eqc-arrow-btn {
+	margin-inline-start: auto;
+	width: calc(46 * var(--eqc-u));
+	height: calc(46 * var(--eqc-u));
+	background: var(--eqc-green-800);
+	color: var(--eqc-white);
+	border-color: var(--eqc-green-800);
+}
+
+/* Benefits strip: 1120 x 96u, four hairline-separated tiles. */
+.eqc-benefits {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	align-items: center;
+	width: 100%;
+	min-height: calc(96 * var(--eqc-u));
+	margin-block-start: calc(24 * var(--eqc-u));
+	padding: calc(16 * var(--eqc-u)) calc(20 * var(--eqc-u));
+	background: var(--eqc-white);
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-panel);
+	box-shadow: var(--eqc-shadow-card);
+}
+.eqc-benefit { display: flex; align-items: center; gap: calc(14 * var(--eqc-u)); padding-inline: calc(18 * var(--eqc-u)); }
+.eqc-benefit + .eqc-benefit { border-inline-start: 1px solid var(--eqc-border); }
+.eqc-benefit__disc {
+	display: inline-flex; align-items: center; justify-content: center; flex: none;
+	width: calc(52 * var(--eqc-u)); height: calc(52 * var(--eqc-u));
+	border-radius: 50%; background: var(--eqc-cream-100); border: 1px solid var(--eqc-border-strong);
+}
+.eqc-benefit__disc .eqc-icon { width: calc(26 * var(--eqc-u)); height: calc(26 * var(--eqc-u)); color: var(--eqc-green-800); }
+.eqc-benefit__label { font-size: var(--eqc-fs-small); line-height: 1.35; color: var(--eqc-heading); }
+@media (max-width: 61.25rem) {
+	.eqc-benefits { grid-template-columns: repeat(2, 1fr); row-gap: calc(18 * var(--eqc-u)); }
+	.eqc-benefit:nth-child(odd) { border-inline-start: 0; }
+}
+@media (max-width: 36rem) {
+	.eqc-benefits { grid-template-columns: 1fr; }
+	.eqc-benefit + .eqc-benefit { border-inline-start: 0; }
+}
+
+/* Centred pill eyebrow with a rosette, as pricing.jpeg draws it. */
+.eqc-eyebrow--rosette { align-self: center; width: auto; border-color: var(--eqc-gold-300); }
+
+/* The pricing panel was insetting the card grid by ~44u a side; in the
+   reference the cards span the full 1119u content column, same as the
+   benefits strip beneath them. */
+.eqc-pricing-panel { padding-inline: 0; }
+.eqc-pricing-panel > .e-con { padding-inline: 0; }
+/* Feature rows are the bulk of the card's height; the reference runs them
+   tighter (card 343u against our 406u). */
+.eqc-pricing-list { gap: calc(7 * var(--eqc-u)); margin: 0; }
+.eqc-pricing-list li { font-size: var(--eqc-fs-small); line-height: 1.35; gap: calc(9 * var(--eqc-u)); }
+.eqc-card--pricing .eqc-pricing-divider { margin-block: calc(4 * var(--eqc-u)); }
+
+/* pricing.jpeg rides the RECOMMENDED label as a horizontal tab ABOVE the
+   card's top edge, not inside it — and that is why the featured card is the
+   one card whose rosette sits fully INSIDE: the tab has taken the space the
+   other three cards use for the rosette's overhang. Placing the tab inside
+   the card put it in the rosette's lane, and the label rendered as
+   "…MENDED" with the medallion covering its first half. */
+.eqc-pricing-badge {
+	transform: none;
+	inset-block-start: calc(-75 * var(--eqc-u));
+	inset-inline-end: calc(-4 * var(--eqc-u));
+	inset-inline-start: auto;
+	border-radius: var(--eqc-radius-pill);
+	padding: calc(6 * var(--eqc-u)) calc(16 * var(--eqc-u));
+	font-size: var(--eqc-fs-xsmall);
+	letter-spacing: 0.1em;
+	white-space: nowrap;
+}
+/* Rosette drops inside the featured card so it clears the tab above it, and
+   the card gains the top padding that overhang used to provide for free —
+   without it the "5 Days/Week" banner runs straight through the medallion. */
+.eqc-card--pricing--featured .eqc-pricing-icon { top: calc(-39 * var(--eqc-u)); }
+.eqc-card--pricing--featured { padding-block-start: calc(56 * var(--eqc-u)); }
+/* The reference sets the four cards straight on the section ground; the
+   enclosing panel frame is ours, not the design's. */
+.eqc-pricing-panel { background: none; border: 0; box-shadow: none; }
+
+/* ---------- Teachers section (Teachers.jpeg) ---------- */
+
+/* Two-column split, not the full-width carousel this replaced. The reference's
+   content column decomposes exactly: left 268u + gap 51u + cards 800u = 1119u. */
+.eqc-teachers-split { gap: calc(51 * var(--eqc-u)); align-items: stretch; padding-inline: 0; }
+.eqc-teachers-split > .eqc-teachers-aside { flex: 0 0 calc(268 * var(--eqc-u)); padding-inline: 0; }
+.eqc-teachers-split > .eqc-teachers-cards {
+	flex: 1 1 auto;
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: calc(22 * var(--eqc-u));
+	align-items: stretch;
+	padding-inline: 0;
+}
+.eqc-teachers-aside { gap: calc(10 * var(--eqc-u)); }
+/* This column, not the cards, sets the teachers row height: it stacks a
+   heading, a rule, a paragraph, three feature tiles and two controls in a
+   268u column, so its text wraps hard. Reducing the CARD height does not
+   move the section at all. Getting it under one screen at 1366 would mean
+   shortening the copy or dropping a feature tile — content decisions, so
+   it is left at ~1.15 viewports and recorded in QA/design-review/home.md. */
+.eqc-section--teachers { padding-block: calc(34 * var(--eqc-u)); }
+.eqc-teachers-aside .eqc-eyebrow {
+	font-size: var(--eqc-fs-eyebrow);
+	letter-spacing: 0;
+	border-radius: var(--eqc-radius-control);
+	padding: calc(8 * var(--eqc-u));
+	white-space: nowrap;
+}
+.eqc-teachers-aside .elementor-widget-text-editor { font-size: max(16px, calc(12 * var(--eqc-u))); }
+.eqc-teachers-split > .eqc-teachers-cards { padding-block-start: calc(40 * var(--eqc-u)); }
+/* This heading sits in a 268u column and is correspondingly smaller than the
+   other sections' — measured 209u of ink for "Learn From". */
+.eqc-section--teachers .eqc-teachers-aside h2 { font-size: var(--eqc-fs-h2-compact); line-height: 1.16; }
+.eqc-teachers-rule { color: var(--eqc-gold-500); line-height: 0; }
+.eqc-teachers-rule .eqc-divider-svg { width: calc(120 * var(--eqc-u)); }
+.eqc-teachers-features { display: flex; flex-direction: column; gap: calc(8 * var(--eqc-u)); }
+.eqc-teachers-features .eqc-trust-tile { padding: calc(10 * var(--eqc-u)) calc(13 * var(--eqc-u)); gap: calc(11 * var(--eqc-u)); align-items: center; }
+.eqc-teachers-features .eqc-trust-tile-title { font-size: var(--eqc-fs-body); font-weight: 700; }
+.eqc-teachers-features .eqc-trust-tile p { font-size: var(--eqc-fs-small); }
+.eqc-teachers-features .eqc-icon { width: calc(24 * var(--eqc-u)); height: calc(24 * var(--eqc-u)); }
+.eqc-teachers-controls { gap: calc(14 * var(--eqc-u)); align-items: center; padding-inline: 0; }
+.eqc-teachers-nav { display: flex; gap: calc(9 * var(--eqc-u)); }
+.eqc-nav-btn {
+	width: calc(42 * var(--eqc-u)); height: calc(42 * var(--eqc-u));
+	border-radius: 50%; border: 1px solid var(--eqc-border-strong);
+	background: none; color: var(--eqc-heading); cursor: pointer;
+	display: inline-flex; align-items: center; justify-content: center;
+}
+.eqc-nav-btn:first-child .eqc-icon { transform: rotate(180deg); }
+.eqc-nav-btn .eqc-icon { width: calc(18 * var(--eqc-u)); height: calc(18 * var(--eqc-u)); }
+.eqc-btn--sm { --_h: max(44px, calc(38 * var(--eqc-u))); padding-inline: calc(18 * var(--eqc-u)); font-size: var(--eqc-fs-small); }
+.eqc-btn--sm.eqc-btn--icon-disc .eqc-icon { padding: calc(5 * var(--eqc-u)); }
+
+/* Card: 187 x 394u, oval portrait overlapping the top edge. */
+.eqc-card--teacher { min-height: calc(394 * var(--eqc-u)); padding: calc(16 * var(--eqc-u)); gap: calc(5 * var(--eqc-u)); text-align: center; align-items: center; }
+.eqc-card--teacher h3 { font-size: var(--eqc-fs-h4); line-height: 1.2; font-family: var(--eqc-font-body); font-weight: 700; }
+.eqc-card--teacher .eqc-teacher-role { font-size: var(--eqc-fs-small); color: var(--eqc-gold-700); }
+.eqc-card--teacher .eqc-teacher-facts { gap: calc(8 * var(--eqc-u)); }
+.eqc-card--teacher .eqc-teacher-facts li { font-size: var(--eqc-fs-small); gap: calc(8 * var(--eqc-u)); }
+.eqc-teacher-profile { width: 100%; justify-content: space-between; }
+/* With the cards stretched to equal height, the pill has to be pushed to the
+   bottom or a shorter card floats it mid-air. */
+.eqc-card--teacher .eqc-card__foot { margin-block-start: auto; width: 100%; }
+.eqc-teacher-profile .eqc-btn-chevron {
+	display: inline-flex; align-items: center; justify-content: center;
+	width: calc(24 * var(--eqc-u)); height: calc(24 * var(--eqc-u));
+	border-radius: 50%; border: 1px solid var(--eqc-border-strong);
+}
+.eqc-teacher-profile .eqc-icon { width: calc(13 * var(--eqc-u)); height: calc(13 * var(--eqc-u)); }
+a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); color: var(--eqc-heading); }
+
+@media (max-width: 61.25rem) {
+	.eqc-teachers-split { flex-wrap: wrap; }
+	.eqc-teachers-split > .eqc-teachers-aside { flex-basis: 100%; }
+	.eqc-teachers-split > .eqc-teachers-cards { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 36rem) { .eqc-teachers-split > .eqc-teachers-cards { grid-template-columns: 1fr; } }
+
+/* Teacher card details the reference is explicit about and the first pass
+   missed: the oval portrait rides ABOVE the card's top edge with the book
+   badge centred on that overlap; the meta rows sit plain on the card, not in
+   a tinted box; the name is bold sans, not the display serif; and the
+   "View Profile" pill stays inside the card. */
+.eqc-section--teachers .eqc-card--teacher {
+	overflow: visible;
+	margin-block-start: calc(142 * var(--eqc-u));
+	/* Measured, not derived: the portrait renders 163px tall on a 157px card
+	   and sits from -120 to +43 relative to the card's top edge, so it
+	   intrudes 43px — about 50u. The old 104u came from an assumed oval
+	   height and left ~46px of dead space inside every card. */
+	padding-block-start: calc(58 * var(--eqc-u));
+}
+.eqc-section--teachers .eqc-card--teacher .eqc-teacher-photo-widget {
+	position: absolute;
+	inset-block-start: calc(-142 * var(--eqc-u));
+	inset-inline: 0;
+	width: 98%;
+	margin-inline: auto;
+	z-index: 2;
+}
+.eqc-section--teachers .eqc-card--teacher .eqc-teacher-seal {
+	position: absolute;
+	inset-block-start: calc(30 * var(--eqc-u));
+	inset-inline: 0;
+	margin: 0 auto;
+	width: calc(44 * var(--eqc-u));
+	height: calc(44 * var(--eqc-u));
+	z-index: 3;
+}
+.eqc-section--teachers .eqc-card--teacher h3 {
+	font-family: var(--eqc-font-body);
+	font-weight: 700;
+	font-size: var(--eqc-fs-h4);
+	color: var(--eqc-heading);
+}
+.eqc-section--teachers .eqc-teacher-facts {
+	background: none;
+	border: 0;
+	padding: 0;
+	width: 100%;
+	text-align: start;
+}
+.eqc-section--teachers .eqc-teacher-profile { width: 100%; box-sizing: border-box; }
+
+/* ---------- Testimonials section (Reviews.jpeg) ---------- */
+
+/* Reviews.jpeg calibrates at s=1.313 (cards x50-1519 = 1469px = 1119u).
+   Unlike every other section, this heading is set in BOLD SANS, not the
+   display serif — measured 420u of ink for "Trusted by Families" at 48.4u. */
+.eqc-section--testimonials .eqc-section-heading h2 {
+	font-family: var(--eqc-font-body);
+	font-weight: 800;
+	font-size: var(--eqc-fs-h2);
+	line-height: 1.16;
+}
+.eqc-testimonials-intro { text-align: center; font-size: var(--eqc-fs-body); color: var(--eqc-text); line-height: 1.6; }
+.eqc-section--testimonials .eqc-card--testimonial {
+	width: calc(354 * var(--eqc-u));
+	max-width: 100%;
+	min-height: calc(330 * var(--eqc-u));
+	margin-block-start: calc(54 * var(--eqc-u));
+	padding: calc(58 * var(--eqc-u)) calc(22 * var(--eqc-u)) calc(18 * var(--eqc-u));
+	overflow: visible;
+	text-align: center;
+}
+/* Circular avatar riding the card's top edge with the quote badge at its
+   lower right, as the reference draws it. */
+.eqc-section--testimonials .eqc-testimonial-avatar-wrap {
+	position: absolute;
+	inset-block-start: calc(-54 * var(--eqc-u));
+	inset-inline: 0;
+	margin-inline: auto;
+	width: calc(108 * var(--eqc-u));
+	height: calc(108 * var(--eqc-u));
+	z-index: 2;
+}
+.eqc-section--testimonials .eqc-testimonial-photo,
+.eqc-section--testimonials .eqc-testimonial-photo img {
+	width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+}
+.eqc-section--testimonials .eqc-testimonial-photo { border: calc(3 * var(--eqc-u)) solid var(--eqc-gold-300); box-sizing: border-box; }
+.eqc-section--testimonials .eqc-testimonial-quote-mark {
+	position: absolute; inset-block-end: calc(-2 * var(--eqc-u)); inset-inline-end: calc(-4 * var(--eqc-u));
+	width: calc(38 * var(--eqc-u)); height: calc(38 * var(--eqc-u));
+	border-radius: 50%; background: var(--eqc-green-800); color: var(--eqc-white);
+	display: flex; align-items: center; justify-content: center;
+}
+.eqc-section--testimonials .eqc-testimonial-quote-mark .eqc-icon { width: calc(16 * var(--eqc-u)); height: calc(16 * var(--eqc-u)); }
+.eqc-section--testimonials .eqc-card--testimonial h3 { font-family: var(--eqc-font-body); font-weight: 700; font-size: var(--eqc-fs-h4); }
+.eqc-section--testimonials .eqc-testimonial-location { font-size: var(--eqc-fs-small); color: var(--eqc-gold-700); justify-content: center; }
+.eqc-section--testimonials .eqc-card--testimonial p { font-size: var(--eqc-fs-body); line-height: 1.7; }
+
+/* Cream inset strip of three mini-features, 324 x 64u, hairline-separated. */
+.eqc-section--testimonials .eqc-testimonial-tags {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	width: 100%;
+	min-height: calc(64 * var(--eqc-u));
+	margin-block-start: auto;
+	background: var(--eqc-cream-50);
+	border: 1px solid var(--eqc-border);
+	border-radius: var(--eqc-radius-control);
+	padding: calc(9 * var(--eqc-u)) 0;
+}
+.eqc-section--testimonials .eqc-testimonial-tags > span {
+	display: flex; flex-direction: column; align-items: center; gap: calc(5 * var(--eqc-u));
+	font-size: var(--eqc-fs-xsmall); color: var(--eqc-text); text-align: center;
+	padding-inline: calc(6 * var(--eqc-u));
+}
+.eqc-section--testimonials .eqc-testimonial-tags > span + span { border-inline-start: 1px solid var(--eqc-border); }
+.eqc-section--testimonials .eqc-testimonial-tags .eqc-icon { width: calc(21 * var(--eqc-u)); height: calc(21 * var(--eqc-u)); color: var(--eqc-gold-700); }
+
+/* ---------- Blog section (Blogs.jpeg) ---------- */
+
+/* s=1.282 (cards x86-1520 = 1435px = 1119u). Like the testimonials heading,
+   this one is bold sans rather than the display serif. */
+.eqc-section--blog .eqc-section-heading h2 {
+	font-family: var(--eqc-font-body);
+	font-weight: 800;
+	font-size: var(--eqc-fs-h2);
+	line-height: 1.18;
+}
+.eqc-card--blog { position: relative; min-height: calc(410 * var(--eqc-u)); overflow: visible; }
+.eqc-card--blog .eqc-blog-media { border-radius: var(--eqc-radius-card); overflow: hidden; display: block; }
+/* White date chip over the image's top-left corner, 65 x 79u. */
+.eqc-blog-date {
+	position: absolute;
+	inset-block-start: calc(18 * var(--eqc-u));
+	inset-inline-start: calc(18 * var(--eqc-u));
+	z-index: 2;
+	display: flex; flex-direction: column; align-items: center; justify-content: center;
+	width: calc(65 * var(--eqc-u)); min-height: calc(79 * var(--eqc-u));
+	background: var(--eqc-white); border-radius: var(--eqc-radius-control);
+	box-shadow: var(--eqc-shadow-card); gap: calc(2 * var(--eqc-u));
+	padding: calc(6 * var(--eqc-u)) 0;
+}
+.eqc-blog-date .eqc-icon { width: calc(18 * var(--eqc-u)); height: calc(18 * var(--eqc-u)); color: var(--eqc-gold-700); }
+.eqc-blog-date__day { font-size: var(--eqc-fs-h4); font-weight: 700; color: var(--eqc-heading); line-height: 1; }
+.eqc-blog-date__mon { font-size: var(--eqc-fs-xsmall); font-weight: 600; color: var(--eqc-heading); line-height: 1; }
+/* Category as gold caps above the title. */
+.eqc-blog-category {
+	display: block;
+	font-size: var(--eqc-fs-xsmall);
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--eqc-gold-700);
+	margin-block-end: calc(6 * var(--eqc-u));
+}
+.eqc-card--blog h3 { font-size: var(--eqc-fs-h3); line-height: 1.25; }
+.eqc-card--blog .eqc-blog-excerpt { font-size: var(--eqc-fs-body); line-height: 1.65; }
+/* "Read More" with a gold double-chevron disc, bottom right. */
+.eqc-card--blog .eqc-read-more {
+	margin-block-start: auto;
+	align-self: flex-end;
+	display: inline-flex; align-items: center; gap: calc(9 * var(--eqc-u));
+	font-size: var(--eqc-fs-small); font-weight: 700; color: var(--eqc-gold-700);
+}
+.eqc-read-more__disc {
+	display: inline-flex; align-items: center; justify-content: center;
+	width: calc(31 * var(--eqc-u)); height: calc(31 * var(--eqc-u));
+	border-radius: 50%; background: var(--eqc-gold-600); color: var(--eqc-white);
+}
+.eqc-read-more__disc .eqc-icon { width: calc(15 * var(--eqc-u)); height: calc(15 * var(--eqc-u)); }
+
+/* ---------- Tap-target floors (DESIGN.md §22, TASK §9) ---------- */
+
+/* Carousel dots and footer links are visually small by design, but a 24x24
+   dot and a 33px-tall link are below the 44px minimum. Expanding the HIT AREA
+   with a pseudo-element keeps the visual size exactly as designed while
+   giving pointer and touch input a full-size target — no layout shift. */
+.eqc-slider-dot { position: relative; }
+.eqc-slider-dot::after {
+	content: '';
+	position: absolute;
+	inset: 50% auto auto 50%;
+	translate: -50% -50%;
+	width: 44px;
+	height: 44px;
+}
+.eqc-footer-links a,
+.eqc-footer-contact a { position: relative; }
+.eqc-footer-links a::after,
+.eqc-footer-contact a::after {
+	content: '';
+	position: absolute;
+	inset-block: -6px;
+	inset-inline: 0;
+	min-height: 44px;
+}
+
+/* Shrinking the header and the type scale pulled these under 44px too. Same
+   technique — expand the hit area, leave the visual size alone. The nav link
+   uses ::before because its ::after is the hover underline. */
+.eqc-nav-list a { position: relative; }
+.eqc-nav-list a::before {
+	content: '';
+	position: absolute;
+	inset: 50% auto auto 50%;
+	translate: -50% -50%;
+	width: 100%;
+	height: 44px;
+}
+.eqc-read-more,
+.eqc-nav-btn,
+.eqc-logo-link { position: relative; }
+.eqc-read-more::after,
+.eqc-nav-btn::after,
+.eqc-logo-link::after {
+	content: '';
+	position: absolute;
+	inset: 50% auto auto 50%;
+	translate: -50% -50%;
+	width: max(100%, 44px);
+	height: max(100%, 44px);
+}
+
+/* ---------- Vertical density pass ----------
+ * Measured against courses.jpeg: that section spans 940u in the reference and
+ * was rendering 1256u here (+34%). Section-height ratios against the hero
+ * showed the same excess across about/pricing/teachers/testimonials, and those
+ * ratios are immune to the composite's uncertain vertical scale, so the excess
+ * is real rather than a scaling artefact.
+ *
+ * The excess was NOT type size (those are measured) — it was the gaps between
+ * elements and the eyebrow's oversized icon. */
+.eqc-section-heading { gap: calc(8 * var(--eqc-u)); }
+.eqc-eyebrow--plain .eqc-icon {
+	width: calc(30 * var(--eqc-u));
+	height: calc(30 * var(--eqc-u));
+}
+.eqc-card--course { gap: calc(2 * var(--eqc-u)); }
+.eqc-card--course p { line-height: 1.45; }
+.eqc-card--course .eqc-card-divider { margin-block: calc(3 * var(--eqc-u)); }
+
+/* Elementor adds --widgets-spacing (20px by default) as a bottom margin on
+   every widget, which stacks ON TOP of the flex `gap` these cards already
+   set. Inside a card that is a second, invisible gap on every row — the main
+   reason each card ran ~50u taller than its reference. Zeroed where the card
+   owns its own rhythm; the page-level containers keep Elementor's spacing. */
+.eqc-card,
+.eqc-section-heading,
+.eqc-hero-text,
+.eqc-about-text,
+.eqc-teachers-aside { --widgets-spacing: 0px; }
+.eqc-card > .elementor-widget,
+.eqc-section-heading > .elementor-widget { margin-block-end: 0; }
+
+/* The heading element itself still carried 8px/16px of its own margin inside
+   that widget, on top of the stack's gap. The stack owns the rhythm. */
+.eqc-section-heading h1,
+.eqc-section-heading h2,
+.eqc-section-heading h3,
+.eqc-section-heading p { margin-block: 0; }
+
+/* Inside a card the widget wrappers carry paragraph margins on top of the
+   card's own flex gap — measured 20.8u on the body copy and 6u on the divider
+   of every course card. The card owns its rhythm, so the inner margins go.
+   Multi-paragraph bodies (the about column) keep theirs. */
+.eqc-card .elementor-widget-text-editor p:only-child,
+.eqc-card .eqc-card-divider,
+.eqc-card .eqc-pricing-divider,
+.eqc-card .eqc-teacher-divider,
+.eqc-card .eqc-testimonial-divider { margin-block: 0; }
+.eqc-card .elementor-widget-text-editor p:only-child { margin: 0; }

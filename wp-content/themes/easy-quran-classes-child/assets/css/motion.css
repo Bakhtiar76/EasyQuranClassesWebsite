@@ -65,8 +65,8 @@ html.eqc-js .is-visible .eqc-path-line { stroke-dashoffset: 0; }
 
 /* Final CTA background ornament: a slow, subtle drift — never distracting. */
 @keyframes eqc-drift {
-	from { transform: translate3d(0, 0, 0); }
-	to { transform: translate3d(-16px, -10px, 0); }
+	from { translate: 0 0; }
+	to { translate: -16px -10px; }
 }
 html.eqc-js .eqc-cta-ornament {
 	animation: eqc-drift 18s var(--eqc-ease-soft) infinite alternate;
@@ -106,8 +106,8 @@ html.eqc-js .eqc-cta-ornament {
 		transform: scaleX(1);
 		opacity: 1;
 	}
-	.eqc-cta-ornament,
-	.eqc-corner-motif { animation: none; }
+	html.eqc-js .eqc-cta-ornament,
+	html.eqc-js .eqc-corner-motif { animation: none; }
 	.eqc-carousel-track { transition: none; }
 	.eqc-btn:hover,
 	.eqc-btn:hover .eqc-icon,

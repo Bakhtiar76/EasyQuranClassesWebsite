@@ -47,6 +47,12 @@ MSYS_NO_PATHCONV=1 docker compose -f local/docker-compose.yml --env-file local/.
 
 Copy `local/.env.example` to `local/.env` and adjust if needed — `local/.env` is gitignored (root `.gitignore`'s `.env` / `.env.*` patterns). These are local-only DB/admin credentials, never production values.
 
+**Never share your `local/.env` with a teammate, and never expect theirs to match yours.** Each
+person's local WordPress is a fully independent install — everyone copies `local/.env.example` and
+picks their own `WP_ADMIN_PASSWORD`; it only has to work on their own machine. `NOVAMIRA_APP_PASSWORD`
+is a WordPress Application Password, which WordPress ties to one specific site install — it cannot
+be copied between machines either; each person generates their own (README-SETUP.md §5).
+
 `WP_ADMIN_USER` / `_PASSWORD` / `_EMAIL` are used by `wp core install`, which creates the local wp-admin account on first bring-up (change the password any time afterward with `wp user update admin --user_pass=...`). This step is now scripted — see "First-run bootstrap" below — so there is no need to run it by hand.
 
 ## First-run bootstrap

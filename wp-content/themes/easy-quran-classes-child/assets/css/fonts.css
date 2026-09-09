@@ -1,0 +1,16 @@
+/* Self-hosted, unmodified Google Fonts Latin subsets; OFL notices in ../fonts/.
+   Only the display and body families used by this English site are loaded. */
+@font-face {
+	font-family: 'DM Serif Display';
+	font-style: normal;
+	font-weight: 400;
+	font-display: swap;
+	src: url('../fonts/dm-serif-display-latin-400.woff2') format('woff2');
+}
+@font-face {
+	font-family: 'Manrope';
+	font-style: normal;
+	font-weight: 400 700;
+	font-display: swap;
+	src: url('../fonts/manrope-latin-variable.woff2') format('woff2');
+}

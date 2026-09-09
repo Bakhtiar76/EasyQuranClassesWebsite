@@ -168,7 +168,7 @@ function eqc_button( $text, $url, $classes = '' ) {
 /**
  * Look up a seeded Media Library attachment ID by its recognizable
  * source filename fragment (e.g. 'hero-online-quran-class', matching
- * local/media-staging/hero-online-quran-class.jpg), so page-building
+ * local/media-staging/hero-online-quran-class.webp), so page-building
  * scripts never hardcode brittle numeric IDs.
  *
  * Matches on the attached file path (_wp_attached_file), not post_name —
@@ -312,9 +312,18 @@ function eqc_teacher_card( $attachment_id, $name, $role, $facts ) {
 				)
 			),
 			eqc_html( '<span class="eqc-teacher-seal" aria-hidden="true">' . eqc_icon_str( 'book-open' ) . '</span>' ),
-			eqc_heading( $name, 'h3' ),
+			// "|" is an explicit line break: the reference sets every teacher
+			// name on two lines, and the break is what keeps the four cards
+			// the same height regardless of name length.
+			eqc_heading( implode( ' <br>', array_map( 'esc_html', explode( '|', $name ) ) ), 'h3' ),
 			eqc_html( '<p class="eqc-teacher-role">' . esc_html( $role ) . '</p><div class="eqc-teacher-divider">' . eqc_divider_svg( 'dot' ) . '</div>' ),
-			eqc_html( $facts_html, 'eqc-card__foot' ),
+			eqc_html( $facts_html ),
+			eqc_html(
+				'<a class="eqc-btn eqc-btn--outline eqc-btn--sm eqc-teacher-profile" href="' . esc_url( home_url( '/teachers/' ) ) . '">'
+				. '<span>' . esc_html__( 'View Profile', 'easy-quran-classes' ) . '</span>'
+				. '<span class="eqc-btn-chevron" aria-hidden="true">' . eqc_icon_str( 'chevron-right' ) . '</span></a>',
+				'eqc-card__foot'
+			),
 		)
 	);
 }
@@ -374,11 +383,12 @@ function eqc_pricing_card( $frequency, $price, $unit, $features, $link, $feature
 	$children[] = eqc_html(
 		'<span class="eqc-pricing-icon"><span class="eqc-pricing-icon-ring" aria-hidden="true">' . eqc_get_svg_asset( 'rosette-12' ) . '</span>' . eqc_icon_str( 'calendar' ) . '</span>'
 	);
-	$children[] = eqc_html( '<span class="eqc-pricing-freq">' . esc_html( $frequency ) . '</span>' );
+	$children[] = eqc_html( '<span class="eqc-pricing-freq eqc-pricing-banner">' . esc_html( $frequency ) . '</span>' );
 	$children[] = eqc_html( '<div class="eqc-pricing-divider">' . eqc_divider_svg( 'accent' ) . '</div>' );
 	$children[] = eqc_html( $features_html );
 	$children[] = eqc_html(
-		'<p class="eqc-pricing-price"><span class="eqc-pricing-price-figure">$' . esc_html( $price ) . '<small>/ ' . esc_html( $unit ) . '</small></span>'
+		'<p class="eqc-pricing-price"><span class="eqc-pricing-price-figure">$' . esc_html( $price ) . '</span>'
+		. '<span class="eqc-pricing-unit">' . esc_html( $unit ) . '</span>'
 		. '<span class="eqc-arrow-btn" aria-hidden="true">' . eqc_icon_str( 'arrow-right' ) . '</span></p>',
 		'eqc-card__foot'
 	);
@@ -525,11 +535,16 @@ function eqc_page_hero( $eyebrow, $title, $intro, $icon = 'book-open' ) {
  * as well as the ornate modifier, painting as a full-width flat gold bar
  * with the old tiny flower glyph stranded near the left edge inside it.
  */
-function eqc_section_heading_el( $eyebrow, $heading, $centered = false ) {
+function eqc_section_heading_el( $eyebrow, $heading, $centered = false, $eyebrow_class = '', $eyebrow_icon = '' ) {
 	$class = 'eqc-stack eqc-section-heading' . ( $centered ? ' eqc-section-heading--center' : '' );
 	$html  = '<div class="' . esc_attr( $class ) . '" data-eqc-reveal data-eqc-reveal-index="0">';
 	if ( $eyebrow ) {
-		$html .= '<span class="eqc-eyebrow">' . esc_html( $eyebrow ) . '</span>';
+		// courses.jpeg draws this label as a bare gold icon + caps, with no
+		// pill; pricing and teachers keep the outlined pill. Hence the
+		// variant rather than restyling the shared .eqc-eyebrow.
+		$html .= '<span class="eqc-eyebrow ' . esc_attr( $eyebrow_class ) . '">'
+			. ( $eyebrow_icon ? eqc_icon_str( $eyebrow_icon ) : '' )
+			. esc_html( $eyebrow ) . '</span>';
 	}
 	$html .= '<h2>' . wp_kses_post( $heading ) . '</h2>';
 	$html .= '<div class="eqc-heading-rule--ornate">' . eqc_divider_svg( 'section' ) . '</div>';
@@ -537,21 +552,72 @@ function eqc_section_heading_el( $eyebrow, $heading, $centered = false ) {
 	return eqc_html( $html );
 }
 
-/** Trust/benefit tile (small icon + heading + description). */
+/**
+ * Trust/benefit tile (small icon + heading + description).
+ *
+ * A "|" in either string is an explicit line break, transcribed from the
+ * reference. The four tiles in Home.jpeg's trust strip break at points no
+ * single max-width can reproduce - "Your child's safety is | our top
+ * priority" wraps at ~105 native px while "Recognize your progress | with
+ * achievement" runs to ~150 - so the break is content, not styling, exactly
+ * as TASK-DESIGN-PARITY.md 2 describes. Callers that pass no "|" are
+ * unaffected and wrap naturally.
+ */
 function eqc_trust_tile( $icon, $title, $description ) {
+	$lines = static function ( $text ) {
+		return implode( ' <br>', array_map( 'esc_html', array_map( 'trim', explode( '|', $text ) ) ) );
+	};
 	// A styled paragraph, not a heading: these tiles are minor benefit
 	// labels, not real subsections, so making them headings would skip a
 	// level wherever they sit between an H1/H2 and the page's next real
 	// H2/H3 (DESIGN.md §22 wants no skipped heading levels).
 	return eqc_html(
 		'<div class="eqc-trust-tile">' . eqc_icon_str( $icon, 'eqc-icon' )
-		. '<div><p class="eqc-trust-tile-title">' . esc_html( $title ) . '</p><p>' . esc_html( $description ) . '</p></div></div>'
+		. '<div><p class="eqc-trust-tile-title">' . $lines( $title ) . '</p><p>' . $lines( $description ) . '</p></div></div>'
 	);
 }
 
-/** Small pill chip used in the hero (icon + short label). */
-function eqc_chip( $icon, $label ) {
-	return '<span class="eqc-chip">' . eqc_icon_str( $icon ) . '<span>' . esc_html( $label ) . '</span></span>';
+/**
+ * Small chip used in the hero (icon + label).
+ *
+ * Pass $label_2 to get the reference's two-line card form (Home.jpeg shows
+ * "1-to-1" over "Live Classes" in a white rounded card, not a one-line
+ * pill) — extended here rather than adding a second card function beside
+ * this one. Callers that pass one label keep the original pill.
+ */
+function eqc_chip( $icon, $label, $label_2 = '' ) {
+	$class = $label_2 ? 'eqc-chip eqc-chip--card' : 'eqc-chip';
+	$text  = '<span class="eqc-chip-label">' . esc_html( $label );
+	$text .= $label_2 ? '<span>' . esc_html( $label_2 ) . '</span>' : '';
+	$text .= '</span>';
+	return '<span class="' . esc_attr( $class ) . '">' . eqc_icon_str( $icon ) . $text . '</span>';
+}
+
+/**
+ * One About-section stat: a rosette-framed icon disc, the label, then the
+ * value. Label ABOVE value, which is the order Home2.jpeg uses - the reverse
+ * of the countup tiles this replaces. Kept as its own small helper rather
+ * than inlined markup so the three calls stay readable and the unverified
+ * values sit in one obvious place (QA/PLACEHOLDER-REGISTER.md).
+ */
+function eqc_about_stat( $icon, $label, $value ) {
+	return '<div class="eqc-about-stat">'
+		. '<span class="eqc-about-stat__disc">' . eqc_icon_str( $icon ) . '</span>'
+		. '<span class="eqc-about-stat__label">' . esc_html( $label ) . '</span>'
+		. '<span class="eqc-about-stat__value">' . esc_html( $value ) . '</span>'
+		. '</div>';
+}
+
+/**
+ * One tile in the pricing benefits strip: a rosette-framed icon disc and a
+ * two-line label. "|" is an explicit line break, as in eqc_trust_tile().
+ */
+function eqc_benefit_tile( $icon, $label ) {
+	$lines = implode( ' <br>', array_map( 'esc_html', array_map( 'trim', explode( '|', $label ) ) ) );
+	return '<div class="eqc-benefit">'
+		. '<span class="eqc-benefit__disc">' . eqc_icon_str( $icon ) . '</span>'
+		. '<span class="eqc-benefit__label">' . $lines . '</span>'
+		. '</div>';
 }
 
 /** A raw icon-labeled anchor matching the .eqc-btn pattern used in header/footer (for icon CTAs). */
@@ -606,6 +672,12 @@ function eqc_faq_group( $title, $items ) {
  * @param array $elements Top-level array of container elements.
  */
 function eqc_save_elementor_page( $post_id, $elements ) {
+	if ( 'local' !== wp_get_environment_type() || 'localhost' !== wp_parse_url( home_url(), PHP_URL_HOST ) ) {
+		WP_CLI::error( 'Page builders require the approved localhost environment.' );
+	}
+	if ( ! current_user_can( 'edit_post', $post_id ) ) {
+		WP_CLI::error( 'Page builders require an editor user; run with --user=1.' );
+	}
 	if ( ! did_action( 'elementor/loaded' ) ) {
 		WP_CLI::error( 'Elementor is not loaded.' );
 	}
@@ -621,6 +693,13 @@ function eqc_save_elementor_page( $post_id, $elements ) {
 			'settings' => array(),
 		)
 	);
+
+	// Re-query persisted markup: Elementor can report success after a no-op.
+	// Fresh element IDs are generated every build, so the root ID proves this save landed.
+	$saved = json_decode( get_post_meta( $post_id, '_elementor_data', true ), true );
+	if ( empty( $elements[0]['id'] ) || ( $saved[0]['id'] ?? null ) !== $elements[0]['id'] ) {
+		WP_CLI::error( "Elementor save verification failed for post #{$post_id}." );
+	}
 
 	// Force the page to be recognized as Elementor-built and regenerate CSS.
 	update_post_meta( $post_id, '_elementor_edit_mode', 'builder' );

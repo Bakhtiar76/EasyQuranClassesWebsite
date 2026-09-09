@@ -1,0 +1,82 @@
+{
+  "generatedAt": "2026-09-08T21:13:17.230Z",
+  "baseUrl": "http://localhost",
+  "widths": [
+    1920,
+    1440,
+    1024,
+    768,
+    390
+  ],
+  "scan": null,
+  "routes": [
+    {
+      "route": "/",
+      "dir": "home",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/courses/",
+      "dir": "courses",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/pricing/",
+      "dir": "pricing",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/teachers/",
+      "dir": "teachers",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/about/",
+      "dir": "about",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/contact/",
+      "dir": "contact",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/free-trial/",
+      "dir": "free-trial",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/faq/",
+      "dir": "faq",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/online-quran-classes-for-kids/",
+      "dir": "online-quran-classes-for-kids",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/blog/",
+      "dir": "blog",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/demo-keeping-kids-motivated-between-classes/",
+      "dir": "demo-keeping-kids-motivated-between-classes",
+      "failures": 0,
+      "warnings": 0
+    }
+  ],
+  "failures": 0,
+  "warnings": 0
+}

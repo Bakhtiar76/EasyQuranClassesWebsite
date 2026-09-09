@@ -39,7 +39,14 @@ project is local-first. Do not configure them.
 ```bash
 git clone <repo-url> EasyQuranClassesWebsite
 cd EasyQuranClassesWebsite
+git checkout feature/setup
 ```
+
+**Do this checkout immediately.** GitHub's default branch here is `main`, which is deliberately
+pruned to production-deployment files only (see `.claude/rules/git.md`) — it has no `local/`,
+`tools/`, `.claude/` or docs at all. Skipping this step means the very next command
+(`cp local/.env.example ...`) fails with "No such file or directory", and everything below it is
+missing too.
 
 ### 2.1 `local/.env` — local WordPress + Novamira (required)
 
@@ -331,12 +338,13 @@ pwsh tools/codex/setup-codex.ps1
 Idempotent. It:
 
 1. **Preflights** Codex version, login, and that a Novamira password is reachable.
-2. **Registers three MCP servers** into `~/.codex/config.toml` (remove-then-add):
+2. **Registers four MCP servers** into `~/.codex/config.toml` (remove-then-add):
    | Server | Command | Purpose |
    |---|---|---|
    | `novamira-localhost` | `cmd /c tools\codex\novamira-mcp.cmd` | WordPress control plane, local site only |
    | `chrome-devtools` | `cmd /c npx -y chrome-devtools-mcp@latest` | screenshots / console / network / Lighthouse |
    | `context7` | `cmd /c npx -y @upstash/context7-mcp` | live library docs |
+   | `playwright` | `cmd /c npx -y @playwright/mcp@latest --isolated --blocked-origins <prod>` | a11y tree, tab order, form fill/submit; isolated profile, production origins blocked |
 
    Every entry goes through `cmd /c` — Codex on Windows cannot spawn a `.cmd`/`npx.cmd`
    directly with working stdio (see §7).
@@ -392,7 +400,7 @@ codex "run: docker compose -f local/docker-compose.yml ps"     # approve the esc
 | 4 | `.\local\wp.ps1 core version` | a version string, no permission errors |
 | 5 | `node tests/visual/sweep.mjs http://localhost/` | screenshots under `tests/visual/test-results/<ts>/`, exit 0 |
 | 6 | `pwsh tools/codex/setup-codex.ps1 -Verify` | `PARITY OK`, exit 0 |
-| 7 | `codex mcp list` (outside a sandbox) | `novamira-localhost`, `chrome-devtools`, `context7` all `enabled` |
+| 7 | `codex mcp list` (outside a sandbox) | `novamira-localhost`, `chrome-devtools`, `context7`, `playwright` all `enabled` |
 | 8 | Claude Code: Novamira ability discovery via `.mcp.json` | abilities list returns |
 | 9 | `.\local\bootstrap.ps1` / `./local/bootstrap.sh` on a fresh clone (empty `eqc_wp` volume) | exits 0; 10 pages + Privacy Policy, 15 attachments, both plugins/theme active, all `tests/visual/sweep.mjs` viewports pass |
 
@@ -413,6 +421,9 @@ Everything below was hit during setup. Symptom → cause → fix.
 | A second machine's `tools/pages/*.php` builders errored with "No Elementor document for post #28", or silently overwrote the wrong page | Every builder used to call `eqc_save_elementor_page()` with a literal post ID (`24`–`33`). Those IDs are an artifact of *this* machine's insert order (`wp_insert_post()` in `00-site-setup.php`) — nothing guarantees a second install produces the same numbers. | Fixed 2026-09-08: builders now resolve the ID by slug via `eqc_page_id()` (`tools/elementor-helpers.php`, mirrors the existing `eqc_media_id()` pattern). Confirmed a no-op on this machine (all nine resolved to their old literal values) before landing. |
 | `01-elementor-kit.php` (or any script needing a plugin) fails with "Elementor is not loaded" when run right after activating the plugin | WordPress loads active plugins once, at the very start of a PHP process. Activating Elementor via `WP_CLI::runcommand()` happens in a spawned **subprocess** — it updates the `active_plugins` DB option, but never `include`s Elementor's code into the *parent* script's still-running process. A plain `require` of the next script inherits that same stale, plugin-not-loaded process. | `tools/05-bootstrap.php` runs every downstream `tools/*.php` script as its **own fresh subprocess** (`eqc_run_step()`), not a `require` — each one starts with an up-to-date `active_plugins` option. Found and fixed while verification-testing the bootstrap script; see its inline comment. |
 | Media import skipped `eqc-logo.webp`, only `eqc-logo-mark.webp` got imported | `eqc_media_id()` does a substring `LIKE` match; checking "already imported?" with the bare filename fragment `eqc-logo` also matches the *already-imported* `eqc-logo-mark.webp`, so the bootstrap script wrongly concluded `eqc-logo.webp` didn't need importing. `00-site-setup.php`'s own logo lookup already works around this by matching the *full filename with extension* — the bootstrap script's import-loop didn't, until fixed. | `tools/05-bootstrap.php` now checks `eqc_media_id( basename( $path ) )` (full filename incl. `.webp`), not the bare fragment. Found and fixed the same verification pass as above. |
+| **Every page shows the same homepage content** on a byte-for-byte fresh bootstrap (`/contact/`, `/teachers/`, etc. all render Home) | `wp core install` never sets a permalink structure; nothing else in the bootstrap chain did either. With plain `?p=123` links and no rewrite rules registered, WordPress can't map a pretty URL to its page and falls back to the front page. Confirmed 2026-09-08 via an isolated fresh-clone-and-Docker test (separate project, separate volumes, cleaned up after): every one of the 10 pages returned `200` but identical content until this was set. | `00-site-setup.php` now sets `permalink_structure` to `/%postname%/` and calls `flush_rewrite_rules()` alongside the other site-identity options. Verified: a fully-fresh isolated bootstrap now serves distinct, correct content per page (screenshotted); re-running the fixed script against the real local site is a safe no-op (already had this set from an earlier manual step). |
+| First bootstrap attempt after `docker compose down -v` fails with "Error establishing a database connection" | The "waiting for reachable" loop's readiness check can pass a beat before `db` is actually ready to accept the `wp core install` connection on a completely fresh volume. | Transient — `bootstrap.sh`/`.ps1` are idempotent; re-running immediately succeeds. Not something to fix by lengthening the wait loop speculatively; noted here in case it recurs. |
+| A plugin download step (`wp plugin install`) fails once with `Warning: Download failed. "A valid URL was not provided."` while sibling installs in the same run succeed | A transient WordPress.org fetch hiccup, not a script defect — confirmed by an immediate re-run succeeding. `tools/05-bootstrap.php`'s downstream steps (e.g. `03-fluentforms.php`'s `WP_CLI::error()` if Fluent Forms isn't active) already turn a real install failure into a loud, whole-run-aborting error rather than a silently half-built site. | Re-run `bootstrap.sh`/`.ps1` — idempotent, resumes from wherever it stopped without duplicating anything already done. |
 
 ### Novamira
 

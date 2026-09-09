@@ -30,11 +30,11 @@
 // side-by-side render, not a flat 0.99.
 //
 // Usage: node tools/graphics/trace-rosette.mjs
-import { writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { loadMask, symmetrizeDihedral, maskToPngBuffer, tracePath, rasterizePath, iou } from './lib/trace.mjs';
 
-const SRC = 'tools/graphics/reference/rosette.png';
-const OUT = 'tools/graphics/scratch/rosette-traced.json';
+const SRC = new URL('./reference/rosette.png', import.meta.url);
+const OUT = new URL('./scratch/rosette-traced.json', import.meta.url);
 const CENTER = 255.5; // measured: bbox 31,32-480,479 on the 512x512 canvas
 
 const ref = loadMask(SRC);
@@ -107,6 +107,7 @@ let maxR = 0;
 	}
 }
 
+mkdirSync(new URL('./', OUT), { recursive: true });
 writeFileSync(OUT, JSON.stringify({ d: finalD, radius: Math.round(maxR * 100) / 100 }, null, '\t') + '\n');
 console.log('rosette outer radius', maxR.toFixed(2));
-console.log('wrote', OUT);
+console.log('wrote', OUT.href);

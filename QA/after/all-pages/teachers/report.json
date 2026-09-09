@@ -1,0 +1,126 @@
+{
+  "route": "/teachers/",
+  "url": "http://localhost/teachers/",
+  "generatedAt": "2026-09-09T07:38:57.677Z",
+  "viewports": [
+    {
+      "name": "desktop-1920x1080",
+      "width": 1920,
+      "height": 1080,
+      "screenshot": "desktop-1920x1080.png",
+      "status": 200,
+      "finalUrl": "http://localhost/teachers/",
+      "scrollWidth": 1920,
+      "overflow": false
+    },
+    {
+      "name": "laptop-sm-1024x768",
+      "width": 1024,
+      "height": 768,
+      "screenshot": "laptop-sm-1024x768.png",
+      "status": 200,
+      "finalUrl": "http://localhost/teachers/",
+      "scrollWidth": 1024,
+      "overflow": false
+    },
+    {
+      "name": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "screenshot": "mobile-390x844.png",
+      "status": 200,
+      "finalUrl": "http://localhost/teachers/",
+      "scrollWidth": 390,
+      "overflow": false
+    }
+  ],
+  "headings": [
+    {
+      "level": 1,
+      "text": "Learn from dedicated Quran teachers"
+    },
+    {
+      "level": 3,
+      "text": "Hafiz Usman Ali"
+    },
+    {
+      "level": 3,
+      "text": "Abdullah Hafeez"
+    },
+    {
+      "level": 3,
+      "text": "Sana Fatima"
+    },
+    {
+      "level": 3,
+      "text": "Maryam Zahra"
+    },
+    {
+      "level": 3,
+      "text": "Add a Teacher"
+    },
+    {
+      "level": 3,
+      "text": "Add a Teacher"
+    },
+    {
+      "level": 3,
+      "text": "Add a Teacher"
+    },
+    {
+      "level": 3,
+      "text": "Add a Teacher"
+    },
+    {
+      "level": 2,
+      "text": "Finding the right teacher for your student"
+    },
+    {
+      "level": 3,
+      "text": "Tell Us the Basics"
+    },
+    {
+      "level": 3,
+      "text": "We Match a Teacher"
+    },
+    {
+      "level": 3,
+      "text": "Try the Free Trial"
+    },
+    {
+      "level": 3,
+      "text": "Adjust if Needed"
+    },
+    {
+      "level": 2,
+      "text": "A calm, encouraging classroom, every session"
+    },
+    {
+      "level": 2,
+      "text": "Your First Class Is Free. Start This Week."
+    },
+    {
+      "level": 3,
+      "text": "Get In Touch!"
+    },
+    {
+      "level": 3,
+      "text": "Quick Links"
+    }
+  ],
+  "h1Count": 1,
+  "imagesMissingAlt": [],
+  "consoleErrors": [],
+  "pageErrors": [],
+  "assetErrors": [],
+  "blockedRequests": [],
+  "scan": {
+    "min": 380,
+    "max": 1900,
+    "step": 40,
+    "checked": 39,
+    "overflows": []
+  },
+  "failures": 0,
+  "warnings": 0
+}

@@ -57,6 +57,11 @@ services:
     # this, wp-cli can't write uploads/plugins the Apache container just made.
     user: "33:33"
     environment:
+      # wp-config-docker.php evaluates this per process; match the web service.
+      WORDPRESS_CONFIG_EXTRA: |
+        define('WP_DEBUG_LOG', true);
+        define('WP_DEBUG_DISPLAY', false);
+        define('WP_ENVIRONMENT_TYPE', 'local');
       WORDPRESS_DB_HOST: db
       WORDPRESS_DB_NAME: ${WORDPRESS_DB_NAME:-wordpress}
       WORDPRESS_DB_USER: ${WORDPRESS_DB_USER:-wordpress}

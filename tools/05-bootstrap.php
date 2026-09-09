@@ -91,26 +91,7 @@ if ( ! wp_get_theme( 'hello-elementor' )->exists() ) {
 WP_CLI::runcommand( 'theme activate easy-quran-classes-child' );
 
 WP_CLI::log( '=== 3/6: Media (from local/media-staging/, mounted read-only at /media-staging) ===' );
-require_once __DIR__ . '/elementor-helpers.php';
-$staging_dir = '/media-staging';
-$webp_files  = glob( $staging_dir . '/*.webp' );
-if ( ! $webp_files ) {
-	WP_CLI::warning( "No .webp files found in {$staging_dir} — is local/media-staging/ populated and the wpcli service's bind mount present?" );
-}
-foreach ( $webp_files as $path ) {
-	// Match on the FULL filename including extension, not the bare
-	// basename — 00-site-setup.php's own eqc_media_id() call documents
-	// why: eqc_media_id() does a substring LIKE match, so the bare
-	// fragment "eqc-logo" also matches the already-imported
-	// "eqc-logo-mark.webp" and would wrongly skip importing
-	// "eqc-logo.webp" itself. Confirmed while testing this script.
-	$fragment = basename( $path );
-	if ( eqc_media_id( $fragment ) ) {
-		WP_CLI::log( "Already imported: {$fragment}" );
-		continue;
-	}
-	WP_CLI::runcommand( 'media import ' . escapeshellarg( $path ), array( 'exit_error' => false ) );
-}
+eqc_run_step( '06-media.php', 1 );
 
 WP_CLI::log( '=== 4/6: Site scaffolding (pages, menus, front page, logo) ===' );
 eqc_run_step( '00-site-setup.php' );
