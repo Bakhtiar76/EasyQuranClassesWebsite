@@ -716,7 +716,7 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	font-weight: 700;
 	letter-spacing: 0.02em;
 	box-shadow: 0 6px 16px rgba(20, 35, 27, 0.2);
-	margin-block: 1.9em 1em;
+	margin-block: 0.8em 0.55em;
 }
 .eqc-pricing-divider { color: var(--eqc-gold-500); width: fit-content; margin: 0 auto 1em; }
 .eqc-pricing-divider svg { display: block; width: 78px; height: auto; }
@@ -2039,7 +2039,7 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 	position: absolute;
 	inset: 0 auto auto 0;
 	height: auto;
-	width: min(24%, calc(250 * var(--eqc-u)));
+	width: min(20%, calc(186 * var(--eqc-u)));
 	aspect-ratio: 1;
 	/* corner-ornament.svg is finished two-tone artwork (cream ground, gold
 	   rules) rather than a silhouette, so it is painted directly instead of
@@ -2056,7 +2056,11 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 
 /* pricing.jpeg calibrates at s=1.345: its card row and benefits strip both
    span 1505px = the 1119u content column. Cards 262u on a 31u gap. */
-.eqc-grid--pricing { grid-template-columns: repeat(4, 1fr); gap: calc(31 * var(--eqc-u)); }
+/* The section already pads; the panel padded again around the grid (32px top
+   and bottom) and Elementor added its default 10px on the grid container on
+   top of that -- 84px of nesting the reference does not have. */
+.eqc-pricing-panel { padding-block: 0; }
+.eqc-grid--pricing { grid-template-columns: repeat(4, 1fr); gap: calc(31 * var(--eqc-u)); padding-block: 0; }
 @media (max-width: 61.25rem) { .eqc-grid--pricing { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 36rem) { .eqc-grid--pricing { grid-template-columns: 1fr; } }
 .eqc-card--pricing { min-height: calc(343 * var(--eqc-u)); padding: calc(20 * var(--eqc-u)); gap: calc(6 * var(--eqc-u)); }
@@ -2110,8 +2114,8 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 	grid-template-columns: repeat(4, 1fr);
 	align-items: center;
 	width: 100%;
-	min-height: calc(96 * var(--eqc-u));
-	margin-block-start: calc(24 * var(--eqc-u));
+	min-height: calc(82 * var(--eqc-u));
+	margin-block-start: calc(6 * var(--eqc-u));
 	padding: calc(16 * var(--eqc-u)) calc(20 * var(--eqc-u));
 	background: var(--eqc-white);
 	border: 1px solid var(--eqc-border);
@@ -2122,7 +2126,7 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 .eqc-benefit + .eqc-benefit { border-inline-start: 1px solid var(--eqc-border); }
 .eqc-benefit__disc {
 	display: inline-flex; align-items: center; justify-content: center; flex: none; position: relative;
-	width: calc(52 * var(--eqc-u)); height: calc(52 * var(--eqc-u));
+	width: calc(43 * var(--eqc-u)); height: calc(43 * var(--eqc-u));
 	background: none;
 }
 .eqc-benefit__disc::before,
