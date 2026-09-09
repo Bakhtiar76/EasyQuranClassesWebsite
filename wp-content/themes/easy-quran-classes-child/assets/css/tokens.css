@@ -55,49 +55,53 @@
 	 * taken off a reference image is transcribed as
 	 * `calc(<measured px> * var(--eqc-u))`.
 	 *
-	 * THE CANVAS IS 1600, NOT 1307. This was calibrated to Home.jpeg's raw
-	 * 1307px width, which inflated every dimension on the site by 22%. The
-	 * reference set is not one canvas:
+	 * THE CANVAS IS 1307. Every measured value in this theme is a native
+	 * pixel on Home.jpeg's 1307px canvas -- --eqc-content-max is 1119u, the
+	 * teachers split is 268u + 51u + 800u, the pricing benefits strip is
+	 * 1119u -- so the unit has to stay on that canvas. Rebasing it to 1600
+	 * without rescaling all 82 horizontal transcriptions is what shrank
+	 * every section to 69.9% of the viewport, leaving 250px of dead margin
+	 * on each side. See QA/LESSONS.md #41.
 	 *
-	 *   Blogs / pricing / Home2 / Reviews / Teachers   1600 x ~900   ratio 1.73-1.86
-	 *   Home.jpeg                                      1307 x  967   ratio 1.35
-	 *   courses.jpeg                                   1296 x  974   ratio 1.33
+	 * The content column is anchored on the one reference that carries both
+	 * the header bar and a content-width element on a single canvas
+	 * (LESSONS #11): Home.jpeg's bar is 1230/1307 = 94.1% and its hero
+	 * content 1119/1307 = 85.6%, a content:chrome ratio of 0.910. The
+	 * section JPEGs read 91-94.5% at face value, but they are crops at
+	 * their own zoom levels and their fractions are not comparable.
 	 *
-	 * Six of the eight are ~1600x900 — a real laptop screen, each showing one
-	 * complete section filling the frame. The two the scale was anchored to
-	 * are the only two whose aspect ratio is not a screen's, i.e. the two
-	 * that are CROPS, so their pixel width was never the canvas width. A
-	 * reference image's pixel width is only the canvas width when its aspect
-	 * ratio is a screen's — see QA/LESSONS.md.
-	 *
-	 * Ratios measured WITHIN one file (LESSONS #11) are unaffected by this:
-	 * only the multiplier moves, so every transcribed proportion is preserved.
-	 *
-	 * 0.0625vw is 100/1600. At 1600px wide -> 1.0; at 1920 -> 1.20; at 2112
-	 * -> 1.32 and held; at 1120 and below -> the 0.70 floor.
+	 * 0.07651vw is 100/1307. At 1307px wide -> 1.0; at 1600 -> 1.224; at
+	 * 1920 -> 1.469; at 2112 -> 1.616 and held; at 915 and below -> the
+	 * 0.70 floor.
 	 *
 	 * The floor and ceiling are the two places this design is NOT the
 	 * reference, and both are deliberate (TASK-DESIGN-PARITY.md 2A): without
 	 * a floor the design would collapse on a phone, and without a ceiling a
-	 * 2560px display would read as zoomed in.
+	 * 2560px display would read as zoomed in. The floor is held at its
+	 * previous value so phone geometry does not move; it simply stops
+	 * binding at 915px instead of 1120px.
 	 *
 	 * This unit governs LAYOUT ONLY. Type has its own compressed scale below:
-	 * a heading and a caption cannot share one linear multiplier — see the
+	 * a heading and a caption cannot share one linear multiplier -- see the
 	 * type block for why.
 	 * ------------------------------------------------------------------ */
-	--eqc-u: clamp(0.70px, 0.0625vw, 1.32px);
+	--eqc-u: clamp(0.70px, 0.07651vw, 1.616px);
 
 	/* ------------------------------------------------------------------
 	 * TYPE SCALE — compressed, and floored at every width.
 	 *
-	 * Type does NOT ride the layout unit linearly. It used to, and that is
-	 * the second reason the page read as "too big": one multiplier drove
-	 * both a 60u heading and a 12u caption, so at 1600 the H2 was 73.4px
-	 * over 14.7px body copy — a 5.0:1 ratio where healthy editorial setting
-	 * is 2.5-3:1. Scaling up to fit the headings starved the body copy;
-	 * scaling down to fix the body copy would have shrunk the headings past
-	 * the reference. A heading and a caption cannot share one linear
-	 * multiplier, so each role gets its own clamp.
+	 * Type does NOT ride the layout unit linearly in one shared step: each
+	 * role gets its own clamp so a caption can be floored for legibility
+	 * without dragging a heading down with it.
+	 *
+	 * The heading sizes here are MEASURED, one per section, not derived from
+	 * a ratio: About 70.5u, Courses 60u, Pricing 51u, Testimonials 48.4u and
+	 * Blog 46.1u (both bold sans), Teachers 40.6u (QA/LESSONS.md #29). An
+	 * earlier pass collapsed all six onto one token and compressed it to
+	 * reach a 2.5-3:1 heading:body ratio, which was an aesthetic rule
+	 * imposed over the reference: measured on pricing.jpeg the client's own
+	 * design sets a 51u heading over a 12.4u list, i.e. 4.1:1. Section
+	 * height is recovered from SPACING, not by shrinking the headings.
 	 *
 	 * Every role is clamp(floor, unit-based, ceiling):
 	 *   - the floor guarantees legibility at ANY width, continuously. This
@@ -108,7 +112,8 @@
 	 *     floor at all.
 	 *   - the ceiling stops headings ballooning on wide displays.
 	 *
-	 * The middle term is px-at-1600, since --eqc-u is 1.0 there.
+	 * The middle term is px on the 1307 reference canvas, where --eqc-u is
+	 * 1.0; multiply by 1.224 for the rendered size at a 1600px viewport.
 	 *
 	 * NOTHING may set font-size as a bare calc() on --eqc-u. 33 rules in
 	 * components.css used to, which is how ten roles reached 7.6-9.4px on a
@@ -116,24 +121,30 @@
 	 * legibility. Use these tokens so a size cannot escape its floor.
 	 * ------------------------------------------------------------------ */
 	/* Display: the About section's heading, the largest type on the site. */
-	--eqc-fs-display-xl: clamp(34px, calc(52 * var(--eqc-u)), 60px);
-	--eqc-fs-h1: clamp(32px, calc(46 * var(--eqc-u)), 54px);      /* hero H1 */
-	--eqc-fs-h2: clamp(28px, calc(44 * var(--eqc-u)), 52px);      /* section headings */
+	--eqc-fs-display-xl: clamp(34px, calc(70.5 * var(--eqc-u)), 114px);
+	--eqc-fs-h1: clamp(32px, calc(58 * var(--eqc-u)), 94px);      /* hero H1 */
+	--eqc-fs-h2: clamp(28px, calc(51 * var(--eqc-u)), 82px);      /* section headings */
 	/* Section headings that sit in a narrower column read smaller in the
 	   references; this is the measured relationship, not a second guess. */
-	--eqc-fs-h2-compact: clamp(24px, calc(34 * var(--eqc-u)), 40px);
-	--eqc-fs-h3: clamp(19px, calc(22 * var(--eqc-u)), 26px);      /* course/blog card title */
-	--eqc-fs-h4: clamp(17px, calc(18 * var(--eqc-u)), 20px);
-	--eqc-fs-body-l: clamp(17px, calc(17.5 * var(--eqc-u)), 19px); /* hero + about body */
-	--eqc-fs-body: clamp(15px, calc(15.5 * var(--eqc-u)), 17px);   /* tile titles, card body */
-	--eqc-fs-small: clamp(14px, calc(14.5 * var(--eqc-u)), 16px);  /* captions, meta rows */
-	--eqc-fs-xsmall: clamp(13px, calc(13 * var(--eqc-u)), 14px);   /* smallest label role */
+	/* courses.jpeg sets its heading larger than any other section; the
+	   testimonial and blog headings are bold SANS and smaller (48.4u and
+	   46.1u measured -- one token at 47u, the 3% spread is inside the
+	   measurement error of both). QA/LESSONS.md #29. */
+	--eqc-fs-h2-courses: clamp(30px, calc(60 * var(--eqc-u)), 97px);
+	--eqc-fs-h2-sans: clamp(26px, calc(47 * var(--eqc-u)), 76px);
+	--eqc-fs-h2-compact: clamp(24px, calc(40.6 * var(--eqc-u)), 66px);
+	--eqc-fs-h3: clamp(19px, calc(17.97 * var(--eqc-u)), 26px);      /* course/blog card title */
+	--eqc-fs-h4: clamp(17px, calc(14.7 * var(--eqc-u)), 20px);
+	--eqc-fs-body-l: clamp(17px, calc(16.5 * var(--eqc-u)), 27px); /* hero + about body */
+	--eqc-fs-body: clamp(15px, calc(12.66 * var(--eqc-u)), 17px);   /* tile titles, card body */
+	--eqc-fs-small: clamp(14px, calc(11.84 * var(--eqc-u)), 16px);  /* captions, meta rows */
+	--eqc-fs-xsmall: clamp(13px, calc(10.62 * var(--eqc-u)), 14px);   /* smallest label role */
 	/* Uppercase, letterspaced section label. Caps read larger than their
 	   point size, so this sits below body while looking like a peer. */
-	--eqc-fs-eyebrow: clamp(12px, calc(13.5 * var(--eqc-u)), 15px);
-	--eqc-fs-button: clamp(15px, calc(15 * var(--eqc-u)), 17px);
+	--eqc-fs-eyebrow: clamp(12px, calc(11.03 * var(--eqc-u)), 15px);
+	--eqc-fs-button: clamp(15px, calc(12.25 * var(--eqc-u)), 17px);
 	/* The large serif figure on a pricing card — a display role, not body. */
-	--eqc-fs-price: clamp(30px, calc(38 * var(--eqc-u)), 44px);
+	--eqc-fs-price: clamp(30px, calc(31.04 * var(--eqc-u)), 44px);
 
 	/* Layout — DESIGN.md §7
 	 * --eqc-content-max is measured, not chosen. In Home.jpeg (1307px canvas)

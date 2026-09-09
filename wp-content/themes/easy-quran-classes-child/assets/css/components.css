@@ -2045,6 +2045,9 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 /* This heading measures 545u for its first line against the courses section's
    604u for a same-length string — the reference genuinely sets it smaller, so
    it carries its own size rather than moving the shared token. */
+/* courses.jpeg draws the largest section heading on the site; pricing
+   keeps the generic one. QA/LESSONS.md #29. */
+.eqc-section--courses .eqc-section-heading h2 { font-size: var(--eqc-fs-h2-courses); }
 .eqc-section--pricing .eqc-section-heading h2 { font-size: var(--eqc-fs-h2); }
 
 /* Dark-green banner with chamfered ends holding "N Days/Week", 207 x 54u. */
@@ -2287,7 +2290,7 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 .eqc-section--testimonials .eqc-section-heading h2 {
 	font-family: var(--eqc-font-body);
 	font-weight: 800;
-	font-size: var(--eqc-fs-h2);
+	font-size: var(--eqc-fs-h2-sans);
 	line-height: 1.16;
 }
 .eqc-testimonials-intro { text-align: center; font-size: var(--eqc-fs-body); color: var(--eqc-text); line-height: 1.6; }
@@ -2368,7 +2371,7 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 .eqc-section--blog .eqc-section-heading h2 {
 	font-family: var(--eqc-font-body);
 	font-weight: 800;
-	font-size: var(--eqc-fs-h2);
+	font-size: var(--eqc-fs-h2-sans);
 	line-height: 1.18;
 }
 .eqc-card--blog { position: relative; min-height: calc(410 * var(--eqc-u)); overflow: visible; }
