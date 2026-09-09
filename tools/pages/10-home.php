@@ -323,7 +323,10 @@ $testimonials = eqc_section(
 
 // ------------------------------------------------------- 9. FAQ PREVIEW
 $faq_preview_items = array(
+	array( 'How are classes conducted?', 'Every class is a live, 1-to-1 video session with a qualified teacher — never a pre-recorded lesson.' ),
+	array( 'How long is each class?', 'Standard classes are 30 minutes, matching the plans on our Pricing page.' ),
 	array( 'Can beginners start from zero?', 'Yes. Noorani Qaida starts from the Arabic alphabet itself, with no prior reading ability assumed.' ),
+	array( 'What age can children start?', 'Children of school age can typically begin; a teacher can advise on readiness during the free trial.' ),
 	array( 'How does the free trial work?', 'Tell us the student\'s age, level and availability, and we match a suitable teacher for one trial class before any commitment.' ),
 	array( 'Are timings flexible?', "Yes. Classes are scheduled around the times that work for your family, not a fixed institutional timetable." ),
 );

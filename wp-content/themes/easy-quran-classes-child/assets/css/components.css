@@ -1476,10 +1476,14 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 .eqc-faq-question {
 	width: 100%;
 	display: flex;
-	align-items: center;
+	align-items: flex-start;
 	justify-content: space-between;
 	gap: 1rem;
 	text-align: left;
+	/* Hello Elementor's reset.css forces white-space:nowrap on every <button>;
+	 * without this the question text can't wrap and gets clipped by the item's
+	 * overflow:hidden on narrow screens (see the span rule below). */
+	white-space: normal;
 	background: none;
 	border: none;
 	cursor: pointer;
@@ -1490,6 +1494,16 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	color: var(--eqc-heading);
 }
 .eqc-faq-question:focus-visible { outline: 3px solid var(--eqc-gold-500); outline-offset: -3px; }
+/* Question text must wrap (and hard-break unbroken strings) instead of
+ * forcing the button wider than its item — .eqc-faq-item has overflow:hidden,
+ * so an un-shrinkable text run would clip the text and push the + icon out
+ * of view on narrow screens. min-width:0 + overflow-wrap:anywhere let the
+ * flex item shrink below its longest word; the icon keeps its slot via flex:none. */
+.eqc-faq-question > span:not(.eqc-faq-icon) {
+	flex: 1 1 auto;
+	min-width: 0;
+	overflow-wrap: anywhere;
+}
 .eqc-faq-icon {
 	flex: none;
 	width: 1.6em;
