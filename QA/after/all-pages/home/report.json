@@ -1,7 +1,7 @@
 {
   "route": "/",
   "url": "http://localhost/",
-  "generatedAt": "2026-09-09T07:37:08.451Z",
+  "generatedAt": "2026-09-09T07:38:13.253Z",
   "viewports": [
     {
       "name": "desktop-1920x1080",
@@ -14,16 +14,6 @@
       "overflow": false
     },
     {
-      "name": "desktop-1440x900",
-      "width": 1440,
-      "height": 900,
-      "screenshot": "desktop-1440x900.png",
-      "status": 200,
-      "finalUrl": "http://localhost/",
-      "scrollWidth": 1440,
-      "overflow": false
-    },
-    {
       "name": "laptop-sm-1024x768",
       "width": 1024,
       "height": 768,
@@ -31,16 +21,6 @@
       "status": 200,
       "finalUrl": "http://localhost/",
       "scrollWidth": 1024,
-      "overflow": false
-    },
-    {
-      "name": "tablet-768x1024",
-      "width": 768,
-      "height": 1024,
-      "screenshot": "tablet-768x1024.png",
-      "status": 200,
-      "finalUrl": "http://localhost/",
-      "scrollWidth": 768,
       "overflow": false
     },
     {

@@ -586,3 +586,80 @@ way to catch this** — it is worth reading after any pass that adds line breaks
 Final state of Home: sweep at 1920/1440/1024/768/390 plus the 380–1900 scan —
 no horizontal overflow, 0 console errors, 0 page errors, 0 asset errors, 0
 images missing `alt`, exactly one H1, and a clean H1→H2 outline.
+
+---
+
+## Full recheck (`claude-opus-5`, 2026-09-09)
+
+An adversarial pass over everything committed so far. It found six real
+problems; all are fixed.
+
+### 1. CSS I had duplicated against itself
+
+Appending rules had produced `.eqc-card--course` defined **twice with
+conflicting padding and gap**, the later silently winning — the same
+source-order fragility that had already hidden a collage image. Consolidated,
+and the superseded `.eqc-section-heading` max-width removed.
+
+### 2. Helper changes never reached the other pages
+
+`eqc_teacher_card()`, `eqc_trust_tile()`, `eqc_testimonial_card()` and
+`eqc_section_heading_el()` all changed, but only `10-home.php` had been re-run
+— every other page still had the **old markup baked into `_elementor_data`**.
+The standalone `/teachers/` page was visibly missing its "View Profile" button.
+All nine builders re-run. **This is the §4 gotcha-2 pattern generalised: a
+change to a shared helper needs every page rebuilt, not just the one being
+worked on.** Added as LESSONS #31.
+
+### 3. An accessibility regression I introduced
+
+Moving the blog category out of the image link left `a.eqc-blog-media` with
+**no accessible name** — three nameless tab stops. The title and "Read More"
+already link to the same post, so the image link is now `aria-hidden` and
+removed from the tab order rather than given a duplicate name.
+
+### 4. Tap targets below 44px (pre-existing)
+
+**17** of them: seven 24×24 carousel dots and ten 33px-tall footer links. Fixed
+by expanding the *hit area* with a pseudo-element, so the visual design is
+unchanged and there is no layout shift.
+
+### 5. Sections systematically too tall — the biggest finding
+
+Section-height **ratios** are immune to the composite's uncertain vertical
+scale, so they are comparable. Every section after the hero was running 1.2–1.6×
+the reference's proportion, and `courses.jpeg` confirmed it independently:
+that section measured **1256u against the reference's 940u (+34%)**.
+
+Diagnosed, not guessed. Two causes, both mine or Elementor's:
+
+- **Paragraph margins inside widget wrappers.** The course card's body widget
+  measured 77.3u around 56.5u of text — 20.8u of dead margin per card, plus 6u
+  on each divider. The card owns its own rhythm, so those are zeroed.
+- **I had applied the reference's column gap to both axes.** Columns sit 88u
+  apart, but row 1 ends at y571 and row 2 starts at y588 — a **17u row gap**.
+  `gap: 88u` was adding 71u of dead space between the card rows.
+
+Courses is now 1046u against 940u; the card 284u exactly matches the reference.
+An earlier guess (`--widgets-spacing: 0`) changed nothing and was replaced by
+the measured fix rather than left in place on the assumption it helped.
+
+### 6. Verification of the whole site
+
+- **Nine routes** (`/`, about, courses, teachers, pricing, contact, faq,
+  free-trial, blog) × 3 viewports + a 39-width scan each: no horizontal
+  overflow, 0 console errors, 0 page errors, 0 asset errors, 0 images missing
+  `alt`, exactly one H1 per route.
+- **Contrast:** all 72 distinct text styles on Home pass WCAG AA. Lowest
+  passing ratio 3.48 (large text, needs 3.0).
+- **Keyboard:** 54 focusable elements, **0** missing a focus ring, **0**
+  missing an accessible name, **0** hit areas under 44px.
+- **Decorative SVGs exposed to the accessibility tree: 0.**
+- PHP lint clean.
+
+### Confirmed from the composite
+
+`Website Layout.png` independently confirms the section-order finding already
+raised: it runs hero → trust → about → courses → **pricing → teachers** →
+testimonials, with **no** "how it works" and **no** FAQ section. That remains a
+user decision, not something to action unprompted.

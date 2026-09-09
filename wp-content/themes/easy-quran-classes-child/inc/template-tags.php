@@ -204,7 +204,10 @@ function eqc_render_blog_cards( $posts ) {
 		$category = ! empty( $cats ) ? '<span class="eqc-blog-category">' . esc_html( $cats[0]->name ) . '</span>' : '';
 
 		$html .= '<article class="eqc-card eqc-card--blog" data-eqc-reveal data-eqc-reveal-index="' . min( $i, 3 ) . '">';
-		$html .= '<a class="eqc-blog-media" href="' . esc_url( $permalink ) . '">' . $thumb . '</a>' . $chip;
+		// aria-hidden + tabindex -1: the title and "Read More" links below already
+		// point here, so exposing the image as a third unnamed link would add
+		// a nameless tab stop for no gain.
+		$html .= '<a class="eqc-blog-media" href="' . esc_url( $permalink ) . '" tabindex="-1" aria-hidden="true">' . $thumb . '</a>' . $chip;
 		$html .= '<div class="eqc-blog-body">';
 		$html .= $category;
 		$html .= '<h3><a href="' . esc_url( $permalink ) . '" style="text-decoration:none;color:inherit;">' . esc_html( get_the_title( $post ) ) . '</a></h3>';
