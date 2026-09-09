@@ -166,7 +166,8 @@ Recommended weights:
 
 Type does **not** ride `--eqc-u` linearly. Every role is
 `clamp(floor, calc(n * var(--eqc-u)), ceiling)`, where `n` is the size in px
-at the 1600px reference width. The floor guarantees legibility at any width
+on the **1307px reference canvas** (`--eqc-u` is 1.0 there); multiply by 1.224
+for the rendered size at a 1600px viewport. The floor guarantees legibility at any width
 *continuously*; the ceiling stops headings ballooning on a 2560px display.
 
 There is no separate mobile table and no floor media query — the clamp is the
@@ -174,25 +175,34 @@ floor at every width. A breakpoint-bounded floor only holds on one side of the
 breakpoint, which is what left a 6px discontinuity at exactly 1100px and
 mainstream laptops (1101–1600) unfloored. See QA/LESSONS.md #36, #38.
 
-| Token | Floor | @1600 | Ceiling | Usage |
-|---|---:|---:|---:|---|
-| Display XL | 34px | 52px | 60px | About section heading |
-| H1 | 32px | 46px | 54px | page hero |
-| H2 | 28px | 44px | 52px | major section title |
-| H2 compact | 24px | 34px | 40px | heading in a narrow column (teachers) |
-| H3 | 19px | 22px | 26px | course/blog card title |
-| H4 | 17px | 18px | 20px | card headings |
-| Body L | 17px | 17.5px | 19px | hero/about intro |
-| Body | 15px | 15.5px | 17px | standard copy, card body |
-| Small | 14px | 14.5px | 16px | metadata/labels |
-| XSmall | 13px | 13px | 14px | smallest label role |
-| Eyebrow | 12px | 13.5px | 15px | uppercase section label |
-| Button | 15px | 15px | 17px | buttons |
-| Price | 30px | 38px | 44px | pricing card figure |
+Heading sizes are **measured per section** (QA/LESSONS.md #29), not derived
+from one token: the reference sets a different size in each column width.
 
-**Heading-to-body ratio must stay between 2.5 and 3.2.** At 1600 it is 2.84.
-It was 5.0 when type shared the layout unit, which is what made the page read
-as simultaneously oversized and unreadable.
+| Token | Floor | n (@1307) | @1600 | Ceiling | Usage |
+|---|---:|---:|---:|---:|---|
+| Display XL | 34px | 70.5 | 86px | 114px | About section heading |
+| H1 | 32px | 58 | 71px | 94px | hero |
+| H2 | 28px | 51 | 62px | 82px | pricing + generic section title |
+| H2 courses | 30px | 60 | 73px | 97px | courses (largest on the site) |
+| H2 sans | 26px | 47 | 58px | 76px | testimonials, blog (bold sans) |
+| H2 compact | 24px | 39 | 48px | 63px | teachers, narrow column |
+| Course title | 20px | 24.6 | 30px | 40px | course card (serif) |
+| Card index | 16px | 26.4 | 32px | 43px | course card numeral |
+| H3 | 19px | 17.97 | 22px | 26px | blog card title, testimonial name |
+| H4 | 17px | 14.7 | 18px | 20px | card headings, course level |
+| Body L | 17px | 16.5 | 20px | 27px | hero/about intro |
+| Body | 15px | 12.66 | 15.5px | 17px | standard copy, card body |
+| Small | 14px | 11.84 | 14.5px | 16px | metadata/labels |
+| XSmall | 13px | 10.62 | 13px | 14px | smallest label role |
+| Eyebrow | 12px | 11.03 | 13.5px | 15px | uppercase section label |
+| Button | 15px | 12.25 | 15px | 17px | buttons |
+| Price | 30px | 31.04 | 38px | 44px | pricing card figure |
+
+**Do not compress a measured heading to hit a ratio.** An earlier pass drove
+the heading:body ratio to 2.84 on the theory that 2.5–3.2 is "healthy"; the
+client's own pricing section is 4.1:1, and the compression left every section
+heading 26–46% too small. Section height comes back from spacing, not from
+overriding a measured size. See QA/LESSONS.md #43.
 
 **Never set `font-size` as a bare `calc()` on `--eqc-u`.** 33 rules did, which
 is how ten roles reached 7.6–9.4px on a 390px phone while every contrast check
@@ -203,9 +213,9 @@ passed. Use the tokens so a size cannot escape its floor.
 ### Global Widths
 
 ```css
---eqc-u: clamp(0.70px, 0.0625vw, 1.32px);    /* 1 unit = 1px on the 1600px reference screen */
+--eqc-u: clamp(0.70px, 0.07651vw, 1.616px);  /* 1 unit = 1px on the 1307px reference canvas */
 --eqc-content-w: 85.6%;
---eqc-content-max: calc(1119 * var(--eqc-u));   /* 1343px @1920 */
+--eqc-content-max: calc(1119 * var(--eqc-u));   /* 1370px @1600, 1644px @1920 */
 --eqc-content-narrow: calc(558 * var(--eqc-u));
 --eqc-text-max: calc(463 * var(--eqc-u));
 ```

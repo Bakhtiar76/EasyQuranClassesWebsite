@@ -78,3 +78,27 @@ worth a second opinion — all flagged `[claude-opus-5 — review]` in
 `--eqc-u` in `tokens.css` now drives every size token. A value measured off a reference image is written `calc(<native px> * var(--eqc-u))` and is correct at every width — which is what makes the remaining seven sections a transcription job rather than seven rounds of guess-and-check.
 
 **This touches every page, not just Home.** The other nine pages inherit the new scale, have changed appearance, and are NOT re-reviewed. Expect to re-check them after Home is finished.
+
+## Canvas correction pass (2026-09-10, `claude-opus-5`)
+
+The 1600-canvas recalibration (`2486a90`) was half wrong. Its vertical
+diagnosis was right and stands; rebasing the horizontal unit was not, because
+every transcribed value in the theme is a native pixel on the 1307 canvas.
+`--eqc-u` is back on that basis and every type token was rescaled to hold the
+sizes the previous pass measured. Content is 85.6% of the viewport again at
+every width — the user-reported "squeezed, extra padding left and right".
+
+Worked this pass, each measured against its own reference at 1600x900:
+**Courses** (landscape cards, 1.27 vs 1.30), **Teachers** (818 vs 923),
+**Reviews** (910 vs 862), **Pricing** (934 vs 906). Section headings restored
+to the six measured sizes of LESSONS #29. Icon call sites rewired to the
+rebuilt sprite and all nine pages re-baked.
+
+Evidence: `QA/after/parity/` — 0 failures, 0 warnings over 9 routes x 8
+viewports plus a 380-1900px scan.
+
+**Still open:** About (1095px) and the Courses section height (1251px) carry
+the same spacing excess the three named sections had and were not worked;
+`--eqc-section-space`, the eyebrow block height and the section padding are
+the shared levers. Pages 2-10 inherit the corrected scale but are not
+individually re-reviewed.

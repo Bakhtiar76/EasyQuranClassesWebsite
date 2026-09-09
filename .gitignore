@@ -68,3 +68,6 @@ Thumbs.db
 
 # Playwright MCP session artifacts (screenshots/logs from ad-hoc QA)
 .playwright-mcp/
+
+# Parity sweep PNGs — regenerate with tests/visual/sweep.mjs; the reports are tracked.
+QA/after/parity/**/*.png

@@ -854,3 +854,110 @@ The new Claude scale commit is preserved for review; its screen-aspect inference
 | S18 | About child246×423 with pointed lobed bottom; alphabet276×300 | Flat-bottom hero frame / generic quatrefoil | P1 | Extend existing arch family into measured closed cartouches |
 
 These are corrections to the supplied geometry, not a new design direction. The new cartouche, bracket and scalloped seal are justified because existing assets have different silhouettes. Plan: generate and inspect assets, integrate existing helpers/classes, rebuild every page, capture Home at five widths, then resolve remaining metrics and interaction flaws.
+
+---
+
+## Iteration log — canvas correction and the three reported sections (2026-09-10, `claude-opus-5`)
+
+**Reported:** Teachers, Reviews and Pricing "squeezed horizontally, extra
+padding on the right and left sides"; icons still wrong; backgrounds not
+matching; courses cards vertical where the reference is horizontal.
+
+### 1. The squeeze — one token, whole site
+
+Measured at 1600x900: the header bar rendered 1504px (94.0%, matching
+Home.jpeg's 94.1%) but **every** section's `.eqc-container` rendered 1119px —
+**69.9%**, leaving 241px of dead margin each side against the reference's
+85.6%. Cause: commit `2486a90` rebased `--eqc-u` to the 1600 canvas while
+every transcribed value in the theme is a native pixel on Home.jpeg's 1307
+canvas (QA/LESSONS.md #41). Restoring `--eqc-u` to `clamp(0.70px, 0.07651vw,
+1.616px)` fixed all 82 horizontal values at once; content is now 1370px
+(85.6%) at 1600 and 1644px at 1920.
+
+The same rebase had silently shrunk the type, whose clamps ride the unit in
+their middle term, so every `n` was divided by 1.224 to hold the sizes the
+previous pass had measured (#42).
+
+### 2. Heading sizes restored
+
+Glyph-width comparison (LESSONS #12) against each reference, normalised to the
+1370 column, showed the section headings 26–46% too small — an earlier pass had
+collapsed the six measured sizes of #29 onto two tokens and compressed them to
+reach a 2.5–3.2 heading:body ratio. The client's pricing section is 4.1:1.
+Restored per-section: About 70.5u, Courses 60u, Pricing 51u, Testimonials/Blog
+47u, Teachers 39u, H1 58u. All roles now measure within 5% of the reference
+(`tools/graphics/scratch/type-parity.mjs`).
+
+### 3. Courses — landscape cards
+
+Reference card is 364x281 native (**1.30**), ours was 379x348 (1.12) on a
+110px column gap. Re-measured the reference card borders directly: gap is 31
+of a 1146 content column, not the 88u recorded in #33. The card is portrait
+because the arrow sat on its own row; the reference places it beside the body,
+bottom-right. Result: 425x335, ratio **1.27**, gap 37px. Course title given
+its own 24.6u role (the blog title, which shared `--eqc-fs-h3`, already
+measured correct), level recoloured to neutral grey and the index badge
+rebuilt as a cream scalloped seal with a 26.4u numeral.
+
+### 4. Teachers
+
+- `.eqc-divider-svg` was a bare `clamp(180px, 22vw, 240px)`: the card divider
+  rendered 240px inside a 183px card and ran across the gap (#44). Now
+  `width: 100%` with the clamp as `max-width`.
+- `.eqc-btn--sm` (0,1,0) lost to `a.eqc-btn` (0,1,1), so the "View All
+  Teachers" pill kept 65px of inline padding and ran 305px wide in a 337px
+  column (#45). Fixed to 215px against a 208px target.
+- The aside column is the tallest element and therefore sets the card height
+  (#40). Its feature caption wrapped to a third line because it measured 273px
+  in a 260px column; at `--eqc-fs-xsmall` it fits on one line, the tile drops
+  61px and the cards' dead space closes.
+- Heading now breaks "Learn From / Dedicated / Quran Teachers" as the
+  reference does.
+- Section **818px** against a 923px reference frame.
+
+### 5. Reviews
+
+- The carousel has `pageCount === 1` — three cards, three visible — so both
+  arrows were permanently disabled and one dot showed. Reviews.jpeg draws no
+  arrows. `eqc.js` now marks such a carousel static and CSS drops the controls
+  and their inline padding, which was holding the cards 22px narrower than the
+  reference. Cards now **425px against 426px**.
+- The mini-feature strip inherited an 18.8px column gap from the base flex
+  rule through the `display:grid` override (#47), wrapping every label. With
+  `gap: 0` and the reference's 19u strip inset, all three labels set on one
+  line.
+- Quote leading 1.7 -> 1.45, name promoted from h4 to h3 (measured 22% small).
+- Section **910px** against an 862px frame.
+
+### 6. Pricing
+
+- `.eqc-pricing-freq` carried `margin-block: 1.9em 1em` — 52px of margin
+  around a 48px banner.
+- `.eqc-pricing-panel` padded the grid again by 32px top and bottom, on top of
+  Elementor's default 10px, inside a section that already pads.
+- Corner ornament was 306px against the reference's 228px.
+- The featured card's lower medallion was **not** a defect — pricing.jpeg does
+  the same (#49); only the magnitude was off.
+- Section **934px** against a 906px frame.
+
+### 7. Icons rewired (needed the all-page re-bake)
+
+`users`->`people-pair`, `book-open`->`rehal-quran`, `shield`->`shield-star` in
+the pricing benefits; `graduation-cap`/`check`/`chart-up` ->
+`graduate`/`clipboard-check`/`target-arrow` on the testimonial tags;
+`monitor-play`->`presenter` and `book-open`->`rehal-quran` on the about stats;
+`shield`->`shield-halved` on the trust tiles; `eqc_page_hero()` default ->
+`rehal-quran`. All nine builders re-run with `--user=1` and each save verified
+by re-querying `_elementor_data`.
+
+### Evidence
+
+`QA/after/parity/` — nine routes, eight viewports, plus a 380–1900px scan in
+40px steps: **0 failures, 0 warnings**, no overflow, no console/page/asset
+errors, one H1 per page, no missing alt.
+
+### Not done
+
+The remaining sections are within 3–6% of their reference frames but not
+exact; About (1095px) and Courses (1251px) were not worked in this pass and
+still carry the spacing excess the three named sections had.
