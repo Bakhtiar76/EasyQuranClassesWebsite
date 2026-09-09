@@ -468,6 +468,18 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	z-index: 0;
 }
 .eqc-card--course > * { position: relative; z-index: 1; }
+/* ...but NOT the wrapper holding the stretched .eqc-card-link. Two reasons it
+   must opt out of the rule above:
+   1. position:static so the inset:0 anchor resolves against the .eqc-card
+      itself, not its own zero-height widget wrapper (else the link collapses
+      and the card body isn't clickable at all).
+   2. z-index:auto because the card is display:flex, and a flex item with a
+      numeric z-index becomes a stacking context even while position:static —
+      that would trap the anchor at the wrapper's own z-index (1), tying with
+      the sibling content wrappers and losing the DOM-order tiebreak, so every
+      heading/level/price above it would still eat the click.
+   Same fix mirrored on .eqc-card--pricing--featured below. */
+.eqc-card--course > *:has(> .eqc-card-link) { position: static; z-index: auto; }
 .eqc-card--course h3 { margin-block: 0.6em 0.1em; }
 /* Reserve two lines of title height so a one-line and a two-line course
    title drop their divider at the same offset across a grid row. Only while
@@ -522,6 +534,28 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 .eqc-arrow-btn:focus-visible {
 	background: var(--eqc-green-800);
 	color: var(--eqc-white);
+	transform: translateX(3px);
+}
+
+/* "A quick way to choose the right course" rows (courses page) — each row is a
+   full link to the Free Trial page. Give it a visible hover/focus cue and nudge
+   the arrow, mirroring the card affordance, without changing the resting look. */
+.eqc-guide-row {
+	transition: background-color var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+.eqc-guide-row:hover,
+.eqc-guide-row:focus-visible {
+	background: var(--eqc-cream-100, rgba(169, 130, 53, 0.06));
+}
+.eqc-guide-row:focus-visible {
+	outline: 2px solid var(--eqc-bronze-700);
+	outline-offset: -2px;
+}
+.eqc-guide-row .eqc-icon {
+	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+.eqc-guide-row:hover .eqc-icon,
+.eqc-guide-row:focus-visible .eqc-icon {
 	transform: translateX(3px);
 }
 
@@ -699,6 +733,13 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	z-index: 0;
 }
 .eqc-card--pricing--featured > * { position: relative; z-index: 1; }
+/* Except the stretched card-link's wrapper — position:static so the inset:0
+   anchor sizes to the whole card, and z-index:auto so the flex item doesn't
+   become a stacking context that traps the anchor below the content wrappers
+   (see the matching .eqc-card--course rule for the full explanation). Without
+   this the featured "Recommended" plan is the one pricing card whose panel
+   isn't clickable. */
+.eqc-card--pricing--featured > *:has(> .eqc-card-link) { position: static; z-index: auto; }
 /* Re-assert the stretched card-link's higher z-index (its own rule lives
    far earlier in this file, in the course-card section, so on the tied
    specificity above it would otherwise lose the cascade to the featured

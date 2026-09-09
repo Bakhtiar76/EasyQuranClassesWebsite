@@ -44,13 +44,16 @@ $guide_rows = array(
 	array( 'Working toward memorizing the Quran?', 'Join the Quran Memorization pathway.' ),
 	array( 'Want the fundamentals of the faith too?', 'Add Islamic Studies alongside any course.' ),
 );
+// Each row is a full-width link to the Free Trial page (the whole row is the
+// tap target, matching the whole-panel-is-the-button pattern used by the
+// course/pricing cards); .eqc-guide-row carries the hover/focus affordance.
 $guide_html = '<div class="eqc-card" style="padding:0;overflow:hidden;">';
 foreach ( $guide_rows as $i => $row ) {
 	$border = $i < count( $guide_rows ) - 1 ? 'border-bottom:1px solid var(--eqc-border);' : '';
-	$guide_html .= '<div style="display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:space-between;align-items:center;padding:1.1rem 1.5rem;' . $border . '">'
+	$guide_html .= '<a class="eqc-guide-row" href="' . esc_url( $trial_url ) . '" style="display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:space-between;align-items:center;padding:1.1rem 1.5rem;text-decoration:none;' . $border . '">'
 		. '<span style="font-weight:600;color:var(--eqc-heading);">' . esc_html( $row[0] ) . '</span>'
 		. '<span style="color:var(--eqc-bronze-700);display:flex;align-items:center;gap:0.5em;font-weight:600;">' . eqc_icon_str( 'arrow-right' ) . esc_html( $row[1] ) . '</span>'
-		. '</div>';
+		. '</a>';
 }
 $guide_html .= '</div>';
 
