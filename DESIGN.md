@@ -173,7 +173,7 @@ Recommended weights:
 | Body L | 18px | 400 | 1.75 | hero/about intro |
 | Body | 16px | 400 | 1.7 | standard copy |
 | Small | 14px | 500 | 1.55 | metadata/labels |
-| Eyebrow | 13–14px | 700 | 1.3 | uppercase section label |
+| Eyebrow | 14–15px | 700 | 1.3 | uppercase section label |
 | Button | 15–16px | 600 | 1 | buttons |
 
 ### Mobile Type Scale

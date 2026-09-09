@@ -49,7 +49,7 @@
 	--eqc-fs-body-l: 1.125rem;
 	--eqc-fs-body: 1rem;
 	--eqc-fs-small: 0.875rem;
-	--eqc-fs-eyebrow: 0.8125rem;
+	--eqc-fs-eyebrow: clamp(0.875rem, 0.82rem + 0.2vw, 0.9375rem);
 	--eqc-fs-button: 0.9375rem;
 
 	/* Layout — DESIGN.md §7 */

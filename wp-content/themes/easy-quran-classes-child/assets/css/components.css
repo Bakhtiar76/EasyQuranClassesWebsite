@@ -133,7 +133,14 @@ button:focus,
 	background: var(--eqc-surface);
 	border: 1px solid var(--eqc-border);
 	border-radius: var(--eqc-radius-pill);
-	padding: 0.5em 1.1em;
+	padding: 0.6em 1.4em;
+	/* Definite cross size so the pill hugs its label even when it lands as a
+	   flex item of `.eqc-stack.eqc-section-heading` — without this, blockified
+	   `inline-flex` inherits `align-items: stretch` and the pill spans the
+	   whole heading column (only `.eqc-section-heading--center` escaped it).
+	   `max-width` keeps a long label wrapping inside the pill, not overflowing. */
+	width: fit-content;
+	max-width: 100%;
 }
 
 .eqc-section--dark .eqc-eyebrow {
@@ -178,6 +185,11 @@ button:focus,
 }
 .eqc-section-heading--center .eqc-heading-rule--ornate { justify-content: center; }
 .eqc-divider-svg { width: clamp(180px, 22vw, 240px); height: auto; flex: none; }
+/* Heavier section-heading rule so the motif reads as a deliberate divider
+   rather than a hairline scratch. Scoped to the heading context only — the
+   bare `.eqc-divider-svg` clamp above still drives the teacher-card dividers,
+   which stay their current size. */
+.eqc-heading-rule--ornate .eqc-divider-svg { width: clamp(240px, 26vw, 330px); max-width: 100%; }
 html.eqc-js .is-visible .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
 html:not(.eqc-js) .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
 .eqc-section--dark .eqc-heading-rule--ornate { color: var(--eqc-gold-300); }
@@ -437,6 +449,14 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 }
 .eqc-card--course > * { position: relative; z-index: 1; }
 .eqc-card--course h3 { margin-block: 0.6em 0.1em; }
+/* Reserve two lines of title height so a one-line and a two-line course
+   title drop their divider at the same offset across a grid row. Only while
+   the courses grid is multi-column (it collapses to one column at 36rem —
+   see .eqc-grid--courses below); on a single column there is no row to align
+   to and the extra height would just be blank space. */
+@media (min-width: 36rem) {
+	.eqc-card--course h3 { min-height: 2em; min-height: 2lh; }
+}
 .eqc-card--course .eqc-card-level {
 	color: var(--eqc-bronze-700);
 	font-size: var(--eqc-fs-small);
