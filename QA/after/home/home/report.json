@@ -1,7 +1,7 @@
 {
   "route": "/",
   "url": "http://localhost/",
-  "generatedAt": "2026-09-09T01:10:08.574Z",
+  "generatedAt": "2026-09-09T06:52:35.327Z",
   "viewports": [
     {
       "name": "desktop-1920x1080",
@@ -65,7 +65,7 @@
     },
     {
       "level": 2,
-      "text": "Choose the course that matches where you are today"
+      "text": "Choose the course thatmatches where you are today"
     },
     {
       "level": 3,
@@ -73,7 +73,7 @@
     },
     {
       "level": 3,
-      "text": "Quran Reading with Tajweed"
+      "text": "Quran Reading With Tajweed"
     },
     {
       "level": 3,

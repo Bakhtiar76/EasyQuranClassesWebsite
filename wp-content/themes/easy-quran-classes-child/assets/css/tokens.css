@@ -84,13 +84,16 @@
 	   by 17% until each was scaled by its own anchor, which is what
 	   LESSONS #11 warns about. */
 	--eqc-fs-h2: calc(60 * var(--eqc-u));
-	--eqc-fs-h3: calc(23.1 * var(--eqc-u));
+	--eqc-fs-h3: calc(25.5 * var(--eqc-u));   /* course/blog card title */
 	--eqc-fs-h4: calc(16.3 * var(--eqc-u));
 	--eqc-fs-body-l: calc(16.6 * var(--eqc-u));  /* hero body */
 	--eqc-fs-body: calc(13.6 * var(--eqc-u));    /* trust tile title, hero eyebrow */
 	--eqc-fs-small: calc(11.6 * var(--eqc-u));   /* trust tile caption */
 	--eqc-fs-xsmall: calc(10.3 * var(--eqc-u));  /* feature card labels */
-	--eqc-fs-eyebrow: calc(8.85 * var(--eqc-u)); /* uppercase section label */
+	/* Uppercase section label. Measured on courses.jpeg: "OUR COURSES" is
+	   145u of letterspaced caps beside a 37u book icon - far larger than the
+	   8.85u this carried, which was a guess inherited from the old scale. */
+	--eqc-fs-eyebrow: calc(20.7 * var(--eqc-u));
 	--eqc-fs-button: calc(11.2 * var(--eqc-u));
 
 	/* Layout — DESIGN.md §7
@@ -191,13 +194,13 @@
 		--eqc-fs-h1: max(34px, calc(53.7 * var(--eqc-u)));
 		--eqc-fs-display-xl: max(36px, calc(70.5 * var(--eqc-u)));
 		--eqc-fs-h2: max(28px, calc(60 * var(--eqc-u)));
-		--eqc-fs-h3: max(22px, calc(23.1 * var(--eqc-u)));
+		--eqc-fs-h3: max(22px, calc(25.5 * var(--eqc-u)));
 		--eqc-fs-h4: max(18px, calc(16.3 * var(--eqc-u)));
 		--eqc-fs-body-l: max(17px, calc(16.6 * var(--eqc-u)));
 		--eqc-fs-body: max(16px, calc(13.6 * var(--eqc-u)));
 		--eqc-fs-small: max(14px, calc(11.6 * var(--eqc-u)));
 		--eqc-fs-xsmall: max(13px, calc(10.3 * var(--eqc-u)));
-		--eqc-fs-eyebrow: max(12px, calc(8.85 * var(--eqc-u)));
+		--eqc-fs-eyebrow: max(12px, calc(20.7 * var(--eqc-u)));
 		--eqc-fs-button: max(15px, calc(11.2 * var(--eqc-u)));
 	}
 	/* Controls and the avatar row need real minimums too: a 44px tap target

@@ -1837,3 +1837,74 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 	.eqc-about-collage__main { width: 100%; }
 	.eqc-about-collage__child { width: 42%; }
 }
+
+/* ---------- Courses section (courses.jpeg) ---------- */
+
+/* Cards measured 313u wide on an 88u gap, three across (3x313 + 2x88 = 1115
+   against the 1119u content column). The shared --eqc-grid-gap is 22u, which
+   is the hero's feature-card gap, so this section carries its own. */
+.eqc-grid--courses { gap: calc(88 * var(--eqc-u)); }
+.eqc-card--course {
+	min-height: calc(284 * var(--eqc-u));
+	padding: calc(26 * var(--eqc-u)) calc(24 * var(--eqc-u));
+	gap: calc(9 * var(--eqc-u));
+}
+.eqc-card--course p { font-size: calc(13 * var(--eqc-u)); line-height: 1.55; }
+.eqc-card--course .eqc-card-level { font-size: calc(12 * var(--eqc-u)); }
+.eqc-card--course .eqc-card-divider .eqc-divider-svg { width: calc(113 * var(--eqc-u)); }
+.eqc-card--course .eqc-arrow-btn {
+	width: calc(50 * var(--eqc-u));
+	height: calc(50 * var(--eqc-u));
+}
+.eqc-card--course .eqc-card-index { width: calc(58 * var(--eqc-u)); height: calc(51 * var(--eqc-u)); }
+
+/* The section heading block was capped at --eqc-content-narrow (558u), which
+   forced the reference's two-line heading onto three lines. Its longest line
+   measures 707u, so the block needs room for that plus its own leading. */
+.eqc-section-heading { max-width: calc(760 * var(--eqc-u)); }
+.eqc-section-heading--center { max-width: calc(820 * var(--eqc-u)); margin-inline: auto; }
+/* Left-aligned ornate divider under the heading, 359u in the reference. */
+.eqc-heading-rule--ornate .eqc-divider-svg { width: calc(359 * var(--eqc-u)); }
+
+/* Bare section label: gold icon + letterspaced caps, no pill. courses.jpeg
+   draws it this way; pricing and teachers keep the outlined pill, so this is
+   a variant rather than a change to the shared .eqc-eyebrow. */
+.eqc-eyebrow--plain {
+	background: none;
+	border: 0;
+	padding: 0;
+	color: var(--eqc-gold-700);
+	align-self: flex-start;
+	width: auto;
+	gap: calc(19 * var(--eqc-u));
+}
+.eqc-eyebrow--plain .eqc-icon {
+	width: calc(37 * var(--eqc-u));
+	height: calc(37 * var(--eqc-u));
+	color: var(--eqc-gold-600);
+}
+.eqc-section-heading--center .eqc-eyebrow--plain { align-self: center; }
+
+/* Our render of the heading's second line runs ~10% wider than the
+   reference's for the same string and size, so the block needs the extra
+   room to keep the reference's two-line break rather than spilling to three. */
+.eqc-section-heading { max-width: calc(820 * var(--eqc-u)); }
+
+/* Card content is denser in the reference: 284u total against our 418u, most
+   of the excess being inter-element gaps rather than type size. */
+.eqc-card--course { padding: calc(22 * var(--eqc-u)) calc(24 * var(--eqc-u)); gap: calc(5 * var(--eqc-u)); }
+.eqc-card--course .eqc-card-level { margin: 0; line-height: 1.3; }
+.eqc-card--course h3 { line-height: 1.2; margin: 0; }
+
+/* The reference pins the course card's arrow to the bottom RIGHT, and pairs
+   the index badge with a short rule to its right. */
+.eqc-card--course .eqc-card__foot { align-self: flex-end; }
+.eqc-card--course .eqc-card-index { display: inline-flex; align-items: center; }
+.eqc-card--course .eqc-card-index::after {
+	content: '';
+	width: calc(18 * var(--eqc-u));
+	height: 1px;
+	background: var(--eqc-gold-600);
+	margin-inline-start: calc(10 * var(--eqc-u));
+	flex: none;
+}

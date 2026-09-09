@@ -204,12 +204,12 @@ $about = eqc_section(
 
 // ------------------------------------------------------- 4. COURSES
 $course_data = array(
-	array( '01', 'Noorani Qaida', 'Beginner', 'Arabic letters, sounds and joining, taught from absolute zero, until short Quranic words can be read unaided.' ),
-	array( '02', 'Quran Reading with Tajweed', 'Beginner to Advanced', 'Read the Quran fluently and correctly, applying the rules of Tajweed as you go, not as an afterthought.' ),
-	array( '03', 'Tajweed Course', 'All Levels', 'Master the rules of Tajweed step by step with practical examples until recitation is both accurate and clear.' ),
-	array( '04', 'Quran Tafseer', 'Advanced', 'Move from reciting the words to understanding them: context, meaning, and how each passage applies today.' ),
-	array( '05', 'Quran Memorization', 'Intermediate', 'A structured Hifz plan with daily new lessons, recent revision and long-term revision paced to your capacity.' ),
-	array( '06', 'Islamic Studies', 'All Levels', 'The essentials every Muslim needs: correct prayer, daily duas, seerah, and the manners that go with the knowledge.' ),
+	array( '01', 'Noorani Qaida', 'Beginner', 'Arabic letters, sounds and joining, taught from absolute zero. Ends when you can read short Quranic words unaided.' ),
+	array( '02', 'Quran Reading With Tajweed', 'Beginner To Advanced', 'Read the Quran fluently and correctly, applying the rules of Tajweed as you go, not as an afterthought.' ),
+	array( '03', 'Tajweed Course', 'All Levels', 'Master the rules of Tajweed step by step with practical examples until you recite the Quran with beauty and accuracy.' ),
+	array( '04', 'Quran Tafseer', 'Advanced', 'Move from reciting the words to understanding them &mdash; context, meaning and how each passage applies now.' ),
+	array( '05', 'Quran Memorization', 'Intermediate', 'A structured Hifz plan with daily new lesson, recent revision and long-term revision paced to your capacity.' ),
+	array( '06', 'Islamic Studies', 'All Levels', 'The essentials every Muslim needs &mdash; how to pray correctly, daily Duas, the life of the Prophet (Peace Be Upon Him) and the manners that go with the knowledge.' ),
 );
 $course_cards = array();
 foreach ( $course_data as $i => $c ) {
@@ -222,7 +222,7 @@ $courses = eqc_section(
 		eqc_inner(
 			'',
 			array_merge(
-				array( eqc_section_heading_el( 'Our Courses', 'Choose the course that matches where <span style="color:var(--eqc-bronze-700)">you are today</span>' ) ),
+				array( eqc_section_heading_el( 'Our Courses', 'Choose the course that<br>matches where <span style="color:var(--eqc-bronze-700)">you are today</span>', false, 'eqc-eyebrow--plain', 'book-open' ) ),
 				array( eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--courses', 'flex_direction' => 'row' ), $course_cards ) )
 			)
 		),

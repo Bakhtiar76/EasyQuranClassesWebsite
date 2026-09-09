@@ -525,11 +525,16 @@ function eqc_page_hero( $eyebrow, $title, $intro, $icon = 'book-open' ) {
  * as well as the ornate modifier, painting as a full-width flat gold bar
  * with the old tiny flower glyph stranded near the left edge inside it.
  */
-function eqc_section_heading_el( $eyebrow, $heading, $centered = false ) {
+function eqc_section_heading_el( $eyebrow, $heading, $centered = false, $eyebrow_class = '', $eyebrow_icon = '' ) {
 	$class = 'eqc-stack eqc-section-heading' . ( $centered ? ' eqc-section-heading--center' : '' );
 	$html  = '<div class="' . esc_attr( $class ) . '" data-eqc-reveal data-eqc-reveal-index="0">';
 	if ( $eyebrow ) {
-		$html .= '<span class="eqc-eyebrow">' . esc_html( $eyebrow ) . '</span>';
+		// courses.jpeg draws this label as a bare gold icon + caps, with no
+		// pill; pricing and teachers keep the outlined pill. Hence the
+		// variant rather than restyling the shared .eqc-eyebrow.
+		$html .= '<span class="eqc-eyebrow ' . esc_attr( $eyebrow_class ) . '">'
+			. ( $eyebrow_icon ? eqc_icon_str( $eyebrow_icon ) : '' )
+			. esc_html( $eyebrow ) . '</span>';
 	}
 	$html .= '<h2>' . wp_kses_post( $heading ) . '</h2>';
 	$html .= '<div class="eqc-heading-rule--ornate">' . eqc_divider_svg( 'section' ) . '</div>';

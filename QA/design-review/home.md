@@ -423,3 +423,35 @@ Sweep at 1920/1440/1024/768/390 plus the 380–1900 scan: no overflow, 0 console
 - The reference's collage is larger and **bleeds left** of the content column;
   ours stays inside it. Deferred with the collage's final geometry, which is
   hard to fix properly while one of its three elements is missing.
+
+---
+
+## Section 4 — Courses (`courses.jpeg`, `claude-opus-5`)
+
+Calibration: ~1:1, anchored by the card grid (3 cards of 313u + 2 gaps of 88u
+= 1115 against the 1119u content column).
+
+| # | Reference shows | Build did | Sev | Fix |
+|---|---|---|---|---|
+| C1 | Bare gold book icon + letterspaced "OUR COURSES", **no pill** | Full-width outlined pill | P1 | `.eqc-eyebrow--plain` variant; pricing/teachers keep their pills |
+| C2 | Eyebrow label 145u wide beside a 37u icon | 8.85u type — a guess carried over from the old scale | P1 | `--eqc-fs-eyebrow` 8.85u → **20.7u** |
+| C3 | Heading on **two** lines, tail bronze | Three lines: no explicit break and the block was capped at `--eqc-content-narrow` (558u) | P1 | `<br>` after "that" + block to 820u |
+| C4 | Card 313 × 284u, gap 88u | 310 × 418u, gap 29u | P1 | `.eqc-grid--courses` gap 88u; card padding/gap tightened |
+| C5 | Card title 160u ink, body 213u ink | h3 23.1u, body 11.6u | P2 | `--eqc-fs-h3` → 25.5u; card body 13u |
+| C6 | Arrow bottom-**right**; index badge paired with a short rule | Arrow bottom-left, badge alone | P2 | `align-self: flex-end`; `::after` rule on the badge |
+| C7 | Card copy ends "Ends when you can read short Quranic words unaided", title "Quran Reading **With** Tajweed", level "(Beginner **To** Advanced)" | Paraphrased, different capitalisation | P0 (§2) | all six cards transcribed verbatim |
+
+**A measurement note worth carrying forward.** The heading's two lines gave
+conflicting sizes — line 1 asked for 59.8u, line 2 for 54.5u. Line 1 matched the
+independent card-grid calibration exactly, so 60u stands; our render of line 2
+simply runs ~10% wider than the reference's for the same string and size (the
+bronze span). The block was widened to keep the reference's two-line break
+rather than shrinking the type to chase one line's width. **When two
+measurements of the same token disagree, trust the one corroborated by an
+independent anchor** — added as LESSONS #27.
+
+Verified: sweep at five viewports + the 380–1900 scan, no overflow, 0 console /
+page / asset errors, 0 images missing `alt`, one H1.
+
+Remaining: the section's closing centred divider (473 × 48u) and the large
+corner girih watermarks are not yet matched to the reference's size/placement.
