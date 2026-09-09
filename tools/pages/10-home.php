@@ -167,7 +167,7 @@ $about = eqc_section(
 							array( 'css_classes' => 'eqc-about-text eqc-align-start', 'flex_direction' => 'column' ),
 							array(
 								eqc_html( '<div class="eqc-about-rail">' . eqc_divider_svg( 'section' ) . '</div>' ),
-								eqc_heading( "Learning the Quran<br>shouldn't depend on<br>where you live", 'h2', 'eqc-display-heading' ),
+								eqc_heading( "Learning the Quran <br>shouldn't depend on <br>where you live", 'h2', 'eqc-display-heading' ),
 								eqc_html( '<div class="eqc-about-rule">' . eqc_divider_svg( 'card' ) . '</div>' ),
 								// Copy transcribed verbatim from the reference, including its
 								// em dash and its "Nobody else is in the room" closing pair.
@@ -222,7 +222,7 @@ $courses = eqc_section(
 		eqc_inner(
 			'',
 			array_merge(
-				array( eqc_section_heading_el( 'Our Courses', 'Choose the course that<br>matches where <span style="color:var(--eqc-bronze-700)">you are today</span>', false, 'eqc-eyebrow--plain', 'book-open' ) ),
+				array( eqc_section_heading_el( 'Our Courses', 'Choose the course that <br>matches where <span style="color:var(--eqc-bronze-700)">you are today</span>', false, 'eqc-eyebrow--plain', 'book-open' ) ),
 				array( eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--courses', 'flex_direction' => 'row' ), $course_cards ) )
 			)
 		),
@@ -290,7 +290,7 @@ $teachers = eqc_section(
 							array( 'css_classes' => 'eqc-teachers-aside', 'flex_direction' => 'column' ),
 							array(
 								eqc_html( '<span class="eqc-eyebrow">' . eqc_icon_str( 'users' ) . esc_html__( 'Our Qualified Teachers', 'easy-quran-classes' ) . '</span>' ),
-								eqc_heading( 'Learn From<br>Dedicated<br><span style="color:var(--eqc-bronze-700)">Quran Teachers</span>', 'h2' ),
+								eqc_heading( 'Learn From <br>Dedicated <br><span style="color:var(--eqc-bronze-700)">Quran Teachers</span>', 'h2' ),
 								eqc_html( '<div class="eqc-teachers-rule">' . eqc_divider_svg( 'accent' ) . '</div>' ),
 								eqc_text( '<p>Our teachers are highly qualified, experienced, and passionate about teaching the Quran. They are here to guide you every step of the way with patience and care.</p>' ),
 								eqc_html(
@@ -354,7 +354,7 @@ $pricing = eqc_section(
 		eqc_inner(
 			'',
 			array(
-				eqc_section_heading_el( 'Pricing', 'Simple monthly pricing,<br>no hidden fees', true, 'eqc-eyebrow--rosette' ),
+				eqc_section_heading_el( 'Pricing', 'Simple monthly pricing, <br>no hidden fees', true, 'eqc-eyebrow--rosette' ),
 				$pricing_panel,
 				// White strip of four benefits under the cards, hairline-separated.
 				eqc_html(
@@ -407,8 +407,8 @@ $testimonials = eqc_section(
 		eqc_inner(
 			'',
 			array(
-				eqc_section_heading_el( 'What Our Families Say', 'Trusted by Families<br><span style="color:var(--eqc-gold-600)">Loved by Students</span>', true, 'eqc-eyebrow--plain', 'quote' ),
-				eqc_text( '<p>We are honoured to be part of hundreds of families&rsquo; journey.<br>Here&rsquo;s what they have to say about their experience with us.</p>', 'eqc-testimonials-intro' ),
+				eqc_section_heading_el( 'What Our Families Say', 'Trusted by Families <br><span style="color:var(--eqc-gold-600)">Loved by Students</span>', true, 'eqc-eyebrow--plain', 'quote' ),
+				eqc_text( '<p>We are honoured to be part of hundreds of families&rsquo; journey. <br>Here&rsquo;s what they have to say about their experience with us.</p>', 'eqc-testimonials-intro' ),
 				eqc_carousel( $testi_all_cards, __( 'Testimonial slides', 'easy-quran-classes' ) ),
 			)
 		),
@@ -442,12 +442,12 @@ $faq = eqc_section(
 
 // ------------------------------------------------------- 10. BLOG PREVIEW
 $blog_section = eqc_section(
-	'eqc-section eqc-section--surface',
+	'eqc-section--blog eqc-section eqc-section--surface',
 	array(
 		eqc_inner(
 			'',
 			array(
-				eqc_section_heading_el( 'Latest News', 'Directly from the latest news &amp; articles' ),
+				eqc_section_heading_el( 'Latest News', 'Directly From the <br><span style="color:var(--eqc-gold-600)">Latest News &amp; Articles</span>', false, 'eqc-eyebrow--plain', 'megaphone' ),
 				eqc_widget( 'shortcode', array( 'shortcode' => '[eqc_latest_posts count="3"]' ) ),
 			)
 		),

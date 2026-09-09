@@ -2192,3 +2192,56 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 }
 .eqc-section--testimonials .eqc-testimonial-tags > span + span { border-inline-start: 1px solid var(--eqc-border); }
 .eqc-section--testimonials .eqc-testimonial-tags .eqc-icon { width: calc(21 * var(--eqc-u)); height: calc(21 * var(--eqc-u)); color: var(--eqc-gold-700); }
+
+/* ---------- Blog section (Blogs.jpeg) ---------- */
+
+/* s=1.282 (cards x86-1520 = 1435px = 1119u). Like the testimonials heading,
+   this one is bold sans rather than the display serif. */
+.eqc-section--blog .eqc-section-heading h2 {
+	font-family: var(--eqc-font-body);
+	font-weight: 800;
+	font-size: calc(46.1 * var(--eqc-u));
+	line-height: 1.18;
+}
+.eqc-card--blog { position: relative; min-height: calc(410 * var(--eqc-u)); overflow: visible; }
+.eqc-card--blog .eqc-blog-media { border-radius: var(--eqc-radius-card); overflow: hidden; display: block; }
+/* White date chip over the image's top-left corner, 65 x 79u. */
+.eqc-blog-date {
+	position: absolute;
+	inset-block-start: calc(18 * var(--eqc-u));
+	inset-inline-start: calc(18 * var(--eqc-u));
+	z-index: 2;
+	display: flex; flex-direction: column; align-items: center; justify-content: center;
+	width: calc(65 * var(--eqc-u)); min-height: calc(79 * var(--eqc-u));
+	background: var(--eqc-white); border-radius: var(--eqc-radius-control);
+	box-shadow: var(--eqc-shadow-card); gap: calc(2 * var(--eqc-u));
+	padding: calc(6 * var(--eqc-u)) 0;
+}
+.eqc-blog-date .eqc-icon { width: calc(18 * var(--eqc-u)); height: calc(18 * var(--eqc-u)); color: var(--eqc-gold-700); }
+.eqc-blog-date__day { font-size: calc(17 * var(--eqc-u)); font-weight: 700; color: var(--eqc-heading); line-height: 1; }
+.eqc-blog-date__mon { font-size: calc(10.5 * var(--eqc-u)); font-weight: 600; color: var(--eqc-heading); line-height: 1; }
+/* Category as gold caps above the title. */
+.eqc-blog-category {
+	display: block;
+	font-size: calc(10.5 * var(--eqc-u));
+	font-weight: 700;
+	letter-spacing: 0.1em;
+	text-transform: uppercase;
+	color: var(--eqc-gold-700);
+	margin-block-end: calc(6 * var(--eqc-u));
+}
+.eqc-card--blog h3 { font-size: calc(17.2 * var(--eqc-u)); line-height: 1.25; }
+.eqc-card--blog .eqc-blog-excerpt { font-size: calc(12.5 * var(--eqc-u)); line-height: 1.65; }
+/* "Read More" with a gold double-chevron disc, bottom right. */
+.eqc-card--blog .eqc-read-more {
+	margin-block-start: auto;
+	align-self: flex-end;
+	display: inline-flex; align-items: center; gap: calc(9 * var(--eqc-u));
+	font-size: calc(12 * var(--eqc-u)); font-weight: 700; color: var(--eqc-gold-700);
+}
+.eqc-read-more__disc {
+	display: inline-flex; align-items: center; justify-content: center;
+	width: calc(31 * var(--eqc-u)); height: calc(31 * var(--eqc-u));
+	border-radius: 50%; background: var(--eqc-gold-600); color: var(--eqc-white);
+}
+.eqc-read-more__disc .eqc-icon { width: calc(15 * var(--eqc-u)); height: calc(15 * var(--eqc-u)); }

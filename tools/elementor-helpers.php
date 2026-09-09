@@ -315,7 +315,7 @@ function eqc_teacher_card( $attachment_id, $name, $role, $facts ) {
 			// "|" is an explicit line break: the reference sets every teacher
 			// name on two lines, and the break is what keeps the four cards
 			// the same height regardless of name length.
-			eqc_heading( implode( '<br>', array_map( 'esc_html', explode( '|', $name ) ) ), 'h3' ),
+			eqc_heading( implode( ' <br>', array_map( 'esc_html', explode( '|', $name ) ) ), 'h3' ),
 			eqc_html( '<p class="eqc-teacher-role">' . esc_html( $role ) . '</p><div class="eqc-teacher-divider">' . eqc_divider_svg( 'dot' ) . '</div>' ),
 			eqc_html( $facts_html ),
 			eqc_html(
@@ -565,7 +565,7 @@ function eqc_section_heading_el( $eyebrow, $heading, $centered = false, $eyebrow
  */
 function eqc_trust_tile( $icon, $title, $description ) {
 	$lines = static function ( $text ) {
-		return implode( '<br>', array_map( 'esc_html', array_map( 'trim', explode( '|', $text ) ) ) );
+		return implode( ' <br>', array_map( 'esc_html', array_map( 'trim', explode( '|', $text ) ) ) );
 	};
 	// A styled paragraph, not a heading: these tiles are minor benefit
 	// labels, not real subsections, so making them headings would skip a
@@ -613,7 +613,7 @@ function eqc_about_stat( $icon, $label, $value ) {
  * two-line label. "|" is an explicit line break, as in eqc_trust_tile().
  */
 function eqc_benefit_tile( $icon, $label ) {
-	$lines = implode( '<br>', array_map( 'esc_html', array_map( 'trim', explode( '|', $label ) ) ) );
+	$lines = implode( ' <br>', array_map( 'esc_html', array_map( 'trim', explode( '|', $label ) ) ) );
 	return '<div class="eqc-benefit">'
 		. '<span class="eqc-benefit__disc">' . eqc_icon_str( $icon ) . '</span>'
 		. '<span class="eqc-benefit__label">' . $lines . '</span>'

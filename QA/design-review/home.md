@@ -551,3 +551,38 @@ Verified: sweep clean at 1920; avatar 108u against the reference's 108u.
 
 Remaining: the eyebrow's flanking rules (reference draws rule–icon–label–rule);
 the carousel constrains cards to 332u against the reference's 354u.
+
+---
+
+## Section 8 — Blog (`Blogs.jpeg`, `claude-opus-5`)
+
+Calibration: **s = 1.282** — cards span x86–1520 = 1435px = 1119u.
+
+| # | Reference shows | Build did | Sev | Fix |
+|---|---|---|---|---|
+| B1 | Heading in **bold sans**, two lines, second gold | Display serif, one line, sentence case | P1 | Manrope 800 at 46.1u + transcribed break |
+| B2 | White **date chip** (calendar icon, day, month) over the image's top-left, 65 × 79u | Absent — a category ribbon sat on the image instead | P0 | `.eqc-blog-date` in `eqc_render_blog_cards()` |
+| B3 | Category as gold caps **above the title** | Inline in a meta line with the date | P1 | `.eqc-blog-category` |
+| B4 | "Read More" + a gold circular **double-chevron**, bottom right | Plain arrow, inline | P1 | `.eqc-read-more__disc` with `chevrons-right` |
+| B5 | Eyebrow icon is a **megaphone** | `monitor-play` (a screen) | P2 | `megaphone` added to the sprite generator |
+
+## Section 9 — Final CTA (`End.jpeg`)
+
+**Already complete.** Verified as `.eqc-footer-cta` in `footer.php` — Codex built
+it from `End.jpeg` during the global-chrome pass, so it is not a missing Home
+section. Measures 1219 × 365u and carries the reference's copy.
+
+---
+
+## Cross-section defect found by the heading outline
+
+Transcribing the reference's line breaks with `<br>` produced run-on accessible
+names across **six** headings — "Learning the Quranshouldn't depend on" — which
+is exactly LESSONS #10 recurring at scale. A real space now precedes every
+`<br>` in the page builder and the helpers; the `report.json` outline confirms
+all ten headings read correctly. **The outline in `report.json` is the cheapest
+way to catch this** — it is worth reading after any pass that adds line breaks.
+
+Final state of Home: sweep at 1920/1440/1024/768/390 plus the 380–1900 scan —
+no horizontal overflow, 0 console errors, 0 page errors, 0 asset errors, 0
+images missing `alt`, exactly one H1, and a clean H1→H2 outline.

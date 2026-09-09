@@ -195,15 +195,23 @@ function eqc_render_blog_cards( $posts ) {
 		$ribbon    = ! empty( $cats ) ? '<span class="eqc-blog-ribbon">' . esc_html( $cats[0]->name ) . '</span>' : '';
 		$thumb     = has_post_thumbnail( $post ) ? get_the_post_thumbnail( $post, 'eqc-blog-card' ) : '';
 
+		// Blogs.jpeg puts a white date chip (calendar icon, day, month) over the
+		// image's top-left corner, and the category as plain gold caps above the
+		// title - not a ribbon on the image.
+		$chip = '<span class="eqc-blog-date">' . eqc_get_icon_html( 'calendar' )
+			. '<span class="eqc-blog-date__day">' . esc_html( get_the_date( 'j', $post ) ) . '</span>'
+			. '<span class="eqc-blog-date__mon">' . esc_html( strtoupper( get_the_date( 'M', $post ) ) ) . '</span></span>';
+		$category = ! empty( $cats ) ? '<span class="eqc-blog-category">' . esc_html( $cats[0]->name ) . '</span>' : '';
+
 		$html .= '<article class="eqc-card eqc-card--blog" data-eqc-reveal data-eqc-reveal-index="' . min( $i, 3 ) . '">';
-		$html .= '<a class="eqc-blog-media" href="' . esc_url( $permalink ) . '">' . $thumb . $ribbon . '</a>';
+		$html .= '<a class="eqc-blog-media" href="' . esc_url( $permalink ) . '">' . $thumb . '</a>' . $chip;
 		$html .= '<div class="eqc-blog-body">';
-		$html .= '<div class="eqc-blog-meta">' . $cat_name . esc_html( get_the_date( '', $post ) ) . '</div>';
+		$html .= $category;
 		$html .= '<h3><a href="' . esc_url( $permalink ) . '" style="text-decoration:none;color:inherit;">' . esc_html( get_the_title( $post ) ) . '</a></h3>';
 		$html .= '<p class="eqc-blog-excerpt">' . esc_html( wp_trim_words( get_the_excerpt( $post ), 18 ) ) . '</p>';
 		/* translators: %s: post title, read by screen readers only — the visible link text stays the short "Read More". */
 		$read_more_label = sprintf( __( 'Read more: %s', 'easy-quran-classes' ), get_the_title( $post ) );
-		$html           .= '<a class="eqc-read-more" href="' . esc_url( $permalink ) . '" aria-label="' . esc_attr( $read_more_label ) . '">' . esc_html__( 'Read More', 'easy-quran-classes' ) . ' ' . eqc_get_icon_html( 'arrow-right' ) . '</a>';
+		$html           .= '<a class="eqc-read-more" href="' . esc_url( $permalink ) . '" aria-label="' . esc_attr( $read_more_label ) . '">' . esc_html__( 'Read More', 'easy-quran-classes' ) . '<span class="eqc-read-more__disc" aria-hidden="true">' . eqc_get_icon_html( 'chevrons-right' ) . '</span>' . '</a>';
 		$html .= '</div></article>';
 	}
 	$html .= '</div>';

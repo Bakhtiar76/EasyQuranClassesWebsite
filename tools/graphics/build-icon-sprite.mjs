@@ -45,6 +45,7 @@ const LUCIDE_MAP = {
 	sparkle: 'Sparkle',
 	'chevron-right': 'ChevronRight',
 	'monitor-play': 'MonitorPlay',
+	megaphone: 'Megaphone',
 	// Global chrome parity (QA/design-review/global-chrome.md #4, #6): the
 	// header CTA is a gift + FREE TRIAL, and the footer CTA button carries a
 	// circled double chevron. Both come from Lucide as outline glyphs so they

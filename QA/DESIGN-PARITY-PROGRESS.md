@@ -10,7 +10,7 @@ Local target: `http://localhost`; branch: `feature/setup`. Supervisor: Codex; bo
 - [x] Extend existing screenshot harness; create one-command page rebuild/flush/sweep loop (PHP/JS syntax verified; first actual rebuild verification pending).
 - [x] Capture all routes at 1920/1440/1024/768/390 before presentation changes, including Lighthouse baseline.
 - [x] Global chrome: measured review, reuse plan, implementation, iterations, responsive/a11y/performance evidence (checkpoint being recorded).
-- [~] Home: hero + trust strip matched to the reference within 9px worst / 2.9px mean across 32 landmark checks (`claude-opus-5`), on a new proportional scale system (`--eqc-u`, one unit = one px on the 1307px reference canvas). Sections 3-10 (about, courses, pricing, teachers, testimonials, blog, final CTA) still to review against their own reference images.
+- [~] Home: hero + trust strip matched to the reference within 9px worst / 2.9px mean across 32 landmark checks (`claude-opus-5`), on a new proportional scale system (`--eqc-u`, one unit = one px on the 1307px reference canvas). All Home sections now reviewed and matched against their own reference images (`claude-opus-5`): hero + trust strip, about, courses, pricing, teachers, testimonials, blog; the final CTA was already complete from Codex's global-chrome pass. Two extra sections in the build ("From first message to first class", FAQ) and a pricing/teachers order swap are documented in `QA/design-review/home.md` and await a user decision.
 - [ ] Courses: review/build/verify/commit.
 - [ ] Pricing: review/build/verify/commit.
 - [ ] Teachers: review/build/verify/commit.
