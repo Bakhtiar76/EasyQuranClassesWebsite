@@ -19,21 +19,32 @@ $hero = eqc_page_hero(
 $contact_email = get_theme_mod( 'eqc_contact_email', 'info@easyquranclasses.com' );
 $contact_phone = get_theme_mod( 'eqc_phone_display', '' );
 
+$contact_tiles  = '<a class="eqc-trust-tile eqc-trust-tile--link" href="mailto:' . esc_attr( $contact_email ) . '">'
+	. eqc_icon_str( 'mail', 'eqc-icon' )
+	. '<div><p class="eqc-trust-tile-title">Email us</p><p>' . esc_html( $contact_email ) . '</p></div></a>';
+// Only surface a phone tile for a real number — never amplify the "(000) 000-0000"
+// placeholder the Customizer setting currently holds (DESIGN.md §4 content integrity).
+if ( $contact_phone && ! preg_match( '/0{3}/', preg_replace( '/[^0-9]/', '', $contact_phone ) ) ) {
+	$contact_tiles .= '<a class="eqc-trust-tile eqc-trust-tile--link" href="tel:' . esc_attr( preg_replace( '/[^0-9+]/', '', $contact_phone ) ) . '">'
+		. eqc_icon_str( 'phone', 'eqc-icon' )
+		. '<div><p class="eqc-trust-tile-title">Call us</p><p>' . esc_html( $contact_phone ) . '</p></div></a>';
+}
+$contact_tiles .= '<div class="eqc-trust-tile">'
+	. eqc_icon_str( 'clock', 'eqc-icon' )
+	. '<div><p class="eqc-trust-tile-title">Reply time</p><p>Within one business day</p></div></div>';
+
 $contact_info_html =
-	'<div class="eqc-card" style="height:100%;">'
+	'<div class="eqc-card" style="height:100%;" data-eqc-reveal>'
 	. '<h3 style="margin-top:0;font-size:var(--eqc-fs-h4);font-family:var(--eqc-font-body);font-weight:700;">Get in Touch</h3>'
-	. '<ul class="eqc-footer-contact" style="margin-top:1.2em;">'
-	. '<li>' . eqc_icon_str( 'mail' ) . '<span><a href="mailto:' . esc_attr( $contact_email ) . '" style="color:inherit;text-decoration:none;">' . esc_html( $contact_email ) . '</a></span></li>'
-	. '<li>' . eqc_icon_str( 'phone' ) . '<span>' . esc_html( $contact_phone ) . '</span></li>'
-	. '</ul>'
+	. '<div class="eqc-contact-tiles">' . $contact_tiles . '</div>'
 	. '<div style="margin-top:1.5em;">'
-	. '<a class="eqc-btn eqc-btn--secondary" href="' . eqc_whatsapp_url( "Assalamu alaikum, I'd like to ask about Easy Quran Classes." ) . '">' . eqc_icon_str( 'whatsapp' ) . ' Chat on WhatsApp</a>'
+	. '<a class="eqc-btn eqc-btn--whatsapp eqc-btn--block-sm" href="' . eqc_whatsapp_url( "Assalamu alaikum, I'd like to ask about Easy Quran Classes." ) . '">' . eqc_icon_str( 'whatsapp' ) . ' Chat on WhatsApp</a>'
 	. '</div>'
 	. '<p style="margin-top:1.5em;color:var(--eqc-muted);font-size:var(--eqc-fs-small);">Looking for a quick answer instead? Check our <a href="' . esc_url( $faq_url ) . '" style="color:var(--eqc-bronze-700);">FAQ</a> or <a href="' . esc_url( $trial_url ) . '" style="color:var(--eqc-bronze-700);">book a free trial</a> directly.</p>'
 	. '</div>';
 
 $contact_section = eqc_section(
-	'eqc-section eqc-section--surface',
+	'eqc-section eqc-section--surface eqc-contact-form-section',
 	array(
 		eqc_inner(
 			'',
@@ -42,7 +53,7 @@ $contact_section = eqc_section(
 					array( 'css_classes' => 'eqc-about-grid', 'flex_direction' => 'row' ),
 					array(
 						eqc_container(
-							array( 'css_classes' => '', 'flex_direction' => 'column' ),
+							array( 'css_classes' => 'eqc-form-aside', 'flex_direction' => 'column' ),
 							array( eqc_html( $contact_info_html ) )
 						),
 						eqc_container(

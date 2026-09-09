@@ -111,6 +111,18 @@ function eqc_enqueue_assets() {
 		$theme_version,
 		true
 	);
+
+	// Contact / Free Trial only: field icons, real-time validation, success
+	// modal. Additive to Fluent Forms — see assets/js/eqc-forms.js.
+	if ( is_page( array( 'contact', 'free-trial' ) ) ) {
+		wp_enqueue_script(
+			'eqc-forms',
+			get_stylesheet_directory_uri() . '/assets/js/eqc-forms.js',
+			array( 'eqc-scripts' ),
+			$theme_version,
+			true
+		);
+	}
 }
 add_action( 'wp_enqueue_scripts', 'eqc_enqueue_assets', 20 );
 

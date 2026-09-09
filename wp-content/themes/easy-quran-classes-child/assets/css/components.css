@@ -295,6 +295,26 @@ a.eqc-btn--bronze, button.eqc-btn--bronze,
 a.eqc-btn--bronze:hover, button.eqc-btn--bronze:hover,
 .elementor-widget-button.eqc-btn--bronze .elementor-button:hover { background: var(--eqc-bronze-600); }
 
+/* WhatsApp CTA — the site's deep green (kept a distinct variant from
+   --primary so the WhatsApp action is greppable and can carry its own
+   icon nudge). Used on the Contact and Free Trial pages. */
+a.eqc-btn--whatsapp, button.eqc-btn--whatsapp {
+	background: var(--eqc-green-800);
+	color: var(--eqc-white);
+}
+a.eqc-btn--whatsapp:hover, button.eqc-btn--whatsapp:hover { background: var(--eqc-green-700); }
+/* Light hover cue on a button's leading icon — arrow/whatsapp/mail all read
+   as "go". transform only; disabled under prefers-reduced-motion (motion.css). */
+a.eqc-btn .eqc-icon, button.eqc-btn .eqc-icon {
+	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+a.eqc-btn:hover .eqc-icon, button.eqc-btn:hover .eqc-icon,
+a.eqc-btn:focus-visible .eqc-icon, button.eqc-btn:focus-visible .eqc-icon {
+	transform: translateX(2px);
+}
+/* Full-width button inside a narrow card column (Contact/Free-Trial asides). */
+a.eqc-btn--block-sm, button.eqc-btn--block-sm { width: 100%; }
+
 a.eqc-btn--secondary, button.eqc-btn--secondary,
 .elementor-widget-button.eqc-btn--secondary .elementor-button {
 	background: transparent;
@@ -1281,8 +1301,166 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	font-weight: 600 !important;
 	padding: 0.9em 1.8em !important;
 	border: none !important;
+	transition: background-color var(--eqc-motion-base) var(--eqc-ease-standard),
+		transform var(--eqc-motion-base) var(--eqc-ease-standard),
+		box-shadow var(--eqc-motion-base) var(--eqc-ease-standard);
 }
-.eqc-form-wrap .ff-btn:hover { background: var(--eqc-bronze-600) !important; }
+.eqc-form-wrap .ff-btn:hover {
+	background: var(--eqc-bronze-600) !important;
+	transform: translateY(-2px);
+	box-shadow: 0 10px 22px rgba(20, 35, 27, 0.16);
+}
+.eqc-form-wrap .ff-btn:active { transform: translateY(0); box-shadow: none; }
+
+/* ---------- Form field enhancements (Contact / Free Trial) ----------
+ * Icons, live-validation state and the success modal are wired by
+ * assets/js/eqc-forms.js (enqueued only on those two pages). Every rule
+ * here is inert without that JS — no field state changes, no icons — so
+ * the plain Fluent Forms markup still renders correctly on its own.
+ */
+.eqc-form-wrap .ff-el-input--content { position: relative; }
+.eqc-field-icon {
+	position: absolute;
+	inset-inline-start: 1em;
+	inset-block-start: 0.9em;
+	width: 1.15em;
+	height: 1.15em;
+	color: var(--eqc-muted);
+	pointer-events: none;
+}
+.eqc-field-icon svg { width: 100%; height: 100%; display: block; }
+.eqc-form-wrap .has-field-icon .ff-el-form-control { padding-inline-start: 2.9em !important; }
+.eqc-form-wrap .has-field-icon textarea.ff-el-form-control { padding-block-start: 0.75em !important; }
+
+/* Live per-field state — classes set by eqc-forms.js on the .ff-el-group.
+   FF's own .ff-el-is-error / .error (its submit-time validation) is styled
+   to match so the two never look different. */
+.eqc-form-wrap .eqc-field--invalid .ff-el-form-control,
+.eqc-form-wrap .ff-el-is-error .ff-el-form-control {
+	border-color: var(--eqc-error) !important;
+	background: rgba(159, 59, 50, 0.04) !important;
+}
+.eqc-form-wrap .eqc-field--valid .ff-el-form-control {
+	border-color: var(--eqc-success) !important;
+}
+.eqc-field-error,
+.eqc-form-wrap .ff-el-group .error {
+	margin-top: 0.4em;
+	color: var(--eqc-error);
+	font-size: var(--eqc-fs-small);
+	line-height: 1.4;
+}
+.eqc-field-error::before {
+	content: "!";
+	display: inline-grid;
+	place-items: center;
+	width: 1.25em;
+	height: 1.25em;
+	margin-inline-end: 0.4em;
+	border-radius: 50%;
+	background: var(--eqc-error);
+	color: var(--eqc-white);
+	font-weight: 700;
+	font-size: 0.8em;
+	vertical-align: -0.15em;
+}
+.eqc-field-valid-mark {
+	position: absolute;
+	inset-inline-end: 1em;
+	inset-block-start: 0.9em;
+	width: 1.15em;
+	height: 1.15em;
+	color: var(--eqc-success);
+	pointer-events: none;
+}
+.eqc-field-valid-mark svg { width: 100%; height: 100%; }
+/* A select carries its own right-side chevron — nudge the check inward. */
+.eqc-form-wrap .ff-el-input--content:has(select) .eqc-field-valid-mark { inset-inline-end: 2.5em; }
+
+/* Short aside column beside a tall form: sit at the top and follow the
+   scroll instead of stretching to leave a dead band. Scoped to the two
+   form pages so .eqc-about-grid stays untouched on Home / About. The
+   .eqc-about-grid flex row wraps to one column below ~48rem, so gate the
+   sticky behaviour there — it only applies while the two columns sit
+   side by side (covers iPad portrait through desktop). */
+@media (min-width: 48rem) {
+	.eqc-contact-form-section .eqc-form-aside,
+	.eqc-trial-form-section .eqc-form-aside {
+		align-self: flex-start;
+		position: sticky;
+		top: calc(var(--eqc-header-h, 96px) + 1.5rem);
+	}
+}
+.eqc-contact-tiles { display: flex; flex-direction: column; gap: 0.75rem; margin-top: 1.2em; }
+.eqc-trust-tile--link { text-decoration: none; color: inherit; }
+.eqc-trust-tile--link:hover { border-color: var(--eqc-gold-300); }
+
+/* Styled fallback for Fluent Forms' own inline confirmation — shown when
+   JS is off or after the modal is dismissed. */
+.eqc-form-wrap .ff-message-success {
+	background: var(--eqc-surface);
+	border: 1px solid var(--eqc-border);
+	border-inline-start: 4px solid var(--eqc-gold-500);
+	border-radius: var(--eqc-radius-control);
+	padding: 1.1em 1.3em;
+	color: var(--eqc-heading);
+	font-size: var(--eqc-fs-body);
+}
+
+/* ---------- Success modal (eqc-forms.js) ---------- */
+.eqc-modal {
+	position: fixed;
+	inset: 0;
+	z-index: 1000;
+	display: grid;
+	place-items: center;
+	padding: var(--eqc-gutter);
+	background: rgba(20, 35, 27, 0.55);
+	opacity: 0;
+	transition: opacity var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+/* `.eqc-modal { display: grid }` outranks the UA `[hidden] { display: none }`,
+   so `el.hidden = true` alone would leave an invisible full-screen layer
+   swallowing every click (the "page frozen after Close" bug). Force it hidden,
+   and drop pointer-events during the close fade so nothing is blocked. */
+.eqc-modal[hidden] { display: none !important; }
+.eqc-modal:not(.is-open) { pointer-events: none; }
+.eqc-modal.is-open { opacity: 1; pointer-events: auto; }
+.eqc-modal__card {
+	background: var(--eqc-surface);
+	border-radius: var(--eqc-radius-panel);
+	box-shadow: 0 24px 60px rgba(20, 35, 27, 0.28);
+	max-width: 30rem;
+	width: 100%;
+	max-height: calc(100dvh - 2 * var(--eqc-gutter));
+	overflow-y: auto;
+	padding: clamp(1.75rem, 1.4rem + 1.6vw, 2.75rem);
+	text-align: center;
+	transform: scale(0.96);
+	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard);
+}
+.eqc-modal.is-open .eqc-modal__card { transform: scale(1); }
+.eqc-modal__badge {
+	width: 3.5em;
+	height: 3.5em;
+	margin: 0 auto 0.9em;
+	display: grid;
+	place-items: center;
+	border-radius: 50%;
+	background: rgba(47, 107, 74, 0.12);
+	color: var(--eqc-success);
+}
+.eqc-modal__badge svg { width: 1.6em; height: 1.6em; }
+.eqc-modal__card h2 { font-size: var(--eqc-fs-h3); margin: 0 0 0.4em; }
+.eqc-modal__card p { color: var(--eqc-text); margin: 0 0 1.4em; }
+.eqc-modal__card .eqc-btn-group { justify-content: center; }
+@media (prefers-reduced-motion: reduce) {
+	.eqc-modal, .eqc-modal.is-open,
+	.eqc-modal__card, .eqc-modal.is-open .eqc-modal__card {
+		transition: none;
+		transform: none;
+	}
+}
 
 /* ---------- FAQ accordion ---------- */
 

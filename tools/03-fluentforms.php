@@ -123,11 +123,121 @@ function eqc_ff_field( $element, $name, $label, $required = false, $placeholder 
 	);
 }
 
-/** Select field builder (options as label=>value pairs, matches label). */
+/**
+ * Select field builder. Pass a plain list for simple options (value === label),
+ * or an explicit value=>label map (keys not 0..n-1) for e.g. dial codes.
+ */
 function eqc_ff_select( $name, $label, $options, $required = false, $placeholder = '' ) {
-	$field = eqc_ff_field( 'select', $name, $label, $required, $placeholder );
-	$field['options'] = array_combine( $options, $options );
+	$field    = eqc_ff_field( 'select', $name, $label, $required, $placeholder );
+	$is_assoc = array_keys( $options ) !== range( 0, count( $options ) - 1 );
+	$field['options'] = $is_assoc ? $options : array_combine( $options, $options );
 	return $field;
+}
+
+/**
+ * Fluent Forms' native Country dropdown (SelectCountry component). With
+ * active_list = 'all' the component populates the full ISO country list at
+ * render time, so no country names are hardcoded here.
+ */
+function eqc_ff_select_country( $name, $label, $required = false, $placeholder = '' ) {
+	return array(
+		'element'        => 'select_country',
+		'attributes'     => array(
+			'name'        => $name,
+			'value'       => '',
+			'id'          => '',
+			'class'       => '',
+			'placeholder' => $placeholder,
+		),
+		'settings'       => array(
+			'container_class'   => '',
+			'label'             => $label,
+			'admin_field_label' => '',
+			'label_placement'   => '',
+			'help_message'      => '',
+			'enable_select_2'   => 'no',
+			'validation_rules'  => array(
+				'required' => array( 'value' => $required, 'message' => 'This field is required', 'global' => true ),
+			),
+			'country_list'      => array(
+				'active_list'  => 'all',
+				'visible_list' => array(),
+				'hidden_list'  => array(),
+			),
+			'conditional_logics' => array(),
+		),
+		'options'        => array( 'US' => 'United States of America' ),
+		'editor_options' => array(
+			'title'      => $label,
+			'element'    => 'country-list',
+			'icon_class' => 'ff-edit-country',
+			'template'   => 'selectCountry',
+		),
+	);
+}
+
+/**
+ * Country dial-code options for the Free Trial phone field (value=>label).
+ * A broad spread across every region — Fluent Forms Lite has no native
+ * international phone field, so this is a plain select.
+ */
+function eqc_ff_dial_codes() {
+	return array(
+		'+93'  => 'Afghanistan (+93)',
+		'+61'  => 'Australia (+61)',
+		'+43'  => 'Austria (+43)',
+		'+973' => 'Bahrain (+973)',
+		'+880' => 'Bangladesh (+880)',
+		'+32'  => 'Belgium (+32)',
+		'+55'  => 'Brazil (+55)',
+		'+86'  => 'China (+86)',
+		'+45'  => 'Denmark (+45)',
+		'+20'  => 'Egypt (+20)',
+		'+358' => 'Finland (+358)',
+		'+33'  => 'France (+33)',
+		'+49'  => 'Germany (+49)',
+		'+30'  => 'Greece (+30)',
+		'+91'  => 'India (+91)',
+		'+62'  => 'Indonesia (+62)',
+		'+964' => 'Iraq (+964)',
+		'+353' => 'Ireland (+353)',
+		'+39'  => 'Italy (+39)',
+		'+81'  => 'Japan (+81)',
+		'+962' => 'Jordan (+962)',
+		'+254' => 'Kenya (+254)',
+		'+965' => 'Kuwait (+965)',
+		'+961' => 'Lebanon (+961)',
+		'+60'  => 'Malaysia (+60)',
+		'+52'  => 'Mexico (+52)',
+		'+212' => 'Morocco (+212)',
+		'+977' => 'Nepal (+977)',
+		'+31'  => 'Netherlands (+31)',
+		'+64'  => 'New Zealand (+64)',
+		'+234' => 'Nigeria (+234)',
+		'+47'  => 'Norway (+47)',
+		'+968' => 'Oman (+968)',
+		'+92'  => 'Pakistan (+92)',
+		'+63'  => 'Philippines (+63)',
+		'+48'  => 'Poland (+48)',
+		'+351' => 'Portugal (+351)',
+		'+974' => 'Qatar (+974)',
+		'+7'   => 'Russia (+7)',
+		'+966' => 'Saudi Arabia (+966)',
+		'+65'  => 'Singapore (+65)',
+		'+27'  => 'South Africa (+27)',
+		'+82'  => 'South Korea (+82)',
+		'+34'  => 'Spain (+34)',
+		'+94'  => 'Sri Lanka (+94)',
+		'+46'  => 'Sweden (+46)',
+		'+41'  => 'Switzerland (+41)',
+		'+66'  => 'Thailand (+66)',
+		'+90'  => 'Turkey (+90)',
+		'+971' => 'United Arab Emirates (+971)',
+		'+44'  => 'United Kingdom (+44)',
+		'+1'   => 'United States / Canada (+1)',
+		'+380' => 'Ukraine (+380)',
+		'+84'  => 'Vietnam (+84)',
+	);
 }
 
 function eqc_ff_submit_button( $text ) {
@@ -153,16 +263,21 @@ function eqc_ff_submit_button( $text ) {
  * Returns the (new or existing) form ID.
  */
 function eqc_ff_ensure_form( $title, $fields, $submit_text, $confirmation_message ) {
-	$existing = Form::where( 'title', $title )->first();
-	if ( $existing ) {
-		WP_CLI::log( "Form already exists: {$title} (#{$existing->id})" );
-		return $existing->id;
-	}
-
 	$form_fields = array(
 		'fields'       => $fields,
 		'submitButton' => eqc_ff_submit_button( $submit_text ),
 	);
+
+	$existing = Form::where( 'title', $title )->first();
+	if ( $existing ) {
+		// Converge the field set of an already-created form to match this code
+		// (IDs stay the same so the [fluentform id="N"] shortcodes still
+		// resolve). formSettings / notifications meta is left untouched.
+		$existing->form_fields = wp_json_encode( $form_fields );
+		$existing->save();
+		WP_CLI::log( "Updated form: {$title} (#{$existing->id})" );
+		return $existing->id;
+	}
 
 	$form = Form::create(
 		array(
@@ -181,11 +296,14 @@ function eqc_ff_ensure_form( $title, $fields, $submit_text, $confirmation_messag
 }
 
 // --------------------------------------------------------------- CONTACT FORM
+// Field-level format rules (letters-only, digits-only, strict email, min
+// length) are enforced client-side in assets/js/eqc-forms.js; Fluent Forms
+// keeps "required" as the server-side backstop.
 $contact_fields = array(
-	eqc_ff_field( 'input_text', 'full_name', 'Full Name', true, 'Your name' ),
+	eqc_ff_field( 'input_text', 'full_name', 'Full Name', true, 'Enter your full name' ),
 	eqc_ff_field( 'input_email', 'email', 'Email Address', true, 'you@example.com' ),
-	eqc_ff_field( 'input_text', 'subject', 'Subject', false, 'What is this about?' ),
-	eqc_ff_field( 'textarea', 'message', 'Message', true, 'How can we help?' ),
+	eqc_ff_field( 'input_text', 'subject', 'Subject', false, 'What is your message about?' ),
+	eqc_ff_field( 'textarea', 'message', 'Message', true, 'Write your message here' ),
 );
 $contact_form_id = eqc_ff_ensure_form(
 	'Contact Form',
@@ -195,17 +313,19 @@ $contact_form_id = eqc_ff_ensure_form(
 );
 
 // ------------------------------------------------------------ FREE TRIAL FORM
+// Format rules (name = letters only min 3, phone = digits only, strict email)
+// live in assets/js/eqc-forms.js. Country is Fluent Forms' native country
+// dropdown; the dial code is a plain select (no intl phone field in FF Lite).
 $trial_fields = array(
-	eqc_ff_field( 'input_text', 'student_name', "Student's Name", true, "Student's full name" ),
-	eqc_ff_select( 'age_range', 'Age Range', array( 'Under 7', '7 - 12', '13 - 17', '18 and over' ), true, '- Select Age Range -' ),
-	eqc_ff_select( 'current_level', 'Current Level', array( 'Complete Beginner', 'Some Reading Ability', 'Confident Reader', 'Memorization Stage' ), true, '- Select Current Level -' ),
-	eqc_ff_select( 'preferred_course', 'Preferred Course', array( 'Noorani Qaida', 'Quran Reading with Tajweed', 'Tajweed Course', 'Quran Tafseer', 'Quran Memorization', 'Islamic Studies', 'Not Sure Yet' ), true, '- Select a Course -' ),
-	eqc_ff_field( 'input_text', 'availability', 'Preferred Days / Time', true, 'e.g. Weekday evenings' ),
-	eqc_ff_field( 'input_text', 'country_timezone', 'Country / Time Zone', true, 'e.g. Pakistan, GMT+5' ),
-	eqc_ff_field( 'input_text', 'guardian_name', 'Parent / Guardian Name', false, 'If the student is a minor' ),
+	eqc_ff_field( 'input_text', 'student_name', "Student's Name", true, "Enter the student's full name" ),
+	eqc_ff_select( 'age_range', 'Age Range', array( 'Under 7', '7 - 12', '13 - 17', '18 and over' ), true, 'Select an age range' ),
+	eqc_ff_select( 'current_level', 'Current Level', array( 'Complete Beginner', 'Some Reading Ability', 'Confident Reader', 'Memorization Stage' ), true, 'Select the current level' ),
+	eqc_ff_select( 'preferred_course', 'Preferred Course', array( 'Noorani Qaida', 'Quran Reading with Tajweed', 'Tajweed Course', 'Quran Tafseer', 'Quran Memorization', 'Islamic Studies', 'Not Sure Yet' ), true, 'Select a course' ),
+	eqc_ff_select_country( 'country', 'Country', true, 'Select your country' ),
+	eqc_ff_field( 'input_text', 'guardian_name', 'Parent / Guardian Name', false, "Parent or guardian's name" ),
 	eqc_ff_field( 'input_email', 'email', 'Email Address', true, 'you@example.com' ),
-	eqc_ff_field( 'input_text', 'whatsapp_phone', 'Phone / WhatsApp Number', true, 'Include country code' ),
-	eqc_ff_field( 'textarea', 'notes', 'Anything Else We Should Know?', false, 'Optional notes' ),
+	eqc_ff_select( 'phone_country_code', 'Country Code', eqc_ff_dial_codes(), true, 'Select country code' ),
+	eqc_ff_field( 'input_text', 'whatsapp_phone', 'Phone / WhatsApp Number', true, 'e.g. 3001234567' ),
 );
 $trial_form_id = eqc_ff_ensure_form(
 	'Free Trial Request',

@@ -329,6 +329,12 @@ Do not mix several icon libraries on one page.
 
 Circular arrow treatment may be used to reflect client references.
 
+### Contact channel buttons
+
+On the Contact and Free Trial pages the two direct-contact CTAs are colour-coded:
+WhatsApp uses the deep-green primary fill (`.eqc-btn--whatsapp`), "Contact Us" uses the
+bronze fill (`.eqc-btn--bronze`). Both keep the standard 1–2px hover lift.
+
 ### Button Behavior
 
 - hover: subtle tone shift + at most 1–2px movement
@@ -351,20 +357,21 @@ Forms should feel simple and private.
 
 ### Trial Form Suggested Fields
 
-Only use fields approved by the client. Likely candidates:
+Only use fields approved by the client. Current set (`tools/03-fluentforms.php`):
 
-- Student name
+- Student name (letters only, min 3)
 - Student age range
 - Current level
 - Preferred course
-- Preferred days/time
-- Country/time zone
+- Country (native country dropdown)
 - Parent/guardian name when relevant
-- Email
-- WhatsApp/phone
-- Notes
+- Email (strict format check)
+- Phone / WhatsApp — country dial-code select + digits-only number
 
 Do not collect more personal information than the business genuinely needs.
+Field-level format rules are enforced client-side in
+`wp-content/themes/easy-quran-classes-child/assets/js/eqc-forms.js`; Fluent
+Forms keeps "required" as the server-side backstop.
 
 ## 14. Header
 

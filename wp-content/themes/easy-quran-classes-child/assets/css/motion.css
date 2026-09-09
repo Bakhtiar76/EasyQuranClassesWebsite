@@ -110,6 +110,9 @@ html.eqc-js .eqc-cta-ornament {
 	.eqc-corner-motif { animation: none; }
 	.eqc-carousel-track { transition: none; }
 	.eqc-btn:hover,
+	.eqc-btn:hover .eqc-icon,
+	.eqc-btn:focus-visible .eqc-icon,
+	.eqc-form-wrap .ff-btn:hover,
 	.eqc-card:hover,
 	.eqc-card:hover .eqc-card-index,
 	.eqc-card--pricing:hover .eqc-pricing-icon,
