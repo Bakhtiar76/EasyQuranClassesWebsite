@@ -405,14 +405,15 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 /* Faint rosette ring behind the number, echoing the scalloped badge shape
    in the client's reference course cards — see components.css note above
    .eqc-corner-motif for why this ships as a mask rather than an <img>. */
+.eqc-card--course .eqc-card-index { border: 0; }
 .eqc-card--course .eqc-card-index::before {
 	content: '';
 	position: absolute;
-	inset: -6px;
+	inset: 0;
 	background-color: var(--eqc-bronze-600);
 	opacity: 0.12;
-	-webkit-mask-image: url('../svg/rosette.svg');
-	mask-image: url('../svg/rosette.svg');
+	-webkit-mask-image: url('../svg/seal-filled.svg');
+	mask-image: url('../svg/seal-filled.svg');
 	-webkit-mask-size: 100% 100%;
 	mask-size: 100% 100%;
 	z-index: 0;
@@ -657,18 +658,26 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	justify-content: center;
 	width: 3.8em;
 	height: 3.8em;
-	border-radius: 50%;
-	background: var(--eqc-green-800);
-	box-shadow: 0 0 0 4px var(--eqc-surface), 0 6px 14px rgba(20, 35, 27, 0.3);
+	background: none;
+	filter: drop-shadow(0 4px 5px rgb(20 35 27 / 18%));
 	z-index: 2;
 	transition: transform var(--eqc-motion-base) var(--eqc-ease-standard);
 }
+.eqc-pricing-icon::before,
+.eqc-pricing-icon::after {
+	content: '';
+	position: absolute;
+	mask: url('../svg/seal-filled.svg') center / 100% 100% no-repeat;
+	pointer-events: none;
+}
+.eqc-pricing-icon::before { inset: -3px; background: var(--eqc-surface); }
+.eqc-pricing-icon::after { inset: 0; background: var(--eqc-green-800); }
 .eqc-pricing-icon-ring {
 	position: absolute;
-	inset: -0.4em;
+	inset: -0.3em;
 	color: var(--eqc-gold-500);
 	pointer-events: none;
-	z-index: 0;
+	z-index: 1;
 }
 .eqc-pricing-icon-ring svg { width: 100%; height: 100%; }
 .eqc-pricing-icon .eqc-icon { position: relative; z-index: 1; width: 1.6em; height: 1.6em; color: var(--eqc-white); }
@@ -1386,7 +1395,7 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 	z-index: 2;
 }
 
-.eqc-arch-media:not(.eqc-arch-media--masked):not(.eqc-arch-media--fourcentred):not(.eqc-arch-media--horseshoe):not(.eqc-arch-media--keel)::before {
+.eqc-arch-media:not(.eqc-arch-media--masked):not(.eqc-arch-media--fourcentred):not(.eqc-arch-media--horseshoe):not(.eqc-arch-media--keel):not(.eqc-arch-media--cartouche)::before {
 	content: '';
 	position: absolute;
 	inset: 0;
@@ -1718,6 +1727,47 @@ a.eqc-btn .eqc-icon, button.eqc-btn .eqc-icon,
 
 /* ---------- About section (Home2.jpeg) ---------- */
 
+.eqc-section--about::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: var(--eqc-gold-500);
+	opacity: 0.16;
+	mask-image: linear-gradient(90deg, #000 0%, #000 12%, transparent 48%), url('../svg/girih-lattice-fine.svg');
+	mask-size: 100% 100%, calc(44 * var(--eqc-u)) calc(44 * var(--eqc-u));
+	mask-repeat: no-repeat, repeat;
+	mask-composite: intersect;
+	pointer-events: none;
+}
+.eqc-section--about::after {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 8%;
+	width: 38%;
+	height: 96%;
+	background: var(--eqc-gold-500);
+	opacity: 0.055;
+	mask: url('../svg/keel-arch-outline.svg') center / contain no-repeat;
+	pointer-events: none;
+}
+.eqc-ornament-rail {
+	display: flex;
+	align-items: center;
+	gap: calc(12 * var(--eqc-u));
+	color: var(--eqc-gold-500);
+}
+.eqc-ornament-rail::before,
+.eqc-ornament-rail::after {
+	content: '';
+	flex: 1;
+	height: 1px;
+	background: currentColor;
+}
+.eqc-ornament-rail > svg { flex: none; width: calc(35 * var(--eqc-u)); height: auto; }
+.eqc-courses-closing { width: min(100%, calc(470 * var(--eqc-u))); margin: calc(22 * var(--eqc-u)) auto 0; }
+.eqc-courses-closing > svg { width: calc(42 * var(--eqc-u)); }
+
 /* Right column measured 608 of the 1119u content column (54.3%); the collage
    fills the rest and deliberately BLEEDS left of the column, running to x95
    against the column's own left edge at x317. That overflow is the
@@ -1780,15 +1830,80 @@ h2.eqc-display-heading { font-size: var(--eqc-fs-display-xl); line-height: 1.12;
    lower left. The figure margin reset must come BEFORE the main's auto
    margin — the other way round it cancelled it, the main sat flush left and
    covered the child exactly, which read as a missing image. */
-.eqc-about-collage { position: relative; width: 100%; }
+.eqc-about-collage { position: relative; width: 100%; padding-block: 7% 12%; }
 .eqc-about-collage figure { margin: 0; }
-.eqc-about-collage__main { width: 82%; margin-inline: auto 0; }
+.eqc-about-collage .eqc-about-collage__main { width: 72%; margin-inline: auto 0; }
+.eqc-about-collage__alphabet {
+	position: absolute;
+	width: 44%;
+	aspect-ratio: 276 / 300;
+	top: 0;
+	left: 4%;
+	z-index: 3;
+	filter: drop-shadow(0 8px 10px rgb(20 35 27 / 12%));
+}
+.eqc-alphabet-panel {
+	position: relative;
+	display: grid;
+	place-items: center;
+	width: 100%;
+	height: 100%;
+	background: var(--eqc-surface);
+	mask: url('../svg/cartouche-alphabet-mask.svg') center / 100% 100% no-repeat;
+}
+.eqc-about-collage__alphabet::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: var(--eqc-gold-500);
+	mask: url('../svg/cartouche-alphabet-frame.svg') center / 100% 100% no-repeat;
+	pointer-events: none;
+}
+.eqc-alphabet-grid {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+	width: 70%;
+	font-family: var(--eqc-font-arabic);
+	font-size: var(--eqc-fs-h3);
+	font-weight: 600;
+	line-height: 1.2;
+	border-top: 1px solid var(--eqc-border-strong);
+	border-right: 1px solid var(--eqc-border-strong);
+	background: var(--eqc-white);
+}
+.eqc-alphabet-grid span {
+	display: grid;
+	place-items: center;
+	aspect-ratio: 1;
+	border-left: 1px solid var(--eqc-border-strong);
+	border-bottom: 1px solid var(--eqc-border-strong);
+	color: var(--eqc-green-800);
+}
+.eqc-alphabet-grid span:nth-child(3n) { color: var(--eqc-bronze-700); }
+.eqc-alphabet-grid span:first-child { background: var(--eqc-gold-300); }
 .eqc-about-collage__child {
 	position: absolute;
 	left: 0;
-	bottom: calc(-6 * var(--eqc-u));
+	bottom: 0;
 	width: 38%;
 	z-index: 3;
+}
+.eqc-arch-media--cartouche {
+	aspect-ratio: 246 / 423;
+	border: 0;
+	border-radius: 0;
+	overflow: visible;
+	filter: drop-shadow(0 8px 10px rgb(20 35 27 / 12%));
+}
+.eqc-arch-media--cartouche img { mask: url('../svg/cartouche-child-mask.svg') center / 100% 100% no-repeat; }
+.eqc-arch-media--cartouche::before {
+	content: '';
+	position: absolute;
+	inset: 0;
+	background: var(--eqc-gold-500);
+	mask: url('../svg/cartouche-child-frame.svg') center / 100% 100% no-repeat;
+	z-index: 2;
+	pointer-events: none;
 }
 
 /* Dark-green CTA with its icon in a filled disc, as the reference draws
@@ -1810,7 +1925,7 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 @media (max-width: 900px) {
 	.eqc-about-grid > .eqc-about-media,
 	.eqc-about-grid > .eqc-about-text { flex-basis: 100%; }
-	.eqc-about-collage__main { width: 100%; }
+	.eqc-about-collage .eqc-about-collage__main { width: 76%; }
 	.eqc-about-collage__child { width: 42%; }
 }
 
@@ -1883,11 +1998,14 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 	width: calc(18 * var(--eqc-u));
 	height: 1px;
 	background: var(--eqc-gold-600);
-	margin-inline-start: calc(10 * var(--eqc-u));
+	position: absolute;
+	left: calc(100% + 10 * var(--eqc-u));
 	flex: none;
 }
 
 /* ---------- Pricing section (pricing.jpeg) ---------- */
+
+.eqc-section--pricing .eqc-heading-rule--ornate .eqc-divider-svg { width: calc(160 * var(--eqc-u)); }
 
 /* pricing.jpeg calibrates at s=1.345: its card row and benefits strip both
    span 1505px = the 1119u content column. Cards 262u on a 31u gap. */
@@ -2154,6 +2272,20 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 	overflow: visible;
 	text-align: center;
 }
+.eqc-section--testimonials .eqc-card--testimonial::before {
+	content: '';
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: calc(100 * var(--eqc-u));
+	height: calc(110 * var(--eqc-u));
+	background: var(--eqc-gold-500);
+	opacity: 0.09;
+	mask: url('../svg/corner-motif.svg') center / 100% 100% no-repeat;
+	scale: -1 1;
+	pointer-events: none;
+}
+.eqc-section--testimonials .eqc-card--testimonial:nth-child(even)::before { left: auto; right: 0; scale: 1; }
 /* Circular avatar riding the card's top edge with the quote badge at its
    lower right, as the reference draws it. */
 .eqc-section--testimonials .eqc-testimonial-avatar-wrap {

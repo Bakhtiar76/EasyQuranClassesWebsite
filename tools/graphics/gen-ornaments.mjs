@@ -23,6 +23,7 @@ import {
 	spikedRosettePath,
 	regularPolygonPath,
 	girihRosettePath,
+	polar,
 } from './lib/geometry.mjs';
 import {
 	arcCmd,
@@ -81,6 +82,27 @@ const svgWrap = (w, h, body, attrs = '') =>
 // circle+star+circle placeholder in place (same CSS mask references keep
 // working).
 save('rosette.svg', svgWrap(64, 64, tracedRosette(32, 32, 28), 'aria-hidden="true" focusable="false"'));
+
+// Quiet scalloped seal for course indices and pricing badges/bullets. Each
+// lobe is a quadratic curve between equal-radius valleys; there are no
+// internal spokes behind a number or icon. Both renders share one path.
+function scallopedSealPath(cx, cy, r, folds = 12, depth = 3.2) {
+	const step = Math.PI * 2 / folds;
+	const start = polar(cx, cy, r - depth, -Math.PI / 2 - step / 2);
+	let d = `M${fmt(start[0])} ${fmt(start[1])}`;
+	for (let i = 0; i < folds; i++) {
+		const angle = -Math.PI / 2 + i * step;
+		const crest = polar(cx, cy, r + depth, angle);
+		const end = polar(cx, cy, r - depth, angle + step / 2);
+		d += `Q${fmt(crest[0])} ${fmt(crest[1])} ${fmt(end[0])} ${fmt(end[1])}`;
+	}
+	return d + 'Z';
+}
+{
+	const d = scallopedSealPath(32, 32, 28);
+	save('seal-filled.svg', svgWrap(64, 64, `<path fill="currentColor" d="${d}"/>`, 'aria-hidden="true" focusable="false"'));
+	save('seal-outline.svg', svgWrap(64, 64, `<path fill="none" stroke="currentColor" stroke-width="1.4" vector-effect="non-scaling-stroke" stroke-linejoin="round" d="${d}"/>`, 'aria-hidden="true" focusable="false"'));
+}
 
 // rosette-12.svg: no 12-fold reference exists, so this is the measured
 // tip/shoulder/valley construction generalized to 12 points (stroke
@@ -162,72 +184,35 @@ for (const [name, a] of [['fine', 34], ['dense', 52]]) {
 	save(`girih-lattice-${name}.svg`, svg);
 }
 
-// Corner ornament: previously a girih-lattice field cropped to a square
-// canvas and faded by a formula that never actually reached zero alpha at
-// its own inner edges (opacity floor ~0.35) — the straight-edged "pasted
-// wallpaper" patches flagged in review. Replaced with a proper arabesque
-// bracket: concentric quarter-arcs anchored at the corner (the same
-// "double gold line sweeping in from a corner" construction as
-// corner-frame.svg, generalized to N rings), a rosette and finial as the
-// ornament's own deliberate silhouette, and a girih fill CLIPPED to a
-// curved annular wedge — bounded by real geometry on every edge, not a
-// crop — with a radial-gradient mask as a second, independent guarantee
-// that alpha reaches true zero well inside the viewBox.
-{
-	const size = 240;
-	const corner = [size, 0]; // top-right, matching the existing --tr/--bl CSS convention
-	const rings = [0.3, 0.48, 0.66, 0.86].map((f) => size * f);
-	const arcs = rings
-		.map((r, i) => {
-			const from = [size - r, 0], to = [size, r];
-			const strokeW = fmt(2.6 - i * 0.5);
-			return `<path fill="none" stroke="currentColor" stroke-width="${strokeW}" stroke-linecap="round" d="M${fmt(from[0])} ${fmt(from[1])} ${arcCmd(corner[0], corner[1], r, from, to)}"/>`;
-		})
-		.join('');
-
-	// Rosette at the second ring, finial (small drop) at the outermost
-	// point along the corner's own diagonal.
-	const diag = Math.SQRT1_2;
-	const rosetteR = rings[1];
-	const rosetteCenter = [size - rosetteR * diag, rosetteR * diag];
-	const rosette = spikedRosettePath(rosetteCenter[0], rosetteCenter[1], 13, 6, 8);
-	const finialR = rings[3] + 14;
-	const finialCenter = [size - finialR * diag, finialR * diag];
-	const finial = spikedRosettePath(finialCenter[0], finialCenter[1], 7, 3, 4);
-
-	// Girih fill clipped to the annular wedge between the first and third
-	// rings — a shape with real curved inner AND outer edges, so it can
-	// never read as a rectangular crop.
-	const rInner = rings[0], rOuter = rings[2];
-	const wedgeClip =
-		`M${fmt(size - rOuter)} 0 ${arcCmd(corner[0], corner[1], rOuter, [size - rOuter, 0], [size, rOuter])} ` +
-		`L${fmt(size)} ${fmt(rInner)} ${arcCmd(corner[0], corner[1], rInner, [size, rInner], [size - rInner, 0])} Z`;
-	const { body: latticeBody, D: latticeD } = girihTile(26);
-	let latticeField = '';
-	for (let i = -1; i <= Math.ceil(size / latticeD); i++) {
-		for (let j = -1; j <= Math.ceil(size / latticeD); j++) {
-			latticeField += `<g transform="translate(${fmt(size - (i + 1) * latticeD)} ${fmt(j * latticeD)})">${latticeBody}</g>`;
+// Shared angular field. A real SVG pattern clips each repeat unit before
+// repetition, preventing coincident duplicate strokes between neighbors.
+function girihPattern(id, side, strokeWidth = 1.2) {
+	const { D } = girihTile(side);
+	const r = side / (2 * Math.sin(Math.PI / 8));
+	let body = '';
+	// Outline the star's perimeter instead of drawing its crossing chords:
+	// the latter line up across repeats and reduce to a diagonal mesh. Two
+	// perimeters make a narrow angular ribbon, with a clear star-shaped void.
+	for (const [cx, cy] of [[0, 0], [D, 0], [0, D], [D, D]]) {
+		for (const inset of [1, .79]) {
+			body += `<path d="${spikedRosettePath(cx, cy, r * inset, r * .62 * inset, 8, Math.PI / 8)}"/>`;
 		}
 	}
+	body += `<path d="${regularPolygonPath(D / 2, D / 2, side * Math.SQRT1_2, 4, 0)}"/>`;
+	return `<pattern id="${id}" width="${fmt(D)}" height="${fmt(D)}" patternUnits="userSpaceOnUse"><g fill="none" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linejoin="round">${body}</g></pattern>`;
+}
 
-	const svg = svgWrap(
-		size, size,
-		`<defs>` +
-			`<clipPath id="wedge"><path d="${wedgeClip}"/></clipPath>` +
-			`<radialGradient id="fade" cx="${fmt(corner[0])}" cy="${fmt(corner[1])}" r="${fmt(rings[3])}" gradientUnits="userSpaceOnUse">` +
-			`<stop offset="0%" stop-color="#fff"/><stop offset="70%" stop-color="#fff" stop-opacity="0.5"/><stop offset="100%" stop-color="#fff" stop-opacity="0"/>` +
-			`</radialGradient>` +
-			`<mask id="fadeMask"><rect width="${size}" height="${size}" fill="url(#fade)"/></mask>` +
-			`</defs>` +
-			`<g clip-path="url(#wedge)" mask="url(#fadeMask)">` +
-			`<g fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round">${latticeField}</g>` +
-			`</g>` +
-			`<g mask="url(#fadeMask)">${arcs}</g>` +
-			`<path fill="currentColor" d="${rosette}"/>` +
-			`<path fill="currentColor" opacity="0.6" d="${finial}"/>`,
-		'aria-hidden="true" focusable="false"'
-	);
-	save('lattice-corner.svg', svg);
+// courses.jpeg / Reviews.jpeg show angular lace, not circular brackets or
+// floating stars. Both assets are dense at TOP RIGHT, fading completely
+// before their left/bottom edges. Mirror horizontally for a top-left card.
+// The separate canvas sizes preserve the measured card/section cell scale.
+for (const [name, size, side] of [['corner-motif.svg', 120, 14], ['lattice-corner.svg', 300, 30]]) {
+	save(name, svgWrap(size, size,
+		`<defs>${girihPattern('lace', side)}` +
+		`<radialGradient id="fade" cx="${size}" cy="0" r="${size * 0.98}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>` +
+		`<mask id="soft"><rect width="${size}" height="${size}" fill="url(#fade)"/></mask></defs>` +
+		`<rect width="${size}" height="${size}" fill="url(#lace)" mask="url(#soft)"/>`,
+		'aria-hidden="true" focusable="false"'));
 }
 
 // =====================================================================
@@ -404,6 +389,32 @@ function sparklePath(cx, cy, r) {
 		`<path transform="translate(${inset} ${inset})" d="${inner.d}"/>` +
 		`</g>`, 0)); // pad 0: the frame's OUTER contour must share the mask's exact
 		// coordinate frame, or the two render at different scales in the same box
+}
+
+// Home2.jpeg's two small panels close into pointed lobed ends. Reuse the
+// measured cusped arch for each cap, mirrored vertically; clipping each
+// half at its jamb removes the hero arch's flat base without parsing path
+// data or duplicating its arc solver. The cap height is an independent
+// parameter, so the tall child panel adds straight jamb rather than
+// stretching the nearly-square alphabet panel's caps.
+function closedCartouche(w, h, capHeight, inset, stroke = false) {
+	const cw = w - inset * 2, ch = h - inset * 2, cap = capHeight - inset;
+	const stops = [[0, 1], [.0751, .3498 / .4626], [.2397, .1908 / .4626], [.4365, .0477 / .4626]]
+		.map(([x, y]) => [x, y * cap / ch]);
+	const { d } = cuspedArchPanel(cw, cap, ch, { stops });
+	const id = `half-${inset}`;
+	const attrs = stroke ? 'fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"' : 'fill="#fff"';
+	// A one-unit overlap on each side avoids a raster seam at the shared
+	// jamb; the contour is vertical, so this does not alter its shape.
+	const half = `<g clip-path="url(#${id})"><path ${attrs} d="${d}"/></g>`;
+	return `<defs><clipPath id="${id}"><rect x="-2" y="-2" width="${fmt(cw + 4)}" height="${fmt(ch / 2 + 3)}"/></clipPath></defs>` +
+		`<g transform="translate(${inset} ${inset})">${half}<g transform="translate(0 ${fmt(ch)}) scale(1 -1)">${half}</g></g>`;
+}
+for (const [name, w, h, cap] of [['child', 246, 423, 123], ['alphabet', 276, 300, 150]]) {
+	// Same viewBox, no CSS shrink: the photo contour follows the inner
+	// frame at5.5px. Two1.2px lines at1.5/5.5 leave the cream ground visible.
+	save(`cartouche-${name}-mask.svg`, svgWrap(w, h, closedCartouche(w, h, cap, 5.5), 'aria-hidden="true" focusable="false"'));
+	save(`cartouche-${name}-frame.svg`, svgWrap(w, h, closedCartouche(w, h, cap, 1.5, true) + closedCartouche(w, h, cap, 5.5, true), 'aria-hidden="true" focusable="false"'));
 }
 
 // Four-centred (Persian/Timurid) arch — course/pricing card media frames.
@@ -624,6 +635,13 @@ function quatrefoilPath(size) {
 		`<path fill="currentColor" d="${regularPolygonPath(4, cy, r, 4, 0)}"/>` +
 		`<path fill="currentColor" d="${regularPolygonPath(w - 4, cy, r, 4, 0)}"/>`;
 	save('divider-rule.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
+}
+
+// pricing.jpeg uses a single central diamond between two hairlines.
+{
+	const w = 240, h = 16, cx = w / 2, cy = h / 2;
+	const body = `<g fill="none" stroke="currentColor" stroke-width="1"><path d="M0 ${cy}H${cx - 12}M${cx + 12} ${cy}H${w}"/><path d="${regularPolygonPath(cx, cy, 5, 4, 0)}"/></g>`;
+	save('divider-diamond.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 
 console.log('\nAll ornament assets generated to', OUT.href);

@@ -56,14 +56,14 @@ $hero = eqc_section(
 							array(
 								// Sentence case in a white pill with a circular icon chip, per the
 								// reference; --hero drops the shared eyebrow's uppercase/tracking.
-								eqc_html( '<span class="eqc-eyebrow eqc-eyebrow--hero"><span class="eqc-eyebrow-chip">' . eqc_icon_str( 'users' ) . '</span>' . esc_html__( 'Trusted by Families Worldwide', 'easy-quran-classes' ) . '</span>' ),
+								eqc_html( '<span class="eqc-eyebrow eqc-eyebrow--hero"><span class="eqc-eyebrow-chip">' . eqc_icon_str( 'users-filled' ) . '</span>' . esc_html__( 'Trusted by Families Worldwide', 'easy-quran-classes' ) . '</span>' ),
 								eqc_heading( 'Learn Quran Online <br>with <span style="color:var(--eqc-bronze-700)">Personal Guidance</span>', 'h1' ),
 								eqc_html( '<div class="eqc-hero-rule">' . eqc_divider_svg( 'rule' ) . '</div>' ),
 								eqc_text( '<p class="eqc-body-l">1-to-1 live classes with qualified male &amp; female teachers. <br>Flexible timing, personalized learning, and real progress.</p>' ),
 								eqc_html(
 									'<div class="eqc-chip-row eqc-chip-row--cards">'
-									. eqc_chip( 'person', '1-to-1', 'Live Classes' )
-									. eqc_chip( 'users', 'Male & Female', 'Teachers' )
+									. eqc_chip( 'person-filled', '1-to-1', 'Live Classes' )
+									. eqc_chip( 'users-filled', 'Male & Female', 'Teachers' )
 									. eqc_chip( 'calendar', 'Flexible', 'Schedule' )
 									. eqc_chip( 'chart-up', 'Progress', 'Tracking' )
 									. '</div>'
@@ -135,8 +135,14 @@ $trust = eqc_section(
 // The reference opens this column with an ornament RAIL (rule - rosette -
 // rule) spanning its full width, not the pill eyebrow used elsewhere, and
 // its heading is a display size larger than the other section headings.
+$alphabet_letters = array( 'ا', 'ب', 'ت', 'ث', 'ج', 'ح', 'خ', 'د', 'ذ', 'ر', 'ز', 'س', 'ش', 'ص', 'ض', 'ط', 'ظ', 'ع', 'غ', 'ف', 'ق', 'ك', 'ل', 'م', 'ن', 'ه', 'و', 'ي' );
+$alphabet_chart = '<div class="eqc-alphabet-panel" role="img" aria-label="Arabic alphabet learning chart"><div class="eqc-alphabet-grid" lang="ar" dir="rtl" aria-hidden="true">';
+foreach ( $alphabet_letters as $letter ) {
+	$alphabet_chart .= '<span>' . esc_html( $letter ) . '</span>';
+}
+$alphabet_chart .= '</div></div>';
 $about = eqc_section(
-	'eqc-section eqc-section--about eqc-section--cream eqc-section--textured',
+	'eqc-section eqc-section--about eqc-section--cream eqc-section--ornamented',
 	array(
 		eqc_inner(
 			'',
@@ -147,16 +153,14 @@ $about = eqc_section(
 						eqc_container(
 							array( 'css_classes' => 'eqc-about-media', 'flex_direction' => 'column' ),
 							array(
-								// The reference's collage is three overlapping arch-masked
-								// images. Two exist in the staging library; the Arabic
-								// alphabet chart does not and is briefed in
-								// QA/IMAGE-BRIEF.md rather than faked from a low-res crop.
+								// Original alphabet typesetting stays crisp at every size.
 								eqc_html(
 									'<div class="eqc-about-collage">'
 									. '<figure class="eqc-about-collage__main eqc-arch-media eqc-arch-media--keel">'
 									. wp_get_attachment_image( $about_img, 'large', false, array( 'alt' => 'An open Quran beside a sunlit window' ) )
 									. '</figure>'
-									. '<figure class="eqc-about-collage__child eqc-arch-media eqc-arch-media--keel">'
+									. '<div class="eqc-about-collage__alphabet">' . $alphabet_chart . '</div>'
+									. '<figure class="eqc-about-collage__child eqc-arch-media eqc-arch-media--cartouche">'
 									. wp_get_attachment_image( eqc_media_id( 'about-child-reading-quran' ), 'medium_large', false, array( 'alt' => 'A young student reading from the Quran' ) )
 									. '</figure>'
 									. '</div>'
@@ -166,7 +170,7 @@ $about = eqc_section(
 						eqc_container(
 							array( 'css_classes' => 'eqc-about-text eqc-align-start', 'flex_direction' => 'column' ),
 							array(
-								eqc_html( '<div class="eqc-about-rail">' . eqc_divider_svg( 'section' ) . '</div>' ),
+								eqc_html( '<div class="eqc-ornament-rail eqc-about-rail" aria-hidden="true">' . eqc_get_svg_asset( 'rosette' ) . '</div>' ),
 								eqc_heading( "Learning the Quran <br>shouldn't depend on <br>where you live", 'h2', 'eqc-display-heading' ),
 								eqc_html( '<div class="eqc-about-rule">' . eqc_divider_svg( 'card' ) . '</div>' ),
 								// Copy transcribed verbatim from the reference, including its
@@ -223,7 +227,8 @@ $courses = eqc_section(
 			'',
 			array_merge(
 				array( eqc_section_heading_el( 'Our Courses', 'Choose the course that <br>matches where <span style="color:var(--eqc-bronze-700)">you are today</span>', false, 'eqc-eyebrow--plain', 'book-open' ) ),
-				array( eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--courses', 'flex_direction' => 'row' ), $course_cards ) )
+				array( eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--courses', 'flex_direction' => 'row' ), $course_cards ) ),
+				array( eqc_html( '<div class="eqc-ornament-rail eqc-courses-closing" aria-hidden="true">' . eqc_get_svg_asset( 'rosette' ) . '</div>' ) )
 			)
 		),
 	)
@@ -258,15 +263,15 @@ $teachers = eqc_section(
 						eqc_container(
 							array( 'css_classes' => 'eqc-teachers-aside', 'flex_direction' => 'column' ),
 							array(
-								eqc_html( '<span class="eqc-eyebrow">' . eqc_icon_str( 'users' ) . esc_html__( 'Our Qualified Teachers', 'easy-quran-classes' ) . '</span>' ),
+								eqc_html( '<span class="eqc-eyebrow">' . eqc_icon_str( 'users-filled' ) . esc_html__( 'Our Qualified Teachers', 'easy-quran-classes' ) . '</span>' ),
 								eqc_heading( 'Learn From <br>Dedicated <br><span style="color:var(--eqc-bronze-700)">Quran Teachers</span>', 'h2' ),
 								eqc_html( '<div class="eqc-teachers-rule">' . eqc_divider_svg( 'accent' ) . '</div>' ),
 								eqc_text( '<p>Our teachers are highly qualified, experienced, and passionate about teaching the Quran. They are here to guide you every step of the way with patience and care.</p>' ),
 								eqc_html(
 									'<div class="eqc-teachers-features">'
-									. '<div class="eqc-trust-tile"><span class="eqc-trust-tile__icon">' . eqc_icon_str( 'graduation-cap' ) . '</span><div><p class="eqc-trust-tile-title">Qualified &amp; Experienced</p><p>Well-trained in Tajweed &amp; Quran teaching</p></div></div>'
-									. '<div class="eqc-trust-tile"><span class="eqc-trust-tile__icon">' . eqc_icon_str( 'person' ) . '</span><div><p class="eqc-trust-tile-title">1-to-1 Personalized Classes</p><p>Focused learning for every student</p></div></div>'
-									. '<div class="eqc-trust-tile"><span class="eqc-trust-tile__icon">' . eqc_icon_str( 'shield' ) . '</span><div><p class="eqc-trust-tile-title">Safe &amp; Supportive Environment</p><p>Your comfort and progress is our priority</p></div></div>'
+									. '<div class="eqc-trust-tile"><span class="eqc-trust-tile__icon">' . eqc_icon_str( 'graduation-cap-filled' ) . '</span><div><p class="eqc-trust-tile-title">Qualified &amp; Experienced</p><p>Well-trained in Tajweed &amp; Quran teaching</p></div></div>'
+									. '<div class="eqc-trust-tile"><span class="eqc-trust-tile__icon">' . eqc_icon_str( 'person-filled' ) . '</span><div><p class="eqc-trust-tile-title">1-to-1 Personalized Classes</p><p>Focused learning for every student</p></div></div>'
+									. '<div class="eqc-trust-tile"><span class="eqc-trust-tile__icon">' . eqc_icon_str( 'shield-filled' ) . '</span><div><p class="eqc-trust-tile-title">Safe &amp; Supportive Environment</p><p>Your comfort and progress is our priority</p></div></div>'
 									. '</div>'
 								),
 								eqc_container(
@@ -313,7 +318,6 @@ foreach ( $plans as $p ) {
 $pricing_panel = eqc_container(
 	array( 'css_classes' => 'eqc-pricing-panel', 'flex_direction' => 'column' ),
 	array(
-		eqc_section_ornaments( 'eqc-corner-motif--sm' ),
 		eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--pricing', 'flex_direction' => 'row' ), $pricing_cards ),
 	)
 );
@@ -323,7 +327,7 @@ $pricing = eqc_section(
 		eqc_inner(
 			'',
 			array(
-				eqc_section_heading_el( 'Pricing', 'Simple monthly pricing, <br>no hidden fees', true, 'eqc-eyebrow--rosette' ),
+				eqc_section_heading_el( 'Pricing', 'Simple monthly pricing, <br>no hidden fees', true, 'eqc-eyebrow--rosette', '', 'diamond' ),
 				$pricing_panel,
 				// White strip of four benefits under the cards, hairline-separated.
 				eqc_html(
@@ -354,9 +358,8 @@ foreach ( $testi_data as $i => $t ) {
 }
 // Reference quotes are unverified staging content; see QA/PLACEHOLDER-REGISTER.md.
 $testimonials = eqc_section(
-	'eqc-section eqc-section--testimonials eqc-section--surface eqc-section--ornamented',
+	'eqc-section eqc-section--testimonials eqc-section--surface',
 	array(
-		eqc_section_ornaments(),
 		eqc_inner(
 			'',
 			array(

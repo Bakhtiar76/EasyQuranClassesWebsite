@@ -46,7 +46,7 @@ defined( 'ABSPATH' ) || exit;
 		<div class="eqc-header-actions">
 			<?php // Uppercasing is presentational (shell.css) so the source string stays naturally cased and translatable. ?>
 			<a class="eqc-btn eqc-btn--bronze eqc-header-cta" href="<?php echo esc_url( home_url( '/free-trial/' ) ); ?>">
-				<?php eqc_icon( 'gift' ); ?>
+				<?php eqc_icon( 'gift-filled' ); ?>
 				<?php esc_html_e( 'Free Trial', 'easy-quran-classes' ); ?>
 			</a>
 			<button type="button" class="eqc-nav-toggle" aria-expanded="false" aria-controls="eqc-nav-drawer">
@@ -83,7 +83,7 @@ defined( 'ABSPATH' ) || exit;
 		?>
 	</nav>
 	<a class="eqc-btn eqc-btn--bronze" href="<?php echo esc_url( home_url( '/free-trial/' ) ); ?>">
-		<?php eqc_icon( 'gift' ); ?> <?php esc_html_e( 'Free Trial', 'easy-quran-classes' ); ?>
+		<?php eqc_icon( 'gift-filled' ); ?> <?php esc_html_e( 'Free Trial', 'easy-quran-classes' ); ?>
 	</a>
 	<a class="eqc-btn eqc-btn--secondary" href="<?php echo eqc_whatsapp_url(); ?>">
 		<?php eqc_icon( 'whatsapp' ); ?> <?php esc_html_e( 'Chat on WhatsApp', 'easy-quran-classes' ); ?>

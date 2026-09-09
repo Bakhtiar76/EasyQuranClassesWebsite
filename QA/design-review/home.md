@@ -838,3 +838,19 @@ here rather than actioned.
   featured card is the one card whose medallion does not overhang. Fixed to
   match, from measured element rects (LESSONS #39).
 - Mobile hero carried 48px of top padding meant for the desktop arch overlap.
+
+### Current-HEAD graphics findings (2486a90)
+
+The new Claude scale commit is preserved for review; its screen-aspect inference is not proof of reference fidelity. Independently verified geometry defects remain:
+
+| ID | Reference and measured native placement | Current defect | Severity | Fix / reuse |
+|---|---|---|---|---|
+| S12 | Home2 left girih strongest x0–280, fades before text x830 | Uniform large honeycomb under all copy | P1 | Reuse girih lattice and arch outline in separate left-fading CSS layers |
+| S13 | Courses top-right lattice x1025–1295/y0–230; card patches about65×100 | Circular corner arcs and dots | P1 | Replace existing corner-motif and lattice-corner outputs with angular fields |
+| S14 | Pricing mirrored top-edge brackets about250×245 | Opposite corners of inner card panel | P1 | Pricing bracket generated with existing geometry, attached to section edges |
+| S15 | Pricing scalloped medallions about108×116; hollow19px bullets | Circle with sharply spiked ring; solid tiny bullets | P1 | One clean scalloped geometry with fill/outline variants; existing calendar icon |
+| S16 | Reviews alternating100×110 card patches; no section brackets | Plain cards plus large section brackets | P1 | Reuse course-card pattern, alternate corners; remove extra section ornaments |
+| S17 | Home2 top rail595px, center35px; Courses bottom rail470px | Uniform SVG scaling inflates center; bottom divider missing | P1 | Existing rosette + flexible CSS rules, independent center size |
+| S18 | About child246×423 with pointed lobed bottom; alphabet276×300 | Flat-bottom hero frame / generic quatrefoil | P1 | Extend existing arch family into measured closed cartouches |
+
+These are corrections to the supplied geometry, not a new design direction. The new cartouche, bracket and scalloped seal are justified because existing assets have different silhouettes. Plan: generate and inspect assets, integrate existing helpers/classes, rebuild every page, capture Home at five widths, then resolve remaining metrics and interaction flaws.

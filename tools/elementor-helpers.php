@@ -290,6 +290,8 @@ function eqc_course_card( $number, $title, $level, $description, $link, $reveal_
 function eqc_teacher_card( $attachment_id, $name, $role, $facts ) {
 	$facts_html = '<ul class="eqc-teacher-facts">';
 	foreach ( $facts as $icon => $label ) {
+		// Teachers.jpeg uses solid award, cap and people silhouettes.
+		$icon = in_array( $icon, array( 'certificate', 'graduation-cap', 'users' ), true ) ? $icon . '-filled' : $icon;
 		$facts_html .= '<li>' . eqc_icon_str( $icon ) . '<span>' . esc_html( $label ) . '</span></li>';
 	}
 	$facts_html .= '</ul>';
@@ -361,7 +363,7 @@ function eqc_teacher_card_stub( $slot_label = 'Teacher Name' ) {
  * @param array $features Plain-text feature list.
  */
 function eqc_pricing_card( $frequency, $price, $unit, $features, $link, $featured = false ) {
-	$star           = eqc_get_svg_asset( 'star-8-filled', 'eqc-pricing-bullet' );
+	$star           = eqc_get_svg_asset( 'seal-outline', 'eqc-pricing-bullet' );
 	$features_html  = '<ul class="eqc-pricing-list">';
 	foreach ( $features as $feature ) {
 		$features_html .= '<li>' . $star . '<span>' . esc_html( $feature ) . '</span></li>';
@@ -381,7 +383,7 @@ function eqc_pricing_card( $frequency, $price, $unit, $features, $link, $feature
 		$children[] = eqc_html( '<span class="eqc-pricing-badge">' . esc_html__( 'Recommended', 'easy-quran-classes' ) . '</span>' );
 	}
 	$children[] = eqc_html(
-		'<span class="eqc-pricing-icon"><span class="eqc-pricing-icon-ring" aria-hidden="true">' . eqc_get_svg_asset( 'rosette-12' ) . '</span>' . eqc_icon_str( 'calendar' ) . '</span>'
+		'<span class="eqc-pricing-icon"><span class="eqc-pricing-icon-ring" aria-hidden="true">' . eqc_get_svg_asset( 'seal-outline' ) . '</span>' . eqc_icon_str( 'calendar' ) . '</span>'
 	);
 	$children[] = eqc_html( '<span class="eqc-pricing-freq eqc-pricing-banner">' . esc_html( $frequency ) . '</span>' );
 	$children[] = eqc_html( '<div class="eqc-pricing-divider">' . eqc_divider_svg( 'accent' ) . '</div>' );
@@ -425,10 +427,10 @@ function eqc_testimonial_card( $attachment_id, $name, $location, $quote, $tags =
 		array(
 			eqc_html(
 				'<div class="eqc-testimonial-avatar-wrap"><div class="eqc-testimonial-photo">' . wp_get_attachment_image( $attachment_id, 'eqc-testimonial' ) . '</div>'
-				. '<div class="eqc-testimonial-quote-mark">' . eqc_icon_str( 'quote' ) . '</div></div>'
+				. '<div class="eqc-testimonial-quote-mark">' . eqc_icon_str( 'quote-filled' ) . '</div></div>'
 			),
 			eqc_heading( $name, 'h3' ),
-			eqc_html( '<p class="eqc-testimonial-location">' . eqc_icon_str( 'map-pin' ) . ' ' . esc_html( $location ) . '</p>' ),
+			eqc_html( '<p class="eqc-testimonial-location">' . eqc_icon_str( 'map-pin-filled' ) . ' ' . esc_html( $location ) . '</p>' ),
 			eqc_html( '<div class="eqc-testimonial-divider">' . eqc_divider_svg( 'dot' ) . '</div>' ),
 			eqc_text( '<p>' . esc_html( $quote ) . '</p>' ),
 			eqc_html( $tags_html, 'eqc-card__foot' ),
@@ -535,7 +537,7 @@ function eqc_page_hero( $eyebrow, $title, $intro, $icon = 'book-open' ) {
  * as well as the ornate modifier, painting as a full-width flat gold bar
  * with the old tiny flower glyph stranded near the left edge inside it.
  */
-function eqc_section_heading_el( $eyebrow, $heading, $centered = false, $eyebrow_class = '', $eyebrow_icon = '' ) {
+function eqc_section_heading_el( $eyebrow, $heading, $centered = false, $eyebrow_class = '', $eyebrow_icon = '', $divider = 'section' ) {
 	$class = 'eqc-stack eqc-section-heading' . ( $centered ? ' eqc-section-heading--center' : '' );
 	$html  = '<div class="' . esc_attr( $class ) . '" data-eqc-reveal data-eqc-reveal-index="0">';
 	if ( $eyebrow ) {
@@ -547,7 +549,7 @@ function eqc_section_heading_el( $eyebrow, $heading, $centered = false, $eyebrow
 			. esc_html( $eyebrow ) . '</span>';
 	}
 	$html .= '<h2>' . wp_kses_post( $heading ) . '</h2>';
-	$html .= '<div class="eqc-heading-rule--ornate">' . eqc_divider_svg( 'section' ) . '</div>';
+	$html .= '<div class="eqc-heading-rule--ornate">' . eqc_divider_svg( $divider ) . '</div>';
 	$html .= '</div>';
 	return eqc_html( $html );
 }

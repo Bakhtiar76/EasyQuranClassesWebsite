@@ -356,6 +356,14 @@ Preferred treatments:
 
 Use one consistent outline or restrained filled icon family.
 
+Reference roles select an explicit variant in the existing 24px sprite:
+filled people, shield, graduation cap and award silhouettes for teacher
+features/facts; filled quotation marks and location pins for reviews; a
+filled gift for Free Trial. Other utility roles retain outlines. These
+original filled paths share the same grid and palette, and introduce no
+additional icon package. Do not replace a filled reference silhouette by
+thickening an outline.
+
 Preferred visual characteristics:
 
 - rounded geometry
