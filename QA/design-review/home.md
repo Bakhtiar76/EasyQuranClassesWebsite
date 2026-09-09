@@ -355,3 +355,71 @@ testimonials, blog, final CTA — are **not** reviewed. They inherit the new
 scale and have changed appearance; each needs its own measured pass against its
 own reference image. The other nine pages likewise shift with the token change
 and are not re-reviewed here.
+
+---
+
+## Section 3 — About (`Home2.jpeg`, `claude-opus-5`)
+
+### Calibrating a second reference
+
+`Home2.jpeg` is 1600px wide against `Home.jpeg`'s 1307, so its scale had to be
+established before anything could be measured (LESSONS #11). Two independent
+anchors agree it is **~1:1 with the reference canvas** — i.e. a wider crop at the
+same zoom, not a magnified one:
+
+- its "Call Any Time" button measures 56px tall, and the secondary control is
+  56u in the design system (verified in the hero);
+- its body copy solves to 16.45px, against body-l's 16.6u — and `DESIGN.md` §6
+  assigns Body-L to "hero/**about** intro".
+
+`courses.jpeg` was calibrated the same way and also lands at ~1.0 (3 cards of
+313u + 2 gaps of 88u = 1115, against the 1119u content column).
+
+**This mattered.** Measured naively, the two references implied heading sizes of
+71u and 61u — a 17% disagreement that looked like measurement error. Once each
+was scaled by its own anchor the disagreement held, which is the actual finding:
+**About's heading is genuinely larger than the other sections'.** It is a display
+size, not an h2. So `--eqc-fs-display-xl` is now 70.5u and `--eqc-fs-h2` 60u
+(from 36.8u — every section heading on the site was undersized).
+
+### Findings
+
+| # | Reference shows | Build did | Sev | Fix |
+|---|---|---|---|---|
+| A1 | Ornament **rail** (rule–rosette–rule) spanning the column | Pill eyebrow "Why Easy Quran Classes" | P0 | `.eqc-about-rail` with `divider-section` |
+| A2 | Three-line display heading, **all dark green** | h2 at 36.8u, one line | P0 | `--eqc-fs-display-xl` 70.5u + transcribed breaks |
+| A3 | Small centred rule–quatrefoil–rule under the heading | Absent | P1 | `.eqc-about-rule` with `divider-card` |
+| A4 | Body copy ending "Nobody else is in the room. Nobody is watching you make mistakes." | Shorter paraphrase, em dash replaced | P0 (§2) | transcribed verbatim |
+| A5 | Three stats, **label above value**, rosette-framed icon discs, hairlines | Countup numbers above labels, no discs | P1 | `eqc_about_stat()` |
+| A6 | **Two** buttons — dark-green "More About Us" (icon in a gold disc) + outlined "Call Any Time" | One button | P0 | `.eqc-btn--green`, `.eqc-btn--icon-disc` |
+| A7 | Collage of **three** overlapping arch-masked images | One image | P1 | Two built; the Arabic alphabet chart does not exist in staging and is briefed, not faked from a low-res crop |
+
+### Iteration log
+
+- **`claude-opus-5` — build.** Rebuilt the section, added `eqc_about_stat()` and
+  the `--green` / `--icon-disc` button skins, set both heading tokens.
+- **`claude-opus-5` — collage debug.** Both images computed correctly (loaded,
+  sized, masked, opacity 1) yet only their gold frames painted. Cause was CSS
+  order: `.eqc-about-collage figure { margin: 0 }` sat *after* the main image's
+  `margin-inline-start: auto` and cancelled it, so the main sat flush left and
+  covered the child exactly. Moved the reset above; added an explicit z-index.
+- **`claude-opus-5` — a QA artefact, not a site bug.** After that fix the images
+  still looked absent in an ad-hoc Playwright `fullPage` capture. They render
+  fine in the live viewport: below-fold images are `loading="lazy"`, and a
+  full-page capture that never scrolls does not load them. `tests/visual/sweep.mjs`
+  already scrolls the page and waits before capturing, so the committed
+  `QA/after/` evidence is truthful — **the ad-hoc capture was the unreliable
+  one.** Use the sweep for evidence, not one-off MCP screenshots (LESSONS #23).
+
+### Verification
+
+Sweep at 1920/1440/1024/768/390 plus the 380–1900 scan: no overflow, 0 console,
+0 page, 0 asset errors, 0 images missing `alt`, one H1.
+
+### Remaining on this section
+
+- The alphabet-chart quatrefoil (third collage image) — briefed in
+  `QA/IMAGE-BRIEF.md`, not invented.
+- The reference's collage is larger and **bleeds left** of the content column;
+  ours stays inside it. Deferred with the collage's final geometry, which is
+  hard to fix properly while one of its three elements is missing.

@@ -131,8 +131,12 @@ $trust = eqc_section(
 );
 
 // ------------------------------------------------------- 3. ABOUT
+// Measured against Assests/Home2.jpeg — see QA/design-review/home.md.
+// The reference opens this column with an ornament RAIL (rule - rosette -
+// rule) spanning its full width, not the pill eyebrow used elsewhere, and
+// its heading is a display size larger than the other section headings.
 $about = eqc_section(
-	'eqc-section eqc-section--cream eqc-section--textured',
+	'eqc-section eqc-section--about eqc-section--cream eqc-section--textured',
 	array(
 		eqc_inner(
 			'',
@@ -143,37 +147,50 @@ $about = eqc_section(
 						eqc_container(
 							array( 'css_classes' => 'eqc-about-media', 'flex_direction' => 'column' ),
 							array(
-								eqc_widget(
-									'image',
-									array(
-										'image'        => array( 'id' => $about_img, 'url' => wp_get_attachment_image_url( $about_img, 'large' ) ),
-										'image_size'   => 'large',
-										'_css_classes' => 'eqc-arch-media eqc-arch-media--masked',
-									)
+								// The reference's collage is three overlapping arch-masked
+								// images. Two exist in the staging library; the Arabic
+								// alphabet chart does not and is briefed in
+								// QA/IMAGE-BRIEF.md rather than faked from a low-res crop.
+								eqc_html(
+									'<div class="eqc-about-collage">'
+									. '<figure class="eqc-about-collage__main eqc-arch-media eqc-arch-media--keel">'
+									. wp_get_attachment_image( $about_img, 'large', false, array( 'alt' => 'An illuminated Quran opened to a decorated page' ) )
+									. '</figure>'
+									. '<figure class="eqc-about-collage__child eqc-arch-media eqc-arch-media--keel">'
+									. wp_get_attachment_image( eqc_media_id( 'about-child-reading-quran' ), 'medium_large', false, array( 'alt' => 'A young student reading from the Quran' ) )
+									. '</figure>'
+									. '</div>'
 								),
 							)
 						),
 						eqc_container(
-							array( 'css_classes' => 'eqc-align-start', 'flex_direction' => 'column' ),
+							array( 'css_classes' => 'eqc-about-text eqc-align-start', 'flex_direction' => 'column' ),
 							array(
-								eqc_html( '<span class="eqc-eyebrow">' . eqc_icon_str( 'book-open' ) . ' ' . esc_html__( 'Why Easy Quran Classes', 'easy-quran-classes' ) . '</span>' ),
-								eqc_heading( "Learning the Quran shouldn't depend on where you live", 'h2' ),
+								eqc_html( '<div class="eqc-about-rail">' . eqc_divider_svg( 'section' ) . '</div>' ),
+								eqc_heading( "Learning the Quran<br>shouldn't depend on<br>where you live", 'h2', 'eqc-display-heading' ),
+								eqc_html( '<div class="eqc-about-rule">' . eqc_divider_svg( 'card' ) . '</div>' ),
+								// Copy transcribed verbatim from the reference, including its
+								// em dash and its "Nobody else is in the room" closing pair.
 								eqc_text(
-									'<p>Most Muslim families want the same thing: children who can read the Quran properly, and adults who can finally correct the recitation they half-learned as kids. What gets in the way is rarely motivation &mdash; it is distance to a qualified teacher, a packed school run, shift work, or the quiet hesitation of being an adult who still struggles with the basics.</p>'
-									. '<p>Easy Quran Classes removes those obstacles. Your teacher joins your screen, at the hour you choose, and works at the pace you set.</p>'
+									'<p>Most Muslim families want the same thing&mdash;children who can read the Quran properly, and adults who can finally correct the recitation they half-learned as kids. What gets in the way is rarely motivation. It is distance to the nearest qualified teacher, a school run that ends at six, shift work, or the quiet embarrassment of being a grown adult who still struggles with the alphabet.</p>'
+									. '<p>Easy Quran Classes removes those obstacles. Your teacher comes to your screen, at the hour you choose, and works at the pace you set. Nobody else is in the room. Nobody is watching you make mistakes.</p>',
+									'eqc-body-l'
 								),
-								eqc_container(
-									array( 'css_classes' => 'eqc-grid eqc-grid--trust', 'flex_direction' => 'row' ),
-									array(
-										eqc_html( '<div style="text-align:center"><strong data-eqc-countup="5000" data-eqc-suffix="+" style="font-family:var(--eqc-font-display);font-size:1.6rem;color:var(--eqc-heading)">0</strong><br><span style="font-size:var(--eqc-fs-small);color:var(--eqc-muted)">Students Taught</span></div>' ),
-										eqc_html( '<div style="text-align:center"><strong data-eqc-countup="10" data-eqc-suffix="+" style="font-family:var(--eqc-font-display);font-size:1.6rem;color:var(--eqc-heading)">0</strong><br><span style="font-size:var(--eqc-fs-small);color:var(--eqc-muted)">Countries Served</span></div>' ),
-										eqc_html( '<div style="text-align:center"><strong style="font-family:var(--eqc-font-display);font-size:1.6rem;color:var(--eqc-heading)">1-to-1</strong><br><span style="font-size:var(--eqc-fs-small);color:var(--eqc-muted)">Private Lessons</span></div>' ),
-									)
+								// Stat tiles: label ABOVE value in the reference, each icon in
+								// a rosette-framed disc, hairlines between. "5,000" and "10"
+								// are unverified client claims - QA/PLACEHOLDER-REGISTER.md.
+								eqc_html(
+									'<div class="eqc-about-stats">'
+									. eqc_about_stat( 'monitor-play', 'Students Taught', '5,000' )
+									. eqc_about_stat( 'globe', 'Countries Served', '10' )
+									. eqc_about_stat( 'book-open', 'Private Quran Lessons', '1-To-1' )
+									. '</div>'
 								),
 								eqc_container(
 									array( 'css_classes' => 'eqc-btn-group eqc-align-start', 'flex_direction' => 'row' ),
 									array(
-										eqc_icon_button( 'arrow-right', __( 'More About Us', 'easy-quran-classes' ), home_url( '/about/' ), 'eqc-btn--primary' ),
+										eqc_icon_button( 'arrow-right', __( 'More About Us', 'easy-quran-classes' ), home_url( '/about/' ), 'eqc-btn--green eqc-btn--icon-disc' ),
+										eqc_icon_button( 'phone', __( 'Call Any Time', 'easy-quran-classes' ), 'tel:' . preg_replace( '/[^0-9+]/', '', (string) get_theme_mod( 'eqc_phone_display', '' ) ), 'eqc-btn--secondary' ),
 									)
 								),
 							)

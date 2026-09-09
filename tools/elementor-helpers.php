@@ -578,6 +578,21 @@ function eqc_chip( $icon, $label, $label_2 = '' ) {
 	return '<span class="' . esc_attr( $class ) . '">' . eqc_icon_str( $icon ) . $text . '</span>';
 }
 
+/**
+ * One About-section stat: a rosette-framed icon disc, the label, then the
+ * value. Label ABOVE value, which is the order Home2.jpeg uses - the reverse
+ * of the countup tiles this replaces. Kept as its own small helper rather
+ * than inlined markup so the three calls stay readable and the unverified
+ * values sit in one obvious place (QA/PLACEHOLDER-REGISTER.md).
+ */
+function eqc_about_stat( $icon, $label, $value ) {
+	return '<div class="eqc-about-stat">'
+		. '<span class="eqc-about-stat__disc">' . eqc_icon_str( $icon ) . '</span>'
+		. '<span class="eqc-about-stat__label">' . esc_html( $label ) . '</span>'
+		. '<span class="eqc-about-stat__value">' . esc_html( $value ) . '</span>'
+		. '</div>';
+}
+
 /** A raw icon-labeled anchor matching the .eqc-btn pattern used in header/footer (for icon CTAs). */
 function eqc_icon_button( $icon, $text, $url, $variant = 'eqc-btn--primary' ) {
 	return eqc_html(

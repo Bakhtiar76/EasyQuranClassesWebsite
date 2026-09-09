@@ -71,9 +71,19 @@
 
 	/* Fluid type scale — native px on the reference canvas, measured by
 	   glyph width (LESSONS #12), not by assumed font metrics. */
-	--eqc-fs-display-xl: calc(51.7 * var(--eqc-u));
+	/* Display: the About section's heading. Measured on Home2.jpeg, whose
+	   scale is anchored at ~1.0 by its 56px "Call Any Time" button (the
+	   design system's 56u secondary control, verified in the hero) and
+	   corroborated by its 16.45px body copy landing on body-l's 16.6u. */
+	--eqc-fs-display-xl: calc(70.5 * var(--eqc-u));
 	--eqc-fs-h1: calc(53.7 * var(--eqc-u));      /* hero H1 */
-	--eqc-fs-h2: calc(36.8 * var(--eqc-u));      /* refined per section */
+	/* Section headings. Measured on courses.jpeg, whose scale is anchored at
+	   ~1.0 by its card grid (3 cards of 313 + 2 gaps of 88 = 1115, against
+	   the 1119u content column). About's heading is genuinely LARGER than
+	   this and uses --eqc-fs-display-xl above - the two references disagreed
+	   by 17% until each was scaled by its own anchor, which is what
+	   LESSONS #11 warns about. */
+	--eqc-fs-h2: calc(60 * var(--eqc-u));
 	--eqc-fs-h3: calc(23.1 * var(--eqc-u));
 	--eqc-fs-h4: calc(16.3 * var(--eqc-u));
 	--eqc-fs-body-l: calc(16.6 * var(--eqc-u));  /* hero body */
@@ -179,7 +189,8 @@
 @media (max-width: 1100px) {
 	:root {
 		--eqc-fs-h1: max(34px, calc(53.7 * var(--eqc-u)));
-		--eqc-fs-h2: max(28px, calc(36.8 * var(--eqc-u)));
+		--eqc-fs-display-xl: max(36px, calc(70.5 * var(--eqc-u)));
+		--eqc-fs-h2: max(28px, calc(60 * var(--eqc-u)));
 		--eqc-fs-h3: max(22px, calc(23.1 * var(--eqc-u)));
 		--eqc-fs-h4: max(18px, calc(16.3 * var(--eqc-u)));
 		--eqc-fs-body-l: max(17px, calc(16.6 * var(--eqc-u)));

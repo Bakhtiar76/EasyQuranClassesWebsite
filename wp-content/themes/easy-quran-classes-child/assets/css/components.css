@@ -1739,3 +1739,101 @@ a.eqc-btn .eqc-icon, button.eqc-btn .eqc-icon,
 .eqc-trust-panel > * + * { border-inline-start: 1px solid var(--eqc-border); }
 .eqc-trust-panel .eqc-trust-tile-title { line-height: 1.3; }
 .eqc-trust-panel .eqc-trust-tile p { line-height: 1.45; }
+
+/* ---------- About section (Home2.jpeg) ---------- */
+
+/* Right column measured 608 of the 1119u content column (54.3%); the collage
+   fills the rest and deliberately BLEEDS left of the column, running to x95
+   against the column's own left edge at x317. That overflow is the
+   composition, not an accident, so the media column is allowed to exceed its
+   track rather than being clipped to it. */
+.eqc-about-grid { gap: calc(21 * var(--eqc-u)); align-items: center; }
+.eqc-about-grid > .eqc-about-media { flex: 0 1 45.7%; min-width: 0; }
+.eqc-about-grid > .eqc-about-text { flex: 0 0 54.3%; min-width: 0; }
+.eqc-about-grid,
+.eqc-about-grid > .eqc-about-media,
+.eqc-about-grid > .eqc-about-text { padding-inline: 0; }
+.eqc-about-text { gap: calc(26 * var(--eqc-u)); }
+
+/* Ornament rail across the top of the column - the reference uses this
+   instead of the pill eyebrow the other sections carry. */
+.eqc-about-rail { width: 100%; color: var(--eqc-gold-500); line-height: 0; }
+.eqc-about-rail .eqc-divider-svg { width: 100%; height: auto; }
+/* Small centred ornament under the heading. */
+.eqc-about-rule { color: var(--eqc-gold-500); line-height: 0; align-self: center; }
+.eqc-about-rule .eqc-divider-svg { width: calc(140 * var(--eqc-u)); }
+
+/* The heading is a display size, larger than the other sections' h2, and is
+   a single colour - the reference gives it no bronze tail. */
+.eqc-display-heading,
+h2.eqc-display-heading { font-size: var(--eqc-fs-display-xl); line-height: 1.12; color: var(--eqc-heading); }
+
+/* Stats: label above value, each icon in a rosette-framed disc, full-height
+   hairlines between the three. */
+.eqc-about-stats {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	width: 100%;
+	align-items: start;
+}
+.eqc-about-stat {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: calc(7 * var(--eqc-u));
+	text-align: center;
+	padding-inline: calc(12 * var(--eqc-u));
+}
+.eqc-about-stat + .eqc-about-stat { border-inline-start: 1px solid var(--eqc-border); }
+.eqc-about-stat__disc {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: calc(56 * var(--eqc-u));
+	height: calc(56 * var(--eqc-u));
+	border-radius: 50%;
+	background: var(--eqc-cream-100);
+	border: 1px solid var(--eqc-border-strong);
+	margin-block-end: calc(4 * var(--eqc-u));
+}
+.eqc-about-stat__disc .eqc-icon { width: calc(26 * var(--eqc-u)); height: calc(26 * var(--eqc-u)); color: var(--eqc-gold-700); }
+.eqc-about-stat__label { font-size: var(--eqc-fs-small); color: var(--eqc-muted); }
+.eqc-about-stat__value { font-family: var(--eqc-font-body); font-size: calc(21 * var(--eqc-u)); font-weight: 700; color: var(--eqc-heading); }
+
+/* Collage: the large Quran page offset right, with the child overlapping its
+   lower left. The figure margin reset must come BEFORE the main's auto
+   margin — the other way round it cancelled it, the main sat flush left and
+   covered the child exactly, which read as a missing image. */
+.eqc-about-collage { position: relative; width: 100%; }
+.eqc-about-collage figure { margin: 0; }
+.eqc-about-collage__main { width: 82%; margin-inline: auto 0; }
+.eqc-about-collage__child {
+	position: absolute;
+	left: 0;
+	bottom: calc(-6 * var(--eqc-u));
+	width: 38%;
+	z-index: 3;
+}
+
+/* Dark-green CTA with its icon in a filled disc, as the reference draws
+   "More About Us". Reuses the shared .eqc-btn box; only the skin differs. */
+a.eqc-btn--green, .eqc-btn--green {
+	background: var(--eqc-green-800);
+	color: var(--eqc-white);
+	border-color: var(--eqc-green-800);
+}
+a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--eqc-green-900); }
+.eqc-btn--icon-disc .eqc-icon {
+	box-sizing: content-box;
+	padding: calc(7 * var(--eqc-u));
+	border-radius: 50%;
+	background: var(--eqc-gold-500);
+	color: var(--eqc-green-900);
+}
+
+@media (max-width: 900px) {
+	.eqc-about-grid > .eqc-about-media,
+	.eqc-about-grid > .eqc-about-text { flex-basis: 100%; }
+	.eqc-about-collage__main { width: 100%; }
+	.eqc-about-collage__child { width: 42%; }
+}

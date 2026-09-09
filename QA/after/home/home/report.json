@@ -1,7 +1,7 @@
 {
   "route": "/",
   "url": "http://localhost/",
-  "generatedAt": "2026-09-09T00:50:06.080Z",
+  "generatedAt": "2026-09-09T01:10:08.574Z",
   "viewports": [
     {
       "name": "desktop-1920x1080",
@@ -61,7 +61,7 @@
     },
     {
       "level": 2,
-      "text": "Learning the Quran shouldn't depend on where you live"
+      "text": "Learning the Quranshouldn't depend onwhere you live"
     },
     {
       "level": 2,
