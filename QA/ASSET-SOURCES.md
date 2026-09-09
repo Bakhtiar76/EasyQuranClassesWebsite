@@ -25,3 +25,45 @@ Full-resolution source files are retained as `local/media-staging/*-source.jpg` 
 Reproduce optimized assets: `wp --user=1 eval-file /tools/06-media.php prepare` in the local Docker runner, inspect `/backups/design-media`, then copy the exports to `local/media-staging`. `wp --user=1 eval-file /tools/06-media.php` imports missing files or updates changed files in place and regenerates attachment sizes. Bootstrap invokes that same synchronization step. Source images are never downloaded at runtime.
 
 Twitter bird source: https://raw.githubusercontent.com/simple-icons/simple-icons/9.21.0/icons/twitter.svg (Simple Icons9.21.0, CC0), vendored as tools/graphics/twitter-reference.svg to reproduce the supplied reference rather than substituting the X glyph.
+
+`tools/graphics/reference/icons/` holds 98 crops of every icon, brand mark and
+ornament visible in the client's design screenshots (`Assests/*.jpeg`), cut at
+native resolution with a manifest recording each one's exact source rectangle.
+Same provenance as the screenshots themselves — client-supplied local design
+reference, not published by the site and not shipped in any release; they
+exist to check a generated symbol against what the client actually drew.
+
+**Client-supplied vector artwork (2026-09-09).** Six icons
+(`graduation-cap-filled`, `graduate`, `people-pair`, `rehal-quran`,
+`presenter`, `target-arrow`) and one corner ornament
+(`assets/svg/corner-ornament.svg`, delivered as
+`islamic_ornament_clean_vector.svg`) were supplied by the client rather than
+drawn for the project. Originals are kept unmodified in
+`tools/graphics/source-icons/supplied-original/`; the working copies differ
+only in having gradient fills replaced with `currentColor` and their viewBox
+tightened, both recorded in `tools/graphics/source-icons/README.md`. Same
+provenance and rights position as the rest of the client's supplied artwork:
+client-provided, ownership/release rights require client confirmation.
+
+**Icon provenance after the 2026-09-09 reference audit.** The sprite holds 57
+symbols from four sources — the six supplied above, plus three below. 16 remain [Lucide](https://lucide.dev) (ISC) —
+each was rendered beside the matching client screenshot and kept only where it
+matched. 5 are Simple Icons (CC0) brand marks. The remaining 36 are
+**project-owned geometry**, authored in `build-icon-sprite.mjs` and
+`lib/icon-shapes.mjs` from circles, polygons, arcs and closed-form star/rosette
+maths on the shared 24px grid. None of it is traced from, derived from, or
+filled over a third-party icon: where a Lucide icon was wrong it was removed
+from the map and redrawn, not edited. Reference for the drawings is the
+client's own screenshots in `Assests/`, cropped to
+`tools/graphics/reference/icons/`. `rehal-quran`, `presenter`, `graduate`,
+`people-pair`, `shield-halved`, `shield-star`, `clipboard-check`,
+`target-arrow`, `quote-bubble` and `rosette-star` have no library counterpart
+at all.
+
+Original filled UI symbols (`person-filled`, `users-filled`, `shield-filled`,
+`graduation-cap-filled`, `certificate-filled`, `quote-filled`, `gift-filled`,
+`map-pin-filled`) were authored for this project in `build-icon-sprite.mjs`.
+They use circles, polygons and curves on the existing 24px grid, without
+third-party tracing or a new dependency. Cream/green contact-sheet inspection
+at 16/24/48px verified transparent cutouts. Reference-specific call sites
+select these symbols; outlines remain available for the reference's other roles.

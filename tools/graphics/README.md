@@ -301,6 +301,11 @@ converge.
 
 ## Icon sprite
 
+Eight original `*-filled` UI variants supplement the outline symbols where
+the reference explicitly shows solid silhouettes. They are authored in the
+same generator on its 24px grid; no additional library is installed. See
+`QA/ASSET-SOURCES.md` and `DESIGN.md` §11 for role selection and provenance.
+
 `build-icon-sprite.mjs` maps every existing `eqc-icon-*` id to a
 [Lucide](https://lucide.dev) (ISC) icon, except the 5 brand marks
 (whatsapp/facebook/twitter/instagram/youtube), which map to
@@ -310,3 +315,50 @@ DESIGN.md §11's one-outline-family rule, since outline-tracing a brand
 mark (the previous WhatsApp glyph) is exactly what read as broken.
 
 The reference uses Twitter's bird mark. Its CC0 Simple Icons9.21.0 source is vendored in twitter-reference.svg; the generator reads it alongside the installed brand icons.
+
+### Where each symbol's geometry comes from
+
+`build-icon-sprite.mjs` now draws from four sources, in this order:
+
+0. **`SUPPLIED`** — hand-supplied vector artwork in `source-icons/`, used for
+   six icons where the supplied drawing is better than anything worth drawing
+   from primitives (`graduation-cap-filled`, `graduate`, `people-pair`,
+   `rehal-quran`, `presenter`, `target-arrow`). It is applied last and
+   *replaces* any same-id symbol built earlier, so the artwork wins rather
+   than colliding. See `source-icons/README.md` for what was normalised and
+   why. Everything below still applies to the other 51.
+
+1. **`LUCIDE_MAP`** — icons where Lucide's drawing was compared with the
+   client's screenshot and matched. An icon leaves this map only when that
+   comparison failed.
+2. **`ORIGINAL_OUTLINE`** — project-owned outline geometry for icons whose
+   Lucide namesake is a different drawing (Lucide's calendar has no date dots,
+   its TrendingUp has no bars, its Headset no boom mic), plus icons no library
+   has at all (`rehal-quran`, `presenter`, `shield-halved`). Same 24px grid and
+   the same 2.1 stroke, so the family still reads as one.
+3. **`FILLED_UI`** — project-owned solid geometry for the roles the design
+   draws filled.
+
+Shared shapes live in `lib/icon-shapes.mjs`, not copied between icons: one
+`bust()` silhouette serves `person-filled`, `users`, `people-pair`,
+`presenter` and `graduate`; one `SHIELD` serves `shield-filled`,
+`shield-halved` and `shield-star`; one `mortarboard()` serves both graduation
+caps and the graduate; one `star5()` serves `star-filled`, `shield-star`,
+`certificate-filled` and `rosette-star`; one `bookOpen()` serves `book-open`,
+`book-open-filled` and `rehal-quran`.
+
+**Flat fills inside an outline symbol must use `stroke-width="0"`, not
+`stroke="none"`.** `none` is the SVG default for `stroke`, so svgo's
+`removeUnknownsAndDefaults` strips it while the fragment is being optimised
+outside its symbol — and the symbol's own 2.1px stroke then lands on details
+meant to be flat, which is what turned the calendar's date dots into blobs.
+
+### Checking a symbol against the client's drawing
+
+`reference/icons/` holds all 98 icons, brand marks and ornaments cut out of
+the client's design screenshots at native resolution, with a labelled contact
+sheet and a manifest giving each one's exact source rectangle. Reference only
+— nothing there ships. Its README also lists the eight roles the design draws
+that the 43-symbol sprite has no equivalent for (`clipboard-check`,
+`target-arrow`, `rehal-quran` and five variants of existing symbols), which is
+the list to work from if any of those sections is built out further.

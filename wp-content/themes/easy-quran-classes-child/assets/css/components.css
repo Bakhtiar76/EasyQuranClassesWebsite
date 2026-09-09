@@ -2005,6 +2005,34 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 
 /* ---------- Pricing section (pricing.jpeg) ---------- */
 
+.eqc-section--pricing { position: relative; isolation: isolate; }
+.eqc-section--pricing > .eqc-container { position: relative; z-index: 1; }
+/* The doubled class outranks Elementor's own `.e-con::before`, which sets
+   `height: max(100% + ..., 100%)` on every container's ::before. That was
+   stretching this square to the full section height, so `contain` sized the
+   ornament to the width but centred it vertically -- the left corner painted
+   halfway down the section instead of in the corner. `height: auto` restores
+   `aspect-ratio` control. ::after is untouched by Elementor and was already
+   correct, which is why only one of the two looked wrong. */
+.eqc-section.eqc-section--pricing::before,
+.eqc-section.eqc-section--pricing::after {
+	content: '';
+	position: absolute;
+	inset: 0 auto auto 0;
+	height: auto;
+	width: min(24%, calc(250 * var(--eqc-u)));
+	aspect-ratio: 1;
+	/* corner-ornament.svg is finished two-tone artwork (cream ground, gold
+	   rules) rather than a silhouette, so it is painted directly instead of
+	   tinting a mask -- a mask can only ever be one flat colour, and the
+	   reference corner is two. */
+	background: url('../svg/corner-ornament.svg') top left / contain no-repeat;
+	opacity: 0.9;
+	pointer-events: none;
+	z-index: 0;
+}
+.eqc-section.eqc-section--pricing::before { left: 0; right: auto; }
+.eqc-section.eqc-section--pricing::after { right: 0; left: auto; scale: -1 1; }
 .eqc-section--pricing .eqc-heading-rule--ornate .eqc-divider-svg { width: calc(160 * var(--eqc-u)); }
 
 /* pricing.jpeg calibrates at s=1.345: its card row and benefits strip both

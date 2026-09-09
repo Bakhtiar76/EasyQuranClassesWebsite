@@ -1,0 +1,1864 @@
+[
+  {
+    "name": "brand-logo-mark",
+    "file": "brand-logo-mark.png",
+    "group": "brand",
+    "source": "Home.jpeg",
+    "bbox": [
+      95,
+      41,
+      170,
+      116
+    ],
+    "size": [
+      75,
+      75
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "header logo lockup"
+  },
+  {
+    "name": "gift",
+    "file": "gift.png",
+    "group": "ui",
+    "source": "Home.jpeg",
+    "bbox": [
+      1085,
+      65,
+      1114,
+      94
+    ],
+    "size": [
+      29,
+      29
+    ],
+    "polarity": "light",
+    "clipped": false,
+    "where": "header FREE TRIAL button"
+  },
+  {
+    "name": "users-pill",
+    "file": "users-pill.png",
+    "group": "ui",
+    "source": "Home.jpeg",
+    "bbox": [
+      113,
+      203,
+      138,
+      227
+    ],
+    "size": [
+      25,
+      24
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "hero trust pill"
+  },
+  {
+    "name": "person",
+    "file": "person.png",
+    "group": "ui",
+    "source": "Home.jpeg",
+    "bbox": [
+      122,
+      529,
+      150,
+      558
+    ],
+    "size": [
+      28,
+      29
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "hero chip 1-to-1 Live Classes"
+  },
+  {
+    "name": "users",
+    "file": "users.png",
+    "group": "ui",
+    "source": "Home.jpeg",
+    "bbox": [
+      256,
+      529,
+      291,
+      558
+    ],
+    "size": [
+      35,
+      29
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "hero chip Male & Female Teachers"
+  },
+  {
+    "name": "calendar",
+    "file": "calendar.png",
+    "group": "ui",
+    "source": "Home.jpeg",
+    "bbox": [
+      405,
+      528,
+      435,
+      559
+    ],
+    "size": [
+      30,
+      31
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "hero chip Flexible Schedule"
+  },
+  {
+    "name": "chart-up",
+    "file": "chart-up.png",
+    "group": "ui",
+    "source": "Home.jpeg",
+    "bbox": [
+      533,
+      529,
+      561,
+      558
+    ],
+    "size": [
+      28,
+      29
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "hero chip Progress Tracking"
+  },
+  {
+    "name": "calendar-on-button",
+    "file": "calendar-on-button.png",
+    "group": "ui",
+    "source": "Home.jpeg",
+    "bbox": [
+      143,
+      617,
+      172,
+      647
+    ],
+    "size": [
+      29,
+      30
+    ],
+    "polarity": "light",
+    "clipped": false,
+    "where": "hero Book Free Trial button"
+  },
+  {
+    "name": "whatsapp",
+    "file": "whatsapp.png",
+    "group": "brand",
+    "source": "Home.jpeg",
+    "bbox": [
+      361,
+      617,
+      390,
+      647
+    ],
+    "size": [
+      29,
+      30
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "hero Chat on WhatsApp button"
+  },
+  {
+    "name": "star",
+    "file": "star.png",
+    "group": "ui",
+    "source": "Home.jpeg",
+    "bbox": [
+      307,
+      693,
+      328,
+      713
+    ],
+    "size": [
+      21,
+      20
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "hero rating, single star"
+  },
+  {
+    "name": "star-rating-row",
+    "file": "star-rating-row.png",
+    "group": "ui",
+    "source": "Home.jpeg",
+    "bbox": [
+      307,
+      692,
+      417,
+      713
+    ],
+    "size": [
+      110,
+      21
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "hero 5-star rating row"
+  },
+  {
+    "name": "shield-check",
+    "file": "shield-check.png",
+    "group": "ui",
+    "source": "Home.jpeg",
+    "bbox": [
+      155,
+      793,
+      199,
+      843
+    ],
+    "size": [
+      44,
+      50
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "trust bar Safe & Secure Learning"
+  },
+  {
+    "name": "headset",
+    "file": "headset.png",
+    "group": "ui",
+    "source": "Home.jpeg",
+    "bbox": [
+      423,
+      793,
+      471,
+      840
+    ],
+    "size": [
+      48,
+      47
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "trust bar Support 7 Days A Week"
+  },
+  {
+    "name": "globe",
+    "file": "globe.png",
+    "group": "ui",
+    "source": "Home.jpeg",
+    "bbox": [
+      686,
+      793,
+      732,
+      840
+    ],
+    "size": [
+      46,
+      47
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "trust bar Students from 20+ Countries"
+  },
+  {
+    "name": "certificate",
+    "file": "certificate.png",
+    "group": "ui",
+    "source": "Home.jpeg",
+    "bbox": [
+      955,
+      793,
+      1004,
+      840
+    ],
+    "size": [
+      49,
+      47
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "trust bar Certificates Available"
+  },
+  {
+    "name": "ornament-rosette-8",
+    "file": "ornament-rosette-8.png",
+    "group": "ornament",
+    "source": "Home2.jpeg",
+    "bbox": [
+      1101,
+      45,
+      1143,
+      88
+    ],
+    "size": [
+      42,
+      43
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "about heading top divider"
+  },
+  {
+    "name": "ornament-diamond",
+    "file": "ornament-diamond.png",
+    "group": "ornament",
+    "source": "Home2.jpeg",
+    "bbox": [
+      1110,
+      334,
+      1134,
+      362
+    ],
+    "size": [
+      24,
+      28
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "about heading lower divider"
+  },
+  {
+    "name": "stat-students",
+    "file": "stat-students.png",
+    "group": "ui",
+    "source": "Home2.jpeg",
+    "bbox": [
+      889,
+      634,
+      943,
+      679
+    ],
+    "size": [
+      54,
+      45
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "about stat Students Taught"
+  },
+  {
+    "name": "stat-globe",
+    "file": "stat-globe.png",
+    "group": "ui",
+    "source": "Home2.jpeg",
+    "bbox": [
+      1100,
+      633,
+      1148,
+      680
+    ],
+    "size": [
+      48,
+      47
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "about stat Countries Served"
+  },
+  {
+    "name": "stat-book-open",
+    "file": "stat-book-open.png",
+    "group": "ui",
+    "source": "Home2.jpeg",
+    "bbox": [
+      1311,
+      637,
+      1362,
+      678
+    ],
+    "size": [
+      51,
+      41
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "about stat Private Quran Lessons"
+  },
+  {
+    "name": "arrow-right-disc-light",
+    "file": "arrow-right-disc-light.png",
+    "group": "composed",
+    "source": "Home2.jpeg",
+    "bbox": [
+      862,
+      796,
+      908,
+      841
+    ],
+    "size": [
+      46,
+      45
+    ],
+    "polarity": "light",
+    "clipped": false,
+    "where": "about More About Us button disc"
+  },
+  {
+    "name": "arrow-right",
+    "file": "arrow-right.png",
+    "group": "ui",
+    "source": "Home2.jpeg",
+    "bbox": [
+      872,
+      808,
+      896,
+      829
+    ],
+    "size": [
+      24,
+      21
+    ],
+    "polarity": "dark",
+    "clipped": true,
+    "where": "about More About Us arrow glyph"
+  },
+  {
+    "name": "phone-call",
+    "file": "phone-call.png",
+    "group": "ui",
+    "source": "Home2.jpeg",
+    "bbox": [
+      1133,
+      804,
+      1163,
+      833
+    ],
+    "size": [
+      30,
+      29
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "about Call Any Time button"
+  },
+  {
+    "name": "book-open",
+    "file": "book-open.png",
+    "group": "ui",
+    "source": "courses.jpeg",
+    "bbox": [
+      64,
+      44,
+      105,
+      75
+    ],
+    "size": [
+      41,
+      31
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "courses eyebrow OUR COURSES"
+  },
+  {
+    "name": "ornament-rosette-section",
+    "file": "ornament-rosette-section.png",
+    "group": "ornament",
+    "source": "courses.jpeg",
+    "bbox": [
+      227,
+      235,
+      266,
+      274
+    ],
+    "size": [
+      39,
+      39
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "courses section divider centre"
+  },
+  {
+    "name": "ornament-diamond-cap",
+    "file": "ornament-diamond-cap.png",
+    "group": "ornament",
+    "source": "courses.jpeg",
+    "bbox": [
+      65,
+      248,
+      79,
+      261
+    ],
+    "size": [
+      14,
+      13
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "courses divider rule end cap"
+  },
+  {
+    "name": "ornament-rosette-card",
+    "file": "ornament-rosette-card.png",
+    "group": "ornament",
+    "source": "courses.jpeg",
+    "bbox": [
+      225,
+      422,
+      246,
+      443
+    ],
+    "size": [
+      21,
+      21
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "course card mini divider"
+  },
+  {
+    "name": "arrow-right-ring",
+    "file": "arrow-right-ring.png",
+    "group": "composed",
+    "source": "courses.jpeg",
+    "bbox": [
+      359,
+      498,
+      412,
+      551
+    ],
+    "size": [
+      53,
+      53
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "course card CTA, arrow in ring"
+  },
+  {
+    "name": "ornament-rosette-closing",
+    "file": "ornament-rosette-closing.png",
+    "group": "ornament",
+    "source": "courses.jpeg",
+    "bbox": [
+      613,
+      891,
+      667,
+      945
+    ],
+    "size": [
+      54,
+      54
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "courses closing divider"
+  },
+  {
+    "name": "ornament-number-badge",
+    "file": "ornament-number-badge.png",
+    "group": "composed",
+    "source": "courses.jpeg",
+    "bbox": [
+      83,
+      308,
+      140,
+      369
+    ],
+    "size": [
+      57,
+      61
+    ],
+    "polarity": "manual",
+    "clipped": false,
+    "where": "course card number badge"
+  },
+  {
+    "name": "ornament-girih-corner",
+    "file": "ornament-girih-corner.png",
+    "group": "ornament",
+    "source": "courses.jpeg",
+    "bbox": [
+      1077,
+      4,
+      1287,
+      215
+    ],
+    "size": [
+      210,
+      211
+    ],
+    "polarity": "dark",
+    "clipped": true,
+    "where": "courses corner watermark"
+  },
+  {
+    "name": "users-filled",
+    "file": "users-filled.png",
+    "group": "ui",
+    "source": "Teachers.jpeg",
+    "bbox": [
+      59,
+      71,
+      90,
+      98
+    ],
+    "size": [
+      31,
+      27
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "teachers eyebrow OUR QUALIFIED TEACHERS"
+  },
+  {
+    "name": "ornament-gear-accent",
+    "file": "ornament-gear-accent.png",
+    "group": "ornament",
+    "source": "Teachers.jpeg",
+    "bbox": [
+      47,
+      350,
+      71,
+      373
+    ],
+    "size": [
+      24,
+      23
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "teachers heading rule accent"
+  },
+  {
+    "name": "graduation-cap-filled",
+    "file": "graduation-cap-filled.png",
+    "group": "ui",
+    "source": "Teachers.jpeg",
+    "bbox": [
+      61,
+      550,
+      98,
+      582
+    ],
+    "size": [
+      37,
+      32
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "teachers feature Qualified & Experienced"
+  },
+  {
+    "name": "person-filled",
+    "file": "person-filled.png",
+    "group": "ui",
+    "source": "Teachers.jpeg",
+    "bbox": [
+      63,
+      625,
+      97,
+      662
+    ],
+    "size": [
+      34,
+      37
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "teachers feature 1-to-1 Personalized Classes"
+  },
+  {
+    "name": "shield-check-filled",
+    "file": "shield-check-filled.png",
+    "group": "ui",
+    "source": "Teachers.jpeg",
+    "bbox": [
+      64,
+      701,
+      96,
+      738
+    ],
+    "size": [
+      32,
+      37
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "teachers feature Safe & Supportive Environment"
+  },
+  {
+    "name": "chevron-left",
+    "file": "chevron-left.png",
+    "group": "ui",
+    "source": "Teachers.jpeg",
+    "bbox": [
+      65,
+      798,
+      81,
+      821
+    ],
+    "size": [
+      16,
+      23
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "teachers carousel previous button"
+  },
+  {
+    "name": "chevron-right",
+    "file": "chevron-right.png",
+    "group": "ui",
+    "source": "Teachers.jpeg",
+    "bbox": [
+      123,
+      798,
+      139,
+      821
+    ],
+    "size": [
+      16,
+      23
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "teachers carousel next button"
+  },
+  {
+    "name": "arrow-right-on-dark",
+    "file": "arrow-right-on-dark.png",
+    "group": "ui",
+    "source": "Teachers.jpeg",
+    "bbox": [
+      361,
+      789,
+      401,
+      829
+    ],
+    "size": [
+      40,
+      40
+    ],
+    "polarity": "dark",
+    "clipped": true,
+    "where": "teachers View All Teachers arrow glyph"
+  },
+  {
+    "name": "book-open-medallion",
+    "file": "book-open-medallion.png",
+    "group": "composed",
+    "source": "Teachers.jpeg",
+    "bbox": [
+      574,
+      345,
+      635,
+      405
+    ],
+    "size": [
+      61,
+      60
+    ],
+    "polarity": "manual",
+    "clipped": false,
+    "where": "teacher card portrait medallion"
+  },
+  {
+    "name": "book-open-gold",
+    "file": "book-open-gold.png",
+    "group": "ui",
+    "source": "Teachers.jpeg",
+    "bbox": [
+      589,
+      360,
+      621,
+      387
+    ],
+    "size": [
+      32,
+      27
+    ],
+    "polarity": "light",
+    "clipped": false,
+    "where": "teacher medallion glyph"
+  },
+  {
+    "name": "certificate-person",
+    "file": "certificate-person.png",
+    "group": "ui",
+    "source": "Teachers.jpeg",
+    "bbox": [
+      499,
+      593,
+      517,
+      616
+    ],
+    "size": [
+      18,
+      23
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "teacher fact, years experience"
+  },
+  {
+    "name": "graduation-cap",
+    "file": "graduation-cap.png",
+    "group": "ui",
+    "source": "Teachers.jpeg",
+    "bbox": [
+      497,
+      639,
+      518,
+      658
+    ],
+    "size": [
+      21,
+      19
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "teacher fact, Tajweed Certified"
+  },
+  {
+    "name": "users-small",
+    "file": "users-small.png",
+    "group": "ui",
+    "source": "Teachers.jpeg",
+    "bbox": [
+      497,
+      684,
+      519,
+      704
+    ],
+    "size": [
+      22,
+      20
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "teacher fact, expertise"
+  },
+  {
+    "name": "chevron-right-ring",
+    "file": "chevron-right-ring.png",
+    "group": "composed",
+    "source": "Teachers.jpeg",
+    "bbox": [
+      659,
+      751,
+      709,
+      801
+    ],
+    "size": [
+      50,
+      50
+    ],
+    "polarity": "dark",
+    "clipped": true,
+    "where": "teacher card View Profile"
+  },
+  {
+    "name": "ornament-rosette-eyebrow",
+    "file": "ornament-rosette-eyebrow.png",
+    "group": "ornament",
+    "source": "pricing.jpeg",
+    "bbox": [
+      715,
+      45,
+      739,
+      68
+    ],
+    "size": [
+      24,
+      23
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "pricing eyebrow pill motif"
+  },
+  {
+    "name": "ornament-diamond-pricing",
+    "file": "ornament-diamond-pricing.png",
+    "group": "ornament",
+    "source": "pricing.jpeg",
+    "bbox": [
+      789,
+      239,
+      815,
+      266
+    ],
+    "size": [
+      26,
+      27
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "pricing heading divider"
+  },
+  {
+    "name": "pricing-medallion",
+    "file": "pricing-medallion.png",
+    "group": "composed",
+    "source": "pricing.jpeg",
+    "bbox": [
+      161,
+      269,
+      266,
+      380
+    ],
+    "size": [
+      105,
+      111
+    ],
+    "polarity": "manual",
+    "clipped": false,
+    "where": "pricing card medallion, whole"
+  },
+  {
+    "name": "calendar-gold",
+    "file": "calendar-gold.png",
+    "group": "ui",
+    "source": "pricing.jpeg",
+    "bbox": [
+      195,
+      299,
+      240,
+      347
+    ],
+    "size": [
+      45,
+      48
+    ],
+    "polarity": "light",
+    "clipped": true,
+    "where": "pricing card medallion glyph"
+  },
+  {
+    "name": "ornament-bullet-rosette",
+    "file": "ornament-bullet-rosette.png",
+    "group": "ornament",
+    "source": "pricing.jpeg",
+    "bbox": [
+      90,
+      460,
+      116,
+      486
+    ],
+    "size": [
+      26,
+      26
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "pricing list bullet"
+  },
+  {
+    "name": "ornament-diamond-price",
+    "file": "ornament-diamond-price.png",
+    "group": "ornament",
+    "source": "pricing.jpeg",
+    "bbox": [
+      208,
+      623,
+      227,
+      641
+    ],
+    "size": [
+      19,
+      18
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "pricing divider above price"
+  },
+  {
+    "name": "arrow-right-disc",
+    "file": "arrow-right-disc.png",
+    "group": "composed",
+    "source": "pricing.jpeg",
+    "bbox": [
+      301,
+      652,
+      357,
+      708
+    ],
+    "size": [
+      56,
+      56
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "pricing card CTA disc"
+  },
+  {
+    "name": "arrow-right-white",
+    "file": "arrow-right-white.png",
+    "group": "ui",
+    "source": "pricing.jpeg",
+    "bbox": [
+      316,
+      668,
+      342,
+      691
+    ],
+    "size": [
+      26,
+      23
+    ],
+    "polarity": "light",
+    "clipped": false,
+    "where": "pricing card CTA arrow glyph"
+  },
+  {
+    "name": "recommended-rosette",
+    "file": "recommended-rosette.png",
+    "group": "ui",
+    "source": "pricing.jpeg",
+    "bbox": [
+      1333,
+      247,
+      1363,
+      277
+    ],
+    "size": [
+      30,
+      30
+    ],
+    "polarity": "light",
+    "clipped": true,
+    "where": "RECOMMENDED badge motif"
+  },
+  {
+    "name": "sparkle-4pt",
+    "file": "sparkle-4pt.png",
+    "group": "ornament",
+    "source": "pricing.jpeg",
+    "bbox": [
+      1218,
+      286,
+      1244,
+      316
+    ],
+    "size": [
+      26,
+      30
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "featured card sparkle"
+  },
+  {
+    "name": "ornament-corner-frame",
+    "file": "ornament-corner-frame.png",
+    "group": "ornament",
+    "source": "pricing.jpeg",
+    "bbox": [
+      3,
+      6,
+      239,
+      239
+    ],
+    "size": [
+      236,
+      233
+    ],
+    "polarity": "dark",
+    "clipped": true,
+    "where": "pricing section corner frame"
+  },
+  {
+    "name": "trust-people-framed",
+    "file": "trust-people-framed.png",
+    "group": "composed",
+    "source": "pricing.jpeg",
+    "bbox": [
+      137,
+      774,
+      230,
+      866
+    ],
+    "size": [
+      93,
+      92
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "pricing trust Qualified Male & Female Tutors"
+  },
+  {
+    "name": "trust-rehal-framed",
+    "file": "trust-rehal-framed.png",
+    "group": "composed",
+    "source": "pricing.jpeg",
+    "bbox": [
+      521,
+      773,
+      616,
+      866
+    ],
+    "size": [
+      95,
+      93
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "pricing trust One-on-One Live Classes"
+  },
+  {
+    "name": "trust-clock-framed",
+    "file": "trust-clock-framed.png",
+    "group": "composed",
+    "source": "pricing.jpeg",
+    "bbox": [
+      854,
+      774,
+      947,
+      866
+    ],
+    "size": [
+      93,
+      92
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "pricing trust Flexible Schedule"
+  },
+  {
+    "name": "trust-shield-framed",
+    "file": "trust-shield-framed.png",
+    "group": "composed",
+    "source": "pricing.jpeg",
+    "bbox": [
+      1149,
+      774,
+      1241,
+      866
+    ],
+    "size": [
+      92,
+      92
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "pricing trust Safe & Supportive Learning"
+  },
+  {
+    "name": "people-pair",
+    "file": "people-pair.png",
+    "group": "ui",
+    "source": "pricing.jpeg",
+    "bbox": [
+      160,
+      796,
+      209,
+      844
+    ],
+    "size": [
+      49,
+      48
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "pricing trust glyph, two people"
+  },
+  {
+    "name": "rehal-quran",
+    "file": "rehal-quran.png",
+    "group": "ui",
+    "source": "pricing.jpeg",
+    "bbox": [
+      539,
+      796,
+      599,
+      849
+    ],
+    "size": [
+      60,
+      53
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "pricing trust glyph, Quran on a stand"
+  },
+  {
+    "name": "clock",
+    "file": "clock.png",
+    "group": "ui",
+    "source": "pricing.jpeg",
+    "bbox": [
+      875,
+      794,
+      928,
+      847
+    ],
+    "size": [
+      53,
+      53
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "pricing trust glyph, clock"
+  },
+  {
+    "name": "shield-star",
+    "file": "shield-star.png",
+    "group": "ui",
+    "source": "pricing.jpeg",
+    "bbox": [
+      1173,
+      794,
+      1218,
+      848
+    ],
+    "size": [
+      45,
+      54
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "pricing trust glyph, shield with star"
+  },
+  {
+    "name": "quote-bubble",
+    "file": "quote-bubble.png",
+    "group": "ui",
+    "source": "Reviews.jpeg",
+    "bbox": [
+      613,
+      21,
+      656,
+      65
+    ],
+    "size": [
+      43,
+      44
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "testimonials eyebrow WHAT OUR FAMILIES SAY"
+  },
+  {
+    "name": "ornament-rosette-reviews",
+    "file": "ornament-rosette-reviews.png",
+    "group": "ornament",
+    "source": "Reviews.jpeg",
+    "bbox": [
+      767,
+      212,
+      805,
+      250
+    ],
+    "size": [
+      38,
+      38
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "testimonials heading divider"
+  },
+  {
+    "name": "quote-badge",
+    "file": "quote-badge.png",
+    "group": "composed",
+    "source": "Reviews.jpeg",
+    "bbox": [
+      329,
+      414,
+      384,
+      467
+    ],
+    "size": [
+      55,
+      53
+    ],
+    "polarity": "manual",
+    "clipped": false,
+    "where": "testimonial avatar quote badge"
+  },
+  {
+    "name": "quote-mark",
+    "file": "quote-mark.png",
+    "group": "ui",
+    "source": "Reviews.jpeg",
+    "bbox": [
+      341,
+      429,
+      370,
+      452
+    ],
+    "size": [
+      29,
+      23
+    ],
+    "polarity": "light",
+    "clipped": false,
+    "where": "testimonial quote glyph"
+  },
+  {
+    "name": "map-pin-filled",
+    "file": "map-pin-filled.png",
+    "group": "ui",
+    "source": "Reviews.jpeg",
+    "bbox": [
+      209,
+      530,
+      227,
+      552
+    ],
+    "size": [
+      18,
+      22
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "testimonial location pin"
+  },
+  {
+    "name": "ornament-dot-rule",
+    "file": "ornament-dot-rule.png",
+    "group": "ornament",
+    "source": "Reviews.jpeg",
+    "bbox": [
+      274,
+      563,
+      296,
+      577
+    ],
+    "size": [
+      22,
+      14
+    ],
+    "polarity": "dark",
+    "clipped": true,
+    "where": "testimonial hairline dot"
+  },
+  {
+    "name": "graduation-cap-outline",
+    "file": "graduation-cap-outline.png",
+    "group": "ui",
+    "source": "Reviews.jpeg",
+    "bbox": [
+      116,
+      709,
+      147,
+      749
+    ],
+    "size": [
+      31,
+      40
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "testimonial tag Expert Tutors"
+  },
+  {
+    "name": "clipboard-check",
+    "file": "clipboard-check.png",
+    "group": "ui",
+    "source": "Reviews.jpeg",
+    "bbox": [
+      255,
+      712,
+      286,
+      747
+    ],
+    "size": [
+      31,
+      35
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "testimonial tag Monthly Tracking"
+  },
+  {
+    "name": "target-arrow",
+    "file": "target-arrow.png",
+    "group": "ui",
+    "source": "Reviews.jpeg",
+    "bbox": [
+      402,
+      713,
+      436,
+      747
+    ],
+    "size": [
+      34,
+      34
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "testimonial tag Personalised Focus"
+  },
+  {
+    "name": "carousel-dots",
+    "file": "carousel-dots.png",
+    "group": "ui",
+    "source": "Reviews.jpeg",
+    "bbox": [
+      734,
+      815,
+      834,
+      840
+    ],
+    "size": [
+      100,
+      25
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "testimonials carousel dots"
+  },
+  {
+    "name": "megaphone",
+    "file": "megaphone.png",
+    "group": "ui",
+    "source": "Blogs.jpeg",
+    "bbox": [
+      190,
+      90,
+      222,
+      118
+    ],
+    "size": [
+      32,
+      28
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "blog eyebrow LATEST NEWS"
+  },
+  {
+    "name": "chevron-left-circle",
+    "file": "chevron-left-circle.png",
+    "group": "ui",
+    "source": "Blogs.jpeg",
+    "bbox": [
+      1394,
+      159,
+      1409,
+      180
+    ],
+    "size": [
+      15,
+      21
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "blog carousel previous"
+  },
+  {
+    "name": "chevron-right-circle",
+    "file": "chevron-right-circle.png",
+    "group": "composed",
+    "source": "Blogs.jpeg",
+    "bbox": [
+      1439,
+      144,
+      1490,
+      196
+    ],
+    "size": [
+      51,
+      52
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "blog carousel next"
+  },
+  {
+    "name": "chevron-right-white",
+    "file": "chevron-right-white.png",
+    "group": "ui",
+    "source": "Blogs.jpeg",
+    "bbox": [
+      1459,
+      159,
+      1473,
+      180
+    ],
+    "size": [
+      14,
+      21
+    ],
+    "polarity": "light",
+    "clipped": false,
+    "where": "blog carousel next glyph"
+  },
+  {
+    "name": "calendar-outline",
+    "file": "calendar-outline.png",
+    "group": "ui",
+    "source": "Blogs.jpeg",
+    "bbox": [
+      148,
+      314,
+      176,
+      343
+    ],
+    "size": [
+      28,
+      29
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "blog card date badge"
+  },
+  {
+    "name": "chevrons-right-disc",
+    "file": "chevrons-right-disc.png",
+    "group": "composed",
+    "source": "Blogs.jpeg",
+    "bbox": [
+      479,
+      741,
+      515,
+      777
+    ],
+    "size": [
+      36,
+      36
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "blog card Read More disc"
+  },
+  {
+    "name": "chevrons-right",
+    "file": "chevrons-right.png",
+    "group": "ui",
+    "source": "Blogs.jpeg",
+    "bbox": [
+      490,
+      750,
+      506,
+      768
+    ],
+    "size": [
+      16,
+      18
+    ],
+    "polarity": "light",
+    "clipped": false,
+    "where": "blog card Read More glyph"
+  },
+  {
+    "name": "carousel-dots-pill",
+    "file": "carousel-dots-pill.png",
+    "group": "ui",
+    "source": "Blogs.jpeg",
+    "bbox": [
+      741,
+      829,
+      853,
+      846
+    ],
+    "size": [
+      112,
+      17
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "blog carousel dots with active pill"
+  },
+  {
+    "name": "seal-book-eyebrow",
+    "file": "seal-book-eyebrow.png",
+    "group": "composed",
+    "source": "End.jpeg",
+    "bbox": [
+      103,
+      83,
+      151,
+      133
+    ],
+    "size": [
+      48,
+      50
+    ],
+    "polarity": "light",
+    "clipped": false,
+    "where": "final CTA eyebrow seal"
+  },
+  {
+    "name": "chevrons-right-on-gold",
+    "file": "chevrons-right-on-gold.png",
+    "group": "ui",
+    "source": "End.jpeg",
+    "bbox": [
+      1130,
+      300,
+      1151,
+      320
+    ],
+    "size": [
+      21,
+      20
+    ],
+    "polarity": "light",
+    "clipped": false,
+    "where": "final CTA Book My Free Trial Class"
+  },
+  {
+    "name": "brand-logo-mark-footer",
+    "file": "brand-logo-mark-footer.png",
+    "group": "brand",
+    "source": "End.jpeg",
+    "bbox": [
+      102,
+      509,
+      171,
+      585
+    ],
+    "size": [
+      69,
+      76
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "footer logo lockup mark"
+  },
+  {
+    "name": "facebook",
+    "file": "facebook.png",
+    "group": "brand",
+    "source": "End.jpeg",
+    "bbox": [
+      117,
+      780,
+      135,
+      809
+    ],
+    "size": [
+      18,
+      29
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "footer social Facebook"
+  },
+  {
+    "name": "twitter",
+    "file": "twitter.png",
+    "group": "brand",
+    "source": "End.jpeg",
+    "bbox": [
+      181,
+      782,
+      208,
+      807
+    ],
+    "size": [
+      27,
+      25
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "footer social Twitter"
+  },
+  {
+    "name": "instagram",
+    "file": "instagram.png",
+    "group": "brand",
+    "source": "End.jpeg",
+    "bbox": [
+      249,
+      780,
+      277,
+      809
+    ],
+    "size": [
+      28,
+      29
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "footer social Instagram"
+  },
+  {
+    "name": "youtube",
+    "file": "youtube.png",
+    "group": "brand",
+    "source": "End.jpeg",
+    "bbox": [
+      318,
+      783,
+      348,
+      806
+    ],
+    "size": [
+      30,
+      23
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "footer social YouTube"
+  },
+  {
+    "name": "social-ring",
+    "file": "social-ring.png",
+    "group": "composed",
+    "source": "End.jpeg",
+    "bbox": [
+      98,
+      773,
+      152,
+      822
+    ],
+    "size": [
+      54,
+      49
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "footer social ring, whole"
+  },
+  {
+    "name": "map-pin-disc",
+    "file": "map-pin-disc.png",
+    "group": "composed",
+    "source": "End.jpeg",
+    "bbox": [
+      544,
+      605,
+      595,
+      655
+    ],
+    "size": [
+      51,
+      50
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "footer contact address"
+  },
+  {
+    "name": "map-pin-on-dark",
+    "file": "map-pin-on-dark.png",
+    "group": "ui",
+    "source": "End.jpeg",
+    "bbox": [
+      558,
+      616,
+      581,
+      644
+    ],
+    "size": [
+      23,
+      28
+    ],
+    "polarity": "light",
+    "clipped": false,
+    "where": "footer contact address glyph"
+  },
+  {
+    "name": "phone-disc",
+    "file": "phone-disc.png",
+    "group": "composed",
+    "source": "End.jpeg",
+    "bbox": [
+      544,
+      681,
+      595,
+      731
+    ],
+    "size": [
+      51,
+      50
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "footer contact phone"
+  },
+  {
+    "name": "phone-on-dark",
+    "file": "phone-on-dark.png",
+    "group": "ui",
+    "source": "End.jpeg",
+    "bbox": [
+      556,
+      693,
+      583,
+      719
+    ],
+    "size": [
+      27,
+      26
+    ],
+    "polarity": "light",
+    "clipped": false,
+    "where": "footer contact phone glyph"
+  },
+  {
+    "name": "mail-disc",
+    "file": "mail-disc.png",
+    "group": "composed",
+    "source": "End.jpeg",
+    "bbox": [
+      544,
+      748,
+      595,
+      800
+    ],
+    "size": [
+      51,
+      52
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "footer contact email"
+  },
+  {
+    "name": "mail-on-dark",
+    "file": "mail-on-dark.png",
+    "group": "ui",
+    "source": "End.jpeg",
+    "bbox": [
+      556,
+      763,
+      583,
+      786
+    ],
+    "size": [
+      27,
+      23
+    ],
+    "polarity": "light",
+    "clipped": false,
+    "where": "footer contact email glyph"
+  },
+  {
+    "name": "chevron-right-link",
+    "file": "chevron-right-link.png",
+    "group": "ui",
+    "source": "End.jpeg",
+    "bbox": [
+      952,
+      611,
+      965,
+      629
+    ],
+    "size": [
+      13,
+      18
+    ],
+    "polarity": "dark",
+    "clipped": false,
+    "where": "footer quick-links bullet"
+  },
+  {
+    "name": "footer-seal",
+    "file": "footer-seal.png",
+    "group": "composed",
+    "source": "End.jpeg",
+    "bbox": [
+      711,
+      836,
+      778,
+      902
+    ],
+    "size": [
+      67,
+      66
+    ],
+    "polarity": "manual",
+    "clipped": false,
+    "where": "footer bottom seal"
+  }
+]

@@ -97,12 +97,20 @@ defined( 'ABSPATH' ) || exit;
 							'instagram' => __( 'Instagram', 'easy-quran-classes' ),
 							'youtube'   => __( 'YouTube', 'easy-quran-classes' ),
 						);
+						/*
+						 * The reference footer sets Facebook as the bare "f",
+						 * inside the shared gold ring the other three sit in;
+						 * the Simple Icons brand mark is the f-in-a-circle,
+						 * which would double that ring. `facebook` keeps the
+						 * official mark for anywhere it is wanted whole.
+						 */
+						$eqc_social_icons = array( 'facebook' => 'facebook-f' );
 						foreach ( $eqc_socials as $eqc_network => $eqc_network_label ) :
 							$eqc_social_href = eqc_social_url( 'eqc_social_' . $eqc_network );
 							if ( $eqc_social_href ) :
 								?>
 								<a class="eqc-social-icon" href="<?php echo esc_url( $eqc_social_href ); ?>" target="_blank" rel="noopener noreferrer">
-									<?php eqc_icon( $eqc_network ); ?>
+									<?php eqc_icon( isset( $eqc_social_icons[ $eqc_network ] ) ? $eqc_social_icons[ $eqc_network ] : $eqc_network ); ?>
 									<span class="eqc-visually-hidden"><?php echo esc_html( $eqc_network_label ); ?></span>
 								</a>
 							<?php else : ?>
@@ -117,7 +125,7 @@ defined( 'ABSPATH' ) || exit;
 								 */
 								?>
 								<span class="eqc-social-icon eqc-social-icon--pending">
-									<?php eqc_icon( $eqc_network ); ?>
+									<?php eqc_icon( isset( $eqc_social_icons[ $eqc_network ] ) ? $eqc_social_icons[ $eqc_network ] : $eqc_network ); ?>
 									<span class="eqc-visually-hidden">
 										<?php
 										/* translators: %s: social network name. */
