@@ -445,9 +445,9 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 .eqc-card--course > * { position: relative; z-index: 1; }
 .eqc-card--course h3 { margin-block: 0.6em 0.1em; }
 .eqc-card--course .eqc-card-level {
-	color: var(--eqc-bronze-700);
+	color: var(--eqc-text);
 	font-size: var(--eqc-fs-small);
-	font-weight: 700;
+	font-weight: 500;
 }
 .eqc-card--course p { margin-block: 0.8em; }
 /* Small centered rosette rule under the level label, matching the
@@ -1937,20 +1937,21 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 /* Row gap and column gap differ in the reference: columns sit 88u apart,
    but row 1 ends at y571 and row 2 starts at y588 - a 17u row gap. Applying
    the column value to both axes added 71u of dead space between the rows. */
-.eqc-grid--courses { gap: calc(17 * var(--eqc-u)) calc(88 * var(--eqc-u)); }
+.eqc-grid--courses { gap: calc(19.5 * var(--eqc-u)) calc(30 * var(--eqc-u)); }
 .eqc-card--course {
-	min-height: calc(284 * var(--eqc-u));
-	padding: calc(22 * var(--eqc-u)) calc(24 * var(--eqc-u));
+	min-height: calc(274 * var(--eqc-u));
+	padding: calc(26 * var(--eqc-u)) calc(33 * var(--eqc-u));
 	gap: calc(5 * var(--eqc-u));
 }
 .eqc-card--course p { font-size: var(--eqc-fs-body); line-height: 1.55; }
-.eqc-card--course .eqc-card-level { font-size: var(--eqc-fs-small); }
+.eqc-card--course h3 { font-size: var(--eqc-fs-course-title); }
+.eqc-card--course .eqc-card-level { font-size: var(--eqc-fs-h4); }
 .eqc-card--course .eqc-card-divider .eqc-divider-svg { width: calc(113 * var(--eqc-u)); }
 .eqc-card--course .eqc-arrow-btn {
 	width: calc(50 * var(--eqc-u));
 	height: calc(50 * var(--eqc-u));
 }
-.eqc-card--course .eqc-card-index { width: calc(58 * var(--eqc-u)); height: calc(51 * var(--eqc-u)); }
+.eqc-card--course .eqc-card-index { width: calc(49 * var(--eqc-u)); height: calc(49 * var(--eqc-u)); font-size: var(--eqc-fs-card-index); }
 
 /* The section heading block was capped at --eqc-content-narrow (558u), which
    forced the reference's two-line heading onto three lines. Its longest line
@@ -1991,7 +1992,19 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 
 /* The reference pins the course card's arrow to the bottom RIGHT, and pairs
    the index badge with a short rule to its right. */
-.eqc-card--course .eqc-card__foot { align-self: flex-end; }
+/* The arrow sits BESIDE the body, bottom-right, which is what makes the
+   reference card landscape (364 x 281 native = 1.30) rather than portrait.
+   Given a row of its own it added ~65px and turned every card upright. It
+   is decorative -- the whole card is one link (.eqc-card-link) -- so taking
+   it out of flow costs nothing; the body reserves its column via max-width
+   so long copy can never run underneath it. */
+.eqc-card--course .eqc-card__foot {
+	position: absolute;
+	right: calc(20 * var(--eqc-u));
+	bottom: calc(21 * var(--eqc-u));
+	margin: 0;
+}
+.eqc-card--course p { max-width: 73%; }
 .eqc-card--course .eqc-card-index { display: inline-flex; align-items: center; }
 .eqc-card--course .eqc-card-index::after {
 	content: '';

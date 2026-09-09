@@ -118,7 +118,7 @@ $trust = eqc_section(
 				eqc_container(
 					array( 'css_classes' => 'eqc-grid eqc-grid--trust eqc-trust-panel', 'flex_direction' => 'row' ),
 					array(
-						eqc_trust_tile( 'shield', 'Safe & Secure | Learning', "Your child's safety is | our top priority" ),
+						eqc_trust_tile( 'shield-halved', 'Safe & Secure | Learning', "Your child's safety is | our top priority" ),
 						eqc_trust_tile( 'headset', 'Support 7 Days | A Week', "We're here to help | anytime you need" ),
 						// "20+ Countries" is an unverified client claim - register entry.
 						eqc_trust_tile( 'globe', 'Students from | 20+ Countries', 'A global community | of Quran learners' ),
@@ -170,9 +170,9 @@ $about = eqc_section(
 						eqc_container(
 							array( 'css_classes' => 'eqc-about-text eqc-align-start', 'flex_direction' => 'column' ),
 							array(
-								eqc_html( '<div class="eqc-ornament-rail eqc-about-rail" aria-hidden="true">' . eqc_get_svg_asset( 'rosette' ) . '</div>' ),
+								eqc_html( '<div class="eqc-ornament-rail eqc-about-rail" aria-hidden="true">' . eqc_get_svg_asset( 'rosette-simple' ) . '</div>' ),
 								eqc_heading( "Learning the Quran <br>shouldn't depend on <br>where you live", 'h2', 'eqc-display-heading' ),
-								eqc_html( '<div class="eqc-about-rule">' . eqc_divider_svg( 'card' ) . '</div>' ),
+								eqc_html( '<div class="eqc-about-rule">' . eqc_divider_svg( 'about' ) . '</div>' ),
 								// Copy transcribed verbatim from the reference, including its
 								// em dash and its "Nobody else is in the room" closing pair.
 								eqc_text(
@@ -185,9 +185,9 @@ $about = eqc_section(
 								// are unverified client claims - QA/PLACEHOLDER-REGISTER.md.
 								eqc_html(
 									'<div class="eqc-about-stats">'
-									. eqc_about_stat( 'monitor-play', 'Students Taught', '5,000' )
+									. eqc_about_stat( 'presenter', 'Students Taught', '5,000' )
 									. eqc_about_stat( 'globe', 'Countries Served', '10' )
-									. eqc_about_stat( 'book-open', 'Private Quran Lessons', '1-To-1' )
+									. eqc_about_stat( 'rehal-quran', 'Private Quran Lessons', '1-To-1' )
 									. '</div>'
 								),
 								eqc_container(
@@ -220,7 +220,7 @@ foreach ( $course_data as $i => $c ) {
 	$course_cards[] = eqc_course_card( $c[0], $c[1], '(' . $c[2] . ')', $c[3], $trial_url, $i );
 }
 $courses = eqc_section(
-	'eqc-section eqc-section--surface eqc-section--ornamented',
+	'eqc-section eqc-section--courses eqc-section--surface eqc-section--ornamented',
 	array(
 		eqc_section_ornaments(),
 		eqc_inner(
@@ -228,7 +228,7 @@ $courses = eqc_section(
 			array_merge(
 				array( eqc_section_heading_el( 'Our Courses', 'Choose the course that <br>matches where <span style="color:var(--eqc-bronze-700)">you are today</span>', false, 'eqc-eyebrow--plain', 'book-open' ) ),
 				array( eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--courses', 'flex_direction' => 'row' ), $course_cards ) ),
-				array( eqc_html( '<div class="eqc-ornament-rail eqc-courses-closing" aria-hidden="true">' . eqc_get_svg_asset( 'rosette' ) . '</div>' ) )
+				array( eqc_html( '<div class="eqc-ornament-rail eqc-courses-closing" aria-hidden="true">' . eqc_get_svg_asset( 'rosette-reviews' ) . '</div>' ) )
 			)
 		),
 	)
@@ -249,9 +249,8 @@ foreach ( $teacher_data as $i => $t ) {
 	$teacher_cards[] = eqc_teacher_card( $teacher_ids[ $i ], $t[0], $t[1], $t[2] );
 }
 $teachers = eqc_section(
-	'eqc-section eqc-section--teachers eqc-section--surface eqc-section--ornamented',
+	'eqc-section eqc-section--teachers eqc-section--surface',
 	array(
-		eqc_section_ornaments(),
 		eqc_inner(
 			'',
 			array(
@@ -265,7 +264,7 @@ $teachers = eqc_section(
 							array(
 								eqc_html( '<span class="eqc-eyebrow">' . eqc_icon_str( 'users-filled' ) . esc_html__( 'Our Qualified Teachers', 'easy-quran-classes' ) . '</span>' ),
 								eqc_heading( 'Learn From <br>Dedicated <br><span style="color:var(--eqc-bronze-700)">Quran Teachers</span>', 'h2' ),
-								eqc_html( '<div class="eqc-teachers-rule">' . eqc_divider_svg( 'accent' ) . '</div>' ),
+								eqc_html( '<div class="eqc-teachers-rule">' . eqc_divider_svg( 'teacher' ) . '</div>' ),
 								eqc_text( '<p>Our teachers are highly qualified, experienced, and passionate about teaching the Quran. They are here to guide you every step of the way with patience and care.</p>' ),
 								eqc_html(
 									'<div class="eqc-teachers-features">'
@@ -332,10 +331,10 @@ $pricing = eqc_section(
 				// White strip of four benefits under the cards, hairline-separated.
 				eqc_html(
 					'<div class="eqc-benefits">'
-					. eqc_benefit_tile( 'users', 'Qualified | Male & Female Tutors' )
-					. eqc_benefit_tile( 'book-open', 'One-on-One | Live Classes' )
+					. eqc_benefit_tile( 'people-pair', 'Qualified | Male & Female Tutors' )
+					. eqc_benefit_tile( 'rehal-quran', 'One-on-One | Live Classes' )
 					. eqc_benefit_tile( 'clock', 'Flexible | Schedule' )
-					. eqc_benefit_tile( 'shield', 'Safe & Supportive | Learning Environment' )
+					. eqc_benefit_tile( 'shield-star', 'Safe & Supportive | Learning Environment' )
 					. '</div>'
 				),
 			)
@@ -354,7 +353,7 @@ foreach ( $testi_data as $i => $t ) {
 	if ( ! $testi_ids[ $i ] ) {
 		continue;
 	}
-	$testi_cards[] = eqc_testimonial_card( $testi_ids[ $i ], $t[0], $t[1], $t[2], array( 'graduation-cap' => 'Expert Tutors', 'check' => 'Monthly Tracking', 'chart-up' => 'Personalised Focus' ) );
+	$testi_cards[] = eqc_testimonial_card( $testi_ids[ $i ], $t[0], $t[1], $t[2], array( 'graduate' => 'Expert Tutors', 'clipboard-check' => 'Monthly Tracking', 'target-arrow' => 'Personalised Focus' ) );
 }
 // Reference quotes are unverified staging content; see QA/PLACEHOLDER-REGISTER.md.
 $testimonials = eqc_section(
@@ -363,7 +362,7 @@ $testimonials = eqc_section(
 		eqc_inner(
 			'',
 			array(
-				eqc_section_heading_el( 'What Our Families Say', 'Trusted by Families <br><span style="color:var(--eqc-gold-600)">Loved by Students</span>', true, 'eqc-eyebrow--plain', 'quote' ),
+				eqc_section_heading_el( 'What Our Families Say', 'Trusted by Families <br><span style="color:var(--eqc-gold-600)">Loved by Students</span>', true, 'eqc-eyebrow--plain', 'quote', 'reviews' ),
 				eqc_text( '<p>We are honoured to be part of hundreds of families&rsquo; journey. <br>Here&rsquo;s what they have to say about their experience with us.</p>', 'eqc-testimonials-intro' ),
 				eqc_carousel( $testi_cards, __( 'Testimonial slides', 'easy-quran-classes' ) ),
 			)
@@ -373,8 +372,9 @@ $testimonials = eqc_section(
 
 // ------------------------------------------------------- 10. BLOG PREVIEW
 $blog_section = eqc_section(
-	'eqc-section--blog eqc-section eqc-section--surface',
+	'eqc-section--blog eqc-section eqc-section--surface eqc-section--ornamented',
 	array(
+		eqc_section_ornaments(),
 		eqc_inner(
 			'',
 			array(

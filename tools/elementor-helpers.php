@@ -507,7 +507,7 @@ function eqc_carousel( $cards, $aria_label ) {
  * with (DESIGN.md §18 gives each page a hero; the homepage's own richer
  * split hero stays specific to tools/pages/10-home.php).
  */
-function eqc_page_hero( $eyebrow, $title, $intro, $icon = 'book-open' ) {
+function eqc_page_hero( $eyebrow, $title, $intro, $icon = 'rehal-quran' ) {
 	return eqc_section(
 		'eqc-section eqc-section--tight eqc-section--cream eqc-section--textured eqc-section--ornamented',
 		array(

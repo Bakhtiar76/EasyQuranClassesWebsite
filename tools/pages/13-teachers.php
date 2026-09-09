@@ -92,7 +92,7 @@ $expect = eqc_section(
 				eqc_container(
 					array( 'css_classes' => 'eqc-grid eqc-grid--2col', 'flex_direction' => 'row' ),
 					array(
-						eqc_trust_tile( 'shield', 'Patient Correction', 'Mistakes are corrected gently, in the moment, without pressure.' ),
+						eqc_trust_tile( 'shield-halved', 'Patient Correction', 'Mistakes are corrected gently, in the moment, without pressure.' ),
 						eqc_trust_tile( 'clock', 'Consistent Timing', 'The same teacher and time slot each week wherever possible.' ),
 						eqc_trust_tile( 'chart-up', 'Real Progress Reviews', 'Teachers share how a student is actually progressing, honestly.' ),
 						eqc_trust_tile( 'headset', 'Easy to Reach', 'Questions between classes are welcome, not an inconvenience.' ),
