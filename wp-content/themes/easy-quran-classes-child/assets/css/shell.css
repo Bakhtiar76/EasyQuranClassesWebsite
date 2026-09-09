@@ -32,7 +32,7 @@
 	top: 0;
 	z-index: 100;
 	background: var(--eqc-cream-100);
-	padding-block: clamp(0.6rem, 0.2rem + 1.9vw, 2.6rem);
+	padding-block: clamp(0.45rem, 0.2rem + 0.85vw, 1.3rem);
 }
 
 .eqc-header-bar {
@@ -57,9 +57,9 @@
  * DESIGN.md §14 ("sticky state must preserve viewport space").
  */
 .eqc-header.is-scrolled {
-	--eqc-header-h: clamp(60px, 32px + 3.1vw, 92px);
-	--eqc-logo-mark-size: clamp(34px, 20px + 2.3vw, 62px);
-	padding-block: clamp(0.4rem, 0.25rem + 0.5vw, 0.85rem);
+	--eqc-header-h: clamp(48px, 26px + 1.9vw, 64px);
+	--eqc-logo-mark-size: clamp(30px, 17px + 1.6vw, 46px);
+	padding-block: clamp(0.3rem, 0.15rem + 0.4vw, 0.6rem);
 }
 .eqc-header,
 .eqc-header-bar,
@@ -103,7 +103,7 @@
 	align-items: stretch;
 	gap: 0.24em;
 	min-width: 0;
-	font-size: calc(var(--eqc-logo-mark-size) * 0.32);
+	font-size: max(15px, calc(var(--eqc-logo-mark-size) * 0.36));
 }
 
 .eqc-logo-name {
@@ -122,7 +122,7 @@
 	display: flex;
 	align-items: center;
 	gap: 0.55em;
-	font-size: 0.34em;
+	font-size: max(11px, 0.34em);
 }
 .eqc-logo-rule {
 	flex: 1 1 0;
@@ -192,9 +192,9 @@
    overlap the logo on a 390px screen instead of staying in the drawer. */
 a.eqc-header-cta {
 	display: none;
-	--_h: clamp(44px, 20px + 2.9vw, 76px);
-	padding-inline: clamp(1rem, 0.4rem + 1.5vw, 2.1rem);
-	font-size: clamp(0.875rem, 1.08vw, 1.3rem);
+	--_h: clamp(44px, 18px + 2.1vw, 58px);
+	padding-inline: clamp(0.9rem, 0.35rem + 1.1vw, 1.6rem);
+	font-size: clamp(13px, 0.4rem + 0.55vw, 16px);
 	font-weight: 700;
 	letter-spacing: 0.07em;
 	text-transform: uppercase;
@@ -202,8 +202,8 @@ a.eqc-header-cta {
 /* The reference's gift sits at ~0.55 of the pill height; keying it to the
    pill rather than the label keeps that ratio as the bar scales. */
 a.eqc-header-cta .eqc-icon {
-	width: calc(var(--_h) * 0.55);
-	height: calc(var(--_h) * 0.55);
+	width: calc(var(--_h) * 0.46);
+	height: calc(var(--_h) * 0.46);
 }
 
 .eqc-nav-toggle {
@@ -470,7 +470,7 @@ a.eqc-header-cta .eqc-icon {
 	color: var(--eqc-gold-700);
 }
 .eqc-cta-stat span {
-	font-size: calc(var(--_stat) * 0.13);
+	font-size: max(12px, calc(var(--_stat) * 0.13));
 	font-weight: 600;
 	color: var(--eqc-green-800);
 }

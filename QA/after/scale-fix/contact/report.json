@@ -1,0 +1,104 @@
+{
+  "route": "/contact/",
+  "url": "http://localhost/contact/",
+  "generatedAt": "2026-09-09T12:16:11.468Z",
+  "viewports": [
+    {
+      "name": "desktop-1920x1080",
+      "width": 1920,
+      "height": 1080,
+      "screenshot": "desktop-1920x1080.png",
+      "status": 200,
+      "finalUrl": "http://localhost/contact/",
+      "scrollWidth": 1920,
+      "overflow": false
+    },
+    {
+      "name": "desktop-1440x900",
+      "width": 1440,
+      "height": 900,
+      "screenshot": "desktop-1440x900.png",
+      "status": 200,
+      "finalUrl": "http://localhost/contact/",
+      "scrollWidth": 1440,
+      "overflow": false
+    },
+    {
+      "name": "laptop-1280x800",
+      "width": 1280,
+      "height": 800,
+      "screenshot": "laptop-1280x800.png",
+      "status": 200,
+      "finalUrl": "http://localhost/contact/",
+      "scrollWidth": 1280,
+      "overflow": false
+    },
+    {
+      "name": "laptop-sm-1024x768",
+      "width": 1024,
+      "height": 768,
+      "screenshot": "laptop-sm-1024x768.png",
+      "status": 200,
+      "finalUrl": "http://localhost/contact/",
+      "scrollWidth": 1024,
+      "overflow": false
+    },
+    {
+      "name": "tablet-768x1024",
+      "width": 768,
+      "height": 1024,
+      "screenshot": "tablet-768x1024.png",
+      "status": 200,
+      "finalUrl": "http://localhost/contact/",
+      "scrollWidth": 768,
+      "overflow": false
+    },
+    {
+      "name": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "screenshot": "mobile-390x844.png",
+      "status": 200,
+      "finalUrl": "http://localhost/contact/",
+      "scrollWidth": 390,
+      "overflow": false
+    }
+  ],
+  "headings": [
+    {
+      "level": 1,
+      "text": "We're here to help"
+    },
+    {
+      "level": 3,
+      "text": "Get in Touch"
+    },
+    {
+      "level": 2,
+      "text": "Your First Class Is Free. Start This Week."
+    },
+    {
+      "level": 3,
+      "text": "Get In Touch!"
+    },
+    {
+      "level": 3,
+      "text": "Quick Links"
+    }
+  ],
+  "h1Count": 1,
+  "imagesMissingAlt": [],
+  "consoleErrors": [],
+  "pageErrors": [],
+  "assetErrors": [],
+  "blockedRequests": [],
+  "scan": {
+    "min": 380,
+    "max": 1900,
+    "step": 40,
+    "checked": 39,
+    "overflows": []
+  },
+  "failures": 0,
+  "warnings": 0
+}

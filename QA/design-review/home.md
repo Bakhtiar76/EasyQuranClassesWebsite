@@ -685,3 +685,156 @@ The earlier completion claims above are superseded by this audit. Home is **not 
 Ordered plan: repair deterministic geometry/motion and Home order; correct icon roles and teacher anatomy; restore missing collage panel and reference-specific backgrounds; recapture and measure all Home sections; verify five widths, intermediate widths, keyboard, reduced motion, console, images and Lighthouse. Rebuild all nine page scripts after shared inline graphics changes. No completion assertion until rendered comparisons resolve P0/P1.
 
 Improvised: original licensed/generated photographs remain per the user's explicit instruction. Filled reference roles use original paths in the existing sprite, not a second icon package. Reduced-motion corrections protect accessibility. Reference desktop spacing is adapted when required for readable mobile content.
+
+---
+
+## Scale correction — the canvas was calibrated to a crop
+
+**Model: Claude Opus 5 (`claude-opus-5`).** Triggered by the user's report that
+sections were too big to fit on screen, that content of one topic did not fit
+together, and that excess spacing diverted focus. The report was correct.
+
+### Root cause
+
+`--eqc-u` was `100/1307 vw` because `Assests/Home.jpeg` is 1307px wide. But the
+reference set is not one canvas:
+
+| Reference | Pixels | Ratio | What it is |
+|---|---|---|---|
+| Blogs.jpeg | 1600 × 905 | 1.77 | full screen |
+| pricing.jpeg | 1600 × 906 | 1.77 | full screen |
+| Home2.jpeg | 1600 × 896 | 1.79 | full screen |
+| Reviews.jpeg | 1600 × 862 | 1.86 | full screen |
+| Teachers.jpeg | 1599 × 923 | 1.73 | full screen |
+| End.jpeg | 1489 × 978 | 1.52 | part screen |
+| **Home.jpeg** | **1307 × 967** | **1.35** | **crop** |
+| **courses.jpeg** | **1296 × 974** | **1.33** | **crop** |
+
+Six of eight are ~1600×900 laptop screens, each showing one complete section
+filling the frame. The two the scale was anchored to are the only two whose
+aspect ratio is not a screen's — the two that are cropped, so their pixel width
+was never the canvas width. The absolute canvas width was the one free
+parameter in the system and it was taken from the least reliable file.
+
+This inflated every dimension by 1600/1307 = **+22%**. Ratios measured *within*
+each file (LESSONS #11) are unaffected: only the multiplier moved.
+
+### Measured before
+
+At 1600×900 — the reference images' own dimensions:
+
+| Section | Height | Viewports | Overflow |
+|---|---|---|---|
+| about | 1269px | 1.41 | +369 |
+| courses | 1329px | 1.48 | +429 |
+| pricing | 1313px | 1.46 | +413 |
+| testimonials | 1303px | 1.45 | +403 |
+
+Sticky header 197px at rest / 108px scrolled → 792px usable, so sections ran
+**1.65× the usable screen**. Whole page 9,452px = 10.5 viewports.
+
+### Two systemic bugs found alongside it
+
+**Type contrast was 5.0:1** (H2 73.4px over 14.7px body at 1600) where healthy
+editorial setting is 2.5–3:1. One multiplier drove both a 60u heading and a 12u
+caption. This produces both complaints at once — oversized headings burn the
+vertical budget, the same multiplier starves the body copy.
+
+**33 `font-size: calc(n * var(--eqc-u))` rules bypassed the type tokens**, so
+the `@media (max-width:1100px)` floor never reached them. On a 390px phone:
+teacher facts and blog dates **7.6px**, teacher role 8.3px, course body 8.6px,
+blog excerpt / testimonial body 9.0px, pricing list 9.4px — ten roles.
+
+The previous pass's **"72 text styles pass WCAG AA" was a contrast check only**.
+7.6px text passes contrast. That report claimed a clean bill of health it had
+not earned; correcting it is part of this pass (LESSONS #37).
+
+The media-query floor also produced a **discontinuity at exactly 1100px**
+(captions 9.8px → 14.0px across one pixel of width) and left **1101–1600px**
+— 1366, 1440, 1536 — with no floor at all. The same boundary-vs-floor mistake
+left buttons at 40.6–44px across 1101–1213px.
+
+### Changes
+
+Three CSS files only; no PHP touched, so no `tools/pages/*.php` re-run needed.
+
+- `tokens.css` — `--eqc-u: clamp(0.70px, 0.0625vw, 1.32px)`; every `--eqc-fs-*`
+  becomes `clamp(floor, unit, ceiling)`; the floor media query deleted; header
+  and section-space tokens reduced.
+- `components.css` — all 33 raw sizes mapped onto tokens (new `--eqc-fs-price`,
+  `--eqc-fs-h2-compact`); ornate rule margin 1em → 0.4em; pricing panel's
+  redundant 64px inset removed; Elementor's untokened 20px container gap
+  replaced; body leading 1.7 → 1.62; tap-target hit areas extended.
+- `shell.css` — header 197→~87px scrolled; logo lockup and footer stat caption
+  floored; header CTA rebalanced to the bar (user-reported: it was 76px tall
+  with a 42px icon in an 86px bar).
+
+### Result
+
+Section heights at 1600x900, measured:
+
+| Section | before | after | change |
+|---|---:|---:|---:|
+| about | 1269px | 994px | -22% |
+| courses | 1329px | 1030px | -22% |
+| pricing | 1313px | 932px | -29% |
+| teachers | 942px | 857px | -9% |
+| testimonials | 1303px | 1079px | -17% |
+| blog | 1022px | 803px | -21% |
+
+| | before @1600 | after @1600 |
+|---|---|---|
+| H2 / body ratio | 5.0 : 1 | 2.84 : 1 |
+| whole page | 9,452px (10.5 screens) | 7,680px (8.5 screens) |
+| smallest text anywhere | 7.6px | 11px |
+| scrolled header | 108px | 87px |
+| usable height | 792px | 813px |
+
+Every section is now at or near one viewport except testimonials (1.20, a
+carousel whose cards are deliberately large) and courses (1.14, two rows of
+three cards). Teachers is the exception discussed below.
+
+Across 390 → 2560: type ratio 2.05–3.06, no overflow-X at any width, no
+discontinuity across the old 1100px boundary (1100 and 1101 now identical).
+
+### Verification
+
+- 9 routes × 6 viewports + 39-width scan each — all passed, zero console/page/
+  asset errors, zero overflow.
+- **Contrast: 0 AA failures** — re-run because the large-text threshold moved
+  when heading sizes changed.
+- Smallest rendered text on any route/viewport: 11px (the tracked logo
+  wordmark; every content role ≥13px).
+- Tap targets: the only remaining sub-44px targets are inline links inside
+  sentences on /contact/ and /free-trial/ ("FAQ", "book a free trial"), which
+  WCAG 2.2 SC 2.5.8 exempts explicitly. Padding them would break the line box.
+- One probe false positive worth recording so it is not "fixed" later: the
+  Fluent Forms fields on /contact/ report no accessible name to a check that
+  only looks at `aria-label`/text/`title`/`alt`. All four have a proper
+  `<label for>`.
+
+### Known residual — teachers section
+
+Teachers is the one section still over one screen at 1024–1366 (its focus unit
+runs 768–824 against 682–688 usable; it passes at 1440, 1600 and 1920).
+
+It is **not** a scale problem — it barely moved during this pass (862 → 835 at
+1366) because its height is set by the 268u aside column beside the cards, not
+by the cards. That column stacks a heading, a rule, a paragraph, three feature
+tiles and two controls in a narrow measure, so its text wraps hard. Reducing
+the card height moves the section by exactly 0px (verified — LESSONS #40).
+
+Getting it under one screen at 1366 means shortening the aside copy or dropping
+one of the three feature tiles. Both are content decisions, so they are raised
+here rather than actioned.
+
+### Also fixed while verifying
+
+- **Teacher cards were unequal height** (`align-items: start`), so their "View
+  Profile" pills sat at different heights. Now stretched with the pill pinned.
+- **The pricing "RECOMMENDED" tab rendered as "…MENDED"** — it was placed inside
+  the card, in the medallion's lane. `pricing.jpeg` shows the tab straddling the
+  card's top border with the medallion dropped fully inside, which is why the
+  featured card is the one card whose medallion does not overhang. Fixed to
+  match, from measured element rects (LESSONS #39).
+- Mobile hero carried 48px of top padding meant for the desktop arch overlap.

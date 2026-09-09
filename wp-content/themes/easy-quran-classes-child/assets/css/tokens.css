@@ -51,50 +51,89 @@
 	 *
 	 * The client's design is proportional: every dimension in Assests/*.jpeg
 	 * is a fixed fraction of the viewport, not a fixed pixel size. So one
-	 * unit here == one pixel on the 1307px-wide Home.jpeg canvas, and any
-	 * measurement taken off a reference image is transcribed directly as
+	 * unit here == one pixel on the reference SCREEN, and any measurement
+	 * taken off a reference image is transcribed as
 	 * `calc(<measured px> * var(--eqc-u))`.
 	 *
-	 * 0.0765vw is 100/1307. At 1307px wide -> 1.0; at 1920 -> 1.469; at 2100
-	 * -> 1.607 and held; at 390 -> the 0.72 floor.
+	 * THE CANVAS IS 1600, NOT 1307. This was calibrated to Home.jpeg's raw
+	 * 1307px width, which inflated every dimension on the site by 22%. The
+	 * reference set is not one canvas:
+	 *
+	 *   Blogs / pricing / Home2 / Reviews / Teachers   1600 x ~900   ratio 1.73-1.86
+	 *   Home.jpeg                                      1307 x  967   ratio 1.35
+	 *   courses.jpeg                                   1296 x  974   ratio 1.33
+	 *
+	 * Six of the eight are ~1600x900 — a real laptop screen, each showing one
+	 * complete section filling the frame. The two the scale was anchored to
+	 * are the only two whose aspect ratio is not a screen's, i.e. the two
+	 * that are CROPS, so their pixel width was never the canvas width. A
+	 * reference image's pixel width is only the canvas width when its aspect
+	 * ratio is a screen's — see QA/LESSONS.md.
+	 *
+	 * Ratios measured WITHIN one file (LESSONS #11) are unaffected by this:
+	 * only the multiplier moves, so every transcribed proportion is preserved.
+	 *
+	 * 0.0625vw is 100/1600. At 1600px wide -> 1.0; at 1920 -> 1.20; at 2112
+	 * -> 1.32 and held; at 1120 and below -> the 0.70 floor.
 	 *
 	 * The floor and ceiling are the two places this design is NOT the
 	 * reference, and both are deliberate (TASK-DESIGN-PARITY.md 2A): without
-	 * a floor the type would fall to ~12px on a phone, and without a ceiling
-	 * a 2560px display would get 32px body copy and read as zoomed in.
+	 * a floor the design would collapse on a phone, and without a ceiling a
+	 * 2560px display would read as zoomed in.
 	 *
-	 * Mixing units is what broke the previous pass: the tokens that were
-	 * fluid scaled correctly while the fixed-px ones did not, so a correct
-	 * 79px H1 sat above 18px body text. Keep every size token on this unit.
+	 * This unit governs LAYOUT ONLY. Type has its own compressed scale below:
+	 * a heading and a caption cannot share one linear multiplier — see the
+	 * type block for why.
 	 * ------------------------------------------------------------------ */
-	--eqc-u: clamp(0.72px, 0.0765vw, 1.607px);
+	--eqc-u: clamp(0.70px, 0.0625vw, 1.32px);
 
-	/* Fluid type scale — native px on the reference canvas, measured by
-	   glyph width (LESSONS #12), not by assumed font metrics. */
-	/* Display: the About section's heading. Measured on Home2.jpeg, whose
-	   scale is anchored at ~1.0 by its 56px "Call Any Time" button (the
-	   design system's 56u secondary control, verified in the hero) and
-	   corroborated by its 16.45px body copy landing on body-l's 16.6u. */
-	--eqc-fs-display-xl: calc(70.5 * var(--eqc-u));
-	--eqc-fs-h1: calc(53.7 * var(--eqc-u));      /* hero H1 */
-	/* Section headings. Measured on courses.jpeg, whose scale is anchored at
-	   ~1.0 by its card grid (3 cards of 313 + 2 gaps of 88 = 1115, against
-	   the 1119u content column). About's heading is genuinely LARGER than
-	   this and uses --eqc-fs-display-xl above - the two references disagreed
-	   by 17% until each was scaled by its own anchor, which is what
-	   LESSONS #11 warns about. */
-	--eqc-fs-h2: calc(60 * var(--eqc-u));
-	--eqc-fs-h3: calc(25.5 * var(--eqc-u));   /* course/blog card title */
-	--eqc-fs-h4: calc(16.3 * var(--eqc-u));
-	--eqc-fs-body-l: calc(16.6 * var(--eqc-u));  /* hero body */
-	--eqc-fs-body: calc(13.6 * var(--eqc-u));    /* trust tile title, hero eyebrow */
-	--eqc-fs-small: calc(11.6 * var(--eqc-u));   /* trust tile caption */
-	--eqc-fs-xsmall: calc(10.3 * var(--eqc-u));  /* feature card labels */
-	/* Uppercase section label. Measured on courses.jpeg: "OUR COURSES" is
-	   145u of letterspaced caps beside a 37u book icon - far larger than the
-	   8.85u this carried, which was a guess inherited from the old scale. */
-	--eqc-fs-eyebrow: calc(20.7 * var(--eqc-u));
-	--eqc-fs-button: calc(11.2 * var(--eqc-u));
+	/* ------------------------------------------------------------------
+	 * TYPE SCALE — compressed, and floored at every width.
+	 *
+	 * Type does NOT ride the layout unit linearly. It used to, and that is
+	 * the second reason the page read as "too big": one multiplier drove
+	 * both a 60u heading and a 12u caption, so at 1600 the H2 was 73.4px
+	 * over 14.7px body copy — a 5.0:1 ratio where healthy editorial setting
+	 * is 2.5-3:1. Scaling up to fit the headings starved the body copy;
+	 * scaling down to fix the body copy would have shrunk the headings past
+	 * the reference. A heading and a caption cannot share one linear
+	 * multiplier, so each role gets its own clamp.
+	 *
+	 * Every role is clamp(floor, unit-based, ceiling):
+	 *   - the floor guarantees legibility at ANY width, continuously. This
+	 *     replaces the old `@media (max-width:1100px)` floor block, which
+	 *     left a 6px discontinuity at exactly 1100px (captions jumped
+	 *     9.8px -> 14.0px across one pixel of viewport width) and gave the
+	 *     entire 1101-1600 band — 1366, 1440, 1536, mainstream laptops — no
+	 *     floor at all.
+	 *   - the ceiling stops headings ballooning on wide displays.
+	 *
+	 * The middle term is px-at-1600, since --eqc-u is 1.0 there.
+	 *
+	 * NOTHING may set font-size as a bare calc() on --eqc-u. 33 rules in
+	 * components.css used to, which is how ten roles reached 7.6-9.4px on a
+	 * 390px phone while every contrast check passed — contrast is not
+	 * legibility. Use these tokens so a size cannot escape its floor.
+	 * ------------------------------------------------------------------ */
+	/* Display: the About section's heading, the largest type on the site. */
+	--eqc-fs-display-xl: clamp(34px, calc(52 * var(--eqc-u)), 60px);
+	--eqc-fs-h1: clamp(32px, calc(46 * var(--eqc-u)), 54px);      /* hero H1 */
+	--eqc-fs-h2: clamp(28px, calc(44 * var(--eqc-u)), 52px);      /* section headings */
+	/* Section headings that sit in a narrower column read smaller in the
+	   references; this is the measured relationship, not a second guess. */
+	--eqc-fs-h2-compact: clamp(24px, calc(34 * var(--eqc-u)), 40px);
+	--eqc-fs-h3: clamp(19px, calc(22 * var(--eqc-u)), 26px);      /* course/blog card title */
+	--eqc-fs-h4: clamp(17px, calc(18 * var(--eqc-u)), 20px);
+	--eqc-fs-body-l: clamp(17px, calc(17.5 * var(--eqc-u)), 19px); /* hero + about body */
+	--eqc-fs-body: clamp(15px, calc(15.5 * var(--eqc-u)), 17px);   /* tile titles, card body */
+	--eqc-fs-small: clamp(14px, calc(14.5 * var(--eqc-u)), 16px);  /* captions, meta rows */
+	--eqc-fs-xsmall: clamp(13px, calc(13 * var(--eqc-u)), 14px);   /* smallest label role */
+	/* Uppercase, letterspaced section label. Caps read larger than their
+	   point size, so this sits below body while looking like a peer. */
+	--eqc-fs-eyebrow: clamp(12px, calc(13.5 * var(--eqc-u)), 15px);
+	--eqc-fs-button: clamp(15px, calc(15 * var(--eqc-u)), 17px);
+	/* The large serif figure on a pricing card — a display role, not body. */
+	--eqc-fs-price: clamp(30px, calc(38 * var(--eqc-u)), 44px);
 
 	/* Layout — DESIGN.md §7
 	 * --eqc-content-max is measured, not chosen. In Home.jpeg (1307px canvas)
@@ -130,11 +169,16 @@
 	 * generous desktop presence without becoming oversized on a phone. */
 	--eqc-chrome-width: 94%;
 	--eqc-chrome-max: 1810px;
-	--eqc-header-h: clamp(64px, 34px + 6vw, 150px);
-	--eqc-logo-mark-size: clamp(44px, 22px + 4.4vw, 106px);
-	--eqc-radius-chrome: clamp(22px, 1rem + 1.4vw, 44px);
+	/* The header is sticky, so its height is subtracted from EVERY screen for
+	   the whole visit. At 1600 it was 197px at rest and 108px scrolled — 22%
+	   of a 900px laptop screen for a nav whose text is 34px tall. Now ~120
+	   at rest and ~76 scrolled, which hands ~32px of every screen back to
+	   the content. The logo mark comes down with it so it still fits the bar. */
+	--eqc-header-h: clamp(56px, 30px + 3.5vw, 96px);
+	--eqc-logo-mark-size: clamp(36px, 18px + 2.9vw, 72px);
+	--eqc-radius-chrome: clamp(18px, 0.8rem + 1.1vw, 34px);
 
-	--eqc-section-space: calc(70 * var(--eqc-u));
+	--eqc-section-space: calc(48 * var(--eqc-u));
 	--eqc-gutter: calc(22 * var(--eqc-u));
 	--eqc-grid-gap: calc(22 * var(--eqc-u));   /* feature-card gap, measured */
 	--eqc-stack-gap: calc(14 * var(--eqc-u));
@@ -174,39 +218,16 @@
 }
 
 /* ----------------------------------------------------------------------
- * Below the reference canvas, stop scaling type down.
+ * Control minimums.
  *
- * The reference is a wide-canvas design and several of its roles are small
- * even at full size (13.6px tile titles, 10.3px card labels on the 1307px
- * canvas). Scaling those proportionally to a 390px phone gives 9.8px and
- * 7.4px — unreadable, and below DESIGN.md §6's "never under 16px for body
- * copy on mobile". The reference shows no mobile layout at all, so this is
- * ours to design (TASK-DESIGN-PARITY.md §2A).
+ * This used to be an `@media (max-width: 1100px)` block holding both type
+ * floors and control floors. Both are now expressed in the values
+ * themselves — clamp() for type, max() for boxes — because a floor tied to a
+ * breakpoint only holds on one side of it: the type floors left a 6px
+ * discontinuity at exactly 1100px and no floor at all from 1101-1600, and
+ * the button floor left every button at 40.6-44px across 1101-1213px.
  *
- * Layout keeps scaling with --eqc-u; only the type floors out. The floors
- * are deliberately ABOVE the reference's own small-role sizes, so they must
- * not apply at or above the reference width — hence the media query rather
- * than a max() on the token itself, which would change the 1307px rendering
- * this whole pass exists to match.
+ * A 44px tap target and a legible font size are floors at EVERY width.
  * ---------------------------------------------------------------------- */
-@media (max-width: 1100px) {
-	:root {
-		--eqc-fs-h1: max(34px, calc(53.7 * var(--eqc-u)));
-		--eqc-fs-display-xl: max(36px, calc(70.5 * var(--eqc-u)));
-		--eqc-fs-h2: max(28px, calc(60 * var(--eqc-u)));
-		--eqc-fs-h3: max(22px, calc(25.5 * var(--eqc-u)));
-		--eqc-fs-h4: max(18px, calc(16.3 * var(--eqc-u)));
-		--eqc-fs-body-l: max(17px, calc(16.6 * var(--eqc-u)));
-		--eqc-fs-body: max(16px, calc(13.6 * var(--eqc-u)));
-		--eqc-fs-small: max(14px, calc(11.6 * var(--eqc-u)));
-		--eqc-fs-xsmall: max(13px, calc(10.3 * var(--eqc-u)));
-		--eqc-fs-eyebrow: max(12px, calc(20.7 * var(--eqc-u)));
-		--eqc-fs-button: max(15px, calc(11.2 * var(--eqc-u)));
-	}
-	/* Controls and the avatar row need real minimums too: a 44px tap target
-	   is the floor, not a preference. */
-	.eqc-btn, a.eqc-btn, button.eqc-btn,
-	.elementor-widget-button.eqc-btn .elementor-button { --_h: max(48px, calc(58 * var(--eqc-u))); }
-	.eqc-hero-trust .eqc-avatar-stack img { --_avatar: max(38px, calc(40 * var(--eqc-u))); }
-	.eqc-chip--card { min-height: max(56px, calc(58 * var(--eqc-u))); }
-}
+.eqc-hero-trust .eqc-avatar-stack img { --_avatar: max(38px, calc(40 * var(--eqc-u))); }
+.eqc-chip--card { min-height: max(52px, calc(58 * var(--eqc-u))); }

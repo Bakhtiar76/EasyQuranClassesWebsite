@@ -162,39 +162,50 @@ Recommended weights:
 - Manrope: 400, 500, 600, 700
 - Noto Naskh Arabic: 400, 600 only if Arabic content requires it
 
-### Type Scale — Desktop
+### Type Scale
 
-| Token | Size | Weight | Line Height | Usage |
+Type does **not** ride `--eqc-u` linearly. Every role is
+`clamp(floor, calc(n * var(--eqc-u)), ceiling)`, where `n` is the size in px
+at the 1600px reference width. The floor guarantees legibility at any width
+*continuously*; the ceiling stops headings ballooning on a 2560px display.
+
+There is no separate mobile table and no floor media query — the clamp is the
+floor at every width. A breakpoint-bounded floor only holds on one side of the
+breakpoint, which is what left a 6px discontinuity at exactly 1100px and
+mainstream laptops (1101–1600) unfloored. See QA/LESSONS.md #36, #38.
+
+| Token | Floor | @1600 | Ceiling | Usage |
 |---|---:|---:|---:|---|
-| Display XL | clamp(52px, 5vw, 76px) | 400 | 1.02 | rare hero/display use |
-| H1 | 53.7u (79px @1920) | 400 | 1.08 | page hero |
-| H2 | clamp(38px, 3.4vw, 54px) | 400 | 1.10 | major section title |
-| H3 | 28–34px | 400/600 | 1.18 | cards/subsections |
-| H4 | 21–24px | 600 | 1.25 | card headings |
-| Body L | 18px | 400 | 1.75 | hero/about intro |
-| Body | 16px | 400 | 1.7 | standard copy |
-| Small | 14px | 500 | 1.55 | metadata/labels |
-| Eyebrow | 13–14px | 700 | 1.3 | uppercase section label |
-| Button | 15–16px | 600 | 1 | buttons |
+| Display XL | 34px | 52px | 60px | About section heading |
+| H1 | 32px | 46px | 54px | page hero |
+| H2 | 28px | 44px | 52px | major section title |
+| H2 compact | 24px | 34px | 40px | heading in a narrow column (teachers) |
+| H3 | 19px | 22px | 26px | course/blog card title |
+| H4 | 17px | 18px | 20px | card headings |
+| Body L | 17px | 17.5px | 19px | hero/about intro |
+| Body | 15px | 15.5px | 17px | standard copy, card body |
+| Small | 14px | 14.5px | 16px | metadata/labels |
+| XSmall | 13px | 13px | 14px | smallest label role |
+| Eyebrow | 12px | 13.5px | 15px | uppercase section label |
+| Button | 15px | 15px | 17px | buttons |
+| Price | 30px | 38px | 44px | pricing card figure |
 
-### Mobile Type Scale
+**Heading-to-body ratio must stay between 2.5 and 3.2.** At 1600 it is 2.84.
+It was 5.0 when type shared the layout unit, which is what made the page read
+as simultaneously oversized and unreadable.
 
-- H1: 38–46px
-- H2: 32–38px
-- H3: 25–29px
-- Body: 16px
-- Small: 13–14px
-
-Do not reduce body copy below 16px on mobile.
+**Never set `font-size` as a bare `calc()` on `--eqc-u`.** 33 rules did, which
+is how ten roles reached 7.6–9.4px on a 390px phone while every contrast check
+passed. Use the tokens so a size cannot escape its floor.
 
 ## 7. Layout System
 
 ### Global Widths
 
 ```css
---eqc-u: clamp(0.72px, 0.0765vw, 1.607px);   /* 1 unit = 1px on the reference canvas */
+--eqc-u: clamp(0.70px, 0.0625vw, 1.32px);    /* 1 unit = 1px on the 1600px reference screen */
 --eqc-content-w: 85.6%;
---eqc-content-max: calc(1119 * var(--eqc-u));   /* 1644px @1920 */
+--eqc-content-max: calc(1119 * var(--eqc-u));   /* 1343px @1920 */
 --eqc-content-narrow: calc(558 * var(--eqc-u));
 --eqc-text-max: calc(463 * var(--eqc-u));
 ```

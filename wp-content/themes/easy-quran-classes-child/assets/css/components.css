@@ -11,7 +11,7 @@ body {
 	color: var(--eqc-text);
 	font-family: var(--eqc-font-body);
 	font-size: var(--eqc-fs-body);
-	line-height: 1.7;
+	line-height: 1.62;
 }
 
 h1, h2, h3, .eqc-display {
@@ -115,6 +115,9 @@ button:focus,
 	margin-inline: auto;
 	padding: 0;
 	box-sizing: border-box;
+	/* Elementor's kit sets a flat 20px container gap, the only spacing in the
+	   vertical stack that never scaled with the design. */
+	row-gap: calc(22 * var(--eqc-u));
 }
 
 .eqc-container--narrow { max-width: var(--eqc-content-narrow); }
@@ -172,7 +175,7 @@ button:focus,
 	width: 100%;
 	height: auto;
 	background: none;
-	margin-block: 1em;
+	margin-block: 0.4em;
 	color: var(--eqc-gold-500);
 	opacity: 0;
 	transform: scale(0.85);
@@ -215,7 +218,8 @@ html:not(.eqc-js) .eqc-heading-rule--ornate { opacity: 1; transform: scale(1); }
 
 a.eqc-btn, button.eqc-btn,
 .elementor-widget-button.eqc-btn .elementor-button {
-	--_h: calc(58 * var(--eqc-u));
+	/* max(), not a media query: the 44px tap floor applies at every width. */
+	--_h: max(48px, calc(58 * var(--eqc-u)));
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
@@ -1062,7 +1066,7 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 }
 .eqc-trust-tile:hover .eqc-icon { transform: scale(1.12) rotate(-6deg); }
 .eqc-trust-tile-title { margin: 0 0 calc(3 * var(--eqc-u)); font-size: var(--eqc-fs-body); font-weight: 700; color: var(--eqc-heading); }
-.eqc-trust-tile p { margin: 0; font-size: var(--eqc-fs-small); color: var(--eqc-muted); }
+.eqc-trust-tile p { margin: 0; font-size: var(--eqc-fs-small); color: var(--eqc-muted); line-height: 1.42; }
 
 /* The reference's trust strip is a white rounded PANEL sitting on the hero's
    cream ground (x109-1212, y750-927 native = 1104x178), not tiles rendered
@@ -1212,7 +1216,7 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 }
 .eqc-hero-trust-text { display: flex; flex-direction: column; gap: calc(2 * var(--eqc-u)); }
 .eqc-hero-trust-text > span:last-child {
-	font-size: calc(14.2 * var(--eqc-u));
+	font-size: var(--eqc-fs-body);
 	font-weight: 600;
 	color: var(--eqc-text);
 }
@@ -1244,6 +1248,9 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
    the arch - it sits 68 native px below the arch's tip. */
 .eqc-hero-grid { gap: calc(14 * var(--eqc-u)); align-items: flex-start; }
 .eqc-hero-grid > .eqc-hero-text { padding-block-start: calc(68 * var(--eqc-u)); }
+@media (max-width: 64rem) {
+	.eqc-hero-grid > .eqc-hero-text { padding-block-start: calc(20 * var(--eqc-u)); }
+}
 .eqc-hero-grid > .eqc-hero-text { flex: 1 1 50.5%; }
 .eqc-hero-grid > .eqc-hero-media { flex: 1 1 48.2%; }
 @media (max-width: 900px) {
@@ -1580,7 +1587,10 @@ html.eqc-js .eqc-corner-motif { animation: eqc-drift 24s var(--eqc-ease-soft) in
 	border: 1px solid var(--eqc-gold-300);
 	border-radius: var(--eqc-radius-panel);
 	box-shadow: var(--eqc-shadow-card);
-	padding: clamp(2.25rem, 1.5rem + 3vw, 4rem);
+	/* Was clamp(2.25rem, 1.5rem + 3vw, 4rem) on all four sides — 64px of
+	   vertical inset inside a section that already pads 77px. The panel is a
+	   frame around the cards, not a second section. */
+	padding: calc(26 * var(--eqc-u)) clamp(1rem, 0.5rem + 1.6vw, 2.25rem);
 }
 .eqc-pricing-panel > .e-con { position: relative; z-index: 1; }
 
@@ -1764,7 +1774,7 @@ h2.eqc-display-heading { font-size: var(--eqc-fs-display-xl); line-height: 1.12;
 }
 .eqc-about-stat__disc .eqc-icon { width: calc(26 * var(--eqc-u)); height: calc(26 * var(--eqc-u)); color: var(--eqc-gold-700); }
 .eqc-about-stat__label { font-size: var(--eqc-fs-small); color: var(--eqc-muted); }
-.eqc-about-stat__value { font-family: var(--eqc-font-body); font-size: calc(21 * var(--eqc-u)); font-weight: 700; color: var(--eqc-heading); }
+.eqc-about-stat__value { font-family: var(--eqc-font-body); font-size: var(--eqc-fs-h3); font-weight: 700; color: var(--eqc-heading); }
 
 /* Collage: the large Quran page offset right, with the child overlapping its
    lower left. The figure margin reset must come BEFORE the main's auto
@@ -1818,8 +1828,8 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 	padding: calc(22 * var(--eqc-u)) calc(24 * var(--eqc-u));
 	gap: calc(5 * var(--eqc-u));
 }
-.eqc-card--course p { font-size: calc(13 * var(--eqc-u)); line-height: 1.55; }
-.eqc-card--course .eqc-card-level { font-size: calc(12 * var(--eqc-u)); }
+.eqc-card--course p { font-size: var(--eqc-fs-body); line-height: 1.55; }
+.eqc-card--course .eqc-card-level { font-size: var(--eqc-fs-small); }
 .eqc-card--course .eqc-card-divider .eqc-divider-svg { width: calc(113 * var(--eqc-u)); }
 .eqc-card--course .eqc-arrow-btn {
 	width: calc(50 * var(--eqc-u));
@@ -1833,7 +1843,7 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 .eqc-section-heading { max-width: calc(760 * var(--eqc-u)); }
 .eqc-section-heading--center { max-width: calc(820 * var(--eqc-u)); margin-inline: auto; }
 /* Left-aligned ornate divider under the heading, 359u in the reference. */
-.eqc-heading-rule--ornate .eqc-divider-svg { width: calc(359 * var(--eqc-u)); }
+.eqc-heading-rule--ornate .eqc-divider-svg { width: calc(240 * var(--eqc-u)); }
 
 /* Bare section label: gold icon + letterspaced caps, no pill. courses.jpeg
    draws it this way; pricing and teachers keep the outlined pill, so this is
@@ -1889,7 +1899,7 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 /* This heading measures 545u for its first line against the courses section's
    604u for a same-length string — the reference genuinely sets it smaller, so
    it carries its own size rather than moving the shared token. */
-.eqc-section--pricing .eqc-section-heading h2 { font-size: calc(51 * var(--eqc-u)); }
+.eqc-section--pricing .eqc-section-heading h2 { font-size: var(--eqc-fs-h2); }
 
 /* Dark-green banner with chamfered ends holding "N Days/Week", 207 x 54u. */
 .eqc-pricing-banner {
@@ -1901,7 +1911,7 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 	background: var(--eqc-green-800);
 	color: var(--eqc-white);
 	font-family: var(--eqc-font-display);
-	font-size: calc(24 * var(--eqc-u));
+	font-size: var(--eqc-fs-h4);
 	text-align: center;
 	line-height: 1.15;
 	clip-path: polygon(calc(14 * var(--eqc-u)) 0, calc(100% - 14 * var(--eqc-u)) 0, 100% 50%, calc(100% - 14 * var(--eqc-u)) 100%, calc(14 * var(--eqc-u)) 100%, 0 50%);
@@ -1909,12 +1919,12 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 
 /* Price row: figure, cream unit pill, dark-green arrow disc. */
 .eqc-pricing-price { display: flex; align-items: center; gap: calc(12 * var(--eqc-u)); margin: 0; }
-.eqc-pricing-price-figure { font-family: var(--eqc-font-display); font-size: calc(44 * var(--eqc-u)); color: var(--eqc-heading); line-height: 1; }
+.eqc-pricing-price-figure { font-family: var(--eqc-font-display); font-size: var(--eqc-fs-price); color: var(--eqc-heading); line-height: 1; }
 .eqc-pricing-unit {
 	background: var(--eqc-cream-100);
 	border-radius: var(--eqc-radius-pill);
 	padding: calc(6 * var(--eqc-u)) calc(13 * var(--eqc-u));
-	font-size: calc(12 * var(--eqc-u));
+	font-size: var(--eqc-fs-small);
 	color: var(--eqc-text);
 }
 .eqc-card--pricing .eqc-arrow-btn {
@@ -1948,7 +1958,7 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 	border-radius: 50%; background: var(--eqc-cream-100); border: 1px solid var(--eqc-border-strong);
 }
 .eqc-benefit__disc .eqc-icon { width: calc(26 * var(--eqc-u)); height: calc(26 * var(--eqc-u)); color: var(--eqc-green-800); }
-.eqc-benefit__label { font-size: calc(13 * var(--eqc-u)); line-height: 1.35; color: var(--eqc-heading); }
+.eqc-benefit__label { font-size: var(--eqc-fs-small); line-height: 1.35; color: var(--eqc-heading); }
 @media (max-width: 61.25rem) {
 	.eqc-benefits { grid-template-columns: repeat(2, 1fr); row-gap: calc(18 * var(--eqc-u)); }
 	.eqc-benefit:nth-child(odd) { border-inline-start: 0; }
@@ -1969,22 +1979,31 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 /* Feature rows are the bulk of the card's height; the reference runs them
    tighter (card 343u against our 406u). */
 .eqc-pricing-list { gap: calc(7 * var(--eqc-u)); margin: 0; }
-.eqc-pricing-list li { font-size: calc(13 * var(--eqc-u)); line-height: 1.35; gap: calc(9 * var(--eqc-u)); }
+.eqc-pricing-list li { font-size: var(--eqc-fs-small); line-height: 1.35; gap: calc(9 * var(--eqc-u)); }
 .eqc-card--pricing .eqc-pricing-divider { margin-block: calc(4 * var(--eqc-u)); }
 
-/* pricing.jpeg rides the RECOMMENDED label as a horizontal tab on the card's
-   top-right corner, not a diagonal corner ribbon. */
+/* pricing.jpeg rides the RECOMMENDED label as a horizontal tab ABOVE the
+   card's top edge, not inside it — and that is why the featured card is the
+   one card whose rosette sits fully INSIDE: the tab has taken the space the
+   other three cards use for the rosette's overhang. Placing the tab inside
+   the card put it in the rosette's lane, and the label rendered as
+   "…MENDED" with the medallion covering its first half. */
 .eqc-pricing-badge {
 	transform: none;
-	inset-block-start: calc(-16 * var(--eqc-u));
-	inset-inline-end: calc(-6 * var(--eqc-u));
+	inset-block-start: calc(-75 * var(--eqc-u));
+	inset-inline-end: calc(-4 * var(--eqc-u));
 	inset-inline-start: auto;
 	border-radius: var(--eqc-radius-pill);
 	padding: calc(6 * var(--eqc-u)) calc(16 * var(--eqc-u));
-	font-size: calc(11 * var(--eqc-u));
+	font-size: var(--eqc-fs-xsmall);
 	letter-spacing: 0.1em;
 	white-space: nowrap;
 }
+/* Rosette drops inside the featured card so it clears the tab above it, and
+   the card gains the top padding that overhang used to provide for free —
+   without it the "5 Days/Week" banner runs straight through the medallion. */
+.eqc-card--pricing--featured .eqc-pricing-icon { top: calc(-39 * var(--eqc-u)); }
+.eqc-card--pricing--featured { padding-block-start: calc(56 * var(--eqc-u)); }
 /* The reference sets the four cards straight on the section ground; the
    enclosing panel frame is ours, not the design's. */
 .eqc-pricing-panel { background: none; border: 0; box-shadow: none; }
@@ -2000,13 +2019,19 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 	display: grid;
 	grid-template-columns: repeat(4, 1fr);
 	gap: calc(22 * var(--eqc-u));
-	align-items: start;
+	align-items: stretch;
 	padding-inline: 0;
 }
-.eqc-teachers-aside { gap: calc(18 * var(--eqc-u)); }
-.eqc-section--teachers { padding-block: calc(44 * var(--eqc-u)); }
+.eqc-teachers-aside { gap: calc(10 * var(--eqc-u)); }
+/* This column, not the cards, sets the teachers row height: it stacks a
+   heading, a rule, a paragraph, three feature tiles and two controls in a
+   268u column, so its text wraps hard. Reducing the CARD height does not
+   move the section at all. Getting it under one screen at 1366 would mean
+   shortening the copy or dropping a feature tile — content decisions, so
+   it is left at ~1.15 viewports and recorded in QA/design-review/home.md. */
+.eqc-section--teachers { padding-block: calc(34 * var(--eqc-u)); }
 .eqc-teachers-aside .eqc-eyebrow {
-	font-size: calc(13.3 * var(--eqc-u));
+	font-size: var(--eqc-fs-eyebrow);
 	letter-spacing: 0;
 	border-radius: var(--eqc-radius-control);
 	padding: calc(8 * var(--eqc-u));
@@ -2016,13 +2041,13 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 .eqc-teachers-split > .eqc-teachers-cards { padding-block-start: calc(40 * var(--eqc-u)); }
 /* This heading sits in a 268u column and is correspondingly smaller than the
    other sections' — measured 209u of ink for "Learn From". */
-.eqc-section--teachers .eqc-teachers-aside h2 { font-size: calc(35.8 * var(--eqc-u)); line-height: 1.16; }
+.eqc-section--teachers .eqc-teachers-aside h2 { font-size: var(--eqc-fs-h2-compact); line-height: 1.16; }
 .eqc-teachers-rule { color: var(--eqc-gold-500); line-height: 0; }
 .eqc-teachers-rule .eqc-divider-svg { width: calc(120 * var(--eqc-u)); }
-.eqc-teachers-features { display: flex; flex-direction: column; gap: calc(10 * var(--eqc-u)); }
+.eqc-teachers-features { display: flex; flex-direction: column; gap: calc(8 * var(--eqc-u)); }
 .eqc-teachers-features .eqc-trust-tile { padding: calc(10 * var(--eqc-u)) calc(13 * var(--eqc-u)); gap: calc(11 * var(--eqc-u)); align-items: center; }
-.eqc-teachers-features .eqc-trust-tile-title { font-size: calc(12.5 * var(--eqc-u)); font-weight: 700; }
-.eqc-teachers-features .eqc-trust-tile p { font-size: calc(10.5 * var(--eqc-u)); }
+.eqc-teachers-features .eqc-trust-tile-title { font-size: var(--eqc-fs-body); font-weight: 700; }
+.eqc-teachers-features .eqc-trust-tile p { font-size: var(--eqc-fs-small); }
 .eqc-teachers-features .eqc-icon { width: calc(24 * var(--eqc-u)); height: calc(24 * var(--eqc-u)); }
 .eqc-teachers-controls { gap: calc(14 * var(--eqc-u)); align-items: center; padding-inline: 0; }
 .eqc-teachers-nav { display: flex; gap: calc(9 * var(--eqc-u)); }
@@ -2034,16 +2059,19 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 }
 .eqc-nav-btn:first-child .eqc-icon { transform: rotate(180deg); }
 .eqc-nav-btn .eqc-icon { width: calc(18 * var(--eqc-u)); height: calc(18 * var(--eqc-u)); }
-.eqc-btn--sm { --_h: calc(38 * var(--eqc-u)); padding-inline: calc(18 * var(--eqc-u)); font-size: calc(11 * var(--eqc-u)); }
+.eqc-btn--sm { --_h: max(44px, calc(38 * var(--eqc-u))); padding-inline: calc(18 * var(--eqc-u)); font-size: var(--eqc-fs-small); }
 .eqc-btn--sm.eqc-btn--icon-disc .eqc-icon { padding: calc(5 * var(--eqc-u)); }
 
 /* Card: 187 x 394u, oval portrait overlapping the top edge. */
 .eqc-card--teacher { min-height: calc(394 * var(--eqc-u)); padding: calc(16 * var(--eqc-u)); gap: calc(5 * var(--eqc-u)); text-align: center; align-items: center; }
-.eqc-card--teacher h3 { font-size: calc(17 * var(--eqc-u)); line-height: 1.2; font-family: var(--eqc-font-body); font-weight: 700; }
-.eqc-card--teacher .eqc-teacher-role { font-size: calc(11.5 * var(--eqc-u)); color: var(--eqc-gold-700); }
+.eqc-card--teacher h3 { font-size: var(--eqc-fs-h4); line-height: 1.2; font-family: var(--eqc-font-body); font-weight: 700; }
+.eqc-card--teacher .eqc-teacher-role { font-size: var(--eqc-fs-small); color: var(--eqc-gold-700); }
 .eqc-card--teacher .eqc-teacher-facts { gap: calc(8 * var(--eqc-u)); }
-.eqc-card--teacher .eqc-teacher-facts li { font-size: calc(10.5 * var(--eqc-u)); gap: calc(8 * var(--eqc-u)); }
+.eqc-card--teacher .eqc-teacher-facts li { font-size: var(--eqc-fs-small); gap: calc(8 * var(--eqc-u)); }
 .eqc-teacher-profile { width: 100%; justify-content: space-between; }
+/* With the cards stretched to equal height, the pill has to be pushed to the
+   bottom or a shorter card floats it mid-air. */
+.eqc-card--teacher .eqc-card__foot { margin-block-start: auto; width: 100%; }
 .eqc-teacher-profile .eqc-btn-chevron {
 	display: inline-flex; align-items: center; justify-content: center;
 	width: calc(24 * var(--eqc-u)); height: calc(24 * var(--eqc-u));
@@ -2067,9 +2095,11 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 .eqc-section--teachers .eqc-card--teacher {
 	overflow: visible;
 	margin-block-start: calc(142 * var(--eqc-u));
-	/* The 112u oval is 149u tall and starts 56u above the card, so its base
-	   lands 93u down; content has to clear that plus the badge. */
-	padding-block-start: calc(104 * var(--eqc-u));
+	/* Measured, not derived: the portrait renders 163px tall on a 157px card
+	   and sits from -120 to +43 relative to the card's top edge, so it
+	   intrudes 43px — about 50u. The old 104u came from an assumed oval
+	   height and left ~46px of dead space inside every card. */
+	padding-block-start: calc(58 * var(--eqc-u));
 }
 .eqc-section--teachers .eqc-card--teacher .eqc-teacher-photo-widget {
 	position: absolute;
@@ -2091,7 +2121,7 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 .eqc-section--teachers .eqc-card--teacher h3 {
 	font-family: var(--eqc-font-body);
 	font-weight: 700;
-	font-size: calc(17 * var(--eqc-u));
+	font-size: var(--eqc-fs-h4);
 	color: var(--eqc-heading);
 }
 .eqc-section--teachers .eqc-teacher-facts {
@@ -2111,16 +2141,16 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 .eqc-section--testimonials .eqc-section-heading h2 {
 	font-family: var(--eqc-font-body);
 	font-weight: 800;
-	font-size: calc(48.4 * var(--eqc-u));
+	font-size: var(--eqc-fs-h2);
 	line-height: 1.16;
 }
-.eqc-testimonials-intro { text-align: center; font-size: calc(13.5 * var(--eqc-u)); color: var(--eqc-text); line-height: 1.7; }
+.eqc-testimonials-intro { text-align: center; font-size: var(--eqc-fs-body); color: var(--eqc-text); line-height: 1.6; }
 .eqc-section--testimonials .eqc-card--testimonial {
 	width: calc(354 * var(--eqc-u));
 	max-width: 100%;
 	min-height: calc(330 * var(--eqc-u));
 	margin-block-start: calc(54 * var(--eqc-u));
-	padding: calc(64 * var(--eqc-u)) calc(22 * var(--eqc-u)) calc(18 * var(--eqc-u));
+	padding: calc(58 * var(--eqc-u)) calc(22 * var(--eqc-u)) calc(18 * var(--eqc-u));
 	overflow: visible;
 	text-align: center;
 }
@@ -2147,9 +2177,9 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 	display: flex; align-items: center; justify-content: center;
 }
 .eqc-section--testimonials .eqc-testimonial-quote-mark .eqc-icon { width: calc(16 * var(--eqc-u)); height: calc(16 * var(--eqc-u)); }
-.eqc-section--testimonials .eqc-card--testimonial h3 { font-family: var(--eqc-font-body); font-weight: 700; font-size: calc(19.5 * var(--eqc-u)); }
-.eqc-section--testimonials .eqc-testimonial-location { font-size: calc(12 * var(--eqc-u)); color: var(--eqc-gold-700); justify-content: center; }
-.eqc-section--testimonials .eqc-card--testimonial p { font-size: calc(12.5 * var(--eqc-u)); line-height: 1.7; }
+.eqc-section--testimonials .eqc-card--testimonial h3 { font-family: var(--eqc-font-body); font-weight: 700; font-size: var(--eqc-fs-h4); }
+.eqc-section--testimonials .eqc-testimonial-location { font-size: var(--eqc-fs-small); color: var(--eqc-gold-700); justify-content: center; }
+.eqc-section--testimonials .eqc-card--testimonial p { font-size: var(--eqc-fs-body); line-height: 1.7; }
 
 /* Cream inset strip of three mini-features, 324 x 64u, hairline-separated. */
 .eqc-section--testimonials .eqc-testimonial-tags {
@@ -2165,7 +2195,7 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 }
 .eqc-section--testimonials .eqc-testimonial-tags > span {
 	display: flex; flex-direction: column; align-items: center; gap: calc(5 * var(--eqc-u));
-	font-size: calc(9.5 * var(--eqc-u)); color: var(--eqc-text); text-align: center;
+	font-size: var(--eqc-fs-xsmall); color: var(--eqc-text); text-align: center;
 	padding-inline: calc(6 * var(--eqc-u));
 }
 .eqc-section--testimonials .eqc-testimonial-tags > span + span { border-inline-start: 1px solid var(--eqc-border); }
@@ -2178,7 +2208,7 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 .eqc-section--blog .eqc-section-heading h2 {
 	font-family: var(--eqc-font-body);
 	font-weight: 800;
-	font-size: calc(46.1 * var(--eqc-u));
+	font-size: var(--eqc-fs-h2);
 	line-height: 1.18;
 }
 .eqc-card--blog { position: relative; min-height: calc(410 * var(--eqc-u)); overflow: visible; }
@@ -2196,26 +2226,26 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 	padding: calc(6 * var(--eqc-u)) 0;
 }
 .eqc-blog-date .eqc-icon { width: calc(18 * var(--eqc-u)); height: calc(18 * var(--eqc-u)); color: var(--eqc-gold-700); }
-.eqc-blog-date__day { font-size: calc(17 * var(--eqc-u)); font-weight: 700; color: var(--eqc-heading); line-height: 1; }
-.eqc-blog-date__mon { font-size: calc(10.5 * var(--eqc-u)); font-weight: 600; color: var(--eqc-heading); line-height: 1; }
+.eqc-blog-date__day { font-size: var(--eqc-fs-h4); font-weight: 700; color: var(--eqc-heading); line-height: 1; }
+.eqc-blog-date__mon { font-size: var(--eqc-fs-xsmall); font-weight: 600; color: var(--eqc-heading); line-height: 1; }
 /* Category as gold caps above the title. */
 .eqc-blog-category {
 	display: block;
-	font-size: calc(10.5 * var(--eqc-u));
+	font-size: var(--eqc-fs-xsmall);
 	font-weight: 700;
 	letter-spacing: 0.1em;
 	text-transform: uppercase;
 	color: var(--eqc-gold-700);
 	margin-block-end: calc(6 * var(--eqc-u));
 }
-.eqc-card--blog h3 { font-size: calc(17.2 * var(--eqc-u)); line-height: 1.25; }
-.eqc-card--blog .eqc-blog-excerpt { font-size: calc(12.5 * var(--eqc-u)); line-height: 1.65; }
+.eqc-card--blog h3 { font-size: var(--eqc-fs-h3); line-height: 1.25; }
+.eqc-card--blog .eqc-blog-excerpt { font-size: var(--eqc-fs-body); line-height: 1.65; }
 /* "Read More" with a gold double-chevron disc, bottom right. */
 .eqc-card--blog .eqc-read-more {
 	margin-block-start: auto;
 	align-self: flex-end;
 	display: inline-flex; align-items: center; gap: calc(9 * var(--eqc-u));
-	font-size: calc(12 * var(--eqc-u)); font-weight: 700; color: var(--eqc-gold-700);
+	font-size: var(--eqc-fs-small); font-weight: 700; color: var(--eqc-gold-700);
 }
 .eqc-read-more__disc {
 	display: inline-flex; align-items: center; justify-content: center;
@@ -2250,6 +2280,32 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 	min-height: 44px;
 }
 
+/* Shrinking the header and the type scale pulled these under 44px too. Same
+   technique — expand the hit area, leave the visual size alone. The nav link
+   uses ::before because its ::after is the hover underline. */
+.eqc-nav-list a { position: relative; }
+.eqc-nav-list a::before {
+	content: '';
+	position: absolute;
+	inset: 50% auto auto 50%;
+	translate: -50% -50%;
+	width: 100%;
+	height: 44px;
+}
+.eqc-read-more,
+.eqc-nav-btn,
+.eqc-logo-link { position: relative; }
+.eqc-read-more::after,
+.eqc-nav-btn::after,
+.eqc-logo-link::after {
+	content: '';
+	position: absolute;
+	inset: 50% auto auto 50%;
+	translate: -50% -50%;
+	width: max(100%, 44px);
+	height: max(100%, 44px);
+}
+
 /* ---------- Vertical density pass ----------
  * Measured against courses.jpeg: that section spans 940u in the reference and
  * was rendering 1256u here (+34%). Section-height ratios against the hero
@@ -2280,6 +2336,13 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 .eqc-teachers-aside { --widgets-spacing: 0px; }
 .eqc-card > .elementor-widget,
 .eqc-section-heading > .elementor-widget { margin-block-end: 0; }
+
+/* The heading element itself still carried 8px/16px of its own margin inside
+   that widget, on top of the stack's gap. The stack owns the rhythm. */
+.eqc-section-heading h1,
+.eqc-section-heading h2,
+.eqc-section-heading h3,
+.eqc-section-heading p { margin-block: 0; }
 
 /* Inside a card the widget wrappers carry paragraph margins on top of the
    card's own flex gap — measured 20.8u on the body copy and 6u on the divider
