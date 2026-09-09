@@ -262,10 +262,10 @@ $how_it_works = eqc_section(
 
 // ------------------------------------------------------- 6. TEACHERS
 $teacher_data = array(
-	array( 'Hafiz Usman Ali', 'Quran Teacher', array( 'certificate' => '7+ Years Experience', 'graduation-cap' => 'Tajweed Certified', 'users' => 'Expert in Kids & Adults' ) ),
-	array( 'Abdullah Hafeez', 'Quran Teacher', array( 'certificate' => '5+ Years Experience', 'graduation-cap' => 'Tajweed Certified', 'users' => 'Quran Memorization Expert' ) ),
-	array( 'Sana Fatima', 'Quran Teacher', array( 'certificate' => '6+ Years Experience', 'graduation-cap' => 'Tajweed Certified', 'users' => 'Specialist in Kids Teaching' ) ),
-	array( 'Maryam Zahra', 'Quran Teacher', array( 'certificate' => '4+ Years Experience', 'graduation-cap' => 'Tajweed Certified', 'users' => 'Quran & Islamic Studies' ) ),
+	array( 'Hafiz|Usman Ali', 'Quran Teacher', array( 'certificate' => '7+ Years Experience', 'graduation-cap' => 'Tajweed Certified', 'users' => 'Expert in Kids & Adults' ) ),
+	array( 'Abdullah|Hafeez', 'Quran Teacher', array( 'certificate' => '5+ Years Experience', 'graduation-cap' => 'Tajweed Certified', 'users' => 'Quran Memorization Expert' ) ),
+	array( 'Sana|Fatima', 'Quran Teacher', array( 'certificate' => '6+ Years Experience', 'graduation-cap' => 'Tajweed Certified', 'users' => 'Specialist in Kids Teaching' ) ),
+	array( 'Maryam|Zahra', 'Quran Teacher', array( 'certificate' => '4+ Years Experience', 'graduation-cap' => 'Tajweed Certified', 'users' => 'Quran & Islamic Studies' ) ),
 );
 $teacher_cards = array();
 foreach ( $teacher_data as $i => $t ) {
@@ -275,20 +275,51 @@ foreach ( $teacher_data as $i => $t ) {
 	$teacher_cards[] = eqc_teacher_card( $teacher_ids[ $i ], $t[0], $t[1], $t[2] );
 }
 $teachers = eqc_section(
-	'eqc-section eqc-section--surface eqc-section--ornamented',
+	'eqc-section eqc-section--teachers eqc-section--surface eqc-section--ornamented',
 	array(
 		eqc_section_ornaments(),
 		eqc_inner(
 			'',
-			array_merge(
-				array( eqc_section_heading_el( 'Our Qualified Teachers', 'Learn from dedicated <span style="color:var(--eqc-bronze-700)">Quran teachers</span>' ) ),
-				array( eqc_carousel( $teacher_cards, __( 'Teacher slides', 'easy-quran-classes' ) ) ),
-				array(
-					eqc_container(
-						array( 'css_classes' => 'eqc-btn-group', 'flex_direction' => 'row', 'content_position' => 'center' ),
-						array( eqc_button( __( 'View All Teachers', 'easy-quran-classes' ), home_url( '/teachers/' ), 'eqc-btn--primary' ) )
-					),
-				)
+			array(
+				eqc_container(
+					array( 'css_classes' => 'eqc-teachers-split', 'flex_direction' => 'row' ),
+					array(
+						// Left column, 268u in the reference: label, three-line
+						// heading, ornament, body, three feature tiles, controls.
+						eqc_container(
+							array( 'css_classes' => 'eqc-teachers-aside', 'flex_direction' => 'column' ),
+							array(
+								eqc_html( '<span class="eqc-eyebrow">' . eqc_icon_str( 'users' ) . esc_html__( 'Our Qualified Teachers', 'easy-quran-classes' ) . '</span>' ),
+								eqc_heading( 'Learn From<br>Dedicated<br><span style="color:var(--eqc-bronze-700)">Quran Teachers</span>', 'h2' ),
+								eqc_html( '<div class="eqc-teachers-rule">' . eqc_divider_svg( 'accent' ) . '</div>' ),
+								eqc_text( '<p>Our teachers are highly qualified, experienced, and passionate about teaching the Quran. They are here to guide you every step of the way with patience and care.</p>' ),
+								eqc_html(
+									'<div class="eqc-teachers-features">'
+									. '<div class="eqc-trust-tile"><span class="eqc-trust-tile__icon">' . eqc_icon_str( 'graduation-cap' ) . '</span><div><p class="eqc-trust-tile-title">Qualified &amp; Experienced</p><p>Well-trained in Tajweed &amp; Quran teaching</p></div></div>'
+									. '<div class="eqc-trust-tile"><span class="eqc-trust-tile__icon">' . eqc_icon_str( 'person' ) . '</span><div><p class="eqc-trust-tile-title">1-to-1 Personalized Classes</p><p>Focused learning for every student</p></div></div>'
+									. '<div class="eqc-trust-tile"><span class="eqc-trust-tile__icon">' . eqc_icon_str( 'shield' ) . '</span><div><p class="eqc-trust-tile-title">Safe &amp; Supportive Environment</p><p>Your comfort and progress is our priority</p></div></div>'
+									. '</div>'
+								),
+								eqc_container(
+									array( 'css_classes' => 'eqc-teachers-controls', 'flex_direction' => 'row' ),
+									array(
+										eqc_html(
+											'<div class="eqc-teachers-nav">'
+											. '<button type="button" class="eqc-nav-btn" aria-label="' . esc_attr__( 'Previous teachers', 'easy-quran-classes' ) . '">' . eqc_icon_str( 'chevron-right' ) . '</button>'
+											. '<button type="button" class="eqc-nav-btn" aria-label="' . esc_attr__( 'Next teachers', 'easy-quran-classes' ) . '">' . eqc_icon_str( 'chevron-right' ) . '</button>'
+											. '</div>'
+										),
+										eqc_icon_button( 'arrow-right', __( 'View All Teachers', 'easy-quran-classes' ), home_url( '/teachers/' ), 'eqc-btn--green eqc-btn--icon-disc eqc-btn--sm' ),
+									)
+								),
+							)
+						),
+						eqc_container(
+							array( 'css_classes' => 'eqc-teachers-cards', 'flex_direction' => 'row' ),
+							$teacher_cards
+						),
+					)
+				),
 			)
 		),
 	)

@@ -2020,3 +2020,107 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 /* The reference sets the four cards straight on the section ground; the
    enclosing panel frame is ours, not the design's. */
 .eqc-pricing-panel { background: none; border: 0; box-shadow: none; }
+
+/* ---------- Teachers section (Teachers.jpeg) ---------- */
+
+/* Two-column split, not the full-width carousel this replaced. The reference's
+   content column decomposes exactly: left 268u + gap 51u + cards 800u = 1119u. */
+.eqc-teachers-split { gap: calc(51 * var(--eqc-u)); align-items: stretch; padding-inline: 0; }
+.eqc-teachers-split > .eqc-teachers-aside { flex: 0 0 calc(268 * var(--eqc-u)); padding-inline: 0; }
+.eqc-teachers-split > .eqc-teachers-cards {
+	flex: 1 1 auto;
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: calc(22 * var(--eqc-u));
+	align-items: start;
+	padding-inline: 0;
+}
+.eqc-teachers-aside { gap: calc(18 * var(--eqc-u)); }
+/* This heading sits in a 268u column and is correspondingly smaller than the
+   other sections' — measured 209u of ink for "Learn From". */
+.eqc-section--teachers .eqc-teachers-aside h2 { font-size: calc(40.6 * var(--eqc-u)); line-height: 1.16; }
+.eqc-teachers-rule { color: var(--eqc-gold-500); line-height: 0; }
+.eqc-teachers-rule .eqc-divider-svg { width: calc(120 * var(--eqc-u)); }
+.eqc-teachers-features { display: flex; flex-direction: column; gap: calc(10 * var(--eqc-u)); }
+.eqc-teachers-features .eqc-trust-tile { padding: calc(10 * var(--eqc-u)) calc(13 * var(--eqc-u)); gap: calc(11 * var(--eqc-u)); align-items: center; }
+.eqc-teachers-features .eqc-trust-tile-title { font-size: calc(12.5 * var(--eqc-u)); font-weight: 700; }
+.eqc-teachers-features .eqc-trust-tile p { font-size: calc(10.5 * var(--eqc-u)); }
+.eqc-teachers-features .eqc-icon { width: calc(24 * var(--eqc-u)); height: calc(24 * var(--eqc-u)); }
+.eqc-teachers-controls { gap: calc(14 * var(--eqc-u)); align-items: center; padding-inline: 0; }
+.eqc-teachers-nav { display: flex; gap: calc(9 * var(--eqc-u)); }
+.eqc-nav-btn {
+	width: calc(42 * var(--eqc-u)); height: calc(42 * var(--eqc-u));
+	border-radius: 50%; border: 1px solid var(--eqc-border-strong);
+	background: none; color: var(--eqc-heading); cursor: pointer;
+	display: inline-flex; align-items: center; justify-content: center;
+}
+.eqc-nav-btn:first-child .eqc-icon { transform: rotate(180deg); }
+.eqc-nav-btn .eqc-icon { width: calc(18 * var(--eqc-u)); height: calc(18 * var(--eqc-u)); }
+.eqc-btn--sm { --_h: calc(38 * var(--eqc-u)); padding-inline: calc(18 * var(--eqc-u)); font-size: calc(11 * var(--eqc-u)); }
+.eqc-btn--sm.eqc-btn--icon-disc .eqc-icon { padding: calc(5 * var(--eqc-u)); }
+
+/* Card: 187 x 394u, oval portrait overlapping the top edge. */
+.eqc-card--teacher { min-height: calc(394 * var(--eqc-u)); padding: calc(16 * var(--eqc-u)); gap: calc(5 * var(--eqc-u)); text-align: center; align-items: center; }
+.eqc-card--teacher h3 { font-size: calc(17 * var(--eqc-u)); line-height: 1.2; font-family: var(--eqc-font-body); font-weight: 700; }
+.eqc-card--teacher .eqc-teacher-role { font-size: calc(11.5 * var(--eqc-u)); color: var(--eqc-gold-700); }
+.eqc-card--teacher .eqc-teacher-facts { gap: calc(8 * var(--eqc-u)); }
+.eqc-card--teacher .eqc-teacher-facts li { font-size: calc(10.5 * var(--eqc-u)); gap: calc(8 * var(--eqc-u)); }
+.eqc-teacher-profile { width: 100%; justify-content: space-between; }
+.eqc-teacher-profile .eqc-btn-chevron {
+	display: inline-flex; align-items: center; justify-content: center;
+	width: calc(24 * var(--eqc-u)); height: calc(24 * var(--eqc-u));
+	border-radius: 50%; border: 1px solid var(--eqc-border-strong);
+}
+.eqc-teacher-profile .eqc-icon { width: calc(13 * var(--eqc-u)); height: calc(13 * var(--eqc-u)); }
+a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); color: var(--eqc-heading); }
+
+@media (max-width: 61.25rem) {
+	.eqc-teachers-split { flex-wrap: wrap; }
+	.eqc-teachers-split > .eqc-teachers-aside { flex-basis: 100%; }
+	.eqc-teachers-split > .eqc-teachers-cards { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 36rem) { .eqc-teachers-split > .eqc-teachers-cards { grid-template-columns: 1fr; } }
+
+/* Teacher card details the reference is explicit about and the first pass
+   missed: the oval portrait rides ABOVE the card's top edge with the book
+   badge centred on that overlap; the meta rows sit plain on the card, not in
+   a tinted box; the name is bold sans, not the display serif; and the
+   "View Profile" pill stays inside the card. */
+.eqc-section--teachers .eqc-card--teacher {
+	overflow: visible;
+	margin-block-start: calc(56 * var(--eqc-u));
+	/* The 112u oval is 149u tall and starts 56u above the card, so its base
+	   lands 93u down; content has to clear that plus the badge. */
+	padding-block-start: calc(104 * var(--eqc-u));
+}
+.eqc-section--teachers .eqc-card--teacher .eqc-teacher-photo-widget {
+	position: absolute;
+	inset-block-start: calc(-56 * var(--eqc-u));
+	inset-inline: 0;
+	width: calc(112 * var(--eqc-u));
+	margin-inline: auto;
+	z-index: 2;
+}
+.eqc-section--teachers .eqc-card--teacher .eqc-teacher-seal {
+	position: absolute;
+	inset-block-start: calc(46 * var(--eqc-u));
+	inset-inline: 0;
+	margin-inline: auto;
+	width: calc(34 * var(--eqc-u));
+	height: calc(34 * var(--eqc-u));
+	z-index: 3;
+}
+.eqc-section--teachers .eqc-card--teacher h3 {
+	font-family: var(--eqc-font-body);
+	font-weight: 700;
+	font-size: calc(17 * var(--eqc-u));
+	color: var(--eqc-heading);
+}
+.eqc-section--teachers .eqc-teacher-facts {
+	background: none;
+	border: 0;
+	padding: 0;
+	width: 100%;
+	text-align: start;
+}
+.eqc-section--teachers .eqc-teacher-profile { width: 100%; box-sizing: border-box; }

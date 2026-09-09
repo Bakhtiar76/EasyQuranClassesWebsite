@@ -312,9 +312,18 @@ function eqc_teacher_card( $attachment_id, $name, $role, $facts ) {
 				)
 			),
 			eqc_html( '<span class="eqc-teacher-seal" aria-hidden="true">' . eqc_icon_str( 'book-open' ) . '</span>' ),
-			eqc_heading( $name, 'h3' ),
+			// "|" is an explicit line break: the reference sets every teacher
+			// name on two lines, and the break is what keeps the four cards
+			// the same height regardless of name length.
+			eqc_heading( implode( '<br>', array_map( 'esc_html', explode( '|', $name ) ) ), 'h3' ),
 			eqc_html( '<p class="eqc-teacher-role">' . esc_html( $role ) . '</p><div class="eqc-teacher-divider">' . eqc_divider_svg( 'dot' ) . '</div>' ),
-			eqc_html( $facts_html, 'eqc-card__foot' ),
+			eqc_html( $facts_html ),
+			eqc_html(
+				'<a class="eqc-btn eqc-btn--outline eqc-btn--sm eqc-teacher-profile" href="' . esc_url( home_url( '/teachers/' ) ) . '">'
+				. '<span>' . esc_html__( 'View Profile', 'easy-quran-classes' ) . '</span>'
+				. '<span class="eqc-btn-chevron" aria-hidden="true">' . eqc_icon_str( 'chevron-right' ) . '</span></a>',
+				'eqc-card__foot'
+			),
 		)
 	);
 }

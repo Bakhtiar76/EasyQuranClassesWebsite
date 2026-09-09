@@ -1,7 +1,7 @@
 {
   "route": "/",
   "url": "http://localhost/",
-  "generatedAt": "2026-09-09T06:59:20.410Z",
+  "generatedAt": "2026-09-09T07:08:22.839Z",
   "viewports": [
     {
       "name": "desktop-1920x1080",
@@ -113,23 +113,23 @@
     },
     {
       "level": 2,
-      "text": "Learn from dedicated Quran teachers"
+      "text": "Learn FromDedicatedQuran Teachers"
     },
     {
       "level": 3,
-      "text": "Hafiz Usman Ali"
+      "text": "HafizUsman Ali"
     },
     {
       "level": 3,
-      "text": "Abdullah Hafeez"
+      "text": "AbdullahHafeez"
     },
     {
       "level": 3,
-      "text": "Sana Fatima"
+      "text": "SanaFatima"
     },
     {
       "level": 3,
-      "text": "Maryam Zahra"
+      "text": "MaryamZahra"
     },
     {
       "level": 2,

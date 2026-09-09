@@ -503,3 +503,30 @@ message to first class", and the FAQ accordion), and **pricing/teachers are
 swapped**. Removing or reordering sections deletes working content and changes
 the page's argument, so it is not something to do unprompted — raised for the
 user rather than actioned.
+
+---
+
+## Section 6 — Teachers (`Teachers.jpeg`, `claude-opus-5`)
+
+Calibration: **s = 1.356** — content column x48–1565 = 1517px = 1119u, which
+then decomposes exactly as **left 268u + gap 51u + card area 800u**. That clean
+decomposition is the strongest confirmation of a scale factor so far.
+
+| # | Reference shows | Build did | Sev | Fix |
+|---|---|---|---|---|
+| T1 | **Two-column split** — aside (label, heading, ornament, body, three feature tiles, prev/next + CTA) beside four cards | Full-width heading + a carousel + one centred button | **P0** | `.eqc-teachers-split` at the measured 268/51/800 |
+| T2 | Three-line heading, third line bronze, ~40.6u in its narrow column | One line, 60u | P1 | explicit breaks + per-section size |
+| T3 | Three feature tiles in the aside | Absent | P0 | reused `.eqc-trust-tile` markup |
+| T4 | prev/next circular buttons + dark-green "View All Teachers" pill | One centred button | P1 | `.eqc-teachers-nav` + `.eqc-btn--sm` |
+| T5 | Oval portrait **overlapping the card's top edge**, book badge centred on the overlap | Portrait inside the card | P1 | absolute portrait at −56u, 104u content clearance |
+| T6 | Two-line bold **sans** name | One-line display serif | P1 | `\|` break in the data + body font |
+| T7 | Meta rows plain on the card | Tinted inset box | P2 | background/border removed |
+| T8 | "View Profile" pill with a circled chevron, inside the card | Absent | P1 | added; `.eqc-btn--outline` |
+
+Verified: sweep at five viewports + the 380–1900 scan, no overflow, 0 console /
+page / asset errors, 0 images missing `alt`, one H1.
+
+**Heading sizes across sections now measure:** About 70.5u (display), Courses
+60u, Pricing 51u, Teachers 40.6u. Each was derived against its own independently
+anchored reference, and the spread tracks the width of the column each heading
+sits in — a designed hierarchy, not measurement drift.
