@@ -1,0 +1,142 @@
+{
+  "route": "/",
+  "url": "http://localhost/",
+  "generatedAt": "2026-09-09T12:48:33.205Z",
+  "viewports": [
+    {
+      "name": "desktop-1920x1080",
+      "width": 1920,
+      "height": 1080,
+      "screenshot": "desktop-1920x1080.png",
+      "status": 200,
+      "finalUrl": "http://localhost/",
+      "scrollWidth": 1920,
+      "overflow": false
+    },
+    {
+      "name": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "screenshot": "mobile-390x844.png",
+      "status": 200,
+      "finalUrl": "http://localhost/",
+      "scrollWidth": 390,
+      "overflow": false
+    }
+  ],
+  "headings": [
+    {
+      "level": 1,
+      "text": "Learn Quran Online with Personal Guidance"
+    },
+    {
+      "level": 2,
+      "text": "Learning the Quran shouldn't depend on where you live"
+    },
+    {
+      "level": 2,
+      "text": "Choose the course that matches where you are today"
+    },
+    {
+      "level": 3,
+      "text": "Noorani Qaida"
+    },
+    {
+      "level": 3,
+      "text": "Quran Reading With Tajweed"
+    },
+    {
+      "level": 3,
+      "text": "Tajweed Course"
+    },
+    {
+      "level": 3,
+      "text": "Quran Tafseer"
+    },
+    {
+      "level": 3,
+      "text": "Quran Memorization"
+    },
+    {
+      "level": 3,
+      "text": "Islamic Studies"
+    },
+    {
+      "level": 2,
+      "text": "Simple monthly pricing, no hidden fees"
+    },
+    {
+      "level": 2,
+      "text": "Learn From Dedicated Quran Teachers"
+    },
+    {
+      "level": 3,
+      "text": "Hafiz Usman Ali"
+    },
+    {
+      "level": 3,
+      "text": "Abdullah Hafeez"
+    },
+    {
+      "level": 3,
+      "text": "Sana Fatima"
+    },
+    {
+      "level": 3,
+      "text": "Maryam Zahra"
+    },
+    {
+      "level": 2,
+      "text": "Trusted by Families Loved by Students"
+    },
+    {
+      "level": 3,
+      "text": "Aisha Khan"
+    },
+    {
+      "level": 3,
+      "text": "Mohammed Rizwan"
+    },
+    {
+      "level": 3,
+      "text": "Abduallah Omar"
+    },
+    {
+      "level": 2,
+      "text": "Directly From the Latest News & Articles"
+    },
+    {
+      "level": 3,
+      "text": "[DEMO] How to Keep Kids Motivated Between Quran Classes"
+    },
+    {
+      "level": 3,
+      "text": "[DEMO] 5 Common Tajweed Mistakes New Reciters Make"
+    },
+    {
+      "level": 3,
+      "text": "[DEMO] Choosing the Right Online Learning Schedule"
+    },
+    {
+      "level": 2,
+      "text": "Your First Class Is Free. Start This Week."
+    },
+    {
+      "level": 3,
+      "text": "Get In Touch!"
+    },
+    {
+      "level": 3,
+      "text": "Quick Links"
+    }
+  ],
+  "h1Count": 1,
+  "imagesMissingAlt": [],
+  "consoleErrors": [],
+  "pageErrors": [],
+  "assetErrors": [],
+  "blockedRequests": [],
+  "scan": null,
+  "failures": 0,
+  "warnings": 0
+}
