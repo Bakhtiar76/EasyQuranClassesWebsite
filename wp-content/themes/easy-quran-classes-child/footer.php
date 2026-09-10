@@ -30,7 +30,7 @@ defined( 'ABSPATH' ) || exit;
 				 */
 				?>
 				<span class="eqc-cta-eyebrow">
-					<span class="eqc-cta-eyebrow-icon"><?php eqc_icon( 'book-open' ); ?></span>
+					<span class="eqc-cta-eyebrow-icon"><?php eqc_icon( 'rehal-quran' ); ?></span>
 					<span class="eqc-cta-eyebrow-label"><?php esc_html_e( 'Start Your Journey', 'easy-quran-classes' ); ?></span>
 				</span>
 				<h2 id="eqc-footer-cta-title">
@@ -48,7 +48,7 @@ defined( 'ABSPATH' ) || exit;
 				?>
 				<p class="eqc-cta-body">
 					<span><?php esc_html_e( 'Tell us the student’s age, level, and the times that suit you.', 'easy-quran-classes' ); ?></span>
-					<span><?php esc_html_e( 'We’ll match a teacher and confirm your trial –', 'easy-quran-classes' ); ?></span>
+					<span><?php esc_html_e( 'We’ll match a teacher and confirm your trial,', 'easy-quran-classes' ); ?></span>
 					<span><?php esc_html_e( 'usually within a day.', 'easy-quran-classes' ); ?></span>
 				</p>
 			</div>
@@ -129,7 +129,7 @@ defined( 'ABSPATH' ) || exit;
 									<span class="eqc-visually-hidden">
 										<?php
 										/* translators: %s: social network name. */
-										printf( esc_html__( '%s — profile coming soon', 'easy-quran-classes' ), esc_html( $eqc_network_label ) );
+										printf( esc_html__( '%s profile coming soon', 'easy-quran-classes' ), esc_html( $eqc_network_label ) );
 										?>
 									</span>
 								</span>

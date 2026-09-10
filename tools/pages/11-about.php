@@ -33,7 +33,7 @@ $mission = eqc_section(
 									array(
 										'image'        => array( 'id' => $boy_img, 'url' => wp_get_attachment_image_url( $boy_img, 'large' ) ),
 										'image_size'   => 'large',
-										'_css_classes' => 'eqc-arch-media eqc-arch-media--masked',
+										'_css_classes' => 'eqc-arch-media eqc-arch-media--keel eqc-arch-media--keel-round',
 									)
 								),
 							)
@@ -42,10 +42,10 @@ $mission = eqc_section(
 							array( 'css_classes' => 'eqc-align-start', 'flex_direction' => 'column' ),
 							array(
 								eqc_html( '<span class="eqc-eyebrow">' . eqc_icon_str( 'shield' ) . ' Our Mission</span>' ),
-								eqc_heading( 'Consistent, personal teaching &mdash; not one more app to abandon', 'h2' ),
+								eqc_heading( 'Consistent, personal teaching that fits real life', 'h2' ),
 								eqc_text(
 									'<p>Plenty of apps promise to teach the Quran. Very few replace what a real teacher gives: correction the moment a mistake happens, encouragement that responds to how a specific student is actually doing, and a relationship that keeps a student coming back next week.</p>'
-									. '<p>We built Easy Quran Classes around live, 1-to-1 teaching first, and treat scheduling flexibility as the thing that makes consistency realistic for busy families &mdash; not the other way around.</p>'
+									. '<p>We built Easy Quran Classes around live, 1-to-1 teaching first, and treat scheduling flexibility as the thing that keeps consistency realistic for busy families.</p>'
 								),
 							)
 						),
@@ -60,7 +60,7 @@ $mission = eqc_section(
 $audiences = array(
 	array( 'graduation-cap', 'Complete Beginners', 'Children and adults starting from the Arabic alphabet itself, with no reading ability assumed.' ),
 	array( 'users', 'Families with Multiple Learners', 'Siblings or a parent and child learning on schedules that fit around each other.' ),
-	array( 'book-open', 'Returning Adults', 'Adults who read as children but want to correct Tajweed and rebuild consistency now.' ),
+	array( 'rehal-quran', 'Returning Adults', 'Adults who read as children but want to correct Tajweed and rebuild consistency now.' ),
 	array( 'globe', 'Learners Anywhere', 'Students outside easy reach of a qualified local teacher, in any time zone.' ),
 );
 $audience_cards = array();
@@ -107,12 +107,15 @@ $approach = eqc_section(
 								eqc_text(
 									'<p>Every student starts with an honest assessment of where they actually are, not where a course outline assumes they should be. From there, teachers adjust pace, revision and difficulty as progress happens.</p>'
 								),
+								// Icon chip cards, the same component the home hero uses
+								// (client review, QA/qa-10092026/20.png) — the plain ticked
+								// list read as a bare panel next to the rest of the page.
 								eqc_html(
-									'<ul class="eqc-teacher-facts" style="text-align:left;">'
-									. '<li>' . eqc_icon_str( 'check' ) . '<span>1-to-1 live video classes, never pre-recorded</span></li>'
-									. '<li>' . eqc_icon_str( 'check' ) . '<span>Male and female teachers so families can choose what suits them</span></li>'
-									. '<li>' . eqc_icon_str( 'check' ) . '<span>Regular progress check-ins with parents/guardians</span></li>'
-									. '</ul>'
+									'<div class="eqc-chip-row eqc-chip-row--cards eqc-chip-row--3">'
+									. eqc_chip( 'person-filled', '1-to-1 Live Video', 'Never pre-recorded' )
+									. eqc_chip( 'users-filled', 'Male & Female', 'Teachers to choose from' )
+									. eqc_chip( 'chart-up', 'Progress Check-Ins', 'With parents and guardians' )
+									. '</div>'
 								),
 								eqc_container(
 									array( 'css_classes' => 'eqc-btn-group eqc-align-start', 'flex_direction' => 'row' ),
@@ -128,7 +131,7 @@ $approach = eqc_section(
 									array(
 										'image'        => array( 'id' => $approach_img, 'url' => wp_get_attachment_image_url( $approach_img, 'large' ) ),
 										'image_size'   => 'large',
-										'_css_classes' => 'eqc-arch-media eqc-arch-media--masked',
+										'_css_classes' => 'eqc-arch-media eqc-arch-media--keel eqc-arch-media--keel-round',
 									)
 								),
 							)

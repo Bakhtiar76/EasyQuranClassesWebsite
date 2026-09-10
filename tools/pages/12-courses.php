@@ -25,7 +25,7 @@ $course_data = array(
 );
 $course_cards = array();
 foreach ( $course_data as $i => $c ) {
-	$course_cards[] = eqc_course_card( $c[0], $c[1], '(' . $c[2] . ')', $c[3], $trial_url, $i );
+	$course_cards[] = eqc_course_card( $c[0], $c[1], '(' . $c[2] . ')', $c[3], $trial_url, $i, 'course-' . $c[0] );
 }
 $courses_grid = eqc_section(
 	'eqc-section eqc-section--courses eqc-section--surface eqc-section--ornamented',
@@ -36,21 +36,23 @@ $courses_grid = eqc_section(
 );
 
 // ------------------------------------------------------- CHOOSING GUIDANCE
+// Each row links down to the matching course card (anchor 'course-NN' set on
+// the card container above) — client request, QA/qa-9-10.md task 16.
 $guide_rows = array(
-	array( 'New to Arabic letters?', 'Start with Noorani Qaida.' ),
-	array( 'Can already read, but not confidently?', 'Start with Quran Reading with Tajweed.' ),
-	array( 'Reading is solid, want the rules formalized?', 'Take the Tajweed Course.' ),
-	array( 'Want to understand meaning, not just recite?', 'Move into Quran Tafseer.' ),
-	array( 'Working toward memorizing the Quran?', 'Join the Quran Memorization pathway.' ),
-	array( 'Want the fundamentals of the faith too?', 'Add Islamic Studies alongside any course.' ),
+	array( 'New to Arabic letters?', 'Start with Noorani Qaida.', '01' ),
+	array( 'Can already read, but not confidently?', 'Start with Quran Reading with Tajweed.', '02' ),
+	array( 'Reading is solid, want the rules formalized?', 'Take the Tajweed Course.', '03' ),
+	array( 'Want to understand meaning, not just recite?', 'Move into Quran Tafseer.', '04' ),
+	array( 'Working toward memorizing the Quran?', 'Join the Quran Memorization pathway.', '05' ),
+	array( 'Want the fundamentals of the faith too?', 'Add Islamic Studies alongside any course.', '06' ),
 );
-$guide_html = '<div class="eqc-card" style="padding:0;overflow:hidden;">';
+$guide_html = '<div class="eqc-card eqc-course-guide" style="padding:0;overflow:hidden;">';
 foreach ( $guide_rows as $i => $row ) {
 	$border = $i < count( $guide_rows ) - 1 ? 'border-bottom:1px solid var(--eqc-border);' : '';
-	$guide_html .= '<div style="display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:space-between;align-items:center;padding:1.1rem 1.5rem;' . $border . '">'
+	$guide_html .= '<a class="eqc-course-guide-row" href="#course-' . esc_attr( $row[2] ) . '" style="display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:space-between;align-items:center;padding:1.1rem 1.5rem;text-decoration:none;' . $border . '">'
 		. '<span style="font-weight:600;color:var(--eqc-heading);">' . esc_html( $row[0] ) . '</span>'
-		. '<span style="color:var(--eqc-bronze-700);display:flex;align-items:center;gap:0.5em;font-weight:600;">' . eqc_icon_str( 'arrow-right' ) . esc_html( $row[1] ) . '</span>'
-		. '</div>';
+		. '<span style="color:var(--eqc-bronze-700);display:flex;align-items:center;gap:0.5em;font-weight:600;">' . esc_html( $row[1] ) . eqc_icon_str( 'arrow-right' ) . '</span>'
+		. '</a>';
 }
 $guide_html .= '</div>';
 

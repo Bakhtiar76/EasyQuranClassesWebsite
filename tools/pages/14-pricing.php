@@ -10,7 +10,7 @@ $trial_url = home_url( '/free-trial/' );
 $hero = eqc_page_hero(
 	'Pricing',
 	'Simple monthly pricing, no hidden fees',
-	'One clear structure based on how many days a week your student wants to learn. Every plan includes the same 1-to-1 teaching, expert tutors and monthly progress tracking — the only difference is frequency.',
+	'One clear structure based on how many days a week your student wants to learn. Every plan includes the same 1-to-1 teaching, expert tutors and monthly progress tracking. The only difference between plans is how many days a week your student attends.',
 	'certificate'
 );
 
@@ -28,7 +28,7 @@ foreach ( $plans as $p ) {
 
 $inclusions = array(
 	array( 'users', 'Qualified Male & Female Tutors' ),
-	array( 'book-open', 'One-on-One Live Classes' ),
+	array( 'rehal-quran', 'One-on-One Live Classes' ),
 	array( 'clock', 'Flexible Schedule' ),
 	array( 'shield', 'Safe & Supportive Environment' ),
 );
@@ -62,8 +62,8 @@ $guidance = eqc_section(
 			array(
 				eqc_section_heading_el( "What's Included", 'Every plan, no tiers, no upsells', true ),
 				eqc_text(
-					'<p style="text-align:center;">Every plan gives the same access to a qualified 1-to-1 teacher, the same monthly progress tracking, and the same responsive support &mdash; the only choice is how many days a week fits your family\'s schedule. There is no separate "premium" tier with better teaching; frequency is the only variable.</p>'
-					. '<p style="text-align:center;">Not sure how many days to start with? Most beginners start at 2&ndash;3 days a week and increase once a routine feels comfortable &mdash; your teacher can advise after the free trial.</p>'
+					'<p style="text-align:center;">Every plan gives the same access to a qualified 1-to-1 teacher, the same monthly progress tracking, and the same responsive support. The only choice is how many days a week fits your family\'s schedule. There is no separate premium tier with better teaching; frequency is the only variable.</p>'
+					. '<p style="text-align:center;">Not sure how many days to start with? Most beginners start at 2 to 3 days a week and add more once a routine feels comfortable. Your teacher can advise after the free trial.</p>'
 				),
 			)
 		),

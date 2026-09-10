@@ -85,7 +85,7 @@ defined( 'ABSPATH' ) || exit;
 	<a class="eqc-btn eqc-btn--bronze" href="<?php echo esc_url( home_url( '/free-trial/' ) ); ?>">
 		<?php eqc_icon( 'gift-filled' ); ?> <?php esc_html_e( 'Free Trial', 'easy-quran-classes' ); ?>
 	</a>
-	<a class="eqc-btn eqc-btn--secondary" href="<?php echo eqc_whatsapp_url(); ?>">
+	<a class="eqc-btn eqc-btn--secondary eqc-btn--whatsapp" href="<?php echo eqc_whatsapp_url(); ?>">
 		<?php eqc_icon( 'whatsapp' ); ?> <?php esc_html_e( 'Chat on WhatsApp', 'easy-quran-classes' ); ?>
 	</a>
 </div>

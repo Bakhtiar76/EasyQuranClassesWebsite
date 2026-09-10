@@ -14,7 +14,7 @@ get_header();
 <section class="eqc-section eqc-section--cream">
 	<div class="eqc-container">
 		<div class="eqc-stack eqc-section-heading eqc-section-heading--center" <?php eqc_reveal_attrs( 0 ); ?>>
-			<span class="eqc-eyebrow"><?php eqc_icon( 'book-open' ); ?> <?php esc_html_e( 'Latest News', 'easy-quran-classes' ); ?></span>
+			<span class="eqc-eyebrow"><?php eqc_icon( 'megaphone' ); ?> <?php esc_html_e( 'Latest News', 'easy-quran-classes' ); ?></span>
 			<h1>
 				<?php
 				if ( is_category() ) {

@@ -47,7 +47,7 @@ $pages = array(
 	),
 	'free-trial'                    => array(
 		'title'       => 'Quran Trial Class | Free Trial | Easy Quran Classes',
-		'description' => "Book a free online Quran trial class. Tell us the student's age, level and availability and we'll match a suitable teacher — no obligation.",
+		'description' => "Book a free online Quran trial class. Tell us the student's age, level and availability and we'll match a suitable teacher. No obligation.",
 	),
 	'online-quran-classes-for-kids' => array(
 		'title'       => 'Online Quran Classes for Kids | Easy Quran Classes',

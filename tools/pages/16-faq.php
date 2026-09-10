@@ -10,13 +10,13 @@ $trial_url = home_url( '/free-trial/' );
 $hero = eqc_page_hero(
 	'FAQ',
 	'Common questions, answered',
-	"Everything families usually ask before starting — classes, beginners, children, scheduling and the free trial. Still have a question? Reach out and we'll help directly.",
+	"Everything families usually ask before starting: classes, beginners, children, scheduling and the free trial. Still have a question? Reach out and we'll help directly.",
 	'quote'
 );
 
 $groups = array(
 	'Classes & Teaching' => array(
-		array( 'How are classes conducted?', 'Every class is a live, 1-to-1 video session with a qualified teacher — never a pre-recorded lesson.' ),
+		array( 'How are classes conducted?', 'Every class is a live, 1-to-1 video session with a qualified teacher. Classes are never pre-recorded.' ),
 		array( 'How long is each class?', 'Standard classes are 30 minutes, matching the plans on our Pricing page.' ),
 		array( 'Can I choose a male or female teacher?', 'Yes, families can request a male or female teacher based on their preference.' ),
 	),

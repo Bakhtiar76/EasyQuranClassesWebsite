@@ -34,12 +34,10 @@ foreach ( $teacher_data as $i => $t ) {
 	}
 	$teacher_cards[] = eqc_teacher_card( $teacher_ids[ $i ], $t[0], $t[1], $t[2] );
 }
-// Four clearly-marked placeholder slots round out the team page to an
-// 8-teacher roster (matching the fuller instructor-directory scale seen on
-// riwaqalquran.com's own "All Instructors" page) — these are stubs an
-// admin fills in via Elementor, never presented as real people (see
-// eqc_teacher_card_stub() for why).
-for ( $i = 0; $i < 4; $i++ ) {
+// Two clearly-marked placeholder slots round the team page out to a 3x2 grid
+// (client request, QA/qa-9-10.md task 15). These are stubs an admin fills in
+// via Elementor, never presented as real people (see eqc_teacher_card_stub()).
+for ( $i = 0; $i < 2; $i++ ) {
 	$teacher_cards[] = eqc_teacher_card_stub( 'Add a Teacher' );
 }
 $grid = eqc_section(
@@ -59,12 +57,16 @@ $match_steps = array(
 );
 $match_cards = array();
 foreach ( $match_steps as $i => $s ) {
+	// Styled by .eqc-card--step in components.css rather than inline: the
+	// inline sizes left the copy at fs-small inside a full-height .eqc-card,
+	// which is the "too small content while the cards are big" the client
+	// marked up in QA/qa-10092026/11.png.
 	$match_cards[] = eqc_html(
-		'<div class="eqc-card" style="text-align:center;">'
+		'<div class="eqc-card eqc-card--step">'
 		. '<span class="eqc-card-index">' . ( $i + 1 ) . '</span>'
-		. '<div style="margin-top:0.8em;color:var(--eqc-green-800);">' . eqc_icon_str( $s[0] ) . '</div>'
-		. '<h3 style="margin:0.5em 0 0.3em;font-size:var(--eqc-fs-h4);font-family:var(--eqc-font-body);font-weight:700;">' . esc_html( $s[1] ) . '</h3>'
-		. '<p style="margin:0;color:var(--eqc-muted);font-size:var(--eqc-fs-small);">' . esc_html( $s[2] ) . '</p>'
+		. '<span class="eqc-step-icon">' . eqc_icon_str( $s[0] ) . '</span>'
+		. '<h3>' . esc_html( $s[1] ) . '</h3>'
+		. '<p>' . esc_html( $s[2] ) . '</p>'
 		. '</div>'
 	);
 }

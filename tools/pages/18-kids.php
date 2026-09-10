@@ -23,7 +23,7 @@ $hero = eqc_section(
 							array(
 								eqc_html( '<span class="eqc-eyebrow">' . eqc_icon_str( 'users' ) . ' For Parents' . '</span>' ),
 								eqc_heading( 'Online Quran Classes for Kids, Built Around Their Attention Span', 'h1' ),
-								eqc_text( '<p class="eqc-body-l">Short, focused, 1-to-1 sessions with a patient teacher — so your child looks forward to class instead of dreading it.</p>' ),
+								eqc_text( '<p class="eqc-body-l">Short, focused, 1-to-1 sessions with a patient teacher, so your child looks forward to class instead of dreading it.</p>' ),
 								eqc_container(
 									array( 'css_classes' => 'eqc-btn-group eqc-align-start', 'flex_direction' => 'row' ),
 									array( eqc_icon_button( 'calendar', __( 'Book a Free Trial', 'easy-quran-classes' ), $trial_url, 'eqc-btn--bronze' ) )
@@ -53,7 +53,7 @@ $hero = eqc_section(
 // ------------------------------------------------------- WHO IT SUITS
 $suits = array(
 	array( 'graduation-cap', 'Complete Beginners', 'Children who have never seen Arabic letters before.' ),
-	array( 'book-open', 'Building Confidence', 'Children who can read a little but need patient correction.' ),
+	array( 'rehal-quran', 'Building Confidence', 'Children who can read a little but need patient correction.' ),
 	array( 'users', 'Siblings Learning Together', 'Multiple children on schedules that fit around each other.' ),
 );
 $suit_cards = array();
@@ -82,7 +82,7 @@ $experience = eqc_section(
 			array(
 				eqc_section_heading_el( 'What a Class Actually Looks Like', 'Calm, encouraging, and never rushed', true ),
 				eqc_text(
-					'<p style="text-align:center;">Classes are short enough to hold a child\'s attention and structured around gentle repetition rather than pressure. Teachers are experienced with children specifically — praising progress, correcting kindly, and pacing the lesson to how the child is doing that day, not a fixed script.</p>'
+					'<p style="text-align:center;">Classes are short enough to hold a child\'s attention and structured around gentle repetition rather than pressure. Teachers are experienced with children specifically. They praise progress, correct kindly, and pace each lesson to how the child is doing that day rather than to a fixed script.</p>'
 				),
 			)
 		),
@@ -132,7 +132,7 @@ $matching = eqc_section(
 			'eqc-container--narrow',
 			array(
 				eqc_section_heading_el( 'Matched to a Teacher Your Child Responds To', 'Male and female teachers experienced with children', true ),
-				eqc_text( '<p style="text-align:center;">Tell us your child\'s age and personality during the free trial, and we will match a teacher whose pace and style suit them — switching later is always fine if the fit isn\'t right.</p>' ),
+				eqc_text( '<p style="text-align:center;">Tell us your child\'s age and personality during the free trial, and we will match a teacher whose pace and style suit them. Switching later is always fine if the fit isn\'t right.</p>' ),
 			)
 		),
 	)
@@ -141,7 +141,7 @@ $matching = eqc_section(
 // ------------------------------------------------------- KIDS FAQ
 $faq_items = array(
 	array( 'What age can my child start?', 'Most children of school age can begin; the free trial helps a teacher assess readiness.' ),
-	array( 'What if my child gets distracted easily?', 'Classes are kept short and interactive specifically because young attention spans are limited — teachers adjust pacing accordingly.' ),
+	array( 'What if my child gets distracted easily?', 'Classes are kept short and interactive because young attention spans are limited, and teachers adjust pacing accordingly.' ),
 	array( 'Can I stay in the room during class?', 'Yes, parents are welcome to sit in, especially for younger or newer students.' ),
 	array( 'Will my child keep the same teacher?', 'We aim to keep the same teacher and time slot consistent each week wherever possible.' ),
 );

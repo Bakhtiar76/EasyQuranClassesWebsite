@@ -72,7 +72,7 @@ $hero = eqc_section(
 									array( 'css_classes' => 'eqc-btn-group', 'flex_direction' => 'row' ),
 									array(
 										eqc_icon_button( 'calendar', __( 'Book Free Trial', 'easy-quran-classes' ), $trial_url, 'eqc-btn--bronze' ),
-										eqc_icon_button( 'whatsapp', __( 'Chat on WhatsApp', 'easy-quran-classes' ), eqc_whatsapp_url(), 'eqc-btn--secondary' ),
+										eqc_icon_button( 'whatsapp', __( 'Chat on WhatsApp', 'easy-quran-classes' ), eqc_whatsapp_url(), 'eqc-btn--secondary eqc-btn--whatsapp' ),
 									)
 								),
 								// Five overlapping avatars, then five gold stars above one trust
@@ -144,6 +144,10 @@ $alphabet_chart .= '</div></div>';
 $about = eqc_section(
 	'eqc-section eqc-section--about eqc-section--cream eqc-section--ornamented',
 	array(
+		// The section already carried --ornamented but never emitted the motifs,
+		// so its background was bare. Home2.jpeg puts the arabesque top-left,
+		// above the collage, with a quieter answer bottom-right.
+		eqc_section_ornaments( '', array( 'tl', 'br' ) ),
 		eqc_inner(
 			'',
 			array(
@@ -156,7 +160,10 @@ $about = eqc_section(
 								// Original alphabet typesetting stays crisp at every size.
 								eqc_html(
 									'<div class="eqc-about-collage">'
-									. '<figure class="eqc-about-collage__main eqc-arch-media eqc-arch-media--keel">'
+									// --keel-round: the About collage closes the arch's foot with a
+									// curve (client review, QA/qa-10092026/14.png). The hero above
+									// keeps the reference's square jambs.
+									. '<figure class="eqc-about-collage__main eqc-arch-media eqc-arch-media--keel eqc-arch-media--keel-round">'
 									. wp_get_attachment_image( $about_img, 'large', false, array( 'alt' => 'An open Quran beside a sunlit window' ) )
 									. '</figure>'
 									. '<div class="eqc-about-collage__alphabet">' . $alphabet_chart . '</div>'
@@ -176,7 +183,7 @@ $about = eqc_section(
 								// Copy transcribed verbatim from the reference, including its
 								// em dash and its "Nobody else is in the room" closing pair.
 								eqc_text(
-									'<p>Most Muslim families want the same thing&mdash;children who can read the Quran properly, and adults who can finally correct the recitation they half-learned as kids. What gets in the way is rarely motivation. It is distance to the nearest qualified teacher, a school run that ends at six, shift work, or the quiet embarrassment of being a grown adult who still struggles with the alphabet.</p>'
+									'<p>Most Muslim families want the same thing. They want children who can read the Quran properly, and adults who can finally correct the recitation they half-learned as children. What gets in the way is rarely motivation. It is distance to the nearest qualified teacher, a school run that ends at six, shift work, or the quiet embarrassment of being a grown adult who still struggles with the alphabet.</p>'
 									. '<p>Easy Quran Classes removes those obstacles. Your teacher comes to your screen, at the hour you choose, and works at the pace you set. Nobody else is in the room. Nobody is watching you make mistakes.</p>',
 									'eqc-body-l'
 								),
@@ -194,7 +201,12 @@ $about = eqc_section(
 									array( 'css_classes' => 'eqc-btn-group eqc-align-start', 'flex_direction' => 'row' ),
 									array(
 										eqc_icon_button( 'arrow-right', __( 'More About Us', 'easy-quran-classes' ), home_url( '/about/' ), 'eqc-btn--green eqc-btn--icon-disc' ),
-										eqc_icon_button( 'phone', __( 'Call Any Time', 'easy-quran-classes' ), 'tel:' . preg_replace( '/[^0-9+]/', '', (string) get_theme_mod( 'eqc_phone_display', '' ) ), 'eqc-btn--secondary' ),
+										// Routed to WhatsApp on client instruction (round 6). The old
+										// `tel:` target was built from the eqc_phone_display theme mod,
+										// which is an unset placeholder on this install — so the link
+										// resolved to a bare "tel:" and went nowhere. Carries the
+										// --whatsapp hover so the destination is signalled before the click.
+										eqc_icon_button( 'phone', __( 'Call Any Time', 'easy-quran-classes' ), eqc_whatsapp_url(), 'eqc-btn--secondary eqc-btn--whatsapp' ),
 									)
 								),
 							)
@@ -211,9 +223,9 @@ $course_data = array(
 	array( '01', 'Noorani Qaida', 'Beginner', 'Arabic letters, sounds and joining, taught from absolute zero. Ends when you can read short Quranic words unaided.' ),
 	array( '02', 'Quran Reading With Tajweed', 'Beginner To Advanced', 'Read the Quran fluently and correctly, applying the rules of Tajweed as you go, not as an afterthought.' ),
 	array( '03', 'Tajweed Course', 'All Levels', 'Master the rules of Tajweed step by step with practical examples until you recite the Quran with beauty and accuracy.' ),
-	array( '04', 'Quran Tafseer', 'Advanced', 'Move from reciting the words to understanding them &mdash; context, meaning and how each passage applies now.' ),
+	array( '04', 'Quran Tafseer', 'Advanced', 'Move from reciting the words to understanding them: context, meaning and how each passage applies now.' ),
 	array( '05', 'Quran Memorization', 'Intermediate', 'A structured Hifz plan with daily new lesson, recent revision and long-term revision paced to your capacity.' ),
-	array( '06', 'Islamic Studies', 'All Levels', 'The essentials every Muslim needs &mdash; how to pray correctly, daily Duas, the life of the Prophet (Peace Be Upon Him) and the manners that go with the knowledge.' ),
+	array( '06', 'Islamic Studies', 'All Levels', 'The essentials every Muslim needs: how to pray correctly, daily Duas, the life of the Prophet (Peace Be Upon Him) and the manners that go with the knowledge.' ),
 );
 $course_cards = array();
 foreach ( $course_data as $i => $c ) {
@@ -226,7 +238,7 @@ $courses = eqc_section(
 		eqc_inner(
 			'',
 			array_merge(
-				array( eqc_section_heading_el( 'Our Courses', 'Choose the course that <br>matches where <span style="color:var(--eqc-bronze-700)">you are today</span>', false, 'eqc-eyebrow--plain', 'book-open' ) ),
+				array( eqc_section_heading_el( 'Our Courses', 'Choose the course that <br>matches where <span style="color:var(--eqc-bronze-700)">you are today</span>', false, 'eqc-eyebrow--plain', 'rehal-quran' ) ),
 				array( eqc_container( array( 'css_classes' => 'eqc-grid eqc-grid--courses', 'flex_direction' => 'row' ), $course_cards ) ),
 				array( eqc_html( '<div class="eqc-ornament-rail eqc-courses-closing" aria-hidden="true">' . eqc_get_svg_asset( 'rosette-reviews' ) . '</div>' ) )
 			)
@@ -357,7 +369,7 @@ foreach ( $testi_data as $i => $t ) {
 }
 // Reference quotes are unverified staging content; see QA/PLACEHOLDER-REGISTER.md.
 $testimonials = eqc_section(
-	'eqc-section eqc-section--testimonials eqc-section--surface',
+	'eqc-section eqc-section--testimonials eqc-section--cream',
 	array(
 		eqc_inner(
 			'',
@@ -385,7 +397,35 @@ $blog_section = eqc_section(
 	)
 );
 
+// ------------------------------------------------------- 11. FAQ
+// Six general questions on the home page; the full set lives on /faq/
+// (client request, QA/qa-9-10.md task 9). Kept in step with 16-faq.php.
+$home_faq_items = array(
+	array( 'How are classes conducted?', 'Every class is a live, 1-to-1 video session with a qualified teacher. Classes are never pre-recorded.' ),
+	array( 'How long is each class?', 'Standard classes are 30 minutes, matching the plans on our Pricing page.' ),
+	array( 'Can beginners start from zero?', 'Yes. Noorani Qaida starts from the Arabic alphabet itself, with no prior reading ability assumed.' ),
+	array( 'Can I choose a male or female teacher?', 'Yes, families can request a male or female teacher based on their preference.' ),
+	array( 'How does the free trial work?', 'Tell us the student\'s age, level and availability, and we match a suitable teacher for one trial class before any commitment.' ),
+	array( 'Are timings flexible?', 'Yes. Classes are scheduled around the times that work for your family, not a fixed institutional timetable.' ),
+);
+$home_faq = eqc_section(
+	'eqc-section eqc-section--cream',
+	array(
+		eqc_inner(
+			'eqc-container--narrow',
+			array(
+				eqc_section_heading_el( 'FAQ', 'Questions families ask before starting', true, 'eqc-eyebrow--plain', 'quote' ),
+				eqc_faq_group( '', $home_faq_items ),
+				eqc_container(
+					array( 'css_classes' => 'eqc-btn-group', 'flex_direction' => 'row', 'content_position' => 'center' ),
+					array( eqc_button( __( 'View All FAQs', 'easy-quran-classes' ), home_url( '/faq/' ), 'eqc-btn--primary' ) )
+				),
+			)
+		),
+	)
+);
+
 eqc_save_elementor_page(
 	eqc_page_id( 'home' ),
-	array( $hero, $trust, $about, $courses, $pricing, $teachers, $testimonials, $blog_section )
+	array( $hero, $trust, $about, $courses, $pricing, $teachers, $testimonials, $blog_section, $home_faq )
 );

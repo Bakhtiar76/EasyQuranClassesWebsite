@@ -7,17 +7,17 @@ require_once '/tools/elementor-helpers.php';
 
 $hero = eqc_page_hero(
 	'Free Trial',
-	'Your first class is free — start this week',
+	'Your first class is free',
 	"Tell us the student's age, level and availability. We'll match a suitable teacher and confirm your trial, usually within a day.",
 	'calendar'
 );
 
 // ------------------------------------------------------- WHAT HAPPENS NEXT
 $steps = array(
-	array( 'book-open', 'You Submit This Form', "Share the student's age, level and preferred timing." ),
+	array( 'clipboard-check', 'You Submit This Form', "Share the student's age, level and preferred timing." ),
 	array( 'users', 'We Match a Teacher', 'Based on level, learning goals and schedule fit.' ),
 	array( 'calendar', 'Trial Is Confirmed', "We'll reach out to confirm the exact date and time." ),
-	array( 'headset', 'Meet Your Teacher', 'Join the class and see how it feels — no obligation.' ),
+	array( 'headset', 'Meet Your Teacher', 'Join the class and see how it feels. There is no obligation.' ),
 );
 $step_cards = array();
 foreach ( $steps as $i => $s ) {
@@ -49,7 +49,7 @@ $alt_contact_html =
 	. '<h3 style="margin-top:0;font-size:var(--eqc-fs-h4);font-family:var(--eqc-font-body);font-weight:700;">Prefer to Talk First?</h3>'
 	. '<p style="color:var(--eqc-muted);">If you have questions before requesting a trial, reach out directly and we will help you choose.</p>'
 	. '<div style="margin-top:1.2em;display:flex;flex-direction:column;gap:0.75rem;align-items:flex-start;">'
-	. '<a class="eqc-btn eqc-btn--secondary" href="' . eqc_whatsapp_url( "Assalamu alaikum, I'd like to ask about a free trial class." ) . '">' . eqc_icon_str( 'whatsapp' ) . ' Chat on WhatsApp</a>'
+	. '<a class="eqc-btn eqc-btn--secondary eqc-btn--whatsapp" href="' . eqc_whatsapp_url( "Assalamu alaikum, I'd like to ask about a free trial class." ) . '">' . eqc_icon_str( 'whatsapp' ) . ' Chat on WhatsApp</a>'
 	. '<a class="eqc-btn eqc-btn--secondary" href="' . esc_url( home_url( '/contact/' ) ) . '">' . eqc_icon_str( 'mail' ) . ' Contact Us</a>'
 	. '</div>'
 	. '<p style="margin-top:1.5em;color:var(--eqc-muted);font-size:var(--eqc-fs-small);">Have a question first? See our <a href="' . esc_url( home_url( '/faq/' ) ) . '" style="color:var(--eqc-bronze-700);">FAQ</a>.</p>'

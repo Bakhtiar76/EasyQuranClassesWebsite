@@ -238,13 +238,21 @@ function eqc_icon_str( $name, $class = '' ) {
  * @param string $modifier Optional extra class (e.g. 'eqc-corner-motif--sm'
  *                          for the smaller pair used inside a nested panel
  *                          like .eqc-pricing-panel).
+ * @param array  $corners  Which corners to draw: any of 'tl', 'tr', 'bl',
+ *                          'br'. Defaults to the site-wide tr/bl diagonal.
+ *                          The home About section overrides it because
+ *                          Assests/Home2.jpeg puts its arabesque top-left.
  */
-function eqc_section_ornaments( $modifier = '' ) {
+function eqc_section_ornaments( $modifier = '', $corners = array( 'tr', 'bl' ) ) {
 	$extra = $modifier ? ' ' . $modifier : '';
-	return eqc_html(
-		'<span class="eqc-corner-motif eqc-corner-motif--tr' . esc_attr( $extra ) . '" aria-hidden="true"></span>'
-		. '<span class="eqc-corner-motif eqc-corner-motif--bl' . esc_attr( $extra ) . '" aria-hidden="true"></span>'
-	);
+	$html  = '';
+	foreach ( $corners as $corner ) {
+		if ( ! in_array( $corner, array( 'tl', 'tr', 'bl', 'br' ), true ) ) {
+			continue;
+		}
+		$html .= '<span class="eqc-corner-motif eqc-corner-motif--' . esc_attr( $corner . $extra ) . '" aria-hidden="true"></span>';
+	}
+	return eqc_html( $html );
 }
 
 /**
@@ -259,19 +267,29 @@ function eqc_section_ornaments( $modifier = '' ) {
  * and the circular arrow is a purely decorative, non-nested affordance
  * matching the client reference.
  */
-function eqc_course_card( $number, $title, $level, $description, $link, $reveal_index = 0 ) {
+function eqc_course_card( $number, $title, $level, $description, $link, $reveal_index = 0, $anchor = '' ) {
 	$label = sprintf(
 		/* translators: %s: course title, read by screen readers only — the card has no other visible link text. */
 		__( 'Learn more about %s', 'easy-quran-classes' ),
 		wp_strip_all_tags( $title )
 	);
+	$settings = array(
+		'css_classes'    => 'eqc-card eqc-card--course',
+		'flex_direction' => 'column',
+	);
+	if ( $anchor ) {
+		$settings['_element_id'] = $anchor;
+	}
 	return eqc_container(
+		$settings,
 		array(
-			'css_classes'    => 'eqc-card eqc-card--course',
-			'flex_direction' => 'column',
-		),
-		array(
-			eqc_html( '<a class="eqc-card-link" href="' . esc_url( $link ) . '" aria-label="' . esc_attr( $label ) . '"></a>' ),
+			// The wrapper class is load-bearing, not decorative: Elementor puts
+			// two divs between this anchor and the card, and .eqc-card--course's
+			// own `> * { position: relative }` was making the outer one the
+			// anchor's containing block — collapsing the stretched link to zero
+			// height and killing the whole card as a CTA. See the
+			// .eqc-card-link-widget note in components.css.
+			eqc_html( '<a class="eqc-card-link" href="' . esc_url( $link ) . '" aria-label="' . esc_attr( $label ) . '"></a>', 'eqc-card-link-widget' ),
 			eqc_html( '<span class="eqc-card-index"><span class="eqc-card-index-num">' . esc_html( $number ) . '</span></span>' ),
 			eqc_heading( $title, 'h3' ),
 			eqc_html( '<p class="eqc-card-level">' . esc_html( $level ) . '</p>' ),
@@ -313,7 +331,7 @@ function eqc_teacher_card( $attachment_id, $name, $role, $facts ) {
 					'_css_classes' => 'eqc-teacher-photo-widget',
 				)
 			),
-			eqc_html( '<span class="eqc-teacher-seal" aria-hidden="true">' . eqc_icon_str( 'book-open' ) . '</span>' ),
+			eqc_html( '<span class="eqc-teacher-seal" aria-hidden="true">' . eqc_icon_str( 'rehal-quran' ) . '</span>' ),
 			// "|" is an explicit line break: the reference sets every teacher
 			// name on two lines, and the break is what keeps the four cards
 			// the same height regardless of name length.
@@ -378,15 +396,22 @@ function eqc_pricing_card( $frequency, $price, $unit, $features, $link, $feature
 	);
 
 	$children   = array();
-	$children[] = eqc_html( '<a class="eqc-card-link" href="' . esc_url( $link ) . '" aria-label="' . esc_attr( $label ) . '"></a>' );
+	// See the eqc_course_card() note: the featured card's `> * { position:
+	// relative }` had the same zero-height effect on this link.
+	$children[] = eqc_html( '<a class="eqc-card-link" href="' . esc_url( $link ) . '" aria-label="' . esc_attr( $label ) . '"></a>', 'eqc-card-link-widget' );
+	// The badge and the medallion are both anchored to the CARD's top edge, so
+	// their widget wrappers must not become their containing block either — see
+	// the eqc-card-link-widget note above. Left unmarked, the featured card's
+	// medallion rendered 38px lower than its three siblings' and the badge sat
+	// inside the card instead of astride its edge.
 	if ( $featured ) {
-		$children[] = eqc_html( '<span class="eqc-pricing-badge">' . esc_html__( 'Recommended', 'easy-quran-classes' ) . '</span>' );
+		$children[] = eqc_html( '<span class="eqc-pricing-badge">' . esc_html__( 'Recommended', 'easy-quran-classes' ) . '</span>', 'eqc-pricing-anchor-widget' );
 	}
 	$children[] = eqc_html(
-		'<span class="eqc-pricing-icon"><span class="eqc-pricing-icon-ring" aria-hidden="true">' . eqc_get_svg_asset( 'pricing-medallion-frame' ) . '</span>' . eqc_icon_str( 'calendar' ) . '</span>'
+		'<span class="eqc-pricing-icon"><span class="eqc-pricing-icon-ring" aria-hidden="true">' . eqc_get_svg_asset( 'pricing-medallion-frame' ) . '</span>' . eqc_icon_str( 'calendar' ) . '</span>',
+		'eqc-pricing-anchor-widget'
 	);
 	$children[] = eqc_html( '<span class="eqc-pricing-freq eqc-pricing-banner">' . esc_html( $frequency ) . '</span>' );
-	$children[] = eqc_html( '<div class="eqc-pricing-divider">' . eqc_divider_svg( 'accent' ) . '</div>' );
 	$children[] = eqc_html( $features_html );
 	$children[] = eqc_html( '<div class="eqc-pricing-price-divider">' . eqc_divider_svg( 'price' ) . '</div>' );
 	$children[] = eqc_html(

@@ -11,7 +11,7 @@ $faq_url   = home_url( '/faq/' );
 $hero = eqc_page_hero(
 	'Contact Us',
 	"We're here to help",
-	'Questions about courses, pricing or scheduling? Send a message or reach us directly — we typically reply within one business day.',
+	'Questions about courses, pricing or scheduling? Send a message or reach us directly. We typically reply within one business day.',
 	'mail'
 );
 
@@ -27,7 +27,7 @@ $contact_info_html =
 	. '<li>' . eqc_icon_str( 'phone' ) . '<span>' . esc_html( $contact_phone ) . '</span></li>'
 	. '</ul>'
 	. '<div style="margin-top:1.5em;">'
-	. '<a class="eqc-btn eqc-btn--secondary" href="' . eqc_whatsapp_url( "Assalamu alaikum, I'd like to ask about Easy Quran Classes." ) . '">' . eqc_icon_str( 'whatsapp' ) . ' Chat on WhatsApp</a>'
+	. '<a class="eqc-btn eqc-btn--secondary eqc-btn--whatsapp" href="' . eqc_whatsapp_url( "Assalamu alaikum, I'd like to ask about Easy Quran Classes." ) . '">' . eqc_icon_str( 'whatsapp' ) . ' Chat on WhatsApp</a>'
 	. '</div>'
 	. '<p style="margin-top:1.5em;color:var(--eqc-muted);font-size:var(--eqc-fs-small);">Looking for a quick answer instead? Check our <a href="' . esc_url( $faq_url ) . '" style="color:var(--eqc-bronze-700);">FAQ</a> or <a href="' . esc_url( $trial_url ) . '" style="color:var(--eqc-bronze-700);">book a free trial</a> directly.</p>'
 	. '</div>';
