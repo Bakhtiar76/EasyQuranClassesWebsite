@@ -128,22 +128,23 @@ write(
 }
 
 // ---------------------------------------------------------------------
-// 4. favicon.svg — the mark alone with an explicit fill (favicons render
-//    outside any page CSS context, so currentColor has nothing to
-//    inherit). Same geometry as eqc-logo-mark.svg — at 16-32px the fine
-//    calligraphy/book-line detail recedes but the arch+headset silhouette
-//    (the part that actually reads at that size) stays intact, same as
-//    how the mark already reads in the browser tests above.
+// 4. favicon.svg — a circular badge with the mark in an explicit fill
+//    (favicons render outside any page CSS context, so currentColor has
+//    nothing to inherit). The circular field gives the browser tab a clean,
+//    deliberate silhouette instead of exposing the square canvas.
 // ---------------------------------------------------------------------
-// A favicon canvas must be SQUARE: browsers scale it into a square slot, so a
-// 770x692 viewBox renders the mark stretched ~11% vertically in the tab. The
-// mark is centred in a 770x770 box instead, with the cream ground filling it.
+// A favicon canvas must still be SQUARE: browsers scale it into a square slot.
+// Keep the source mark padded inside the circular badge so the headphones do
+// not crowd or clip at small tab sizes.
 const FAV = Math.max(MARK_W, MARK_H);
+const FAV_MARK_SCALE = 0.82;
+const FAV_MARK_W = MARK_W * FAV_MARK_SCALE;
+const FAV_MARK_H = MARK_H * FAV_MARK_SCALE;
 write(
 	'favicon.svg',
 	`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${FAV} ${FAV}">` +
-	`<rect width="${FAV}" height="${FAV}" fill="#F7F3EC"/>` +
-	`<g fill="#1B3A2D" transform="translate(${(FAV - MARK_W) / 2} ${(FAV - MARK_H) / 2})">${markPath(0, 0, 1)}</g>` +
+	`<circle cx="${FAV / 2}" cy="${FAV / 2}" r="${FAV / 2}" fill="#1B3A2D"/>` +
+	`<g fill="#F7F3EC" transform="translate(${(FAV - FAV_MARK_W) / 2} ${(FAV - FAV_MARK_H) / 2})">${markPath(0, 0, FAV_MARK_SCALE)}</g>` +
 	`</svg>`
 );
 
