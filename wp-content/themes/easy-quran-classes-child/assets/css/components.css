@@ -1014,7 +1014,12 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
    .eqc-carousel-viewport > .eqc-carousel-track > (cards), plus sibling
    .eqc-carousel-arrow buttons and an .eqc-slider-dots row. */
 .eqc-carousel { position: relative; padding-inline: clamp(0px, 2vw, 2.75em); }
-.eqc-carousel-viewport { overflow: hidden; }
+/* pan-y: the track is transform-positioned, not natively scrollable, so a
+   finger swipe has nothing to grab without JS (see the pointer handlers in
+   initCarousel(), eqc.js). pan-y leaves vertical page scroll to the browser
+   untouched and hands horizontal drags to that JS, with no preventDefault()
+   fight needed. */
+.eqc-carousel-viewport { overflow: hidden; touch-action: pan-y; }
 .eqc-carousel-track {
 	/* !important on display/flex-wrap: Elementor's own container default is
 	   flex-wrap:wrap, which this single-row sliding track can never allow —
@@ -1029,6 +1034,10 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
 	will-change: transform;
 	--_visible: 3;
 }
+/* While a drag is live the transform is set per pointermove frame, not by
+   the transition above — with the transition still active, each frame
+   would visibly lag behind the finger instead of tracking it 1:1. */
+.eqc-carousel-track.eqc-carousel--dragging { transition: none; }
 @media (max-width: 61.25rem) { .eqc-carousel-track { --_visible: 2; } }
 @media (max-width: 36rem) { .eqc-carousel-track { --_visible: 1; } }
 /* !important: each card here is an Elementor Container in its own right

@@ -383,6 +383,96 @@
 				}
 			} );
 
+			/* Touch/mouse/pen swipe. Unlike the teacher row (native
+			 * scroll-snap, see setupTeacherRow() below), this carousel
+			 * positions its track with `transform`, which is not a
+			 * scrollable element — so without this, a finger swipe over it
+			 * has nothing to grab and only the dots/arrows work.
+			 * `.eqc-carousel-viewport { touch-action: pan-y }` (components.css)
+			 * leaves vertical page scroll to the browser and hands
+			 * horizontal drags to us, so no preventDefault() fight is
+			 * needed. A move only commits to a swipe once it is clearly
+			 * more horizontal than vertical, past a small slop threshold —
+			 * short of that, it's released back to the page as a normal
+			 * scroll/tap. */
+			var dragPointerId = null;
+			var dragging = false;
+			var dragStartX = 0;
+			var dragStartY = 0;
+			var dragDeltaX = 0;
+
+			carousel.addEventListener( 'pointerdown', function ( e ) {
+				if ( 'mouse' === e.pointerType && 0 !== e.button ) {
+					return;
+				}
+				dragPointerId = e.pointerId;
+				dragging = false;
+				dragStartX = e.clientX;
+				dragStartY = e.clientY;
+				dragDeltaX = 0;
+				stopAutoplay();
+			} );
+
+			carousel.addEventListener( 'pointermove', function ( e ) {
+				if ( null === dragPointerId || e.pointerId !== dragPointerId ) {
+					return;
+				}
+				var dx = e.clientX - dragStartX;
+				var dy = e.clientY - dragStartY;
+				if ( ! dragging ) {
+					if ( Math.abs( dx ) < 8 && Math.abs( dy ) < 8 ) {
+						return;
+					}
+					if ( Math.abs( dy ) > Math.abs( dx ) ) {
+						// A vertical gesture — not ours; let the page scroll.
+						dragPointerId = null;
+						return;
+					}
+					dragging = true;
+					track.classList.add( 'eqc-carousel--dragging' );
+					// Best-effort: capture keeps the drag tracking the pointer
+					// even if it leaves the carousel's bounds. Not essential —
+					// the pointer can legitimately no longer be "active" by the
+					// time this runs (e.g. already released), which throws
+					// rather than silently no-op'ing, so this must not be
+					// allowed to abort the rest of the handler.
+					try {
+						carousel.setPointerCapture( dragPointerId );
+					} catch ( err ) {}
+				}
+				dragDeltaX = dx;
+				var base = -( index * ( 100 / visibleCount() ) );
+				var percent = ( dragDeltaX / track.getBoundingClientRect().width ) * 100;
+				track.style.transform = 'translateX(' + ( base + percent ) + '%)';
+			} );
+
+			function endDrag( e ) {
+				if ( null === dragPointerId || e.pointerId !== dragPointerId ) {
+					return;
+				}
+				if ( dragging ) {
+					track.classList.remove( 'eqc-carousel--dragging' );
+					// A firm fifth of the viewport commits to the next/previous
+					// card; anything shorter snaps back to the current one.
+					var threshold = Math.max( 40, track.getBoundingClientRect().width * 0.18 );
+					if ( dragDeltaX <= -threshold ) {
+						goTo( index + 1 );
+					} else if ( dragDeltaX >= threshold ) {
+						goTo( index - 1 );
+					} else {
+						render();
+					}
+					if ( carousel.hasPointerCapture( dragPointerId ) ) {
+						carousel.releasePointerCapture( dragPointerId );
+					}
+				}
+				dragPointerId = null;
+				dragging = false;
+				startAutoplay();
+			}
+			carousel.addEventListener( 'pointerup', endDrag );
+			carousel.addEventListener( 'pointercancel', endDrag );
+
 			window.addEventListener( 'resize', function () {
 				buildDots();
 				render();
