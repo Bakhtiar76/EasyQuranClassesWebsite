@@ -550,7 +550,6 @@ a.eqc-cta-button:focus-visible { outline-color: var(--eqc-green-900); }
 	.eqc-cta-body { font-size: min(1.15vw, 22px); line-height: 1.7; }
 	.eqc-cta-capsule { align-self: end; flex-wrap: nowrap; margin-bottom: min(0.8vw, 15px); gap: min(0.8vw, 15px); padding: min(2.05vw, 39px) min(1.3vw, 25px); border-radius: min(3.2vw, 62px); }
 	.eqc-avatar-stack img { --_avatar: min(6.1vw, 117px); margin-inline-start: calc(var(--_avatar) * -0.17); }
-	.eqc-avatar-stack img:first-child { margin-inline-start: 0; }
 	.eqc-cta-stat { --_stat: min(6.4vw, 122px); margin-inline-start: calc(var(--_stat) * -0.18); }
 	a.eqc-cta-button { --_h: min(5.1vw, 98px); flex: 1; font-size: min(1.05vw, 20px); padding-inline: min(0.8vw, 15px); white-space: nowrap; }
 	.eqc-cta-button-icon { --_badge-size: min(3vw, 58px); }

@@ -47,15 +47,6 @@ html.eqc-js [data-eqc-reveal].is-visible {
 }
 html.eqc-js .is-visible .eqc-heading-rule--draw { transform: scaleX(1); }
 
-/* How It Works progress line. */
-.eqc-path-line {
-	stroke-dasharray: 1;
-	stroke-dashoffset: 1;
-	pathLength: 1;
-	transition: stroke-dashoffset var(--eqc-motion-slow) var(--eqc-ease-standard);
-}
-html.eqc-js .is-visible .eqc-path-line { stroke-dashoffset: 0; }
-
 /* Sticky header state change. */
 .eqc-header {
 	transition: box-shadow var(--eqc-motion-base) var(--eqc-ease-standard),
@@ -113,15 +104,13 @@ html.eqc-js .eqc-corner-motif--br { animation-name: eqc-drift-br; }
 		transform: none;
 		transition: none;
 	}
-	.eqc-heading-rule--draw,
-	.eqc-path-line {
+	.eqc-heading-rule--draw {
 		transition: none;
 		transform: none;
 		stroke-dashoffset: 0;
 	}
 	.eqc-heading-rule--ornate::before,
-	.eqc-heading-rule--ornate::after,
-	.eqc-divider-flower {
+	.eqc-heading-rule--ornate::after {
 		transition: none;
 		transform: scaleX(1);
 		opacity: 1;
