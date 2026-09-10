@@ -651,3 +651,101 @@ monthly) otherwise, following this same procedure. Do not delete the
 2026-09-07 pre-deployment backup or these 2026-09-08 backups when taking new
 ones — keep the most recent 2-3 rotations per `CPANEL-WORKFLOW.md` §14's
 "never delete the last known-good backup" rule.
+
+## 21. Round 11 Production Update — First Post-Launch Content Sync (2026-09-10)
+
+Production had been live since 2026-09-08 (§18-20) but was never updated
+after that first deploy — confirmed by measurement, not assumed: live
+served theme `?ver=1.0.0` against local's `1.11.0`; live homepage HTML had
+none of the new course/pricing-card or teacher dot-nav markup (10 QA rounds
+and 22 `tools/pages/*.php` commits behind); live photos were the pre-
+licensing crops (e.g. 34,480 bytes) against local's licensed replacements
+(up to 111,678 bytes). This section is the **update deployment** — theme +
+database delta + uploads together, not a fresh Mode-A install like §7-13.
+Package details/checksums: `local/backups/RELEASE-MANIFEST.md`.
+
+**Sequence actually run, with explicit user approval at each stage:** fresh
+full account backup (Backup Wizard, 161.75 MB) → theme released to `main`
+via an isolated worktree, FTPS Action confirmed successful → licensed
+uploads extracted via File Manager (165 files) → production-URL SQL
+imported via phpMyAdmin (110 queries) → the mandatory Elementor JSON-
+escaped-URL fix applied (§8; one `UPDATE ... REPLACE()` statement, 193 rows
+affected) → account-level NGINX cache cleared. Full verification via plain
+`curl` (no cache-bypass tricks — what a real visitor gets, see the gotcha
+below) on 6 routes: 0 remaining `http://localhost` references, new markup
+classes present, hero image confirmed serving at the licensed 111,678-byte
+size, 0 console errors, `noindex, nofollow` confirmed unchanged.
+
+### Gotcha: a browser hard-reload can pass verification while real visitors still see stale content
+
+Chrome's `ignoreCache`/hard-reload sends `Cache-Control: no-cache`, which
+this account's NGINX reverse-proxy cache (§ home-page toggle, referenced
+throughout §17/§19) honors and bypasses — so a hard-reloaded browser check
+can show the post-fix page while a plain request (any real visitor, `curl`,
+a search-engine crawler) is still served whatever NGINX cached *before* the
+fix. This produced a real false-positive during the Round 11 deploy: a
+browser-based check showed the Elementor JSON-escaped-URL fix already live,
+but the client independently reported "empty images" — a plain `curl` fetch
+confirmed the live homepage was still serving `http://localhost/...` image
+URLs. Root cause: the NGINX cache was cleared once, but *before* the URL
+fix ran, and repopulated with pre-fix content from the browser checks done
+in between. **Lesson: verify any post-deploy fix with a plain, non-cache-
+bypassing request (`curl` with no special headers) — not a hard-reloaded
+browser — and clear the NGINX cache *after* the last content-changing step,
+not before it.**
+
+### Gotcha: phpMyAdmin's own JS is unreliable to drive via CDP-based browser automation
+
+Three different ways of triggering phpMyAdmin action buttons each failed a
+different way this round:
+- The file-**Import** button's own click handler silently did not submit —
+  confirmed via `list_network_requests`: the click registered in the DOM
+  (button focus changed) but zero HTTP request fired. **Fix that worked:**
+  grab the underlying `<form>` via `document.getElementById('input_import_file').closest('form')`
+  and call `form.submit()` directly, bypassing the button's JS entirely.
+  This is what actually landed both the 110-query production-content import
+  and the follow-up 1-query URL-escape fix.
+- The **SQL query console** ("Run SQL query" tab) is unreliable by a
+  different failure mode: clicking its own "Go" button, `form.submit()` on
+  that form, and `form.requestSubmit(goButton)` each failed differently (a
+  silent no-op, a server-side "Incorrect format parameter" from hitting the
+  wrong internal route, and a query box that came back empty after
+  submission). **Never fought further — the working file-based Import
+  method above was reused instead**: write the one-off SQL as a tiny `.sql`
+  file, upload it through the same file-input + `form.submit()` path that
+  already works. This is the reliable path for any future one-off
+  production SQL from an automated session, not the query console.
+- A stray, unrelated browser alert ("Missing value in the form!") was left
+  open on the phpMyAdmin tab by one of the failed attempts above and blocked
+  further navigation on that tab until explicitly dismissed
+  (`handle_dialog`) — worth checking for on any phpMyAdmin tab that stops
+  responding to navigation.
+
+### CI/CD pipeline — re-verified end-to-end, 4/4 successful runs
+
+Two more live pushes to `main` this round (theme release `1cf7403`, favicon
+follow-up `118ea5e`) both triggered `.github/workflows/deploy.yml`
+correctly and completed `success` in single digits of seconds — consistent
+with the original 2026-09-08 build/test (§18) and its bump/revert
+round-trip. Cumulative: 4/4 successful runs across two separate sessions.
+The favicon release also incidentally verified the **deletion** side of the
+sync (`dangerous-clean-slate: false` still respects file removals via the
+Action's own state tracking, not just additions/updates) — `favicon-32.png`
+was removed from the theme locally, released, and confirmed `404` on
+production afterward, with no other file affected.
+
+### Session-driven cPanel browser automation (new working mode this round)
+
+This round is also the first time a session drove cPanel/phpMyAdmin/File
+Manager directly via `chrome-devtools` MCP after the user logged in
+themselves (rather than the user clicking through cPanel per §15/§17's
+original framing) — an explicit, mid-session user redirect, not a default.
+The security boundary held throughout: the session never saw, typed, or
+had access to the login credentials (the user typed them directly into the
+browser window this session was already controlling, same pattern as the
+read-only 2026-09-07 audit); every write action (file upload, SQL import,
+cache clear) was narrated and independently verified afterward via
+read-only checks against the public site. Treat this as available on
+future rounds only when the user explicitly asks for it again, not as the
+new default — §15's "user controls cPanel login and sensitive UI actions
+by default" still stands as the baseline.
