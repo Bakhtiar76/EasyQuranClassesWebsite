@@ -38,7 +38,7 @@ function eqc_print_icon_sprite() {
 
 		<symbol id="eqc-icon-calendar" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="16.4" x="3" y="4.6" rx="2.8"/><path d="M3 9.6h18m-12.8-7v3.8m7.6-3.8v3.8"/><g fill="currentColor" stroke-width="0"><rect width="2.2" height="2.2" x="6.9" y="12.2" rx=".5"/><rect width="2.2" height="2.2" x="10.9" y="12.2" rx=".5"/><rect width="2.2" height="2.2" x="14.9" y="12.2" rx=".5"/><rect width="2.2" height="2.2" x="6.9" y="16.4" rx=".5"/><rect width="2.2" height="2.2" x="10.9" y="16.4" rx=".5"/><rect width="2.2" height="2.2" x="14.9" y="16.4" rx=".5"/></g></symbol>
 
-		<symbol id="eqc-icon-certificate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M13.2 2.6H6.3A2.3 2.3 0 0 0 4 4.9v14.2a2.3 2.3 0 0 0 2.3 2.3h4.4m2.5-18.8L19.6 9v2.4"/><path d="M13.2 2.6v4.8A1.6 1.6 0 0 0 14.8 9h4.8M7.3 10.6h6.2m-6.2 2.8h5m-5 2.8h3.4"/><circle cx="17.8" cy="16.2" r="3.4"/><path d="M17.8 14.5v3.2m-1.4-1.3 1.4 1.3 1.4-1.3M15.6 19l-.5 2.9 2.7-1.3 2.7 1.3L20 19"/></symbol>
+		<symbol id="eqc-icon-certificate" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><g stroke-width="1.6"><path d="M13.2 2.6H6.3A2.3 2.3 0 0 0 4 4.9v14.2a2.3 2.3 0 0 0 2.3 2.3h4.4m2.5-18.8L19.6 9v2.4"/><path d="M13.2 2.6v4.8A1.6 1.6 0 0 0 14.8 9h4.8M7.3 10.6h6.2m-6.2 2.8h5m-5 2.8h3.4"/><circle cx="17.8" cy="16.2" r="3.4"/><path d="M17.8 14.5v3.2m-1.4-1.3 1.4 1.3 1.4-1.3M15.6 19l-.5 2.9 2.7-1.3 2.7 1.3L20 19"/></g></symbol>
 
 		<symbol id="eqc-icon-certificate-filled" viewBox="0 0 24 24" fill="currentColor" stroke-width="0"><path d="m7.6 12.8-2.4 9.5 3.6-1.5 2.4 1.7.8-8.6.8 8.6 2.4-1.7 3.6 1.5-2.4-9.5Z"/><path fill-rule="evenodd" d="m12 1.5 1.449 1.291 1.901-.393.61 1.842 1.842.61-.393 1.901L18.7 8.2l-1.291 1.449.393 1.901-1.842.61-.61 1.842-1.901-.393L12 14.9l-1.449-1.291-1.901.393-.61-1.842-1.842-.61.393-1.901L5.3 8.2l1.291-1.449-.393-1.901 1.842-.61.61-1.842 1.901.393Zm0 3.2 1 2.323 2.519.234-1.9 1.669.556 2.467L12 10.102l-2.175 1.291.556-2.467-1.9-1.669L11 7.023Z"/></symbol>
 
@@ -54,7 +54,7 @@ function eqc_print_icon_sprite() {
 
 		<symbol id="eqc-icon-clipboard-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect width="16.4" height="17.2" x="3.8" y="4.4" rx="2.6"/><path d="M8.4 2.6v3.6m7.2-3.6v3.6M7.4 10l1.5 1.5 2.9-2.9m-4.4 6.6 1.5 1.5 2.9-2.9m2.4-3.6h2.6m-2.6 5.2h2.6"/></symbol>
 
-		<symbol id="eqc-icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.4"/><path d="M12 6.8V12l3.9 2.4M12 2.8v1.7m0 15v1.7M2.8 12h1.7m15 0h1.7"/></symbol>
+		<symbol id="eqc-icon-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9.4"/><path d="M12 6.8V12l3.9 2.4"/><path stroke-width="1.3" d="M12 3.2v1.2m0 15.2v1.2M3.2 12h1.2m15.2 0h1.2"/></symbol>
 
 		<symbol id="eqc-icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12"/></symbol>
 
@@ -84,7 +84,7 @@ function eqc_print_icon_sprite() {
 
 		<symbol id="eqc-icon-map-pin-filled" viewBox="0 0 24 24" fill="currentColor" stroke-width="0"><path fill-rule="evenodd" d="M12 1.5a8 8 0 0 0-8 8c0 5 8 13 8 13s8-8 8-13a8 8 0 0 0-8-8m3 8a3 3 0 1 0-6 0 3 3 0 1 0 6 0"/></symbol>
 
-		<symbol id="eqc-icon-megaphone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect width="4.8" height="5.6" x="2.2" y="9.2" rx="1.2"/><path d="m7 9 10.6-4.8v15.6L7 15Zm-2.4 5.8v3.4a2.2 2.2 0 0 0 4.4 0V16m11-4h2m-1-1v2"/></symbol>
+		<symbol id="eqc-icon-megaphone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><g stroke-width="1.8"><rect width="4.8" height="5.6" x="2.2" y="9.2" rx="1.2"/><path d="m7 9 10.6-4.8v15.6L7 15Zm-2.4 5.8v3.4a2.2 2.2 0 0 0 4.4 0V16m11-4h2m-1-1v2"/></g></symbol>
 
 		<symbol id="eqc-icon-menu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16M4 12h16M4 19h16"/></symbol>
 
@@ -96,7 +96,7 @@ function eqc_print_icon_sprite() {
 
 		<symbol id="eqc-icon-person-filled" viewBox="0 0 24 24" fill="currentColor" stroke-width="0"><circle cx="12" cy="6.6" r="4.4"/><path d="M3.2 21v-2.2c0-4.1 3.9-6.1 8.8-6.1s8.8 2 8.8 6.1V21Z"/></symbol>
 
-		<symbol id="eqc-icon-phone" viewBox="0 0 24 24" fill="currentColor" stroke-width="0"><path d="M6.6 2.9a1.9 1.9 0 0 0-2.5.4L2.6 5.1c-.8.9-1 2.2-.5 3.3a24 24 0 0 0 13.5 13.5c1.1.5 2.4.3 3.3-.5l1.8-1.5a1.9 1.9 0 0 0 .4-2.5l-2.4-3.8a1.9 1.9 0 0 0-2.4-.7l-2 1A13 13 0 0 1 9 8.6l1-2a1.9 1.9 0 0 0-.7-2.4Z"/><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="1.6" d="M14.6 7.2a3.6 3.6 0 0 1 2.3 2.8m-1.7-4.5a5.4 5.4 0 0 1 3.5 4.2m-2.8-5.9a7.2 7.2 0 0 1 4.6 5.6"/></symbol>
+		<symbol id="eqc-icon-phone" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M14.05 6c.98.19 1.87.67 2.58 1.37.7.71 1.18 1.6 1.37 2.58M14.05 2c2.03.23 3.92 1.13 5.37 2.58A9 9 0 0 1 22 9.94M18.5 21C9.94 21 3 14.06 3 5.5c0-.39.01-.77.04-1.15.03-.43.05-.65.16-.85.09-.16.26-.32.44-.4.2-.1.44-.1.92-.1h2.82c.4 0 .6 0 .78.07.15.06.29.15.4.28.12.14.19.33.32.71l1.17 3.2c.16.45.24.67.23.88-.01.18-.08.36-.19.51-.12.17-.32.29-.72.53L8 10c1.2 2.65 3.35 4.8 6 6l.82-1.37c.24-.4.36-.6.53-.72.15-.11.33-.17.51-.19.21-.01.43.07.87.23l3.21 1.17c.38.13.57.2.71.32.13.11.22.25.28.4.07.17.07.37.07.78v2.82c0 .48 0 .72-.1.92-.08.18-.24.35-.4.44-.2.11-.42.13-.85.16-.38.03-.76.04-1.15.04"/></symbol>
 
 		<symbol id="eqc-icon-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14m-7-7v14"/></symbol>
 

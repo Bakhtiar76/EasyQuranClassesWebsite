@@ -496,11 +496,21 @@ function bulgedArc(from, to, sag, outwardSign) {
 /** Measured three-lobe cusped keel arch (the Home.jpeg hero). `stops` are
  * [x/w, y/baseH] cusp points from the apex down the LEFT side, `sagittae`
  * the perpendicular bulge of each segment as a fraction of w. Defaults are
- * the measured fit; override to fit a different reference. */
+ * the measured fit; override to fit a different reference.
+ *
+ * `bottomRadius` rounds the two square base corners into quarter-arcs. The
+ * client's About collage reference (QA/qa-10092026/14.png) closes the arch's
+ * foot with a curve; the hero's reference does not, so this is opt-in and the
+ * default output is byte-identical to the square-footed original. The rounded
+ * path deliberately STARTS at (r, baseH) and ENDS at (w-r, baseH), so the
+ * existing `d.replace(/Z$/, '')` trick that derives the open-bottom frame
+ * keeps working: dropping the close removes exactly the flat base and leaves
+ * corner-arc + jambs + arch as one continuous stroked run. */
 export function cuspedArchPanel(w, jamb, baseH, {
 	// left-side cusps, base -> apex (x fraction of w, y fraction of baseH)
 	stops = [[0.0000, 0.4626], [0.0751, 0.3498], [0.2397, 0.1908], [0.4365, 0.0477]],
 	sagittae = [0.0130, 0.0363, 0.0218],
+	bottomRadius = 0,
 } = {}) {
 	const hw = w / 2, apex = [hw, 0];
 	const P = stops.map(([fx, fy]) => [fx * w, fy * baseH]);
@@ -522,9 +532,20 @@ export function cuspedArchPanel(w, jamb, baseH, {
 		const seg = bulgedArc(R[i], R[i + 1], sagittae[sagittae.length - 1 - i] * w, -1);
 		rightD += seg.d; extent = extent.concat(seg.extent);
 	}
-	rightD += `L${fmt(w)} ${fmt(baseH)} `;
+	// Clamp so a radius can never eat past the jamb or the half-width.
+	const r = Math.max(0, Math.min(bottomRadius, w / 2, baseH - P[0][1]));
 
-	const d = `M0 ${fmt(baseH)} L${fmt(P[0][0])} ${fmt(P[0][1])} ${leftD}${rightD}Z`;
+	rightD += `L${fmt(w)} ${fmt(baseH - r)} `;
+
+	// Sweep flag 1 on both corners: the run travels up the left jamb, over the
+	// crown and down the right, which is clockwise in SVG's y-down space, so
+	// both quarter-arcs turn the same way to stay convex.
+	const startD = r
+		? `M${fmt(r)} ${fmt(baseH)} A${fmt(r)} ${fmt(r)} 0 0 1 0 ${fmt(baseH - r)} `
+		: `M0 ${fmt(baseH)} `;
+	const endD = r ? `A${fmt(r)} ${fmt(r)} 0 0 1 ${fmt(w - r)} ${fmt(baseH)} ` : '';
+
+	const d = `${startD}L${fmt(P[0][0])} ${fmt(P[0][1])} ${leftD}${rightD}${endD}Z`;
 	const bbox = mergeBbox(bboxOf([[0, 0], [w, 0], [0, baseH], [w, baseH]]), bboxOf(extent));
 	return { d, bbox };
 }

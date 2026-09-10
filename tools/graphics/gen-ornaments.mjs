@@ -37,7 +37,30 @@ import {
 	cuspedArchPanel,
 } from './lib/arches.mjs';
 
-const rosetteTrace = JSON.parse(readFileSync(new URL('./scratch/rosette-traced.json', import.meta.url), 'utf8'));
+/** Read a build input that lives in the gitignored scratch/ directory.
+ * Those files are produced by the trace step, not committed, so on a fresh
+ * clone they simply do not exist — and a raw ENOENT here reads like a broken
+ * script rather than a missing prerequisite. Name the command that creates it. */
+function readTraced(file, producedBy) {
+	try {
+		return readFileSync(new URL(`./scratch/${file}`, import.meta.url), 'utf8');
+	} catch (err) {
+		if (err.code !== 'ENOENT') throw err;
+		throw new Error(
+			`Missing build input scratch/${file}.
+` +
+			`It is generated, not committed. Run this first, from tools/graphics:
+
+` +
+			`    node ${producedBy}
+
+` +
+			`See tools/graphics/README.md for the full regeneration sequence.`
+		);
+	}
+}
+
+const rosetteTrace = JSON.parse(readTraced('rosette-traced.json', 'trace-rosette.mjs'));
 
 /** Place the traced 8-fold rosette (centered at its own origin, see
  * trace-rosette.mjs) at (cx, cy) scaled so its outer radius becomes r. */
@@ -242,8 +265,29 @@ for (const [name, a] of [['fine', 34], ['dense', 52]]) {
 
 // Shared angular field. A real SVG pattern clips each repeat unit before
 // repetition, preventing coincident duplicate strokes between neighbors.
-function girihPattern(id, side, strokeWidth = 1.2) {
+/** @param cornerPhase  Set for the corner ornaments: shifts the lace so its
+ *  dense corner lands on a star's RING rather than in a void.
+ *
+ *  The lace tiles from the SVG origin and the canvas is not a whole number of
+ *  tiles wide, so by default the far corner fell in a gap — measured 7px of
+ *  empty canvas at corner-motif.svg's top-right corner, which is why the
+ *  ornament looked detached from the card corner it should meet (client
+ *  review, round 8). Aligning a star CENTRE there is worse, not better: the
+ *  stars are drawn as outlines, so their centre is hollow (that attempt
+ *  measured a 10px gap).
+ *
+ *  The right phase depends on the tile size, so it is NOT a shared constant —
+ *  each corner asset carries its own, found by sweeping every phase and
+ *  scoring ink in the block hugging the corner:
+ *    corner-motif  (D 33.8): 11/12 -> corner alpha 116, gap 0, ink 130
+ *                            (phase 0 was alpha 0, gap 7px, ink 121)
+ *    lattice-corner(D 72.4): 5/6   -> corner alpha 132, gap 0, ink 44
+ *                            (11/12 here would leave a 31px gap)
+ *  Re-measure with the same sweep if a tile size or canvas size changes. */
+function girihPattern(id, side, strokeWidth = 1.2, cornerPhase = 0) {
 	const { D } = girihTile(side);
+	const shift = D * cornerPhase;
+	const phase = shift ? ` patternTransform="translate(${fmt(shift)} ${fmt(shift)})"` : '';
 	const r = side / (2 * Math.sin(Math.PI / 8));
 	let body = '';
 	// Outline the star's perimeter instead of drawing its crossing chords:
@@ -255,16 +299,19 @@ function girihPattern(id, side, strokeWidth = 1.2) {
 		}
 	}
 	body += `<path d="${regularPolygonPath(D / 2, D / 2, side * Math.SQRT1_2, 4, 0)}"/>`;
-	return `<pattern id="${id}" width="${fmt(D)}" height="${fmt(D)}" patternUnits="userSpaceOnUse"><g fill="none" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linejoin="round">${body}</g></pattern>`;
+	return `<pattern id="${id}" width="${fmt(D)}" height="${fmt(D)}" patternUnits="userSpaceOnUse"${phase}><g fill="none" stroke="currentColor" stroke-width="${strokeWidth}" stroke-linejoin="round">${body}</g></pattern>`;
 }
 
 // courses.jpeg / Reviews.jpeg show angular lace, not circular brackets or
 // floating stars. Both assets are dense at TOP RIGHT, fading completely
 // before their left/bottom edges. Mirror horizontally for a top-left card.
 // The separate canvas sizes preserve the measured card/section cell scale.
-for (const [name, size, side] of [['corner-motif.svg', 120, 14], ['lattice-corner.svg', 300, 30]]) {
+for (const [name, size, side, cornerPhase] of [
+	['corner-motif.svg', 120, 14, 11 / 12],
+	['lattice-corner.svg', 300, 30, 5 / 6],
+]) {
 	save(name, svgWrap(size, size,
-		`<defs>${girihPattern('lace', side)}` +
+		`<defs>${girihPattern('lace', side, 1.2, cornerPhase)}` +
 		`<radialGradient id="fade" cx="${size}" cy="0" r="${size * 0.98}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#fff"/><stop offset=".45" stop-color="#fff" stop-opacity=".8"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient>` +
 		`<mask id="soft"><rect width="${size}" height="${size}" fill="url(#fade)"/></mask></defs>` +
 		`<rect width="${size}" height="${size}" fill="url(#lace)" mask="url(#soft)"/>`,
@@ -423,28 +470,51 @@ function sparklePath(cx, cy, r) {
 // the curve.
 {
 	const w = 559, jamb = 291, baseH = 629;
-	const panel = cuspedArchPanel(w, jamb, baseH);
-	save('keel-arch-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
-	save('keel-arch-outline.svg', svgFromBbox(panel.bbox, `<path fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" d="${panel.d}"/>`, 0));
+	const KEEL_STROKE = 3;
+	// Half the stroke, rounded up. A stroke is painted centred on its path, so
+	// a path that runs along its own viewBox edge (x=0 and x=w here, for the
+	// full height of both jambs) loses half its width to the viewBox clip and
+	// renders at HALF weight, while the crown — safely inside the box — renders
+	// full weight. That is the "arch frame is thinner on the left and right"
+	// the client reported (QA/qa-9-10.md round 5). Padding the canvas is the
+	// fix; consumers compensate with a mask-size just over 100% so the contour
+	// still lands exactly on the element's edges. See components.css
+	// .eqc-arch-media--keel::before.
+	const KEEL_PAD = Math.ceil(KEEL_STROKE / 2);
 
-	// Double gold contour. The reference's two lines sit 11.5px apart on a
-	// 537px-wide arch = 2.14% of the width (home.md finding 3) — half the
-	// inset arch-frame.svg uses, so the ratio is taken from the measurement
-	// rather than reusing that asset's 14px directly.
-	const inset = Math.round(w * 0.0214);
-	const inner = cuspedArchPanel(w - inset * 2, jamb - inset, baseH - inset * 2);
-	const unionBbox = {
-		minX: Math.min(panel.bbox.minX, inner.bbox.minX + inset),
-		minY: Math.min(panel.bbox.minY, inner.bbox.minY + inset),
-		maxX: Math.max(panel.bbox.maxX, inner.bbox.maxX + inset),
-		maxY: Math.max(panel.bbox.maxY, inner.bbox.maxY + inset),
-	};
-	save('keel-arch-frame.svg', svgFromBbox(unionBbox,
-		`<g fill="none" stroke="currentColor" stroke-width="2">` +
-		`<path d="${panel.d}"/>` +
-		`<path transform="translate(${inset} ${inset})" d="${inner.d}"/>` +
-		`</g>`, 0)); // pad 0: the frame's OUTER contour must share the mask's exact
-		// coordinate frame, or the two render at different scales in the same box
+	const panel = cuspedArchPanel(w, jamb, baseH);
+	// The fill mask has no stroke, so it keeps pad 0 and stays the canonical
+	// coordinate frame every keel consumer is sized against.
+	save('keel-arch-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
+	save('keel-arch-outline.svg', svgFromBbox(panel.bbox,
+		`<path fill="none" stroke="currentColor" stroke-width="${KEEL_STROKE}" stroke-linejoin="round" d="${panel.d}"/>`,
+		KEEL_PAD));
+
+	// Single gold contour, even weight, OPEN at the bottom: the client's review
+	// (QA/qa-10092026/4.png, 5.png) asked for one border of uniform thickness
+	// that stops where the image bottom stops — no base line, and no second
+	// inset line thinning out along the foot. `panel.d` is a closed shape;
+	// dropping the trailing Z removes exactly the implicit base segment and
+	// leaves jambs + arch as one stroked run.
+	const frameD = panel.d.replace(/Z\s*$/, '');
+	save('keel-arch-frame.svg', svgFromBbox(panel.bbox,
+		`<path fill="none" stroke="currentColor" stroke-width="${KEEL_STROKE}" stroke-linecap="round" stroke-linejoin="round" d="${frameD}"/>`,
+		KEEL_PAD));
+
+	// Rounded-foot variant. The About collage and About page close the arch's
+	// foot with a curve (QA/qa-10092026/14.png); the hero keeps square jambs,
+	// so this ships as its own pair rather than changing the shape everywhere.
+	//
+	// This one stays CLOSED — the trailing Z is kept, so the frame draws its
+	// base line and the contour reads as a complete border. Only the HERO's
+	// frame is open at the bottom; round 5 stripped the base from both and the
+	// client flagged the About arch as missing its bottom edge
+	// (QA/qa-10092026/18.png).
+	const round = cuspedArchPanel(w, jamb, baseH, { bottomRadius: 46 });
+	save('keel-arch-mask-round.svg', wrapArch(round, { pad: 0, fill: '#fff' }));
+	save('keel-arch-frame-round.svg', svgFromBbox(round.bbox,
+		`<path fill="none" stroke="currentColor" stroke-width="${KEEL_STROKE}" stroke-linecap="round" stroke-linejoin="round" d="${round.d}"/>`,
+		KEEL_PAD));
 }
 
 // Home2.jpeg's two small panels close into pointed lobed ends. Reuse the
@@ -453,12 +523,18 @@ function sparklePath(cx, cy, r) {
 // data or duplicating its arc solver. The cap height is an independent
 // parameter, so the tall child panel adds straight jamb rather than
 // stretching the nearly-square alphabet panel's caps.
-function closedCartouche(w, h, capHeight, inset, stroke = false) {
+function closedCartouche(w, h, capHeight, inset, stroke = false, opts = {}) {
 	const cw = w - inset * 2, ch = h - inset * 2, cap = capHeight - inset;
 	const stops = [[0, 1], [.0751, .3498 / .4626], [.2397, .1908 / .4626], [.4365, .0477 / .4626]]
 		.map(([x, y]) => [x, y * cap / ch]);
-	const { d } = cuspedArchPanel(cw, cap, ch, { stops });
-	const id = `half-${inset}`;
+	// `lobeDepth` scales the bulge of each cusp segment. 1 is the measured
+	// reference profile; the pricing banner asks for deeper, more sculpted
+	// lobes than the shared cartouche family, so it passes its own value
+	// rather than moving the contour everything else is calibrated against.
+	const lobe = opts.lobeDepth || 1;
+	const base = [0.0130, 0.0363, 0.0218];
+	const { d } = cuspedArchPanel(cw, cap, ch, { stops, sagittae: base.map((s) => s * lobe) });
+	const id = `half-${inset}${lobe === 1 ? '' : `-l${String(lobe).replace('.', '_')}`}`;
 	const attrs = stroke ? 'fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"' : 'fill="#fff"';
 	// A one-unit overlap on each side avoids a raster seam at the shared
 	// jamb; the contour is vertical, so this does not alter its shape.
@@ -494,6 +570,15 @@ for (const [name, w, h, cap] of [['child', 246, 423, 123], ['alphabet', 276, 300
 	const w = 260, h = 54;
 	const body = `<g transform="translate(${w} 0) rotate(90)">${closedCartouche(h, w, h / 2, 2, true)}</g>`;
 	save('pricing-eyebrow-frame.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
+
+	// Solid-fill version of the same horizontal cusped cartouche, used as a
+	// CSS mask on the "N Days/Week" pricing banner so it takes the client's
+	// lobed contour (QA/qa-10092026/8.png) instead of the old hexagon chamfer.
+	// lobeDepth 1.85: the client asked for a deeper, more sculpted contour on
+	// the banner specifically (round 6). The eyebrow frame above keeps the
+	// measured 1.0 profile, so the shared cartouche family is unchanged.
+	const fill = `<g transform="translate(${w} 0) rotate(90)">${closedCartouche(h, w, h / 2, 2, false, { lobeDepth: 1.85 })}</g>`;
+	save('pricing-banner-mask.svg', svgWrap(w, h, fill, 'aria-hidden="true" focusable="false"'));
 }
 
 // Four-centred (Persian/Timurid) arch — course/pricing card media frames.

@@ -86,24 +86,41 @@ const ORIGINAL_OUTLINE = {
 
 	// The design's certificate is a written document with an award medal;
 	// Lucide's FileBadge2 has no text lines and a ribbon, not a medal.
-	certificate: '<path d="M13.2 2.6H6.3A2.3 2.3 0 0 0 4 4.9v14.2a2.3 2.3 0 0 0 2.3 2.3h4.4"/>'
+	// Drawn a notch lighter than the family (1.6 vs 2.1) — at the sizes it
+	// ships (trust strip, pricing, contact) the full weight read as a heavy
+	// blob rather than a document.
+	certificate: '<g stroke-width="1.6">'
+		+ '<path d="M13.2 2.6H6.3A2.3 2.3 0 0 0 4 4.9v14.2a2.3 2.3 0 0 0 2.3 2.3h4.4"/>'
 		+ '<path d="M13.2 2.6 19.6 9v2.4"/>'
 		+ '<path d="M13.2 2.6v4.8a1.6 1.6 0 0 0 1.6 1.6h4.8"/>'
 		+ '<path d="M7.3 10.6h6.2M7.3 13.4h5M7.3 16.2h3.4"/>'
 		+ '<circle cx="17.8" cy="16.2" r="3.4"/>'
 		+ '<path d="M17.8 14.5v3.2M16.4 16.4l1.4 1.3 1.4-1.3"/>'
-		+ '<path d="m15.6 19-.5 2.9 2.7-1.3 2.7 1.3-.5-2.9"/>',
+		+ '<path d="m15.6 19-.5 2.9 2.7-1.3 2.7 1.3-.5-2.9"/>'
+		+ '</g>',
 
 	// The design's megaphone has a squared driver, a grip below it and a
-	// spark at the mouth; Lucide's is a plain cone.
-	megaphone: '<rect x="2.2" y="9.2" width="4.8" height="5.6" rx="1.2"/>'
+	// spark at the mouth; Lucide's is a plain cone. Slightly lighter weight
+	// (1.8) so it doesn't dominate the blog eyebrow row.
+	megaphone: '<g stroke-width="1.8">'
+		+ '<rect x="2.2" y="9.2" width="4.8" height="5.6" rx="1.2"/>'
 		+ '<path d="M7 9 17.6 4.2v15.6L7 15Z"/>'
 		+ '<path d="M4.6 14.8v3.4a2.2 2.2 0 0 0 4.4 0v-2.2"/>'
-		+ '<path d="M20 12h2M21 11v2"/>',
+		+ '<path d="M20 12h2M21 11v2"/>'
+		+ '</g>',
 
-	// Lucide's Clock has no dial ticks; the design's does.
+	// Lucide's Clock has no dial ticks; the design's does. The four ticks are
+	// their own light, short strokes (1.3 / 1.2 long) — at full family weight
+	// they read as chunky nubs rather than dial marks. Rim and hands keep 2.1.
 	clock: '<circle cx="12" cy="12" r="9.4"/><path d="M12 6.8V12l3.9 2.4"/>'
-		+ '<path d="M12 2.8v1.7M12 19.5v1.7M2.8 12h1.7M19.5 12h1.7"/>',
+		+ '<path stroke-width="1.3" d="M12 3.2v1.2M12 19.6v1.2M3.2 12h1.2M19.6 12h1.2"/>',
+
+	// A clean line handset with three signal waves — matches the client-picked
+	// drawing and the "Call Any Time" reference in Home2.jpeg. Was a filled
+	// receiver in FILLED_UI; the design draws it as a line everywhere it
+	// appears (footer contact list, contact page, about CTA), so it lives with
+	// the outline family now.
+	phone: '<path d="M14.05 6C15.03 6.19 15.92 6.67 16.63 7.37 17.33 8.08 17.81 8.97 18 9.95M14.05 2C16.08 2.23 17.97 3.13 19.42 4.58 20.86 6.02 21.77 7.91 22 9.94M18.5 21C9.94 21 3 14.06 3 5.5c0-.39.01-.77.04-1.15.03-.43.05-.65.16-.85.09-.16.26-.32.44-.4.2-.1.44-.1.92-.1h2.82c.4 0 .6 0 .78.07.15.06.29.15.4.28.12.14.19.33.32.71l1.17 3.2c.16.45.24.67.23.88-.01.18-.08.36-.19.51-.12.17-.32.29-.72.53l-1.37.82c1.2 2.65 3.35 4.8 6 6l.82-1.37c.24-.4.36-.6.53-.72.15-.11.33-.17.51-.19.21-.01.43.07.87.23l3.21 1.17c.38.13.57.2.71.32.13.11.22.25.28.4.07.17.07.37.07.78v2.82c0 .48 0 .72-.1.92-.08.18-.24.35-.4.44-.2.11-.42.13-.85.16-.38.03-.76.04-1.15.04Z"/>',
 
 	// Squarer pages and a flat base; Lucide's BookOpen is rounder and its
 	// spine is a straight bar rather than a gap.
@@ -253,14 +270,6 @@ const FILLED_UI = {
 	})(),
 
 	'arrow-right-filled': '<path d="M3 10.5h10.6L9.5 6.4l1.7-1.8 7.4 7.4-7.4 7.4-1.7-1.8 4.1-4.1H3Z"/>',
-
-	// Footer and "Call Any Time" draw a solid classic receiver with signal
-	// arcs; the outline `phone` above stays for anywhere drawn as a line.
-	phone: '<path d="M6.6 2.9a1.9 1.9 0 0 0-2.5.4L2.6 5.1c-.8.9-1 2.2-.5 3.3a24 24 0 0 0 13.5 13.5c1.1.5 2.4.3 3.3-.5l1.8-1.5a1.9 1.9 0 0 0 .4-2.5l-2.4-3.8a1.9 1.9 0 0 0-2.4-.7l-2 1a13 13 0 0 1-5.3-5.3l1-2a1.9 1.9 0 0 0-.7-2.4Z"/>'
-		+ '<g fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round">'
-		+ '<path d="M14.6 7.2A3.6 3.6 0 0 1 16.9 10"/>'
-		+ '<path d="M15.2 5.5A5.4 5.4 0 0 1 18.7 9.7"/>'
-		+ '<path d="M15.9 3.8A7.2 7.2 0 0 1 20.5 9.4"/></g>',
 
 	mail: '<path d="M2.4 6.8a2.6 2.6 0 0 1 2.6-2.6h14a2.6 2.6 0 0 1 2.6 2.6v.4L12 13.6 2.4 7.2Z"/>'
 		+ '<path d="M2.4 9.7v7.5a2.6 2.6 0 0 0 2.6 2.6h14a2.6 2.6 0 0 0 2.6-2.6V9.7l-8.8 5.9a1.5 1.5 0 0 1-1.6 0Z"/>',
