@@ -1,8 +1,9 @@
 /**
  * Easy Quran Classes — shared vanilla JS.
  * No framework, no animation library. Handles: mobile nav drawer, sticky
- * header state, scroll-reveal via IntersectionObserver, and the FAQ
- * accordion. Respects prefers-reduced-motion (see DESIGN.md §20).
+ * header state, scroll-reveal via IntersectionObserver, stat count-up,
+ * the carousel (teachers/testimonials), teacher-row dot navigation, and
+ * the FAQ accordion. Respects prefers-reduced-motion (see DESIGN.md §20).
  */
 ( function () {
 	'use strict';
@@ -561,17 +562,32 @@
 			syncDots();
 		}
 
-		row.addEventListener( 'scroll', syncAll, { passive: true } );
+		// Throttled to one syncAll() per animation frame, same pattern as
+		// initHeaderScrollState() above — syncDots() reads layout
+		// (getBoundingClientRect on the row and every card) on every call,
+		// which is a layout-thrash risk if it ran on every raw scroll event.
+		var ticking = false;
+		row.addEventListener(
+			'scroll',
+			function () {
+				if ( ! ticking ) {
+					window.requestAnimationFrame( function () {
+						syncAll();
+						ticking = false;
+					} );
+					ticking = true;
+				}
+			},
+			{ passive: true }
+		);
+		// buildDots() already reads mq.matches internally, so a plain
+		// resize already covers every breakpoint crossing — a separate
+		// mq 'change' listener with the same body would only double the
+		// rebuild cost on each crossing.
 		window.addEventListener( 'resize', function () {
 			buildDots();
 			syncAll();
 		} );
-		if ( mq.addEventListener ) {
-			mq.addEventListener( 'change', function () {
-				buildDots();
-				syncAll();
-			} );
-		}
 
 		buildDots();
 		syncAll();
