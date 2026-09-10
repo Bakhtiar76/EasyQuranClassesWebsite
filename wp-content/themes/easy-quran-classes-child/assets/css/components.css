@@ -321,9 +321,13 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
    Selectors carry element+class weight to match the `a.eqc-btn--secondary`
    rules they override, and the `.eqc-section--dark`/`.eqc-footer-cta` variants
    are listed explicitly because those set their own hover background at
-   higher specificity. #25D366 is WhatsApp's own green; white on it measures
-   2.4:1, so the label is bold and the resting state keeps the accessible
-   green-800-on-cream contrast — hover is a reinforcement, never the only cue. */
+   higher specificity. #25D366 is WhatsApp's own green, kept because the point
+   is instant brand recognition — but the label on it is DARK, not white.
+   White on #25D366 measures 1.98:1, which fails WCAG 1.4.3 at any size, and
+   `font-weight` is not a contrast exemption. This state is also
+   `:focus-visible`, i.e. the keyboard focus state, so "hover is only a
+   reinforcement" would not have excused it. --eqc-heading on the same green
+   measures 8.23:1. */
 a.eqc-btn--whatsapp:hover,
 a.eqc-btn--whatsapp:focus-visible,
 a.eqc-btn--whatsapp:active,
@@ -332,13 +336,13 @@ a.eqc-btn--whatsapp:active,
 .eqc-footer-cta a.eqc-btn--whatsapp:hover,
 .eqc-footer-cta a.eqc-btn--whatsapp:focus-visible {
 	background: #25D366;
-	border-color: #25D366;
-	color: var(--eqc-white);
+	border-color: #1EBE5A;
+	color: var(--eqc-heading);
 	font-weight: 700;
 }
 a.eqc-btn--whatsapp:hover .eqc-icon,
 a.eqc-btn--whatsapp:focus-visible .eqc-icon,
-a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-white); }
+a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
 
 .eqc-btn-group {
 	display: flex;
@@ -427,7 +431,14 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-white); }
 /* Explicit column counts, not auto-fit — every card/panel grid resolves to a
    symmetric layout at every width (DESIGN.md rule: 6->3x2, 4->2x2, 3->3x1;
    1-up + side-scroll on phones) rather than leaving a 3+1 / 2+1 orphan row.
-   QA/qa-9-10.md task 23. --pricing is re-set to repeat(4,1fr) further down. */
+   QA/qa-9-10.md task 23. --pricing is re-set to repeat(4,1fr) further down.
+
+   Scope note: this guarantee only holds for the grids whose child count is
+   FIXED by a page builder (courses 6, pricing 4, teachers 6, trust 4). The
+   blog grid is fed by however many posts are published, so a partial last row
+   is normal there and expected — a 3-up archive is the intended shape, not an
+   orphan to design out. If a trust/step row ever grows past 4, revisit that
+   count too rather than assuming this comment still covers it. */
 .eqc-grid--pricing { grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr)); }
 .eqc-grid--blog { grid-template-columns: repeat(3, 1fr); }
 .eqc-grid--2col { grid-template-columns: repeat(2, 1fr); }
@@ -726,7 +737,7 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-white); }
 .eqc-card--pricing--featured {
 	border-color: var(--eqc-gold-500);
 	border-width: 2px;
-	outline: 1px solid rgb(169 130 53 / 0.34);
+	outline: 1px solid rgb(var(--eqc-gold-600-rgb) / 0.34);
 	outline-offset: 3px;
 	box-shadow: 0 18px 40px rgba(169, 130, 53, 0.26);
 }
@@ -747,7 +758,7 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-white); }
 	inset: 0;
 	/* Tint in the paint's own alpha, not element `opacity`, so the glow
 	   filter below renders at full strength (QA/LESSONS.md #51). */
-	background-color: rgb(169 130 53 / 0.62);
+	background-color: rgb(var(--eqc-gold-500-rgb) / 0.62);
 	-webkit-mask-image: url('../svg/sparkle-dust.svg');
 	mask-image: url('../svg/sparkle-dust.svg');
 	-webkit-mask-size: cover;
@@ -756,7 +767,7 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-white); }
 	mask-repeat: no-repeat;
 	/* A faint bloom on each mote so the field reads as light rather than as
 	   flat gold specks. */
-	filter: drop-shadow(0 0 2px rgb(214 178 110 / 0.55));
+	filter: drop-shadow(0 0 2px rgb(var(--eqc-gold-300-rgb) / 0.55));
 	pointer-events: none;
 	z-index: 0;
 }
@@ -1514,14 +1525,12 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-white); }
 }
 .eqc-arch-media--fourcentred::before { -webkit-mask-image: url('../svg/fourcentred-mask.svg'); mask-image: url('../svg/fourcentred-mask.svg'); }
 .eqc-arch-media--horseshoe::before { -webkit-mask-image: url('../svg/horseshoe-mask.svg'); mask-image: url('../svg/horseshoe-mask.svg'); }
-/* --keel: the hero's own silhouette (Home.jpeg). Unlike every variant above
-   it needs TWO gold contours with a cream gap between them, so it uses
-   keel-arch-frame.svg (both lines, generated with pad 0 so its outer
-   contour shares keel-arch-mask.svg's exact coordinate frame — the
-   padding/inset mismatch warned about above) and shrinks the PHOTO's mask
-   to 95.72% instead, i.e. 100% - 2 x the measured 2.14% inset. The gap
-   that opens up shows the section's own cream ground, which is what the
-   reference shows between its two lines. */
+/* --keel: the hero's own silhouette (Home.jpeg). A SINGLE gold contour, and
+   the photo fills it exactly — see the two notes on the img and ::before
+   rules below for why the frame's canvas is padded and the photo's mask is
+   100%. (This block previously described a two-line frame at pad 0 with the
+   photo inset to 95.72%; all three of those facts changed and the stale text
+   contradicted the notes immediately below it.) */
 .eqc-arch-media--keel {
 	border-radius: 0;
 	border: none;
@@ -1750,7 +1759,7 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-white); }
 	   drop-shadow below renders at full strength instead of being multiplied
 	   down with it. That is also why this number can be lowered freely: the
 	   carved depth lives in the filter, not in how opaque the gold is. */
-	background-color: rgb(169 130 53 / 0.26);
+	background-color: rgb(var(--eqc-gold-600-rgb) / 0.26);
 	-webkit-mask-image: url('../svg/lattice-corner.svg');
 	mask-image: url('../svg/lattice-corner.svg');
 	-webkit-mask-size: contain;
@@ -1791,13 +1800,13 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-white); }
 .eqc-corner-motif--tl { top: var(--_motif-inset); left: var(--_motif-inset); transform: scaleX(-1); }
 .eqc-corner-motif--br { bottom: var(--_motif-inset); right: var(--_motif-inset); transform: scaleY(-1); }
 .eqc-section--dark .eqc-corner-motif {
-	background-color: rgb(214 178 110 / 0.5);
+	background-color: rgb(var(--eqc-gold-300-rgb) / 0.5);
 	filter: drop-shadow(1px 3px 5px rgb(0 0 0 / 0.55)) drop-shadow(-1px -1px 0 rgb(255 253 249 / 0.18));
 }
 /* Smaller pair for a nested panel (e.g. .eqc-pricing-panel below) rather
    than a full section — the reference's arches sit tight against the
    pricing panel's own corners, not spread across the whole section. */
-.eqc-corner-motif--sm { width: clamp(70px, 8vw, 130px); height: clamp(70px, 8vw, 130px); background-color: rgb(169 130 53 / 0.28); }
+.eqc-corner-motif--sm { width: clamp(70px, 8vw, 130px); height: clamp(70px, 8vw, 130px); background-color: rgb(var(--eqc-gold-600-rgb) / 0.28); }
 /* Slow ambient drift so the ornament reads as gently alive rather than a static
    watermark. This shorthand supplies the timing; motion.css then overrides
    `animation-name` per corner so each drifts along its own diagonal (a single
@@ -2488,7 +2497,7 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
    Twice reported as not prominent enough (QA/qa-9-10.md task 13, then again in
    round 5), so it takes the gold-100 fill and the full heading colour. */
 .eqc-pricing-unit {
-	background: #F0E7D3;
+	background: var(--eqc-cream-200);
 	border: 1px solid var(--eqc-gold-300);
 	border-radius: var(--eqc-radius-pill);
 	padding: calc(7 * var(--eqc-u)) calc(16 * var(--eqc-u));
@@ -2743,15 +2752,158 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 	padding: calc(24 * var(--eqc-u)) calc(20 * var(--eqc-u)) calc(26 * var(--eqc-u));
 }
 .eqc-card--step .eqc-card-index { margin-inline: auto; }
+/* The step icon sits in the same scalloped gold seal the pricing benefits
+   strip uses (.eqc-benefit__disc) rather than floating as a bare dark glyph.
+   A plain green icon on a white card was the whole of "the panels look small
+   and have no colour contrast" (client review, round 9) — the seal gives each
+   step a gold ring and a cream well, so the row reads as designed rather than
+   as four icons dropped on four boxes. */
 .eqc-card--step .eqc-step-icon {
-	display: block;
-	margin: calc(10 * var(--eqc-u)) auto calc(2 * var(--eqc-u));
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	flex: none;
+	width: calc(58 * var(--eqc-u));
+	height: calc(58 * var(--eqc-u));
+	margin: calc(10 * var(--eqc-u)) auto calc(4 * var(--eqc-u));
+}
+.eqc-card--step .eqc-step-icon::before,
+.eqc-card--step .eqc-step-icon::after {
+	content: '';
+	position: absolute;
+	inset: 0;
+	mask: url('../svg/seal-filled.svg') center / 100% 100% no-repeat;
+}
+.eqc-card--step .eqc-step-icon::before { background: var(--eqc-gold-500); }
+.eqc-card--step .eqc-step-icon::after { inset: calc(1.6 * var(--eqc-u)); background: var(--eqc-cream-50); }
+.eqc-card--step .eqc-step-icon .eqc-icon {
+	position: relative;
+	z-index: 1;
+	width: calc(28 * var(--eqc-u));
+	height: calc(28 * var(--eqc-u));
 	color: var(--eqc-green-800);
 }
-.eqc-card--step .eqc-step-icon .eqc-icon {
-	width: calc(34 * var(--eqc-u));
-	height: calc(34 * var(--eqc-u));
+/* The numeral moves onto the seal's shoulder instead of sitting alone above
+   it, so the card leads with one object rather than two stacked ones. */
+.eqc-card--step { position: relative; }
+.eqc-card--step .eqc-card-index {
+	position: absolute;
+	inset-block-start: calc(14 * var(--eqc-u));
+	inset-inline-start: calc(14 * var(--eqc-u));
+	margin-inline: 0;
 }
+
+/* ---------- Invitation panel (free-trial / contact asides) ----------
+   A dark green panel against the cream form column. These two pages were the
+   flattest on the site — a white card on a cream ground, all body-colour text
+   (client review, round 9). Green here is the same move the footer CTA makes,
+   so it reads as part of the system rather than a one-off. */
+.eqc-panel--invite {
+	background: linear-gradient(160deg, var(--eqc-green-700) 0%, var(--eqc-green-900) 100%);
+	border: 1px solid var(--eqc-green-700);
+	border-radius: var(--eqc-radius-panel);
+	padding: clamp(1.5rem, 1.2rem + 1.4vw, 2.5rem);
+	color: var(--eqc-cream-100);
+	position: relative;
+	overflow: hidden;
+	display: flex;
+	flex-direction: column;
+	gap: calc(14 * var(--eqc-u));
+}
+/* Girih watermark in the panel's own corner, same treatment as the dark
+   footer CTA. Tint in the paint's alpha so it stays a texture. */
+.eqc-panel--invite::after {
+	content: '';
+	position: absolute;
+	inset-block-start: 0;
+	inset-inline-end: 0;
+	width: calc(150 * var(--eqc-u));
+	height: calc(150 * var(--eqc-u));
+	background-color: rgb(var(--eqc-gold-300-rgb) / 0.16);
+	mask: url('../svg/corner-motif.svg') top right / 100% 100% no-repeat;
+	pointer-events: none;
+}
+.eqc-panel--invite > * { position: relative; z-index: 1; }
+.eqc-panel--invite h3 {
+	margin: 0;
+	font-family: var(--eqc-font-display);
+	font-size: var(--eqc-fs-h2-compact);
+	line-height: 1.15;
+	color: var(--eqc-white);
+}
+.eqc-panel--invite h3 em { font-style: normal; color: var(--eqc-gold-300); }
+.eqc-panel--invite p { margin: 0; color: rgb(247 243 236 / 0.82); line-height: 1.6; }
+.eqc-panel--invite .eqc-panel-actions { display: flex; flex-direction: column; gap: calc(10 * var(--eqc-u)); align-items: stretch; }
+.eqc-panel--invite .eqc-btn { justify-content: center; width: 100%; }
+.eqc-panel--invite .eqc-panel-foot {
+	margin-block-start: auto;
+	padding-block-start: calc(14 * var(--eqc-u));
+	border-block-start: 1px solid rgb(var(--eqc-gold-300-rgb) / 0.28);
+	font-size: var(--eqc-fs-small);
+	color: rgb(247 243 236 / 0.72);
+}
+.eqc-panel--invite .eqc-panel-foot a { color: var(--eqc-gold-300); }
+.eqc-panel--invite .eqc-panel-contact {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	gap: calc(11 * var(--eqc-u));
+}
+.eqc-panel--invite .eqc-panel-contact li {
+	display: flex;
+	align-items: center;
+	gap: calc(11 * var(--eqc-u));
+	color: var(--eqc-cream-100);
+	font-size: var(--eqc-fs-body);
+	overflow-wrap: anywhere;
+}
+.eqc-panel--invite .eqc-panel-contact .eqc-icon {
+	flex: none;
+	width: var(--eqc-icon-sm);
+	height: var(--eqc-icon-sm);
+	color: var(--eqc-gold-300);
+}
+.eqc-panel--invite .eqc-panel-contact a { color: inherit; text-decoration: none; }
+.eqc-panel--invite .eqc-panel-contact a:hover { text-decoration: underline; }
+/* The bronze CTA keeps its own fill inside the green panel; only the outlined
+   secondary needs the light-on-dark treatment the dark sections already set. */
+.eqc-panel--invite a.eqc-btn--secondary {
+	color: var(--eqc-cream-100);
+	border-color: rgb(var(--eqc-gold-300-rgb) / 0.45);
+}
+.eqc-panel--invite a.eqc-btn--secondary:hover { background: rgb(255 255 255 / 0.08); }
+.eqc-panel--invite a.eqc-btn--whatsapp:hover,
+.eqc-panel--invite a.eqc-btn--whatsapp:focus-visible {
+	background: #25D366;
+	border-color: #1EBE5A;
+	color: var(--eqc-heading);
+}
+
+/* Reassurance list under the invitation panel. Every line restates a promise
+   already made elsewhere on the page — nothing new is claimed here. */
+.eqc-reassure { display: flex; flex-direction: column; gap: calc(10 * var(--eqc-u)); margin: 0; padding: 0; list-style: none; }
+.eqc-reassure li { display: flex; align-items: flex-start; gap: calc(10 * var(--eqc-u)); color: var(--eqc-text); line-height: 1.45; }
+.eqc-reassure .eqc-icon { flex: none; width: var(--eqc-icon-sm); height: var(--eqc-icon-sm); margin-block-start: 0.15em; color: var(--eqc-gold-700); }
+.eqc-reassure strong { color: var(--eqc-heading); font-weight: 600; }
+
+/* The two-column form layout: the aside column is much shorter than the form,
+   which left ~600px of dead cream beside it. Aligning the columns to the top
+   and letting the aside stick keeps it beside the fields the whole way down
+   instead of stranding it. */
+.eqc-form-grid { align-items: flex-start; gap: calc(40 * var(--eqc-u)); }
+.eqc-form-grid > .eqc-form-wrap { flex: 1 1 58%; }
+.eqc-form-grid > .eqc-form-aside { flex: 1 1 34%; display: flex; flex-direction: column; gap: calc(24 * var(--eqc-u)); }
+@media (min-width: 62rem) {
+	.eqc-form-grid > .eqc-form-aside { position: sticky; top: calc(var(--eqc-header-h, 96px) + 28px); }
+}
+@media (max-width: 61.99rem) {
+	.eqc-form-grid > .eqc-form-wrap,
+	.eqc-form-grid > .eqc-form-aside { flex-basis: 100%; }
+}
+
 .eqc-card--step h3 {
 	margin: 0;
 	font-family: var(--eqc-font-body);
@@ -2810,8 +2962,9 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
    HOME section's cards live in .eqc-teachers-cards, not .eqc-grid--teachers,
    so they were still a plain vertical stack on phones (measured at 390px: four
    cards at x=25, 464px apart). Same snap-scroll treatment, so both places
-   behave like the reviews row the client asked them to match. The aside's own
-   prev/next buttons sit directly above it and scroll this container. */
+   behave like the reviews row the client asked them to match. The aside's
+   prev/next buttons page this container — see initTeachersNav() in eqc.js;
+   they had no handler at all until round 9. */
 @media (max-width: 61.25rem) {
 	.eqc-teachers-split > .eqc-teachers-cards {
 		grid-template-columns: none;
@@ -2889,7 +3042,7 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 /* Client review (QA/qa-9-10.md task 13): the reviews band sits between two
    --surface sections and needs to read as its own section. A deeper warm
    cream than the standard --cream token, distinct from both neighbours. */
-.eqc-section--testimonials { background: #F1EBDF; }
+.eqc-section--testimonials { background: var(--eqc-cream-150); }
 .eqc-testimonials-intro { text-align: center; font-size: var(--eqc-fs-body); color: var(--eqc-text); line-height: 1.6; }
 .eqc-section--testimonials .eqc-card--testimonial {
 	width: calc(354 * var(--eqc-u));
