@@ -14,10 +14,31 @@
 import { readFileSync, writeFileSync, mkdirSync } from 'node:fs';
 import { optimize } from 'svgo';
 
-const MARK_D = readFileSync('tools/graphics/scratch/mark-path.txt', 'utf8').trim();
+// scratch/ is gitignored, so this input does not exist on a fresh clone until
+// the trace step has run. Fail with the command to run, not a bare ENOENT.
+let MARK_D;
+try {
+	// Resolved from this file, not the CWD: the previous repo-root-relative
+	// literal meant the script only worked when run from the repo root and
+	// failed confusingly from tools/graphics, where its sibling scripts run.
+	MARK_D = readFileSync(new URL('./scratch/mark-path.txt', import.meta.url), 'utf8').trim();
+} catch (err) {
+	if (err.code !== 'ENOENT') throw err;
+	throw new Error(`Missing build input tools/graphics/scratch/mark-path.txt.
+It is generated, not committed. Run this first, from tools/graphics:
+
+    node trace-logo.mjs
+
+See tools/graphics/README.md for the full regeneration sequence.`);
+}
+
 const MARK_W = 770;
 const MARK_H = 692;
-const OUT_DIR = 'wp-content/themes/easy-quran-classes-child/assets/svg/logo';
+// Resolved from this file, not the CWD — matching gen-ornaments.mjs. As a
+// repo-root-relative literal it silently created a whole stray
+// tools/graphics/wp-content/... tree when run from tools/graphics, where the
+// sibling generators are run from, and the real theme assets never changed.
+const OUT_DIR = new URL('../../wp-content/themes/easy-quran-classes-child/assets/svg/logo/', import.meta.url);
 mkdirSync(OUT_DIR, { recursive: true });
 
 const FONT_DISPLAY = "'DM Serif Display', Georgia, 'Times New Roman', serif";
@@ -25,7 +46,7 @@ const FONT_BODY = "'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', san
 
 function write(name, svg) {
 	const { data } = optimize(svg, { multipass: true, plugins: ['preset-default'] });
-	writeFileSync(`${OUT_DIR}/${name}`, data);
+	writeFileSync(new URL(name, OUT_DIR), data);
 	console.log(`${name.padEnd(28)} ${data.length} bytes`);
 }
 
@@ -98,9 +119,16 @@ write(
 //    (the part that actually reads at that size) stays intact, same as
 //    how the mark already reads in the browser tests above.
 // ---------------------------------------------------------------------
+// A favicon canvas must be SQUARE: browsers scale it into a square slot, so a
+// 770x692 viewBox renders the mark stretched ~11% vertically in the tab. The
+// mark is centred in a 770x770 box instead, with the cream ground filling it.
+const FAV = Math.max(MARK_W, MARK_H);
 write(
 	'favicon.svg',
-	`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${MARK_W} ${MARK_H}"><rect width="${MARK_W}" height="${MARK_H}" fill="#F7F3EC"/><g fill="#1B3A2D">${markPath(0, 0, 1)}</g></svg>`
+	`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${FAV} ${FAV}">` +
+	`<rect width="${FAV}" height="${FAV}" fill="#F7F3EC"/>` +
+	`<g fill="#1B3A2D" transform="translate(${(FAV - MARK_W) / 2} ${(FAV - MARK_H) / 2})">${markPath(0, 0, 1)}</g>` +
+	`</svg>`
 );
 
 console.log('\nDone. Mono dark-background variant is NOT a separate file:');

@@ -142,6 +142,37 @@ function eqc_preload_fonts() {
 add_action( 'wp_head', 'eqc_preload_fonts', 2 );
 
 /**
+ * Browser tab / bookmark icon.
+ *
+ * WordPress only prints icon tags when a `site_icon` attachment is set in
+ * Settings > General, and this install has none (`site_icon` = 0) — so every
+ * page shipped with no icon at all and browsers fell back to their generic
+ * default. The theme already generates the marks it needs
+ * (`assets/svg/logo/`, from `tools/graphics/build-logo.mjs`), so they are
+ * served straight from the theme rather than round-tripping the logo through
+ * the Media Library: no attachment ID to keep in sync, and a fresh clone gets
+ * the right icon with no manual step.
+ *
+ * `favicon.svg` first — modern browsers prefer it and it stays crisp at any
+ * density; the 32px PNG is the fallback for those that don't, and the 180px
+ * one is what iOS uses for a home-screen bookmark.
+ *
+ * If an admin ever does set a Site Icon in Settings > General, WordPress's own
+ * tags are left to win and these are skipped, so the Customizer stays the
+ * source of truth the moment someone uses it.
+ */
+function eqc_site_icons() {
+	if ( has_site_icon() ) {
+		return;
+	}
+	$logo = get_stylesheet_directory_uri() . '/assets/svg/logo/';
+	printf( '<link rel="icon" href="%s" sizes="any" type="image/svg+xml">', esc_url( $logo . 'favicon.svg' ) );
+	printf( '<link rel="icon" href="%s" sizes="32x32" type="image/png">', esc_url( $logo . 'favicon-32.png' ) );
+	printf( '<link rel="apple-touch-icon" href="%s">', esc_url( $logo . 'apple-touch-icon-180.png' ) );
+}
+add_action( 'wp_head', 'eqc_site_icons', 3 );
+
+/**
  * Mark the document as JS-capable before first paint, so motion.css can
  * keep [data-eqc-reveal] elements visible-by-default until JS proves it
  * can reveal them again (progressive enhancement, no FOUC either way).
