@@ -666,7 +666,7 @@ user decision, not something to action unprompted.
 
 ## Supervisor re-audit — 2026-09-09, HEAD f60e0a8
 
-The earlier completion claims above are superseded by this audit. Home is **not accepted**. Current evidence: `QA/supervisor-review/home/` (1920 and 390).
+The earlier completion claims above are superseded by this audit. Home is **not accepted**. Evidence at the time: `QA/supervisor-review/home/` (1920 and 390) — its `report.json` is retained; the screenshots were pruned in the 2026-09-10 cleanup, since every defect below has since been re-audited against later rounds.
 
 | ID | Section | Reference | Current defect | Severity | Fix and reuse |
 |---|---|---|---|---|---|

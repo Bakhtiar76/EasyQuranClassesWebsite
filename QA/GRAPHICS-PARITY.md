@@ -77,9 +77,10 @@ flower styles.
 - `QA/icon-parity/collage.html` — live source sheet.
 - `QA/icon-parity/collage-full.png` — all icon families.
 - `QA/icon-parity/collage-14.png` — ornament reference/output pairs.
-- `QA/graphics-parity-final/home/desktop-1440x900.png`
-- `QA/graphics-parity-final/home/tablet-768x1024.png`
-- `QA/graphics-parity-final/home/mobile-390x844.png`
+- `QA/graphics-parity-final/home/report.json` — the accepted run's own result.
+  Its screenshots were pruned in the 2026-09-10 cleanup (superseded by later
+  rounds; ~100MB a round of regenerable images). Recapture that set with
+  `node tests/visual/sweep.mjs http://localhost / --out QA/after --widths 1440,768,390`.
 - `tools/graphics/scratch/shot-*-1600.png` — local ignored working captures
   for direct section comparison; regenerate rather than commit them.
 

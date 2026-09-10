@@ -1,0 +1,116 @@
+{
+  "route": "/kids/",
+  "url": "http://localhost/kids/",
+  "generatedAt": "2026-09-09T22:57:13.012Z",
+  "viewports": [
+    {
+      "name": "desktop-1920x1080",
+      "width": 1920,
+      "height": 1080,
+      "screenshot": "desktop-1920x1080.png",
+      "status": 404,
+      "finalUrl": "http://localhost/kids/",
+      "scrollWidth": 1920,
+      "overflow": false
+    },
+    {
+      "name": "laptop-1280x800",
+      "width": 1280,
+      "height": 800,
+      "screenshot": "laptop-1280x800.png",
+      "status": 404,
+      "finalUrl": "http://localhost/kids/",
+      "scrollWidth": 1280,
+      "overflow": false
+    },
+    {
+      "name": "tablet-768x1024",
+      "width": 768,
+      "height": 1024,
+      "screenshot": "tablet-768x1024.png",
+      "status": 404,
+      "finalUrl": "http://localhost/kids/",
+      "scrollWidth": 768,
+      "overflow": false
+    },
+    {
+      "name": "mobile-390x844",
+      "width": 390,
+      "height": 844,
+      "screenshot": "mobile-390x844.png",
+      "status": 404,
+      "finalUrl": "http://localhost/kids/",
+      "scrollWidth": 390,
+      "overflow": false
+    }
+  ],
+  "headings": [
+    {
+      "level": 1,
+      "text": "Page not found"
+    },
+    {
+      "level": 2,
+      "text": "Your First Class Is Free. Start This Week."
+    },
+    {
+      "level": 3,
+      "text": "Get In Touch!"
+    },
+    {
+      "level": 3,
+      "text": "Quick Links"
+    }
+  ],
+  "h1Count": 1,
+  "imagesMissingAlt": [],
+  "consoleErrors": [
+    {
+      "viewport": "desktop-1920x1080",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "viewport": "laptop-1280x800",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "text": "Failed to load resource: the server responded with a status of 404 (Not Found)"
+    }
+  ],
+  "pageErrors": [],
+  "assetErrors": [
+    {
+      "viewport": "desktop-1920x1080",
+      "url": "http://localhost/kids/",
+      "status": 404,
+      "resourceType": "document"
+    },
+    {
+      "viewport": "laptop-1280x800",
+      "url": "http://localhost/kids/",
+      "status": 404,
+      "resourceType": "document"
+    },
+    {
+      "viewport": "tablet-768x1024",
+      "url": "http://localhost/kids/",
+      "status": 404,
+      "resourceType": "document"
+    },
+    {
+      "viewport": "mobile-390x844",
+      "url": "http://localhost/kids/",
+      "status": 404,
+      "resourceType": "document"
+    }
+  ],
+  "blockedRequests": [],
+  "scan": null,
+  "failures": 4,
+  "warnings": 1
+}

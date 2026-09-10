@@ -69,5 +69,14 @@ Thumbs.db
 # Playwright MCP session artifacts (screenshots/logs from ad-hoc QA)
 .playwright-mcp/
 
-# Parity sweep PNGs — regenerate with tests/visual/sweep.mjs; the reports are tracked.
-QA/after/parity/**/*.png
+# Visual-QA sweep screenshots are REGENERABLE (tests/visual/sweep.mjs) and cost
+# ~100MB a round, so only the reports they produce are tracked. Everything a
+# reviewer needs to judge a run — pass/fail, h1 count, console + request errors,
+# horizontal overflow, missing alt — lives in report.json / summary.json.
+# Non-regenerable evidence (the client's annotated review images in
+# QA/qa-10092026/, the icon-parity crops CLAUDE.md cites) is NOT covered here
+# and stays tracked.
+QA/after*/**/*.png
+QA/baseline/**/*.png
+QA/supervisor-review/**/*.png
+QA/graphics-parity-final/**/*.png
