@@ -382,7 +382,56 @@ $blog_section = eqc_section(
 	)
 );
 
+// ------------------------------------------------------- 11. FAQ
+// Enrollment-objection questions (DESIGN.md 17.9), phrased differently from
+// the FAQ page's own set. One eqc_faq_group() with no <h3> => a single
+// per-group accordion (assets/js/eqc.js). The bar, the wrapping question
+// text and the always-present + icon are handled by the hardened
+// .eqc-faq-* rules in components.css.
+$home_faq_items = array(
+	array(
+		'Do I need to know any Arabic before I start?',
+		'No. Our Noorani Qaida course begins with the Arabic letters and their sounds, so complete beginners of any age can join and build up from there.',
+	),
+	array(
+		'Are the teachers properly qualified to teach Tajweed?',
+		'Yes. Every teacher is trained in Tajweed rules and has years of experience teaching the Quran online to both children and adults.',
+	),
+	array(
+		'What actually happens in the free trial class?',
+		'You tell us the student&rsquo;s age, level and available times. We match a suitable male or female teacher and you attend one full class before deciding to continue &mdash; no card details needed.',
+	),
+	array(
+		'How do you keep online classes safe for children?',
+		'Classes are one-to-one with a verified teacher, parents are welcome to sit in at any time, and a session can be recorded on request for your own peace of mind.',
+	),
+	array(
+		'Can I change my timings or pause classes later?',
+		'Yes. You can adjust your weekly schedule directly with your teacher, and you can pause or switch your plan at the end of any billing month.',
+	),
+	array(
+		'Which time zones and countries do you teach in?',
+		'We teach students across North America, Europe, the Middle East, Africa and Asia, and every class is scheduled to fit your own local time.',
+	),
+);
+$faq_section = eqc_section(
+	'eqc-section eqc-section--faq eqc-section--cream',
+	array(
+		eqc_inner(
+			'eqc-container--narrow',
+			array(
+				eqc_section_heading_el( 'FAQ', 'Questions Families Ask <br><span style="color:var(--eqc-gold-600)">Before They Start</span>', true, 'eqc-eyebrow--plain', 'quote' ),
+				eqc_faq_group( '', $home_faq_items ),
+				eqc_container(
+					array( 'css_classes' => 'eqc-btn-group', 'flex_direction' => 'row', 'content_position' => 'center' ),
+					array( eqc_button( __( 'View All FAQs', 'easy-quran-classes' ), home_url( '/faq/' ), 'eqc-btn--primary' ) )
+				),
+			)
+		),
+	)
+);
+
 eqc_save_elementor_page(
 	eqc_page_id( 'home' ),
-	array( $hero, $trust, $about, $courses, $pricing, $teachers, $testimonials, $blog_section )
+	array( $hero, $trust, $about, $courses, $pricing, $teachers, $testimonials, $blog_section, $faq_section )
 );
