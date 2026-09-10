@@ -31,8 +31,21 @@
 	position: sticky;
 	top: 0;
 	z-index: 100;
-	background: var(--eqc-cream-100);
+	/* Transparent at rest so the hero arch can rise into the gutter around the
+	   floating nav pill (client review, QA/qa-10092026/5.png); the page ground
+	   is this same cream, so nothing else changes. The scrolled state restores
+	   an opaque ground so content never shows through behind the pill. */
+	background: transparent;
 	padding-block: clamp(0.45rem, 0.2rem + 0.85vw, 1.3rem);
+}
+.eqc-header.is-scrolled {
+	background: var(--eqc-cream-100);
+	/* At rest the hero arch's tip paints in FRONT of the nav pill (z-index 120,
+	   components.css .eqc-section--hero .eqc-hero-media) as a deliberate
+	   flourish. Once the page moves, the bar has to take the front again —
+	   otherwise the arch would slide up across the nav on its way out. The
+	   .is-scrolled class is toggled at scrollY > 8 in eqc.js. */
+	z-index: 200;
 }
 
 .eqc-header-bar {
@@ -331,14 +344,31 @@ a.eqc-header-cta .eqc-icon {
 	position: relative;
 	overflow: hidden;
 }
+/* Client review (QA/qa-9-10.md task 21): the girih watermark was invisible.
+   Darker, more golden and a touch wider so it reads on the deep green. */
+/* Gold girih lattice over the dark green, fading out to the left. Cropping it
+   to a 44%-wide band gave the pattern a hard vertical edge mid-panel, which is
+   the "mesh background just visible, looking bad" the client objected to. It
+   now spans the full width and the LATTICE mask is intersected with a
+   horizontal gradient, so the texture dissolves smoothly into the green
+   instead of stopping. Same two-layer mask-composite technique as
+   components.css .eqc-section--about::before. */
 .eqc-footer-cta::before {
 	content: '';
 	position: absolute;
-	inset: 0 0 0 auto;
-	width: 36%;
-	background: var(--eqc-gold-300);
-	opacity: 0.035;
-	mask: url('../svg/girih-lattice-fine.svg') right center / 72px repeat;
+	inset: 0;
+	background: var(--eqc-gold-500);
+	opacity: 0.2;
+	-webkit-mask-image: linear-gradient(270deg, #000 0%, #000 26%, transparent 72%), url('../svg/girih-lattice-fine.svg');
+	mask-image: linear-gradient(270deg, #000 0%, #000 26%, transparent 72%), url('../svg/girih-lattice-fine.svg');
+	-webkit-mask-size: 100% 100%, 96px 96px;
+	mask-size: 100% 100%, 96px 96px;
+	-webkit-mask-repeat: no-repeat, repeat;
+	mask-repeat: no-repeat, repeat;
+	-webkit-mask-position: center, right center;
+	mask-position: center, right center;
+	-webkit-mask-composite: source-in;
+	mask-composite: intersect;
 	pointer-events: none;
 }
 .eqc-footer-cta > * { position: relative; }
@@ -446,23 +476,28 @@ a.eqc-header-cta .eqc-icon {
    ratios (0.22 and 0.13 of the diameter), so the badge stays in proportion
    as it scales. */
 .eqc-cta-stat {
-	--_stat: clamp(64px, 39px + 4.1vw, 118px);
+	--_stat: clamp(66px, 40px + 4.4vw, 124px);
 	width: var(--_stat);
 	height: var(--_stat);
 	flex: none;
 	margin: 0;
+	/* Client review (QA/qa-9-10.md task 21): tuck the circle under the last
+	   avatar the same way the avatars overlap each other, and layer it above. */
+	margin-inline-start: calc(var(--_stat) * -0.14);
+	position: relative;
+	z-index: 1;
 	border-radius: 50%;
 	background: var(--eqc-cream-100);
 	display: flex;
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	gap: 0.2em;
+	gap: 0.15em;
 	text-align: center;
-	line-height: 1.1;
+	line-height: 1.05;
 }
 .eqc-cta-stat strong {
-	font-size: calc(var(--_stat) * 0.22);
+	font-size: calc(var(--_stat) * 0.2);
 	font-weight: 700;
 	/* The reference's brighter gold is only 3.2:1 on this cream circle,
 	   which fails AA once the badge scales the figure below large-text
@@ -470,9 +505,10 @@ a.eqc-header-cta .eqc-icon {
 	color: var(--eqc-gold-700);
 }
 .eqc-cta-stat span {
-	font-size: max(12px, calc(var(--_stat) * 0.13));
+	font-size: max(11px, calc(var(--_stat) * 0.115));
 	font-weight: 600;
 	color: var(--eqc-green-800);
+	max-width: 84%;
 }
 
 a.eqc-cta-button {
@@ -515,7 +551,7 @@ a.eqc-cta-button:focus-visible { outline-color: var(--eqc-green-900); }
 	.eqc-cta-capsule { align-self: end; flex-wrap: nowrap; margin-bottom: min(0.8vw, 15px); gap: min(0.8vw, 15px); padding: min(2.05vw, 39px) min(1.3vw, 25px); border-radius: min(3.2vw, 62px); }
 	.eqc-avatar-stack img { --_avatar: min(6.1vw, 117px); margin-inline-start: calc(var(--_avatar) * -0.17); }
 	.eqc-avatar-stack img:first-child { margin-inline-start: 0; }
-	.eqc-cta-stat { --_stat: min(6.15vw, 118px); }
+	.eqc-cta-stat { --_stat: min(6.4vw, 122px); margin-inline-start: calc(var(--_stat) * -0.18); }
 	a.eqc-cta-button { --_h: min(5.1vw, 98px); flex: 1; font-size: min(1.05vw, 20px); padding-inline: min(0.8vw, 15px); white-space: nowrap; }
 	.eqc-cta-button-icon { --_badge-size: min(3vw, 58px); }
 }
@@ -537,6 +573,9 @@ a.eqc-cta-button:focus-visible { outline-color: var(--eqc-green-900); }
 		gap: 0.45em;
 		padding: 0.55em 1em;
 		border-radius: var(--eqc-radius-pill);
+		/* pill state: no avatar overlap */
+		margin-inline-start: 0;
+		z-index: auto;
 	}
 	.eqc-cta-stat strong { font-size: 1.05rem; }
 	.eqc-cta-stat span { font-size: 0.8125rem; }
