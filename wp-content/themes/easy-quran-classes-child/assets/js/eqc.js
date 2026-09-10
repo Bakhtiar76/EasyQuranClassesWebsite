@@ -424,49 +424,154 @@
 	}
 
 	/**
-	 * Home teachers row: the aside's prev/next buttons.
+	 * Teacher card rows: the snap-scrolling overflow container both the home
+	 * aside and the /teachers/ page grid become below 61.25rem
+	 * (components.css .eqc-teachers-cards / .eqc-grid--teachers).
 	 *
-	 * These two buttons shipped with an aria-label and a focus ring and no
-	 * handler at all — a keyboard user could tab into them and nothing
-	 * happened. Below 61.25rem the card row is a snap-scrolling overflow
-	 * container (components.css .eqc-teachers-cards), so paging it is just a
-	 * scrollBy; above that width every card is already visible, so the buttons
-	 * are hidden by CSS and this does nothing.
+	 * Two things live here:
+	 *  - The home aside's prev/next buttons. These shipped with an aria-label
+	 *    and a focus ring and no handler at all — a keyboard user could tab
+	 *    into them and nothing happened (fixed round 9). The /teachers/ page
+	 *    grid has no such buttons in its markup, so `buttons` is simply empty
+	 *    there and this half is a no-op.
+	 *  - A `.eqc-slider-dots` strip (round 10, client review: the native
+	 *    `scrollbar-width: thin` bar read as "old and bad looking" — replace
+	 *    it with the same dot pattern the reviews carousel already uses, not
+	 *    a second implementation of it). The row itself stays plain
+	 *    scroll-snap rather than becoming a `.eqc-carousel` transform slider —
+	 *    that keeps real per-finger touch scrolling, which is the better
+	 *    mobile behaviour; only the indicator was missing. Dots are built in
+	 *    JS (mirroring how initCarousel() builds `.eqc-slider-dots` already)
+	 *    so no page rebake is needed for this change, and they are removed
+	 *    above 61.25rem, where every card is already visible and there is
+	 *    nothing to page to.
 	 */
-	function initTeachersNav() {
-		document.querySelectorAll( '.eqc-teachers-nav' ).forEach( function ( nav ) {
-			var split = nav.closest( '.eqc-teachers-split' );
-			var row = split ? split.querySelector( '.eqc-teachers-cards' ) : null;
-			var buttons = nav.querySelectorAll( '.eqc-nav-btn' );
-			if ( ! row || buttons.length < 2 ) {
-				return;
-			}
+	function initTeacherRows() {
+		var entries = [];
+		document.querySelectorAll( '.eqc-teachers-split > .eqc-teachers-cards' ).forEach( function ( row ) {
+			var split = row.closest( '.eqc-teachers-split' );
+			var nav = split ? split.querySelector( '.eqc-teachers-nav' ) : null;
+			entries.push( { row: row, buttons: nav ? nav.querySelectorAll( '.eqc-nav-btn' ) : [] } );
+		} );
+		document.querySelectorAll( '.eqc-grid--teachers' ).forEach( function ( row ) {
+			entries.push( { row: row, buttons: [] } );
+		} );
+		entries.forEach( setupTeacherRow );
+	}
 
-			function page( direction ) {
-				var card = row.firstElementChild;
-				// One card plus its gap, so a press lands on the next snap point
-				// rather than an arbitrary offset; fall back to most of a screen.
-				var step = card ? card.getBoundingClientRect().width + 16 : row.clientWidth * 0.8;
-				row.scrollBy( { left: direction * step, behavior: 'smooth' } );
-			}
+	function setupTeacherRow( entry ) {
+		var row = entry.row;
+		var buttons = entry.buttons;
+		var dotsWrap = null;
+		var mq = window.matchMedia( '(max-width: 61.25rem)' );
 
-			function syncDisabled() {
-				var max = row.scrollWidth - row.clientWidth;
-				buttons[ 0 ].disabled = row.scrollLeft <= 1;
-				buttons[ 1 ].disabled = row.scrollLeft >= max - 1;
-			}
-
+		function page( direction ) {
+			var card = row.firstElementChild;
+			// One card plus its gap, so a press lands on the next snap point
+			// rather than an arbitrary offset; fall back to most of a screen.
+			var step = card ? card.getBoundingClientRect().width + 16 : row.clientWidth * 0.8;
+			row.scrollBy( { left: direction * step, behavior: reduceMotion ? 'auto' : 'smooth' } );
+		}
+		if ( buttons.length >= 2 ) {
 			buttons[ 0 ].addEventListener( 'click', function () { page( -1 ); } );
 			buttons[ 1 ].addEventListener( 'click', function () { page( 1 ); } );
-			row.addEventListener( 'scroll', syncDisabled, { passive: true } );
-			window.addEventListener( 'resize', syncDisabled );
-			syncDisabled();
+		}
+
+		function syncButtons() {
+			if ( buttons.length < 2 ) {
+				return;
+			}
+			var max = row.scrollWidth - row.clientWidth;
+			buttons[ 0 ].disabled = row.scrollLeft <= 1;
+			buttons[ 1 ].disabled = row.scrollLeft >= max - 1;
+		}
+
+		function ensureDots() {
+			if ( ! dotsWrap ) {
+				dotsWrap = document.createElement( 'div' );
+				dotsWrap.className = 'eqc-slider-dots';
+				row.insertAdjacentElement( 'afterend', dotsWrap );
+			}
+			return dotsWrap;
+		}
+		function removeDots() {
+			if ( dotsWrap ) {
+				dotsWrap.remove();
+				dotsWrap = null;
+			}
+		}
+		function buildDots() {
+			if ( ! mq.matches ) {
+				removeDots();
+				return;
+			}
+			var cards = Array.prototype.slice.call( row.children );
+			var wrap = ensureDots();
+			wrap.innerHTML = '';
+			cards.forEach( function ( card, i ) {
+				var dot = document.createElement( 'button' );
+				dot.type = 'button';
+				dot.className = 'eqc-slider-dot';
+				dot.setAttribute( 'role', 'tab' );
+				dot.setAttribute( 'aria-label', 'Show teacher ' + ( i + 1 ) + ' of ' + cards.length );
+				dot.addEventListener( 'click', function () {
+					card.scrollIntoView( { behavior: reduceMotion ? 'auto' : 'smooth', inline: 'center', block: 'nearest' } );
+				} );
+				wrap.appendChild( dot );
+			} );
+			syncDots();
+		}
+		function syncDots() {
+			if ( ! dotsWrap ) {
+				return;
+			}
+			// Nearest-centre card, not scrollLeft math against card width — the
+			// row's cards are minmax(72%/84%, 1fr), so their rendered width
+			// isn't a fixed step, and this stays correct regardless.
+			var cards = row.children;
+			var rowBox = row.getBoundingClientRect();
+			var center = rowBox.left + rowBox.width / 2;
+			var closest = 0;
+			var closestDist = Infinity;
+			Array.prototype.forEach.call( cards, function ( card, i ) {
+				var box = card.getBoundingClientRect();
+				var dist = Math.abs( ( box.left + box.width / 2 ) - center );
+				if ( dist < closestDist ) {
+					closestDist = dist;
+					closest = i;
+				}
+			} );
+			Array.prototype.forEach.call( dotsWrap.children, function ( dot, i ) {
+				var isActive = i === closest;
+				dot.classList.toggle( 'is-active', isActive );
+				dot.setAttribute( 'aria-selected', isActive ? 'true' : 'false' );
+			} );
+		}
+
+		function syncAll() {
+			syncButtons();
+			syncDots();
+		}
+
+		row.addEventListener( 'scroll', syncAll, { passive: true } );
+		window.addEventListener( 'resize', function () {
+			buildDots();
+			syncAll();
 		} );
+		if ( mq.addEventListener ) {
+			mq.addEventListener( 'change', function () {
+				buildDots();
+				syncAll();
+			} );
+		}
+
+		buildDots();
+		syncAll();
 	}
 
 	function init() {
 		initNavDrawer();
-		initTeachersNav();
+		initTeacherRows();
 		initHeaderScrollState();
 		initScrollReveal();
 		initCountUp();
