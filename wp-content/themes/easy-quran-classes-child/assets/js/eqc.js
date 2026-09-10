@@ -490,6 +490,14 @@
 			if ( ! dotsWrap ) {
 				dotsWrap = document.createElement( 'div' );
 				dotsWrap.className = 'eqc-slider-dots';
+				// role="tab" on each dot (below) requires a role="tablist"
+				// ancestor per WAI-ARIA — the PHP-rendered carousel dots this
+				// mirrors set both on their own wrapper (eqc_carousel(),
+				// elementor-helpers.php); this JS-built one needs the same
+				// pair, or the tabs are orphaned and axe's
+				// aria-required-parent check fails.
+				dotsWrap.setAttribute( 'role', 'tablist' );
+				dotsWrap.setAttribute( 'aria-label', 'Teachers' );
 				row.insertAdjacentElement( 'afterend', dotsWrap );
 			}
 			return dotsWrap;
