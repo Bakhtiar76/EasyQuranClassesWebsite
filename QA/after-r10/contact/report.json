@@ -1,7 +1,7 @@
 {
   "route": "/contact",
   "url": "http://localhost/contact",
-  "generatedAt": "2026-09-10T06:07:36.540Z",
+  "generatedAt": "2026-09-10T06:36:36.170Z",
   "viewports": [
     {
       "name": "desktop-1920x1080",
@@ -116,13 +116,7 @@
   "pageErrors": [],
   "assetErrors": [],
   "blockedRequests": [],
-  "scan": {
-    "min": 380,
-    "max": 1900,
-    "step": 40,
-    "checked": 39,
-    "overflows": []
-  },
+  "scan": null,
   "failures": 0,
   "warnings": 0
 }
