@@ -399,14 +399,18 @@ $blog_section = eqc_section(
 
 // ------------------------------------------------------- 11. FAQ
 // Six general questions on the home page; the full set lives on /faq/
-// (client request, QA/qa-9-10.md task 9). Kept in step with 16-faq.php.
+// (client request, QA/qa-9-10.md task 9). Pulled from eqc_faq_data()
+// (elementor-helpers.php) — the same canonical strings 16-faq.php builds
+// its full grouped page from — rather than a second hardcoded copy, so an
+// edit to a shared answer's wording can't drift between the two pages.
+$faq_data       = eqc_faq_data();
 $home_faq_items = array(
-	array( 'How are classes conducted?', 'Every class is a live, 1-to-1 video session with a qualified teacher. Classes are never pre-recorded.' ),
-	array( 'How long is each class?', 'Standard classes are 30 minutes, matching the plans on our Pricing page.' ),
-	array( 'Can beginners start from zero?', 'Yes. Noorani Qaida starts from the Arabic alphabet itself, with no prior reading ability assumed.' ),
-	array( 'Can I choose a male or female teacher?', 'Yes, families can request a male or female teacher based on their preference.' ),
-	array( 'How does the free trial work?', 'Tell us the student\'s age, level and availability, and we match a suitable teacher for one trial class before any commitment.' ),
-	array( 'Are timings flexible?', 'Yes. Classes are scheduled around the times that work for your family, not a fixed institutional timetable.' ),
+	$faq_data['Classes & Teaching'][0],      // How are classes conducted?
+	$faq_data['Classes & Teaching'][1],      // How long is each class?
+	$faq_data['Beginners'][0],               // Can beginners start from zero?
+	$faq_data['Classes & Teaching'][2],      // Can I choose a male or female teacher?
+	$faq_data['Scheduling & Free Trial'][0], // How does the free trial work?
+	$faq_data['Scheduling & Free Trial'][1], // Are timings flexible?
 );
 $home_faq = eqc_section(
 	'eqc-section eqc-section--cream',
