@@ -455,7 +455,7 @@ writeFileSync(new URL('../../wp-content/themes/easy-quran-classes-child/inc/icon
 // each also carries an explicit `color` so it renders in the brand green when
 // opened on its own, where there is nothing to inherit from.
 // ---------------------------------------------------------------------------
-const iconsDir = new URL('../../wp-content/themes/easy-quran-classes-child/assets/svg/icons/', import.meta.url);
+const iconsDir = new URL('./output/icons/', import.meta.url);
 mkdirSync(iconsDir, { recursive: true });
 
 // Remove files for icons that no longer exist, so a renamed icon does not
@@ -474,5 +474,5 @@ for (const { id, attrs, inner, viewBox } of ICONS) {
 `;
 	writeFileSync(new URL(`${id}.svg`, iconsDir), file);
 }
-console.log(`Wrote ${ICONS.length} standalone SVGs to assets/svg/icons/`);
+console.log(`Wrote ${ICONS.length} standalone SVGs to tools/graphics/output/icons/`);
 console.log(`Wrote ${Object.keys(LUCIDE_MAP).length + Object.keys(ORIGINAL_OUTLINE).length + Object.keys(BRAND_MAP).length + Object.keys(FILLED_UI).length + 2} symbols to inc/icon-sprite.php`);

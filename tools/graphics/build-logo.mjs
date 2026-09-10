@@ -41,12 +41,23 @@ const MARK_H = 692;
 const OUT_DIR = new URL('../../wp-content/themes/easy-quran-classes-child/assets/svg/logo/', import.meta.url);
 mkdirSync(OUT_DIR, { recursive: true });
 
+// eqc-logo-horizontal.svg and eqc-logo.svg have no current runtime
+// reference — every page composes the theme's own mark + live text
+// instead — but their own future uses (social avatar, print, schema.org
+// Organization logo; email signatures, social previews) are real, so they
+// stay generated rather than deleted. Kept out of the production theme
+// (CLAUDE.md: production ships only what's actually used) alongside this
+// project's other dev-only generator output (reference/, scratch/,
+// source-icons/).
+const OUT_DIR_UNUSED = new URL('./output/logo/', import.meta.url);
+mkdirSync(OUT_DIR_UNUSED, { recursive: true });
+
 const FONT_DISPLAY = "'DM Serif Display', Georgia, 'Times New Roman', serif";
 const FONT_BODY = "'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif";
 
-function write(name, svg) {
+function write(name, svg, dir = OUT_DIR) {
 	const { data } = optimize(svg, { multipass: true, plugins: ['preset-default'] });
-	writeFileSync(new URL(name, OUT_DIR), data);
+	writeFileSync(new URL(name, dir), data);
 	console.log(`${name.padEnd(28)} ${data.length} bytes`);
 }
 
@@ -68,7 +79,9 @@ write(
 //    self-contained lockup asset for contexts that can't compose the
 //    theme's own mark + live-text (email signatures, social previews,
 //    print). currentColor throughout, so one file serves both light and
-//    dark backgrounds via the consumer's CSS `color`.
+//    dark backgrounds via the consumer's CSS `color`. No current runtime
+//    reference, so it is written to output/logo/ (dev-only) rather than
+//    the production theme — see OUT_DIR_UNUSED above.
 // ---------------------------------------------------------------------
 {
 	const markH = 120;
@@ -83,14 +96,16 @@ write(
 			markPath(0, (viewH - MARK_H * markScale) / 2, markScale) +
 			`<text x="${textX}" y="${viewH * 0.46}" font-family="${FONT_DISPLAY}" font-size="42" letter-spacing="1.5">EASY QURAN CLASSES</text>` +
 			`<text x="${textX}" y="${viewH * 0.46 + 34}" font-family="${FONT_BODY}" font-size="17" font-weight="500" letter-spacing="0.5" fill-opacity="0.82">Learning the Quran step by step</text>` +
-			`</svg>`
+			`</svg>`,
+		OUT_DIR_UNUSED
 	);
 }
 
 // ---------------------------------------------------------------------
 // 3. eqc-logo.svg — full stacked lockup (mark above, wordmark + tagline
 //    below), matching Logo2.jpeg's own layout. For square contexts:
-//    social avatar, print, schema.org Organization logo.
+//    social avatar, print, schema.org Organization logo. No current
+//    runtime reference — written to output/logo/, same as #2 above.
 // ---------------------------------------------------------------------
 {
 	const markScale = 1;
@@ -107,7 +122,8 @@ write(
 			markPath(0, 0, markScale) +
 			`<text x="${cx}" y="${MARK_H + gap1 + titleH * 0.7}" text-anchor="middle" font-family="${FONT_DISPLAY}" font-size="52" letter-spacing="2">EASY QURAN CLASSES</text>` +
 			`<text x="${cx}" y="${MARK_H + gap1 + titleH + gap2 + tagH * 0.6}" text-anchor="middle" font-family="${FONT_BODY}" font-size="22" font-weight="500" letter-spacing="0.5" fill-opacity="0.82">Learning the Quran step by step</text>` +
-			`</svg>`
+			`</svg>`,
+		OUT_DIR_UNUSED
 	);
 }
 

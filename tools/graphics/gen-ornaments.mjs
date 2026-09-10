@@ -30,10 +30,6 @@ import {
 	wrapArch,
 	svgFromBbox,
 	ogeeArchPanel,
-	fourCentredArchPanel,
-	horseshoeArchPanel,
-	mandorlaPanel,
-	multifoilArchPanel,
 	cuspedArchPanel,
 	CUSPED_SAGITTAE,
 } from './lib/arches.mjs';
@@ -91,13 +87,9 @@ const svgWrap = (w, h, body, attrs = '') =>
 
 // =====================================================================
 // 1. Rosettes — badge medallions and divider centerpieces.
-//    rosette.svg and the 3 medallions below are the client's 8-fold girih
-//    star (tools/graphics/reference/rosette.png), traced exactly rather
-//    than the previous simple {n/step} star — see trace-rosette.mjs and
-//    README.md. rosette-12.svg and star-8-filled.svg have no reference to
-//    trace, so they use girihRosettePath (lib/geometry.mjs), the same
-//    tip/shoulder/valley construction measured off that same reference,
-//    honestly generalized rather than guessed.
+//    rosette.svg is the client's 8-fold girih star (tools/graphics/
+//    reference/rosette.png), traced exactly rather than the previous
+//    simple {n/step} star — see trace-rosette.mjs and README.md.
 // =====================================================================
 
 // rosette.svg: the exact traced 8-fold shape (fill, using its own
@@ -174,31 +166,6 @@ function signatureRosette(cx, cy, outer, simple = false) {
 	save('seal-outline.svg', svgWrap(64, 64, `<path fill="none" stroke="currentColor" stroke-width="1.4" vector-effect="non-scaling-stroke" stroke-linejoin="round" d="${d}"/>`, 'aria-hidden="true" focusable="false"'));
 }
 
-// rosette-12.svg: no 12-fold reference exists, so this is the measured
-// tip/shoulder/valley construction generalized to 12 points (stroke
-// outline, matching this asset's decorative-ring role at
-// .eqc-pricing-icon-ring's ~60px render size).
-{
-	const d = girihRosettePath(32, 32, 28, 12);
-	save('rosette-12.svg', svgWrap(64, 64, `<path fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" d="${d}"/>`, 'aria-hidden="true" focusable="false"'));
-}
-
-// Filled 8-point star bullet — pricing feature lists. Renders around
-// 12px, far too small for the rosette's interior weave to read, so this
-// uses girihRosettePath's OUTER silhouette only (filled solid) — the
-// same measured tip/shoulder/valley proportions as rosette-12.svg, just
-// at folds=8 to match this bullet's established 8-point look.
-{
-	const d = girihRosettePath(12, 12, 11, 8);
-	save('star-8-filled.svg', svgWrap(24, 24, `<path fill="currentColor" d="${d}"/>`, 'aria-hidden="true" focusable="false"'));
-}
-
-// Divider medallion (small, for the section-heading rule) — the exact
-// traced rosette, scaled down.
-{
-	save('divider-medallion.svg', svgWrap(32, 32, tracedRosette(16, 16, 14), 'aria-hidden="true" focusable="false"'));
-}
-
 // One professional rosette family: the testimonial flower is the signature
 // version, and a reduced drawing of that SAME twelve-fold contour covers
 // compact/simple-outline contexts. Do not proliferate reference artefacts
@@ -254,14 +221,18 @@ function girihTile(a, { starInset = 0.86 } = {}) {
 	return { body, D };
 }
 
-for (const [name, a] of [['fine', 34], ['dense', 52]]) {
-	const { body, D } = girihTile(a);
+// Only 'fine' (a=34) is consumed (components.css, shell.css background
+// masks). A denser 'dense' (a=52) variant was generated alongside it with
+// no consumer anywhere — removed round 11 (CLAUDE.md: production ships
+// only what's actually used).
+{
+	const { body, D } = girihTile(34);
 	const svg = svgWrap(
 		D, D,
 		`<g fill="none" stroke="currentColor" stroke-width="1" stroke-linejoin="round">${body}</g>`,
 		'aria-hidden="true" focusable="false"'
 	);
-	save(`girih-lattice-${name}.svg`, svg);
+	save('girih-lattice-fine.svg', svg);
 }
 
 // Shared angular field. A real SVG pattern clips each repeat unit before
@@ -439,23 +410,6 @@ function sparklePath(cx, cy, r) {
 	// closed anyway, but this stroked render does NOT draw a line across
 	// the base, reading as an open-bottomed frame rather than a capped box.
 	save('arch-outline.svg', svgFromBbox(panel.bbox, `<path fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round" d="${panel.d}"/>`, 0));
-
-	// Double-line frame: outline plus a second, uniformly inset copy
-	// (inset both axes, not just x, so the two lines stay concentric).
-	const inset = 14;
-	const inner = ogeeArchPanel(w - inset * 2, jamb - inset, baseH - inset * 2, { riseFrac, c1, c2 });
-	const unionBbox = {
-		minX: Math.min(panel.bbox.minX, inner.bbox.minX + inset),
-		minY: Math.min(panel.bbox.minY, inner.bbox.minY + inset),
-		maxX: Math.max(panel.bbox.maxX, inner.bbox.maxX + inset),
-		maxY: Math.max(panel.bbox.maxY, inner.bbox.maxY + inset),
-	};
-	const frame =
-		`<g fill="none" stroke="currentColor" stroke-width="2">` +
-		`<path d="${panel.d}"/>` +
-		`<path transform="translate(${fmt(inset)} ${fmt(inset)})" d="${inner.d}"/>` +
-		`</g>`;
-	save('arch-frame.svg', svgFromBbox(unionBbox, frame, 4));
 }
 
 // Cusped keel arch — the client's Home.jpeg hero silhouette (three outward
@@ -583,138 +537,6 @@ for (const [name, w, h, cap] of [['child', 246, 423, 123], ['alphabet', 276, 300
 	save('pricing-banner-mask.svg', svgWrap(w, h, fill, 'aria-hidden="true" focusable="false"'));
 }
 
-// Four-centred (Persian/Timurid) arch — course/pricing card media frames.
-// Its bbox comes out essentially exact (0..w, 0..baseH) at these
-// proportions, but it's still wrapped via wrapArch() rather than a fixed
-// box — the same safety net every other panel gets, on principle, not
-// because this one happens to need the padding.
-{
-	const panel = fourCentredArchPanel(320, 200, 380);
-	save('fourcentred-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
-	save('fourcentred-outline.svg', wrapArch(panel, { pad: 2, stroke: true, strokeWidth: 2.5 }));
-}
-
-// Horseshoe (Moorish) arch — decorative accent frame. Genuinely overshoots
-// its nominal width (~9px/side at this scale, the bulge below the
-// springline that makes it a horseshoe rather than a plain round arch).
-{
-	const panel = horseshoeArchPanel(300, 260, 340);
-	save('horseshoe-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
-	save('horseshoe-outline.svg', wrapArch(panel, { pad: 2, stroke: true, strokeWidth: 2.5 }));
-}
-
-// Mandorla (pointed-oval) — teacher/avatar photo frames. Flatter than the
-// equilateral default (e = 0.4*halfWidth, not halfWidth) so it reads as a
-// gentle oval suited to a face photo rather than an aggressive lens; the
-// flatter cap also genuinely overshoots the nominal height (~11px
-// top/bottom), same reasoning as the keel and horseshoe arches above.
-{
-	const w = 240, h = 300;
-	const panel = mandorlaPanel(w, h, { e: (w / 2) * 0.4 });
-	save('mandorla-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
-	save('mandorla-outline.svg', wrapArch(panel, { pad: 2, stroke: true, strokeWidth: 2.5 }));
-}
-
-// Multifoil (inward-cusped) arch — card frame. Rebuilt on the shared
-// scallop construction in lib/arches.mjs (previously a parallel,
-// hand-rolled copy of the same math); 3 lobes per side, matching the
-// clean mosque-window silhouette confirmed against the Flaticon reference.
-// Inward cusps stay within the nominal box by construction (they bulge
-// toward the centerline, never past it), so no overshoot here.
-{
-	const panel = multifoilArchPanel(260, 180, 320, { lobes: 3 });
-	save('multifoil-arch-mask.svg', wrapArch(panel, { pad: 0, fill: '#fff' }));
-	save('multifoil-arch-outline.svg', wrapArch(panel, { pad: 2, stroke: true, strokeWidth: 2.5 }));
-}
-
-// =====================================================================
-// 7. Quatrefoil — 4-lobed frame (the "alphabet card" reference).
-//    Construction: 4 circles of radius r, centers placed at distance r
-//    from the shared middle on each axis, union of all 4 (classic
-//    quatrefoil / four-petal construction).
-// =====================================================================
-function quatrefoilPath(size) {
-	// 4 circles of radius r, centered at distance r from the shared middle
-	// along each cardinal direction — each circle then passes exactly
-	// through that shared middle point (center-to-origin distance == r ==
-	// its own radius), which is what makes adjacent circles cross at two
-	// clean points: the shared middle, and an outer "cusp" point. For the
-	// N/E pair (centers (0,-r) and (r,0)), solving the two-circle
-	// intersection gives cusp (r,-r) — and by the 4-fold symmetry the
-	// other three cusps are just that point rotated 90/180/270°. The
-	// union's outline is then just the 4 "outer" semicircle arcs between
-	// consecutive cusps (the far half of each circle, not the half that
-	// passes through the shared middle).
-	const r = size * 0.32;
-	const c = size / 2;
-	const cusps = [
-		[c + r, c - r], // between N and E petals
-		[c + r, c + r], // between E and S petals
-		[c - r, c + r], // between S and W petals
-		[c - r, c - r], // between W and N petals
-	];
-	let d = `M${fmt(cusps[0][0])} ${fmt(cusps[0][1])} `;
-	for (let i = 0; i < 4; i++) {
-		const [ex, ey] = cusps[(i + 1) % 4];
-		d += `A${fmt(r)} ${fmt(r)} 0 0 0 ${fmt(ex)} ${fmt(ey)} `;
-	}
-	return d + 'Z';
-}
-
-{
-	const size = 200;
-	const d = quatrefoilPath(size);
-	save('quatrefoil-mask.svg', svgWrap(size, size, `<path fill="#fff" fill-rule="evenodd" d="${d}"/>`));
-	save('quatrefoil-outline.svg', svgWrap(size, size, `<path fill="none" stroke="currentColor" stroke-width="2" d="${d}"/>`, 'aria-hidden="true" focusable="false"'));
-}
-
-// =====================================================================
-// 7b. Mihrab finial — a pointed 4-lobe ornament (reference: the classic
-//     "dome finial" cartouche shape seen on Islamic-design icon sets).
-//     Built by taking one ogee-arch lobe and rotating it 4 times around a
-//     shared center — reuses ogeeArchPath's own S-curve rather than a
-//     second hand-authored curve, so the two shapes stay a visually
-//     related family.
-// =====================================================================
-{
-	// A dedicated symmetric "petal" curve (not a reuse of ogeeArchPath,
-	// whose control-point formula assumes a small dome atop a tall
-	// rectangle and distorts badly outside that range): two mirrored
-	// cubic beziers from the shared center out to a pointed tip and back,
-	// belly-bulging outward by `bulge` at their midpoint. Rotating one
-	// petal 4 times around the center gives the finial.
-	const size = 200;
-	const cx = size / 2, cy = size / 2;
-	const R = size * 0.42;
-	const bulge = R * 0.5;
-	const petal =
-		`M${fmt(cx)} ${fmt(cy)} ` +
-		`C${fmt(cx + bulge)} ${fmt(cy - R * 0.42)} ${fmt(cx + bulge * 0.5)} ${fmt(cy - R * 0.86)} ${fmt(cx)} ${fmt(cy - R)} ` +
-		`C${fmt(cx - bulge * 0.5)} ${fmt(cy - R * 0.86)} ${fmt(cx - bulge)} ${fmt(cy - R * 0.42)} ${fmt(cx)} ${fmt(cy)} Z`;
-	let body = '';
-	for (let k = 0; k < 4; k++) {
-		body += `<g transform="rotate(${k * 90} ${fmt(cx)} ${fmt(cy)})"><path d="${petal}"/></g>`;
-	}
-	save('mihrab-finial-mask.svg', svgWrap(size, size, `<g fill="#fff">${body}</g>`));
-	save('mihrab-finial-outline.svg', svgWrap(size, size, `<g fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round">${body}</g>`, 'aria-hidden="true" focusable="false"'));
-}
-
-// =====================================================================
-// 8. Corner frame — double gold arch line sweeping in from a corner
-//    (Pricing-card reference). A quarter-circle arc pair.
-// =====================================================================
-{
-	const size = 140;
-	const r1 = size * 0.78;
-	const r2 = size * 0.6;
-	const body =
-		`<g fill="none" stroke="currentColor" stroke-linecap="round">` +
-		`<path stroke-width="2.5" d="M0 ${fmt(r1)} A${fmt(r1)} ${fmt(r1)} 0 0 1 ${fmt(r1)} 0"/>` +
-		`<path stroke-width="1.5" d="M0 ${fmt(r2)} A${fmt(r2)} ${fmt(r2)} 0 0 1 ${fmt(r2)} 0"/>` +
-		`</g>`;
-	save('corner-frame.svg', svgWrap(size, size, body, 'aria-hidden="true" focusable="false"'));
-}
-
 // =====================================================================
 // 9. Dividers — the fix for the reported broken heading rule, plus the
 //    other 4 variants used across cards/hero/teacher-facts. All inline
@@ -748,16 +570,6 @@ function quatrefoilPath(size) {
 	save('divider-about.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 
-// divider-eyebrow: short flanking rules around an eyebrow label (drawn as
-// two short lines with generous side margins — the label itself is real
-// text, positioned by the consuming CSS, so this asset is just the two
-// rule segments as a background-less pair).
-{
-	const w = 120, h = 2;
-	const body = `<line x1="0" y1="1" x2="${w}" y2="1" stroke="currentColor" stroke-width="1"/>`;
-	save('divider-eyebrow.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
-}
-
 // divider-card: the tiny scalloped flower used inside each course card.
 {
 	const w = 140, h = 20, cy = 10;
@@ -777,16 +589,6 @@ function quatrefoilPath(size) {
 		`<line x1="${fmt(w / 2 + 6)}" y1="${cy}" x2="${w}" y2="${cy}" stroke="currentColor" stroke-width="1"/>` +
 		`<circle cx="${fmt(w / 2)}" cy="${cy}" r="2" fill="currentColor"/>`;
 	save('divider-dot.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
-}
-
-// divider-accent: left-aligned short rule with the soft four-point sparkle
-// used by the pricing cards.
-{
-	const w = 90, h = 8, cy = 4;
-	const body =
-		`<path fill="currentColor" d="${curvedSparklePath(4, cy, 3.6, 3.8)}"/>` +
-		`<line x1="12" y1="${cy}" x2="${w}" y2="${cy}" stroke="currentColor" stroke-width="1"/>`;
-	save('divider-accent.svg', svgWrap(w, h, body, 'aria-hidden="true" focusable="false"'));
 }
 
 // Teachers.jpeg starts its rule with a small filled floral gear.
