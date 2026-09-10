@@ -556,9 +556,10 @@ function eqc_page_hero( $eyebrow, $title, $intro, $icon = 'rehal-quran' ) {
 
 /**
  * Section heading block (eyebrow + H2 + gold rule) as an Elementor element
- * — the page-building equivalent of the theme's eqc_section_heading()
- * template tag (which echoes PHP for header.php-style templates and can't
- * be used inside an elements array passed to Document::save()).
+ * — builds the same eyebrow + H2 + gold-rule markup pattern used
+ * site-wide, but as a plain element-tree array so it can be dropped into
+ * an elements array passed to Document::save() (echoing PHP, as a
+ * header.php-style template tag would, isn't usable there).
  *
  * The rule is the generated divider-section.svg (hairline + diamond
  * terminals + rosette medallion, see tools/graphics/gen-ornaments.mjs) as

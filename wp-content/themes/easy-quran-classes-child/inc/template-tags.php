@@ -154,25 +154,6 @@ function eqc_logo_lockup( $class = '' ) {
 }
 
 /**
- * Output a heading eyebrow + H2 + gold rule block shared by every section.
- *
- * @param string $eyebrow Small label above the heading.
- * @param string $heading Heading HTML (may include a <span> for emphasis).
- * @param bool   $centered Center the block.
- */
-function eqc_section_heading( $eyebrow, $heading, $centered = false ) {
-	?>
-	<div class="eqc-stack eqc-section-heading<?php echo $centered ? ' eqc-section-heading--center' : ''; ?>" <?php eqc_reveal_attrs( 0 ); ?>>
-		<?php if ( $eyebrow ) : ?>
-			<span class="eqc-eyebrow"><?php echo esc_html( $eyebrow ); ?></span>
-		<?php endif; ?>
-		<h2><?php echo wp_kses_post( $heading ); ?></h2>
-		<hr class="eqc-heading-rule eqc-heading-rule--draw" />
-	</div>
-	<?php
-}
-
-/**
  * Render the shared blog-card markup for a list of WP_Post objects.
  * Used by archive.php (the real Blog page) and by the [eqc_latest_posts]
  * shortcode below, so the two never drift apart.
@@ -191,8 +172,6 @@ function eqc_render_blog_cards( $posts ) {
 		$i++;
 		$permalink = get_permalink( $post );
 		$cats      = get_the_category( $post->ID );
-		$cat_name  = ! empty( $cats ) ? esc_html( $cats[0]->name ) . ' &middot; ' : '';
-		$ribbon    = ! empty( $cats ) ? '<span class="eqc-blog-ribbon">' . esc_html( $cats[0]->name ) . '</span>' : '';
 		$thumb     = has_post_thumbnail( $post ) ? get_the_post_thumbnail( $post, 'eqc-blog-card' ) : '';
 
 		// Blogs.jpeg puts a white date chip (calendar icon, day, month) over the
