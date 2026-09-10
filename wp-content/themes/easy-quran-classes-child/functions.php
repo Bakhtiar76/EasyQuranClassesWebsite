@@ -57,18 +57,37 @@ function eqc_setup() {
 add_action( 'after_setup_theme', 'eqc_setup' );
 
 /**
- * Enqueue parent stylesheet, Google fonts, then the child's tokens ->
+ * Asset cache-buster.
+ *
+ * Production keeps the theme version, so a release ships one stable URL per
+ * asset. Locally that is actively harmful: the theme version only changes on
+ * a release, so every CSS edit during a design iteration is served from the
+ * browser cache under an unchanged `?ver=`. That produced a genuinely
+ * misleading half-applied page during the Home parity pass — tokens.css had
+ * refreshed while components.css had not, so new custom properties were live
+ * but the rules consuming them were not, which reads exactly like a
+ * specificity bug and is not one. Locally, fall back to the file's own mtime.
+ */
+function eqc_asset_version( $relative_path ) {
+	$version = wp_get_theme()->get( 'Version' );
+	if ( 'local' !== wp_get_environment_type() ) {
+		return $version;
+	}
+	$file = get_stylesheet_directory() . $relative_path;
+	return file_exists( $file ) ? (string) filemtime( $file ) : $version;
+}
+
+/**
+ * Enqueue parent stylesheet, self-hosted fonts, then the child's tokens ->
  * components -> motion -> style.css cascade (each layer can safely
  * override the one before it), then the shared vanilla JS.
  */
 function eqc_enqueue_assets() {
-	$theme_version = wp_get_theme()->get( 'Version' );
-
 	wp_enqueue_style(
 		'easy-quran-classes-fonts',
-		'https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=Manrope:wght@400;500;600;700&family=Noto+Naskh+Arabic:wght@400;600&display=swap',
+		get_stylesheet_directory_uri() . '/assets/css/fonts.css',
 		array(),
-		null
+		eqc_asset_version( '/assets/css/fonts.css' )
 	);
 
 	// Hello Elementor registers/enqueues its own 'hello-elementor' style
@@ -77,42 +96,81 @@ function eqc_enqueue_assets() {
 		'eqc-tokens',
 		get_stylesheet_directory_uri() . '/assets/css/tokens.css',
 		array( 'hello-elementor' ),
-		$theme_version
+		eqc_asset_version( '/assets/css/tokens.css' )
 	);
 	wp_enqueue_style(
 		'eqc-components',
 		get_stylesheet_directory_uri() . '/assets/css/components.css',
 		array( 'eqc-tokens' ),
-		$theme_version
+		eqc_asset_version( '/assets/css/components.css' )
 	);
 	wp_enqueue_style(
 		'eqc-shell',
 		get_stylesheet_directory_uri() . '/assets/css/shell.css',
 		array( 'eqc-components' ),
-		$theme_version
+		eqc_asset_version( '/assets/css/shell.css' )
 	);
 	wp_enqueue_style(
 		'eqc-motion',
 		get_stylesheet_directory_uri() . '/assets/css/motion.css',
 		array( 'eqc-shell' ),
-		$theme_version
+		eqc_asset_version( '/assets/css/motion.css' )
 	);
 	wp_enqueue_style(
 		'easy-quran-classes-style',
 		get_stylesheet_uri(),
 		array( 'eqc-motion' ),
-		$theme_version
+		eqc_asset_version( '/style.css' )
 	);
 
 	wp_enqueue_script(
 		'eqc-scripts',
 		get_stylesheet_directory_uri() . '/assets/js/eqc.js',
 		array(),
-		$theme_version,
+		eqc_asset_version( '/assets/js/eqc.js' ),
 		true
 	);
 }
 add_action( 'wp_enqueue_scripts', 'eqc_enqueue_assets', 20 );
+
+/** Discover the two above-the-fold font files before stylesheets finish loading. */
+function eqc_preload_fonts() {
+	foreach ( array( 'dm-serif-display-latin-400.woff2', 'manrope-latin-variable.woff2' ) as $font ) {
+		printf( '<link rel="preload" href="%s" as="font" type="font/woff2" crossorigin>', esc_url( get_stylesheet_directory_uri() . '/assets/fonts/' . $font ) );
+	}
+}
+add_action( 'wp_head', 'eqc_preload_fonts', 2 );
+
+/**
+ * Browser tab / bookmark icon.
+ *
+ * WordPress only prints icon tags when a `site_icon` attachment is set in
+ * Settings > General, and this install has none (`site_icon` = 0) — so every
+ * page shipped with no icon at all and browsers fell back to their generic
+ * default. The theme already generates the marks it needs
+ * (`assets/svg/logo/`, from `tools/graphics/build-logo.mjs`), so they are
+ * served straight from the theme rather than round-tripping the logo through
+ * the Media Library: no attachment ID to keep in sync, and a fresh clone gets
+ * the right icon with no manual step.
+ *
+ * `favicon.svg` first — modern browsers prefer it and it stays crisp at any
+ * density; the 32px PNG is the fallback for those that don't, and the 180px
+ * one is what iOS uses for a home-screen bookmark.
+ *
+ * If an admin ever does set a Site Icon in Settings > General, WordPress's own
+ * tags are left to win and these are skipped, so the Customizer stays the
+ * source of truth the moment someone uses it.
+ */
+function eqc_site_icons() {
+	if ( has_site_icon() ) {
+		return;
+	}
+	$logo = get_stylesheet_directory_uri() . '/assets/svg/logo/';
+	printf( '<link rel="icon" href="%s" sizes="any" type="image/svg+xml">', esc_url( $logo . 'favicon.svg' ) );
+	printf( '<link rel="icon" href="%s" sizes="32x32" type="image/png">', esc_url( $logo . 'favicon-32.png' ) );
+	printf( '<link rel="apple-touch-icon" href="%s">', esc_url( $logo . 'apple-touch-icon-180.png' ) );
+}
+add_action( 'wp_head', 'eqc_site_icons', 3 );
 
 /**
  * Mark the document as JS-capable before first paint, so motion.css can

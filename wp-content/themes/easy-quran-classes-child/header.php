@@ -25,13 +25,9 @@ defined( 'ABSPATH' ) || exit;
 <a class="eqc-skip-link" href="#eqc-content"><?php esc_html_e( 'Skip to content', 'easy-quran-classes' ); ?></a>
 
 <header class="eqc-header" id="eqc-header">
-	<div class="eqc-container eqc-header-bar">
+	<div class="eqc-container eqc-container--chrome eqc-header-bar">
 		<div class="eqc-logo">
-			<?php if ( has_custom_logo() ) : ?>
-				<?php the_custom_logo(); ?>
-			<?php else : ?>
-				<a href="<?php echo esc_url( home_url( '/' ) ); ?>" class="eqc-logo-text"><?php bloginfo( 'name' ); ?></a>
-			<?php endif; ?>
+			<?php echo eqc_logo_lockup(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped internally. ?>
 		</div>
 
 		<nav class="eqc-nav-desktop" aria-label="<?php esc_attr_e( 'Primary', 'easy-quran-classes' ); ?>">
@@ -48,8 +44,9 @@ defined( 'ABSPATH' ) || exit;
 		</nav>
 
 		<div class="eqc-header-actions">
+			<?php // Uppercasing is presentational (shell.css) so the source string stays naturally cased and translatable. ?>
 			<a class="eqc-btn eqc-btn--bronze eqc-header-cta" href="<?php echo esc_url( home_url( '/free-trial/' ) ); ?>">
-				<?php eqc_icon( 'calendar' ); ?>
+				<?php eqc_icon( 'gift-filled' ); ?>
 				<?php esc_html_e( 'Free Trial', 'easy-quran-classes' ); ?>
 			</a>
 			<button type="button" class="eqc-nav-toggle" aria-expanded="false" aria-controls="eqc-nav-drawer">
@@ -62,7 +59,17 @@ defined( 'ABSPATH' ) || exit;
 </header>
 
 <div class="eqc-nav-scrim" id="eqc-nav-scrim"></div>
-<div class="eqc-nav-drawer" id="eqc-nav-drawer" aria-hidden="true">
+<?php
+// Starts `inert` so the off-screen drawer's links are not tabbable (and
+// stay out of the accessibility tree) before JS opens it — including when
+// JS never runs, in which case the drawer can't be opened at all.
+?>
+<div class="eqc-nav-drawer" id="eqc-nav-drawer" role="dialog" aria-modal="true" aria-label="<?php esc_attr_e( 'Site menu', 'easy-quran-classes' ); ?>" aria-hidden="true" inert>
+	<?php // A close control inside the overlay: the toggle that opened it sits behind the scrim and is made inert while the drawer is open (assets/js/eqc.js). ?>
+	<button type="button" class="eqc-nav-close" data-eqc-nav-close>
+		<?php eqc_icon( 'close' ); ?>
+		<span class="eqc-visually-hidden"><?php esc_html_e( 'Close menu', 'easy-quran-classes' ); ?></span>
+	</button>
 	<nav aria-label="<?php esc_attr_e( 'Mobile', 'easy-quran-classes' ); ?>">
 		<?php
 		wp_nav_menu(
@@ -76,9 +83,9 @@ defined( 'ABSPATH' ) || exit;
 		?>
 	</nav>
 	<a class="eqc-btn eqc-btn--bronze" href="<?php echo esc_url( home_url( '/free-trial/' ) ); ?>">
-		<?php eqc_icon( 'calendar' ); ?> <?php esc_html_e( 'Free Trial', 'easy-quran-classes' ); ?>
+		<?php eqc_icon( 'gift-filled' ); ?> <?php esc_html_e( 'Free Trial', 'easy-quran-classes' ); ?>
 	</a>
-	<a class="eqc-btn eqc-btn--secondary" href="<?php echo eqc_whatsapp_url(); ?>">
+	<a class="eqc-btn eqc-btn--secondary eqc-btn--whatsapp" href="<?php echo eqc_whatsapp_url(); ?>">
 		<?php eqc_icon( 'whatsapp' ); ?> <?php esc_html_e( 'Chat on WhatsApp', 'easy-quran-classes' ); ?>
 	</a>
 </div>

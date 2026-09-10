@@ -47,15 +47,6 @@ html.eqc-js [data-eqc-reveal].is-visible {
 }
 html.eqc-js .is-visible .eqc-heading-rule--draw { transform: scaleX(1); }
 
-/* How It Works progress line. */
-.eqc-path-line {
-	stroke-dasharray: 1;
-	stroke-dashoffset: 1;
-	pathLength: 1;
-	transition: stroke-dashoffset var(--eqc-motion-slow) var(--eqc-ease-standard);
-}
-html.eqc-js .is-visible .eqc-path-line { stroke-dashoffset: 0; }
-
 /* Sticky header state change. */
 .eqc-header {
 	transition: box-shadow var(--eqc-motion-base) var(--eqc-ease-standard),
@@ -63,15 +54,35 @@ html.eqc-js .is-visible .eqc-path-line { stroke-dashoffset: 0; }
 }
 .eqc-header.is-scrolled { box-shadow: 0 8px 24px rgba(20, 35, 27, 0.08); }
 
-/* Final CTA background ornament: a slow, subtle drift — never distracting. */
+/* Default ornament drift — a slow, subtle translate, never distracting. The
+   per-corner variants below are what actually run on the corner motifs; this
+   one remains the fallback for any ornament without a corner modifier. */
 @keyframes eqc-drift {
-	from { transform: translate3d(0, 0, 0); }
-	to { transform: translate3d(-16px, -10px, 0); }
-}
-html.eqc-js .eqc-cta-ornament {
-	animation: eqc-drift 18s var(--eqc-ease-soft) infinite alternate;
+	from { translate: 0 0; }
+	to { translate: -16px -10px; }
 }
 
+/* One shared translate cannot serve four corners: -16px/-10px carries the
+   top-right motif up and out of its section while carrying the bottom-left one
+   inward, so the pair never reads as a matched set. Each corner drifts along
+   its OWN diagonal, toward the section's middle, at half the amplitude — the
+   ornaments stay anchored to their corners and breathe together.
+   `translate` is its own property, so this composes with the flips and
+   rotations `transform` carries on --bl/--tl/--br.
+   Amplitude 4px/3px (round 10; was 7px/5px) — the motif now starts flush
+   against the section edge (--_motif-inset: 0), and since every one of these
+   keyframes moves inward only, never back out past 0 0, the amplitude is the
+   full size of the gap the motif ever shows. Kept small so it still reads as
+   flush throughout the cycle rather than opening the gap the client asked to
+   have removed. */
+@keyframes eqc-drift-tl { from { translate: 0 0; } to { translate: 4px 3px; } }
+@keyframes eqc-drift-tr { from { translate: 0 0; } to { translate: -4px 3px; } }
+@keyframes eqc-drift-bl { from { translate: 0 0; } to { translate: 4px -3px; } }
+@keyframes eqc-drift-br { from { translate: 0 0; } to { translate: -4px -3px; } }
+html.eqc-js .eqc-corner-motif--tl { animation-name: eqc-drift-tl; }
+html.eqc-js .eqc-corner-motif--tr { animation-name: eqc-drift-tr; }
+html.eqc-js .eqc-corner-motif--bl { animation-name: eqc-drift-bl; }
+html.eqc-js .eqc-corner-motif--br { animation-name: eqc-drift-br; }
 /* Mobile nav drawer */
 .eqc-nav-drawer {
 	transform: translateX(100%);
@@ -93,26 +104,31 @@ html.eqc-js .eqc-cta-ornament {
 		transform: none;
 		transition: none;
 	}
-	.eqc-heading-rule--draw,
-	.eqc-path-line {
+	.eqc-heading-rule--draw {
 		transition: none;
 		transform: none;
 		stroke-dashoffset: 0;
 	}
 	.eqc-heading-rule--ornate::before,
-	.eqc-heading-rule--ornate::after,
-	.eqc-divider-flower {
+	.eqc-heading-rule--ornate::after {
 		transition: none;
 		transform: scaleX(1);
 		opacity: 1;
 	}
-	.eqc-cta-ornament,
-	.eqc-corner-motif { animation: none; }
-	.eqc-testimonial-track { transition: none; }
+	html.eqc-js .eqc-corner-motif { animation: none; }
+	.eqc-carousel-track { transition: none; }
 	.eqc-btn:hover,
 	.eqc-card:hover,
+	.eqc-card--pricing:hover,
 	.eqc-card:hover .eqc-card-index,
-	.eqc-card--pricing:hover .eqc-pricing-icon,
 	.eqc-trust-tile:hover .eqc-icon { transform: none; }
+	/* The medallion's transform is doing two jobs: translateX(-50%) is layout
+	   (it is what centres an absolutely-positioned element on the card's axis)
+	   and scale() is the motion. `transform: none` here would un-centre it, so
+	   the layout half is kept and only the scale dropped. */
+	.eqc-card--pricing:hover .eqc-pricing-icon { transform: translateX(-50%); }
+	/* The featured plan no longer carries a resting scale (it matches its
+	   siblings' size, per Assests/pricing.jpeg), so there is nothing left to
+	   preserve here — the `transform: none` above covers the card itself. */
 	* { scroll-behavior: auto !important; }
 }

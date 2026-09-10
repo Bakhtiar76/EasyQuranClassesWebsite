@@ -30,23 +30,23 @@ function eqc_customize_register( $wp_customize ) {
 	);
 
 	$fields = array(
-		'eqc_contact_email'   => array( 'label' => __( 'Contact email', 'easy-quran-classes' ), 'default' => 'info@easyquranclasses.com', 'sanitize' => 'sanitize_email' ),
-		'eqc_whatsapp_number' => array( 'label' => __( 'WhatsApp number (digits only, with country code, TEMP placeholder)', 'easy-quran-classes' ), 'default' => '10000000000', 'sanitize' => 'sanitize_text_field' ),
-		'eqc_whatsapp_display'=> array( 'label' => __( 'WhatsApp number (displayed, TEMP placeholder)', 'easy-quran-classes' ), 'default' => '+1 (000) 000-0000', 'sanitize' => 'sanitize_text_field' ),
-		'eqc_phone_display'   => array( 'label' => __( 'Phone number (displayed, TEMP placeholder)', 'easy-quran-classes' ), 'default' => '+1 (000) 000-0000', 'sanitize' => 'sanitize_text_field' ),
-		'eqc_address'         => array( 'label' => __( 'Postal address (TEMP placeholder, remove if none)', 'easy-quran-classes' ), 'default' => 'Address to be confirmed', 'sanitize' => 'sanitize_text_field' ),
-		'eqc_footer_about'    => array( 'label' => __( 'Footer about text', 'easy-quran-classes' ), 'default' => 'Online Quran classes for kids and adults with qualified teachers. Learn Quran, Tajweed, Hifz and Islamic Studies from the comfort of your home.', 'sanitize' => 'sanitize_textarea_field' ),
-		'eqc_social_facebook' => array( 'label' => __( 'Facebook URL (TEMP, leave blank to hide)', 'easy-quran-classes' ), 'default' => '', 'sanitize' => 'esc_url_raw' ),
-		'eqc_social_twitter'  => array( 'label' => __( 'X / Twitter URL (TEMP, leave blank to hide)', 'easy-quran-classes' ), 'default' => '', 'sanitize' => 'esc_url_raw' ),
-		'eqc_social_instagram'=> array( 'label' => __( 'Instagram URL (TEMP, leave blank to hide)', 'easy-quran-classes' ), 'default' => '', 'sanitize' => 'esc_url_raw' ),
-		'eqc_social_youtube'  => array( 'label' => __( 'YouTube URL (TEMP, leave blank to hide)', 'easy-quran-classes' ), 'default' => '', 'sanitize' => 'esc_url_raw' ),
+		'eqc_contact_email'   => array( 'label' => __( 'Contact email', 'easy-quran-classes' ), 'sanitize' => 'sanitize_email' ),
+		'eqc_whatsapp_number' => array( 'label' => __( 'WhatsApp number (digits only, with country code, TEMP placeholder)', 'easy-quran-classes' ), 'sanitize' => 'sanitize_text_field' ),
+		'eqc_whatsapp_display'=> array( 'label' => __( 'WhatsApp number (displayed, TEMP placeholder)', 'easy-quran-classes' ), 'sanitize' => 'sanitize_text_field' ),
+		'eqc_phone_display'   => array( 'label' => __( 'Phone number (displayed, TEMP placeholder)', 'easy-quran-classes' ), 'sanitize' => 'sanitize_text_field' ),
+		'eqc_address'         => array( 'label' => __( 'Postal address (TEMP placeholder, remove if none)', 'easy-quran-classes' ), 'sanitize' => 'sanitize_text_field' ),
+		'eqc_footer_about'    => array( 'label' => __( 'Footer about text', 'easy-quran-classes' ), 'sanitize' => 'sanitize_textarea_field' ),
+		'eqc_social_facebook' => array( 'label' => __( 'Facebook URL (TEMP, leave blank to hide)', 'easy-quran-classes' ), 'sanitize' => 'esc_url_raw' ),
+		'eqc_social_twitter'  => array( 'label' => __( 'X / Twitter URL (TEMP, leave blank to hide)', 'easy-quran-classes' ), 'sanitize' => 'esc_url_raw' ),
+		'eqc_social_instagram'=> array( 'label' => __( 'Instagram URL (TEMP, leave blank to hide)', 'easy-quran-classes' ), 'sanitize' => 'esc_url_raw' ),
+		'eqc_social_youtube'  => array( 'label' => __( 'YouTube URL (TEMP, leave blank to hide)', 'easy-quran-classes' ), 'sanitize' => 'esc_url_raw' ),
 	);
 
 	foreach ( $fields as $id => $args ) {
 		$wp_customize->add_setting(
 			$id,
 			array(
-				'default'           => $args['default'],
+				'default'           => '', // Local seed values live only in tools/00-site-setup.php.
 				'sanitize_callback' => $args['sanitize'],
 				'transport'         => 'refresh',
 			)

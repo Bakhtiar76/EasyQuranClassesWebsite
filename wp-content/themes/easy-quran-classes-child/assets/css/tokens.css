@@ -11,9 +11,30 @@
 	--eqc-green-700: #24503B;
 	--eqc-brand-green: #006B3D;
 
+	/* --eqc-gold-700 is the only gold dark enough to carry text on cream at
+	   any size (6.3:1 on --eqc-cream-100; --eqc-gold-600 is 3.2:1, which
+	   only clears AA as large text). DESIGN.md §5 warns against
+	   low-contrast gold on cream but stops at --eqc-gold-600, so this
+	   extends the ramp rather than introducing a new hue. */
+	--eqc-gold-700: #6F551C;
 	--eqc-gold-600: #A98235;
 	--eqc-gold-500: #B9974C;
 	--eqc-gold-300: #D9C48D;
+	/* Channel triples for the same three golds. Ornaments carry their tint in
+	   the paint's own alpha rather than element `opacity`, so a `drop-shadow`
+	   on them renders at full strength (QA/LESSONS.md #51) — and an alpha
+	   colour cannot be written as `var(--eqc-gold-500)`. Without these the
+	   alpha variants get hand-typed as literals, which is how two of them
+	   silently drifted off the ramp (gold-500 -> gold-600 on the pricing
+	   sparkle, gold-300 -> an untokened #D6B26E on the dark motifs). Keep each
+	   triple in step with the hex above it. */
+	--eqc-gold-600-rgb: 169 130 53;
+	--eqc-gold-500-rgb: 185 151 76;
+	--eqc-gold-300-rgb: 217 196 141;
+	/* Two creams the ornament/section work needs by name rather than as a
+	   literal: the pricing unit pill and the reviews band. */
+	--eqc-cream-200: #F0E7D3;
+	--eqc-cream-150: #F1EBDF;
 
 	--eqc-bronze-700: #7A432A;
 	--eqc-bronze-600: #925234;
@@ -40,33 +61,181 @@
 	--eqc-font-body: 'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 	--eqc-font-arabic: 'Noto Naskh Arabic', 'Traditional Arabic', serif;
 
-	/* Fluid type scale */
-	--eqc-fs-display-xl: clamp(2.6rem, 1.4rem + 4.4vw, 4.75rem);
-	--eqc-fs-h1: clamp(2.375rem, 1.55rem + 3vw, 4.125rem);
-	--eqc-fs-h2: clamp(2rem, 1.35rem + 2.4vw, 3.375rem);
-	--eqc-fs-h3: clamp(1.75rem, 1.5rem + 1vw, 2.125rem);
-	--eqc-fs-h4: clamp(1.3125rem, 1.2rem + 0.4vw, 1.5rem);
-	--eqc-fs-body-l: 1.125rem;
-	--eqc-fs-body: 1rem;
-	--eqc-fs-small: 0.875rem;
-	--eqc-fs-eyebrow: 0.8125rem;
-	--eqc-fs-button: 0.9375rem;
+	/* ------------------------------------------------------------------
+	 * THE REFERENCE UNIT
+	 *
+	 * The client's design is proportional: every dimension in Assests/*.jpeg
+	 * is a fixed fraction of the viewport, not a fixed pixel size. So one
+	 * unit here == one pixel on the reference SCREEN, and any measurement
+	 * taken off a reference image is transcribed as
+	 * `calc(<measured px> * var(--eqc-u))`.
+	 *
+	 * THE CANVAS IS 1307. Every measured value in this theme is a native
+	 * pixel on Home.jpeg's 1307px canvas -- --eqc-content-max is 1119u, the
+	 * teachers split is 268u + 51u + 800u, the pricing benefits strip is
+	 * 1119u -- so the unit has to stay on that canvas. Rebasing it to 1600
+	 * without rescaling all 82 horizontal transcriptions is what shrank
+	 * every section to 69.9% of the viewport, leaving 250px of dead margin
+	 * on each side. See QA/LESSONS.md #41.
+	 *
+	 * The content column is anchored on the one reference that carries both
+	 * the header bar and a content-width element on a single canvas
+	 * (LESSONS #11): Home.jpeg's bar is 1230/1307 = 94.1% and its hero
+	 * content 1119/1307 = 85.6%, a content:chrome ratio of 0.910. The
+	 * section JPEGs read 91-94.5% at face value, but they are crops at
+	 * their own zoom levels and their fractions are not comparable.
+	 *
+	 * 0.07651vw is 100/1307. At 1307px wide -> 1.0; at 1600 -> 1.224; at
+	 * 1920 -> 1.469; at 2112 -> 1.616 and held; at 915 and below -> the
+	 * 0.70 floor.
+	 *
+	 * The floor and ceiling are the two places this design is NOT the
+	 * reference, and both are deliberate (TASK-DESIGN-PARITY.md 2A): without
+	 * a floor the design would collapse on a phone, and without a ceiling a
+	 * 2560px display would read as zoomed in. The floor is held at its
+	 * previous value so phone geometry does not move; it simply stops
+	 * binding at 915px instead of 1120px.
+	 *
+	 * This unit governs LAYOUT ONLY. Type has its own compressed scale below:
+	 * a heading and a caption cannot share one linear multiplier -- see the
+	 * type block for why.
+	 * ------------------------------------------------------------------ */
+	--eqc-u: clamp(0.70px, 0.07651vw, 1.616px);
 
-	/* Layout — DESIGN.md §7 */
-	--eqc-content-max: 1400px;
-	--eqc-content-narrow: 820px;
-	--eqc-text-max: 680px;
+	/* ------------------------------------------------------------------
+	 * TYPE SCALE — compressed, and floored at every width.
+	 *
+	 * Type does NOT ride the layout unit linearly in one shared step: each
+	 * role gets its own clamp so a caption can be floored for legibility
+	 * without dragging a heading down with it.
+	 *
+	 * The heading sizes here are MEASURED, one per section, not derived from
+	 * a ratio: About 70.5u, Courses 60u, Pricing 51u, Testimonials 48.4u and
+	 * Blog 46.1u (both bold sans), Teachers 40.6u (QA/LESSONS.md #29). An
+	 * earlier pass collapsed all six onto one token and compressed it to
+	 * reach a 2.5-3:1 heading:body ratio, which was an aesthetic rule
+	 * imposed over the reference: measured on pricing.jpeg the client's own
+	 * design sets a 51u heading over a 12.4u list, i.e. 4.1:1. Section
+	 * height is recovered from SPACING, not by shrinking the headings.
+	 *
+	 * Every role is clamp(floor, unit-based, ceiling):
+	 *   - the floor guarantees legibility at ANY width, continuously. This
+	 *     replaces the old `@media (max-width:1100px)` floor block, which
+	 *     left a 6px discontinuity at exactly 1100px (captions jumped
+	 *     9.8px -> 14.0px across one pixel of viewport width) and gave the
+	 *     entire 1101-1600 band — 1366, 1440, 1536, mainstream laptops — no
+	 *     floor at all.
+	 *   - the ceiling stops headings ballooning on wide displays.
+	 *
+	 * The middle term is px on the 1307 reference canvas, where --eqc-u is
+	 * 1.0; multiply by 1.224 for the rendered size at a 1600px viewport.
+	 *
+	 * NOTHING may set font-size as a bare calc() on --eqc-u. 33 rules in
+	 * components.css used to, which is how ten roles reached 7.6-9.4px on a
+	 * 390px phone while every contrast check passed — contrast is not
+	 * legibility. Use these tokens so a size cannot escape its floor.
+	 * ------------------------------------------------------------------ */
+	/* Display: the About section's heading, the largest type on the site. */
+	--eqc-fs-display-xl: clamp(34px, calc(70.5 * var(--eqc-u)), 114px);
+	--eqc-fs-h1: clamp(32px, calc(58 * var(--eqc-u)), 94px);      /* hero H1 */
+	--eqc-fs-h2: clamp(28px, calc(51 * var(--eqc-u)), 82px);      /* section headings */
+	/* Section headings that sit in a narrower column read smaller in the
+	   references; this is the measured relationship, not a second guess. */
+	/* courses.jpeg sets its heading larger than any other section; the
+	   testimonial and blog headings are bold SANS and smaller (48.4u and
+	   46.1u measured -- one token at 47u, the 3% spread is inside the
+	   measurement error of both). QA/LESSONS.md #29. */
+	--eqc-fs-h2-courses: clamp(30px, calc(60 * var(--eqc-u)), 97px);
+	--eqc-fs-h2-sans: clamp(26px, calc(47 * var(--eqc-u)), 76px);
+	--eqc-fs-h2-compact: clamp(24px, calc(39 * var(--eqc-u)), 63px);
+	--eqc-fs-h3: clamp(19px, calc(17.97 * var(--eqc-u)), 26px);      /* course/blog card title */
+	--eqc-fs-h4: clamp(17px, calc(14.7 * var(--eqc-u)), 20px);
+	/* The course card title is DM Serif and measurably LARGER than the blog
+	   card title, which is bold sans -- 24.6u against 17.97u on courses.jpeg
+	   and Blogs.jpeg respectively. They shared --eqc-fs-h3 and so could not
+	   both be right; the blog title was, so the course title gets its own.
+	   The scalloped index badge carries the same relationship: 49u across
+	   with a 26.4u numeral, where the numeral used to be a fixed 1.1rem and
+	   did not scale with the design at all. */
+	--eqc-fs-course-title: clamp(20px, calc(24.6 * var(--eqc-u)), 40px);
+	--eqc-fs-card-index: clamp(16px, calc(26.4 * var(--eqc-u)), 43px);
+	--eqc-fs-body-l: clamp(17px, calc(16.5 * var(--eqc-u)), 27px); /* hero + about body */
+	--eqc-fs-body: clamp(15px, calc(12.66 * var(--eqc-u)), 17px);   /* tile titles, card body */
+	--eqc-fs-small: clamp(14px, calc(11.84 * var(--eqc-u)), 16px);  /* captions, meta rows */
+	--eqc-fs-xsmall: clamp(13px, calc(10.62 * var(--eqc-u)), 14px);   /* smallest label role */
+	/* Uppercase, letterspaced section label. Caps read larger than their
+	   point size, so this sits below body while looking like a peer. */
+	--eqc-fs-eyebrow: clamp(12px, calc(11.03 * var(--eqc-u)), 15px);
+	--eqc-fs-button: clamp(15px, calc(12.25 * var(--eqc-u)), 17px);
+	/* The large serif figure on a pricing card — a display role, not body. */
+	--eqc-fs-price: clamp(30px, calc(31.04 * var(--eqc-u)), 44px);
 
-	--eqc-section-space: clamp(2.75rem, 2rem + 3vw, 6.5rem);
-	--eqc-gutter: clamp(1rem, 0.6rem + 1.6vw, 2rem);
-	--eqc-grid-gap: clamp(1rem, 0.75rem + 1vw, 1.875rem);
-	--eqc-stack-gap: clamp(0.75rem, 0.6rem + 0.6vw, 1.25rem);
+	/* Layout — DESIGN.md §7
+	 * --eqc-content-max is measured, not chosen. In Home.jpeg (1307px canvas)
+	 * the trust panel — a content-width element — spans x109–1212, i.e.
+	 * 84.39% of the canvas, stable across rows 790/860/890. The header bar on
+	 * that same canvas is 94.3% (QA/design-review/global-chrome.md row 1), so
+	 * content is 0.895 x the chrome width. Against the chrome's own
+	 * --eqc-chrome-max of 1810px that is a 1620px content column; .eqc-container
+	 * is border-box with --eqc-gutter padding inside. The hero's own bounds are
+	 * the tighter check and give 1644px (H1 left edge x105 to the arch's outer
+	 * right edge x1224 = 1119 of 1307), so the token carries 1644 + 2x32 =
+	 * 1708px; the 24px against the trust panel's 1620 is the panel's own inset. See QA/design-review/home.md finding 1.
+	 * Only ratios measured WITHIN one reference file are meaningful — the
+	 * section JPEGs are crops at different zoom levels (LESSONS #11). */
+	/* The content column is a PROPORTION, not a px cap. Measured on
+	   Home.jpeg: the hero runs from the H1's left edge x105 to the arch's
+	   outer right edge x1224 = 1119 of 1307 = 85.6%. As a px cap it was
+	   correct only at 1920 and ran near full-bleed at 1307/1440. */
+	--eqc-content-w: 85.6%;
+	--eqc-content-max: calc(1119 * var(--eqc-u));
+	--eqc-content-narrow: calc(558 * var(--eqc-u));
+	--eqc-text-max: calc(463 * var(--eqc-u));
+
+	/* Site chrome — header bar and footer panels.
+	 * These deliberately do NOT use --eqc-content-max. In the client
+	 * reference the header bar and the footer panels are near-full-bleed
+	 * frames — 1232/1307 of the Home.jpeg canvas and 1403/1489 of
+	 * End.jpeg, i.e. ~94% in both — while the page content inside them
+	 * stays on the narrower content column. See
+	 * QA/design-review/global-chrome.md rows 1 and 7.
+	 * The bar height, mark size and panel radius are the same proportion
+	 * of the canvas scaled fluidly, so the chrome keeps the reference's
+	 * generous desktop presence without becoming oversized on a phone. */
+	--eqc-chrome-width: 94%;
+	--eqc-chrome-max: 1810px;
+	/* The header is sticky, so its height is subtracted from EVERY screen for
+	   the whole visit. At 1600 it was 197px at rest and 108px scrolled — 22%
+	   of a 900px laptop screen for a nav whose text is 34px tall. Now ~120
+	   at rest and ~76 scrolled, which hands ~32px of every screen back to
+	   the content. The logo mark comes down with it so it still fits the bar. */
+	--eqc-header-h: clamp(56px, 30px + 3.5vw, 96px);
+	--eqc-logo-mark-size: clamp(36px, 18px + 2.9vw, 72px);
+	--eqc-radius-chrome: clamp(18px, 0.8rem + 1.1vw, 34px);
+
+	--eqc-section-space: calc(48 * var(--eqc-u));
+	--eqc-gutter: calc(22 * var(--eqc-u));
+	--eqc-grid-gap: calc(22 * var(--eqc-u));   /* feature-card gap, measured */
+	--eqc-stack-gap: calc(14 * var(--eqc-u));
+
+	/* Hero component boxes, measured on Home.jpeg (native px):
+	   eyebrow pill 251x44, feature card 126x58 gap 22, buttons 218x58 and
+	   235x56 gap 13, avatars 40 diameter on a 36.75 pitch (8% overlap),
+	   trust panel 1104x178 at x109. */
+	--eqc-control-h: calc(58 * var(--eqc-u));
+	--eqc-eyebrow-h: calc(44 * var(--eqc-u));
+	--eqc-card-h: calc(58 * var(--eqc-u));
+	--eqc-avatar: calc(40 * var(--eqc-u));
+	--eqc-avatar-overlap: calc(-3.25 * var(--eqc-u));
+	--eqc-icon-sm: calc(15 * var(--eqc-u));
+	--eqc-icon-md: calc(21 * var(--eqc-u));
+	--eqc-icon-lg: calc(30 * var(--eqc-u));
 
 	/* Radius — DESIGN.md §7 */
-	--eqc-radius-control: 11px;
-	--eqc-radius-card: 18px;
-	--eqc-radius-panel: 28px;
-	--eqc-radius-media: 32px;
+	--eqc-radius-control: calc(8 * var(--eqc-u));
+	--eqc-radius-card: calc(12 * var(--eqc-u));
+	--eqc-radius-panel: calc(19 * var(--eqc-u));
+	--eqc-radius-media: calc(22 * var(--eqc-u));
 	--eqc-radius-pill: 999px;
 
 	/* Elevation — DESIGN.md §8 */
@@ -82,3 +251,18 @@
 	--eqc-ease-standard: cubic-bezier(.22, 1, .36, 1);
 	--eqc-ease-soft: cubic-bezier(.16, 1, .3, 1);
 }
+
+/* ----------------------------------------------------------------------
+ * Control minimums.
+ *
+ * This used to be an `@media (max-width: 1100px)` block holding both type
+ * floors and control floors. Both are now expressed in the values
+ * themselves — clamp() for type, max() for boxes — because a floor tied to a
+ * breakpoint only holds on one side of it: the type floors left a 6px
+ * discontinuity at exactly 1100px and no floor at all from 1101-1600, and
+ * the button floor left every button at 40.6-44px across 1101-1213px.
+ *
+ * A 44px tap target and a legible font size are floors at EVERY width.
+ * ---------------------------------------------------------------------- */
+.eqc-hero-trust .eqc-avatar-stack img { --_avatar: max(38px, calc(40 * var(--eqc-u))); }
+.eqc-chip--card { min-height: max(52px, calc(58 * var(--eqc-u))); }
