@@ -11,6 +11,148 @@ CSS, and three of those were measurably still broken. See "Round 5" below.
 
 ---
 
+## Round 10 — 2026-09-10 (`claude-opus-5`)
+
+Client review of round 9's build, plus two items raised mid-round. Evidence:
+`QA/after-r10/` — 9 routes x 8 viewports + the 380-1900:40 scan, 0 console
+errors, 0 page errors, 0 failed requests, 0 horizontal overflow.
+
+- [x] **R10-1 Corner girih flush to the section edge** — client: "some gap has
+  been added between the edges of the ornament and the page side edge."
+  Root cause: `--_motif-inset: clamp(14px, 1.6vw, 30px)` was defending
+  against a round-6 bug (a single shared drift keyframe carrying the motif
+  outward and clipping it) that round 7 had already fixed a different way
+  (four per-corner keyframes, each moving INWARD only) — the inset outlived
+  the problem it solved. Set to `0`; drift amplitude trimmed 7px/5px ->
+  4px/3px so the largest gap in the animation cycle stays small. The
+  `.eqc-pricing-panel`'s small motifs sit at a rounded corner with no
+  `overflow: hidden` (deliberate — the medallions/RECOMMENDED tab need to
+  overhang), so flush ink now clips past the curve exactly as it did for the
+  review cards in round 8 (QA/qa-10092026/23.png) — fixed the same way,
+  `border-top-right-radius` on the motif itself, matching the panel's own
+  radius. Confirmed flush (`top/left/right/bottom` = 0 against the section)
+  at 1920 and 390, and the pricing-panel clip verified via computed style
+  (`border-top-right-radius: 25.3735px`) plus a screenshot showing no spill.
+- [x] **R10-2 Mobile teacher cards ("too big images and totally messed up",
+  QA/qa-10092026/24.png; then "still too big" once proportionally correct)**
+  — two-part root cause. First: the portrait's WIDTH was percentage-based
+  (98% of the card) but its vertical placement was `--eqc-u`-based, which
+  floors at 0.70px below ~915px viewport width — below that width the two
+  systems disagreed and the portrait grew with the card while the space
+  reserved for it stayed frozen, overlapping the card's own content by
+  ~120px (measured at 390px). Fixed by putting every offset on the same
+  percentage-of-card-width basis (measured constants: margin-block-start
+  77.49%, padding-block-start 53.48%, seal offset 16.9%, seal size 24% —
+  clean, near-identical ratios at 1920/1440/1280/1024, confirming the
+  relationship rather than assuming it). That fix was proportionally
+  correct but still read as oversized against the plainer `/teachers/` page
+  card — client: "make this the same ... smaller teacher picture and
+  formatting matched". Rather than further scale the overlap treatment down,
+  the whole override now only applies at `min-width: 61.3125rem`; below that
+  the card falls through to the exact same base `.eqc-card--teacher`/
+  `.eqc-teacher-photo`/`.eqc-teacher-seal` rules the `/teachers/` page grid
+  already used — an exact match (photo width 126.69px measured identical on
+  both pages at 455px viewport), not an approximation. Desktop re-confirmed
+  unchanged (photo still 97.3% of card, `position: absolute`).
+- [x] **R10-3 Teachers scrollbar -> dot navigation** — client: "grey
+  Horizontal scroll bar ... old and bad looking. It should be like the Dot
+  scroll like the review cards have." `scrollbar-width` set to `none` (both
+  the home row and the `/teachers/` page grid) and `initTeachersNav()`
+  rewritten as `initTeacherRows()`/`setupTeacherRow()`, building a
+  `.eqc-slider-dots` strip in JS (same markup/ARIA pattern the reviews
+  carousel's `buildDots()` already uses) for each snap-scroll row, active
+  dot tracked by nearest-centre card on scroll. The home row's dots were
+  initially off-centre — its dots wrapper is inserted as a sibling inside a
+  flex row (`.eqc-teachers-split`), where a flex item's default width is its
+  own shrink-to-fit content, so `justify-content: center` had nothing to
+  center within. Fixed with `width: 100%` on `.eqc-slider-dots` (a no-op
+  everywhere else it's used). Verified: dot click scrolls to and activates
+  the correct card; row-center and dots-center measured identical (both
+  220.45px) after the fix; `/teachers/` page (6 dots) and home (4 dots) both
+  confirmed with no regression to the existing prev/next buttons.
+- [x] **R10-4 Contact "Get in touch" panel alignment** — client: "vertical
+  size and position should be aligned with the form properly, slight
+  difference right now." Measured: the aside column (green panel +
+  reassurance list) was naturally ~640px tall against a ~564px form — TALLER
+  than the form, the opposite of Free Trial's much longer form (~1166px vs a
+  ~632px aside), which is what the shared `.eqc-form-grid`'s
+  `position: sticky` aside was built for. With the aside already at least as
+  tall as the form, sticky just detached it from the form as the page
+  scrolled. New `.eqc-form-grid--balanced` modifier (Contact only, via
+  `tools/pages/15-contact.php`) sets `align-items: stretch` and disables
+  sticky, so the shorter box (the form) grows to match the taller one — top
+  and bottom deltas both measured `0` after the fix, versus `+10px`/`-36px`
+  before. Also zeroed an Elementor-default 10px top padding on the aside
+  column that had the "Get in touch" panel starting below the form's own
+  top edge even before this fix. Free Trial untouched, still sticky.
+- [x] **R10-5 Pricing cards too close together on mobile** — client, mid-round.
+  Measured: each card's medallion badge shell overhangs ~36px above its own
+  card's top edge (`top: -1.9rem` plus the `::before` shell's further
+  `-0.42em` inset), but the grid's row-gap (`calc(31 * var(--eqc-u))`) floors
+  at ~21.7px below ~915px viewport width — so the next card's badge
+  overlapped the previous card's bottom edge by 13-14px at both the 2-column
+  and 1-column breakpoints. Fixed with a flat `row-gap: 2.75rem` (44px, not
+  `--eqc-u`-based so it can't floor) below 61.25rem — measured 8-9px of clear
+  space afterward at both breakpoints, confirmed with a screenshot.
+- [x] **R10-6 FAQ content duplicated between home and /faq/** — same six
+  question/answer strings hardcoded in both `10-home.php` and `16-faq.php`;
+  an edit to one could silently drift from the other. Extracted to
+  `eqc_faq_data()` in `elementor-helpers.php`; both pages now read from it.
+  Re-baked both pages, verified the saved `_elementor_data` contains the
+  expected strings, and confirmed the home page still renders the same six
+  questions in the same order.
+- [x] **R10-7 Minor cleanup** — removed an inert `-webkit-mask-composite:
+  source-in` (evergreen WebKit/Blink read the unprefixed `mask-composite`
+  once present and never consult the legacy keyword property); added
+  cross-reference comments for `.eqc-pricing-list`/`.eqc-pricing-price-divider`
+  (rules genuinely split ~1800 lines apart) so a future edit doesn't touch
+  one half and miss the other; fixed `QA/GRAPHICS-PARITY.md`'s own
+  regeneration command, which wrote to `QA/after` instead of the evidence
+  path (`QA/graphics-parity-final`) the doc had just cited; renamed
+  `QA/qa-10092026/7..png` (double dot) to `7.png`; pruned the superseded
+  `QA/after/all-pages/` and `QA/after/global-chrome/` sweep subfolders
+  (round 8 leftovers, no doc referenced either path).
+- Not merged: `.eqc-card--pricing--featured`'s four occurrences turned out to
+  already sit adjacent (lines 741-778), not scattered as the code-review's
+  line-count grep suggested — no action needed there.
+
+Full functional pass re-run after all of the above: stretched card links on
+`/courses/` and `/pricing/` still hit-test correctly; FAQ accordion
+opens/closes; mobile nav drawer opens, traps focus (`inert` on
+`#eqc-content`), closes on Escape; WhatsApp CTAs resolve to a `wa.me` link.
+
+## Round 9 — 2026-09-10 (`claude-opus-5`)
+
+Free Trial and Contact page redesign (client: "no color Contrast, no
+interesting or attention grabbing feel ... looking small and cards have empty
+spaces ... the form is too plain"), followed by a code review of the diff.
+
+- [x] **R9-1 Free Trial / Contact redesign** — both pages rebuilt around
+  `.eqc-card--step` (icon in the site's gold seal disc, not a bare glyph),
+  bronze `<span>` emphasis in section headings (matching the rest of the
+  site's heading treatment), a dark green `.eqc-panel--invite` aside (same
+  gradient/girih-watermark treatment as the footer CTA, replacing a second
+  plain white box), and a `.eqc-reassure` list filling the ~600px of empty
+  column the short aside used to leave beside the form.
+- [x] **R9-2 Code review, two Critical findings, both fixed and verified:**
+  - WhatsApp button contrast failed WCAG AA — white on `#25D366` measured
+    **1.98:1** (the CSS comment claimed 2.4:1), applying on `:focus-visible`.
+    Switched the label to `var(--eqc-heading)`: **8.23:1**, comment corrected.
+  - `/teachers/` page prev/next buttons had an `aria-label` and focus ring but
+    **no click handler at all** — a CSS comment claimed they scrolled the
+    row. Wrote `initTeachersNav()` (superseded by `initTeacherRows()` in
+    round 10) wiring them to the snap-scroll row; verified paging
+    (`scrollLeft` 0 -> 262 -> 0) and disabled-at-ends state.
+  - Also fixed two Important findings from the same review: two gold literals
+    had drifted off the token ramp during the contrast fix (gold-500 ->
+    gold-600 sparkle, an untokened dark motif) — added RGB channel tokens
+    (`--eqc-gold-*-rgb`) so alpha variants derive from `tokens.css`; a stale
+    keel-arch comment contradicting its own neighbouring rule was replaced.
+
+Full sweep after: 11 route folders x 8 viewports, 0 console/page/request
+errors, 0 overflow, one H1 per route, 0 images missing alt. `style.css`
+1.8.0 -> 1.9.0.
+
 ## Round 8 — 2026-09-10 (`claude-sonnet-5`)
 
 Ornament depth, favicon, repo cleanup and the first full-coverage QA pass.

@@ -313,3 +313,47 @@ referenced pruned screenshots were corrected in the same pass. `.gitignore` now
 excludes sweep PNGs, so a QA round costs ~40KB instead of ~100MB. Dead
 `.eqc-pricing-divider` and `.eqc-cta-ornament` rules removed; `debug.log`
 deleted. Theme 1.7.0 → 1.8.0.
+
+## Round 9-10 — 2026-09-10
+
+**Free Trial / Contact redesign** (round 9): both pages rebuilt around
+`.eqc-card--step`, bronze emphasis spans matching the rest of the site's
+headings, a dark green `.eqc-panel--invite` aside (the footer CTA's own
+gradient/girih treatment) and a `.eqc-reassure` list, replacing a flat cream
+form beside an empty cream box. Code review found two real Critical issues,
+both fixed and verified: WhatsApp button contrast (white on `#25D366`
+measured 1.98:1, not the 2.4:1 a stale comment claimed) and the `/teachers/`
+page's prev/next buttons, which had a focus ring and aria-label but no click
+handler at all.
+
+**Corner ornaments now sit flush** (round 10) rather than inset — the inset
+was defending against a drift animation that had already been fixed a
+different, better way two rounds earlier (four per-corner keyframes, each
+moving inward only), so the inset had become dead padding read as "a gap".
+The pricing panel's small motifs, now flush against its rounded corner, get
+`border-radius` matching the panel's own curve so the ink doesn't spill past
+it.
+
+**Mobile teacher cards rebuilt twice in one round.** First fix: the
+portrait's width was a percentage of the card but its vertical placement was
+`--eqc-u`-based (floors below ~915px viewport width) — below the floor the
+two disagreed and the portrait grew into the card's own content. Made every
+offset a percentage of the card's own width instead, which self-corrects at
+every width with no extra breakpoint. That was proportionally correct but
+still read as oversized against the plainer `/teachers/` page card, so the
+whole desktop overlap treatment now only applies above 61.3125rem; below
+that, the home card falls through to the exact same base rules the
+`/teachers/` page grid already used.
+
+**Teachers row scrollbar replaced with dot navigation**, matching the
+reviews carousel, built in JS rather than a second dot-strip implementation.
+
+**FAQ content shared** between the home page's 6-item teaser and the full
+`/faq/` page via a new `eqc_faq_data()` helper, replacing two hardcoded
+copies of the same six question/answer strings.
+
+**Pricing cards** get a `row-gap` below 61.25rem that isn't `--eqc-u`-based
+(so it can't floor), clearing a ~36px medallion-badge overhang that the
+previous, floored gap (~22px) let overlap into the card above.
+
+Theme 1.9.0 → 1.10.0.

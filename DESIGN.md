@@ -341,6 +341,35 @@ block hugging the corner. The right fraction depends on the tile size, so it is
 never shared between assets, and it must be re-measured if a canvas or tile
 size changes. See `girihPattern()` in `tools/graphics/gen-ornaments.mjs`.
 
+Once the asset itself is phase-corrected to be dense right at its own canvas
+edge, place `.eqc-corner-motif` **flush** (`--_motif-inset: 0`) — not inset
+from the section edge. An inset here has usually been added to defend against
+a drift animation carrying the motif outward past `overflow: hidden`; the
+current drift (`motion.css`, per-corner `eqc-drift-tl/tr/bl/br`) moves every
+motif INWARD only, so nothing needs the defence, and any inset just reads as
+the gap the client keeps reporting. If the drift direction ever changes,
+re-check this. A motif sitting on a rounded corner (e.g.
+`.eqc-corner-motif--sm` on `.eqc-pricing-panel`, which has no
+`overflow: hidden`) needs `border-radius` matching that corner's own radius —
+`border-radius` clips an element's own background/mask paint even without
+`overflow: hidden`, which is the same fix the testimonial card ornament uses
+(`QA/LESSONS.md` #67, #70).
+
+### Snap-scroll rows use dots, not the native scrollbar
+
+Below the tablet breakpoint, a card row that becomes horizontally scrollable
+(`overflow-x: auto; scroll-snap-type: x mandatory`) hides the native scrollbar
+(`scrollbar-width: none` and a `::-webkit-scrollbar { display: none }`) and
+gets a `.eqc-slider-dots` strip instead, matching the reviews carousel. Build
+the dots in JS (`initTeacherRows()`/`setupTeacherRow()` in `eqc.js`) rather
+than a second implementation — reuse the same markup/ARIA pattern the
+carousel's own `buildDots()` uses, active dot tracked by nearest-centre card
+on scroll, removed above the breakpoint where every card is already visible.
+If the dots wrapper is inserted where a flex parent doesn't stretch it to the
+row's full width, give it `width: 100%` explicitly — a shrink-to-fit flex item
+has nothing for `justify-content: center` to center within (`QA/LESSONS.md`
+#72).
+
 ### Whole-card links (mandatory pattern)
 
 A card whose entire surface is the CTA uses one invisible stretched anchor
