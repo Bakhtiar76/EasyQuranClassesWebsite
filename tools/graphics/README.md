@@ -378,3 +378,40 @@ sheet and a manifest giving each one's exact source rectangle. Reference only
 that the 43-symbol sprite has no equivalent for (`clipboard-check`,
 `target-arrow`, `rehal-quran` and five variants of existing symbols), which is
 the list to work from if any of those sections is built out further.
+
+## Stroked ornaments need a padded viewBox
+
+An SVG stroke is painted **centred on its path**, so a path that runs along its
+own viewBox edge loses half its width to the clip. `keel-arch-frame.svg` was
+generated with `svgFromBbox(bbox, body, 0)` and its jambs run along `x=0` and
+`x=559` for their full height — they rendered at half the crown's weight, which
+the client reported as "the left and right of the arch frame is thinner".
+
+Rule: any asset that is **stroked** (not filled) gets `pad >= ceil(strokeWidth / 2)`.
+Fill masks (`keel-arch-mask.svg`) have no stroke and stay at pad 0, which keeps
+them the canonical coordinate frame everything else is calibrated against.
+
+Padding the viewBox is only half the fix. The consumer's box has to grow by the
+same ratio, or the outer half of the stroke simply falls outside the element and
+there is no background colour there to mask:
+
+```css
+/* viewBox "-2 -2 563 633" around a 559x629 arch */
+inset: calc(-2 / 629 * 100%) calc(-2 / 559 * 100%);
+mask-size: 100% 100%;
+```
+
+Verify by rasterising the mask into a canvas at the element's real box size and
+comparing opaque run-lengths at both jambs against a near-horizontal point on
+the crown. A 1px difference on a gold hairline is not detectable by eye.
+
+## keel-arch-*-round.svg
+
+`cuspedArchPanel()` takes an optional `bottomRadius` that replaces the two
+square base corners with quarter-arcs. The rounded path deliberately starts at
+`(r, baseH)` and ends at `(w-r, baseH)`, so the existing
+`d.replace(/Z\s*$/, '')` trick that derives the open-bottom frame still works —
+dropping the close removes exactly the flat base.
+
+The rounded pair is used by the About collage and the About page only
+(`.eqc-arch-media--keel-round`); the hero keeps the reference's square jambs.

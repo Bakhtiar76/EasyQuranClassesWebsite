@@ -260,6 +260,20 @@ Elementor content for post #N`, but the save silently doesn't take;
 confirmed once by re-querying `_elementor_data` and finding old content
 still there after an apparently-successful run without it.
 
+### QA evidence policy (set 2026-09-10)
+
+Visual-QA sweep **screenshots are regenerable and are not tracked** — a full
+round is ~100MB. `.gitignore` excludes `QA/after*/**/*.png`; the `report.json`
+/ `summary.json` those runs produce **are** tracked and carry everything a
+reviewer needs (pass/fail, h1 count, console and request errors, horizontal
+overflow, missing alt). Regenerate images with `tests/visual/sweep.mjs`.
+
+Non-regenerable evidence stays tracked and must not be pruned: the client's
+annotated review images (`QA/qa-10092026/`), the icon-parity crops this file
+cites below, and every `*.md` in `QA/`. When pruning superseded evidence, keep
+the JSON (including Lighthouse baselines) and update any doc that cites a
+deleted file in the same commit.
+
 ### Graphics parity memory
 
 Before changing an icon, divider, rosette, cartouche, corner texture or SVG

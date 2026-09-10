@@ -284,6 +284,84 @@ passed. Use the tokens so a size cannot escape its floor.
 - Grid gap mobile: 16–20px
 - Text stack gap: 12–20px
 
+### Card / panel symmetry (mandatory)
+
+Any row of cards or panels lays out symmetrically at every width — no orphan
+row. Use an explicit column count, never `repeat(auto-fit, …)`:
+
+- 6 items → 3×2 (→ 2×3 on tablet → 1-up + horizontal scroll on phones)
+- 4 items → 2×2 (or 4×1 where the row is a trust/benefit strip → 2×2 → 1)
+- 3 items → 3×1 → 1-up + scroll
+- Equal gap on both axes unless a reference explicitly shows otherwise.
+
+Never ship a 4-then-1, 3-then-1 or 2-then-1 wrap. On phones a set that can't
+stay symmetric collapses to one column with a side-scroll carousel
+(`eqc_carousel()` / `.eqc-carousel`), matching the testimonials pattern.
+
+The phone rule applies to **every** card row, not just the ones on a
+`.eqc-grid--*` class. The home page's teachers row is a bespoke
+`.eqc-teachers-cards` grid and was missed for a whole review round because the
+fix was written against `.eqc-grid--teachers` only. When adding the snap-scroll
+treatment, grep for the section's real container class first.
+
+### Ornament depth (how to give an ornament relief)
+
+Two ornament kinds, two different techniques. Using the wrong one is what made
+the pricing corner read flat for four review rounds.
+
+**Solid silhouette** (`.eqc-corner-motif` — a colour behind a `mask`): carry the
+tint in the paint's own alpha (`background-color: rgb(r g b / a)`) and leave
+element `opacity: 1`. `opacity` groups the already-filtered result, so any
+`drop-shadow` on a faded element is multiplied down with it. With the tint in
+the alpha you can restyle the ornament's strength freely without touching its
+shadow. A dark cast down-right plus a fine light lift up-left carves it off the
+surface.
+
+**Pierced artwork** (the pricing corner — a two-tone SVG with real holes,
+painted as `background-image`): do **not** stack cast shadows. `drop-shadow`
+follows the whole silhouette, so it deposits ink through every hole and the
+pale tiles end up floating on a grey ground — which reads as the tiles being
+raised, the opposite of what the references show. Use one tight, low-alpha
+contact shadow, a fine light bevel, and get the actual relief from the
+artwork's own gradients with `contrast()`/`saturate()`. Depth on a pierced
+ornament is a lighting problem, not a cast-shadow problem.
+
+Either way: verify by sampling rendered pixels, not by eye — and sample the
+thing you care about. A metric that only measures "is the shadow darker" will
+confirm a change that made the ornament worse (`QA/LESSONS.md` #65–66).
+
+### Corner ornaments must meet the corner
+
+A corner ornament is drawn as a repeating girih `<pattern>` tiled from the SVG
+origin. If the canvas is not a whole number of tiles, the *dense* corner — the
+one meant to touch the card or section corner — can land in a tile void and the
+ornament looks detached. Each corner asset therefore carries its own phase
+offset, found empirically by sweeping phases and scoring ink density in the
+block hugging the corner. The right fraction depends on the tile size, so it is
+never shared between assets, and it must be re-measured if a canvas or tile
+size changes. See `girihPattern()` in `tools/graphics/gen-ornaments.mjs`.
+
+### Whole-card links (mandatory pattern)
+
+A card whose entire surface is the CTA uses one invisible stretched anchor
+(`.eqc-card-link`, `position: absolute; inset: 0`) above the content. Because
+that anchor ships inside an Elementor HTML widget, it is separated from the
+card by `.elementor-widget > .elementor-widget-container`.
+
+**Any `> * { position: relative }` rule on the card breaks it.** The widget
+becomes the anchor's containing block, collapses to zero height (its only child
+is absolutely positioned), and the link renders with no area — a card that looks
+correct and cannot be clicked. The same applies to any decoration anchored to
+the card's own edges (the pricing medallion and RECOMMENDED tab).
+
+So: pass a wrapper class through `eqc_html( $html, $classes )` — Elementor
+prints it on the widget element — and stretch that wrapper
+(`.eqc-card-link-widget`, `.eqc-pricing-anchor-widget`). Never rely on the
+anchor reaching the card by itself.
+
+Verify with `document.elementFromPoint()` at several points inside the card,
+not by reading the CSS. See `QA/LESSONS.md` #54.
+
 ### Corner Radius
 
 - Small control: 10–12px
