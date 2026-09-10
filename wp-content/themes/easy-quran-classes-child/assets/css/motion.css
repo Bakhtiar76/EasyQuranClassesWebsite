@@ -77,11 +77,17 @@ html.eqc-js .is-visible .eqc-path-line { stroke-dashoffset: 0; }
    its OWN diagonal, toward the section's middle, at half the amplitude — the
    ornaments stay anchored to their corners and breathe together.
    `translate` is its own property, so this composes with the flips and
-   rotations `transform` carries on --bl/--tl/--br. */
-@keyframes eqc-drift-tl { from { translate: 0 0; } to { translate: 7px 5px; } }
-@keyframes eqc-drift-tr { from { translate: 0 0; } to { translate: -7px 5px; } }
-@keyframes eqc-drift-bl { from { translate: 0 0; } to { translate: 7px -5px; } }
-@keyframes eqc-drift-br { from { translate: 0 0; } to { translate: -7px -5px; } }
+   rotations `transform` carries on --bl/--tl/--br.
+   Amplitude 4px/3px (round 10; was 7px/5px) — the motif now starts flush
+   against the section edge (--_motif-inset: 0), and since every one of these
+   keyframes moves inward only, never back out past 0 0, the amplitude is the
+   full size of the gap the motif ever shows. Kept small so it still reads as
+   flush throughout the cycle rather than opening the gap the client asked to
+   have removed. */
+@keyframes eqc-drift-tl { from { translate: 0 0; } to { translate: 4px 3px; } }
+@keyframes eqc-drift-tr { from { translate: 0 0; } to { translate: -4px 3px; } }
+@keyframes eqc-drift-bl { from { translate: 0 0; } to { translate: 4px -3px; } }
+@keyframes eqc-drift-br { from { translate: 0 0; } to { translate: -4px -3px; } }
 html.eqc-js .eqc-corner-motif--tl { animation-name: eqc-drift-tl; }
 html.eqc-js .eqc-corner-motif--tr { animation-name: eqc-drift-tr; }
 html.eqc-js .eqc-corner-motif--bl { animation-name: eqc-drift-bl; }

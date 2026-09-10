@@ -421,8 +421,12 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
 		scroll-snap-type: x mandatory;
 		-webkit-overflow-scrolling: touch;
 		padding-bottom: 0.5rem;
-		scrollbar-width: thin;
+		/* Round 10: the native bar read as "old and bad looking" against the
+		   reviews carousel's dot strip (initTeacherRows() in eqc.js builds a
+		   matching .eqc-slider-dots row right after this element). */
+		scrollbar-width: none;
 	}
+	.eqc-grid--teachers::-webkit-scrollbar { display: none; }
 	.eqc-grid--teachers > * { scroll-snap-align: center; }
 }
 @media (max-width: 36rem) {
@@ -855,6 +859,10 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
 	box-shadow: 0 6px 16px rgba(20, 35, 27, 0.2);
 	margin-block: 0.8em 0.55em;
 }
+/* A later, more specific block for .eqc-pricing-list and
+   .eqc-pricing-price-divider (client-review refinements, each layered in by
+   source-order cascade rather than editing these) lives further down this
+   file, search for "the BLOCK they form is centred in the card". */
 .eqc-pricing-list {
 	list-style: none;
 	margin: 0 0 1.2em;
@@ -1096,7 +1104,14 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
 @media (max-width: 30rem) {
 	.eqc-carousel-arrow { display: none; }
 }
-.eqc-slider-dots { display: flex; justify-content: center; gap: 0.6rem; margin-top: clamp(1.5rem, 1.2rem + 1vw, 2.25rem); }
+/* width:100% matters where this is inserted as a sibling inside a flex row
+   (the home teachers row, .eqc-teachers-split — initTeacherRows() in eqc.js
+   appends it after .eqc-teachers-cards): without it, a flex item's default
+   basis is its own shrink-to-fit content width, so `justify-content:center`
+   has nothing to center within and the dots read as pinned to one side
+   (round 10 client review). No-op everywhere else this is used (a normal
+   block already fills its container). */
+.eqc-slider-dots { display: flex; justify-content: center; gap: 0.6rem; width: 100%; margin-top: clamp(1.5rem, 1.2rem + 1vw, 2.25rem); }
 /* Button itself is a 24px tap target (Lighthouse/axe target-size minimum;
    DESIGN.md's 44px guidance would make the visible dot look oversized) —
    the small 10px dot users actually see is a ::before centered inside it,
@@ -1772,7 +1787,7 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
 	filter: drop-shadow(1px 3px 3px rgb(20 35 27 / 0.5)) drop-shadow(-1px -1px 0 rgb(255 253 249 / 0.4));
 	pointer-events: none;
 	z-index: 0;
-	--_motif-inset: clamp(14px, 1.6vw, 30px);
+	--_motif-inset: 0;
 }
 /* lattice-corner.svg is drawn dense at its own top-right corner (see the
    asset's own comment), so .eqc-corner-motif--tr needs no transform and
@@ -1784,13 +1799,16 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
    second, smaller multiplier on top — deliberately higher than
    DESIGN.md §9's 3-10% baseline per explicit user feedback that the
    previous motif read as "boring and dull" at that strength. */
-/* Inset from the true corner, not flush to it. Every ornamented section is
-   `overflow: hidden`, and the shared drift animation translates the motif by
-   -16px/-10px — so a flush motif spends most of its cycle with a slice of its
-   own arabesque clipped off by the section edge, which is why the courses
-   section's brackets read as broken fragments rather than corner ornaments
-   (client review, round 6). The inset is larger than the drift's amplitude,
-   so the shape stays whole through the whole cycle. */
+/* Flush to the true corner (client review, round 10: a visible gap had opened
+   between the ornament and the section edge). This is safe only because the
+   per-corner drift keyframes (motion.css eqc-drift-tl/tr/bl/br) move each
+   motif INWARD, toward the section middle, never outward past its start
+   position — round 6's original problem (a single shared -16px/-10px drift
+   that carried motifs outward and clipped them against `overflow: hidden`)
+   was already fixed by splitting that into four inward-only keyframes; the
+   inset this comment used to defend against was left in place afterward and
+   became the round-10 defect. If the drift direction ever changes again,
+   re-check this. */
 .eqc-corner-motif--tr { top: var(--_motif-inset); right: var(--_motif-inset); }
 .eqc-corner-motif--bl { bottom: var(--_motif-inset); left: var(--_motif-inset); transform: rotate(180deg); }
 /* The remaining two corners, by the same mapping: mirroring the asset puts
@@ -1837,6 +1855,21 @@ html.eqc-js .eqc-corner-motif { animation: eqc-drift 24s var(--eqc-ease-soft) in
 	padding: calc(26 * var(--eqc-u)) clamp(1rem, 0.5rem + 1.6vw, 2.25rem);
 }
 .eqc-pricing-panel > .e-con { position: relative; z-index: 1; }
+/* Now that the corner motif sits flush (--_motif-inset: 0, round 10), its
+   dense corner pixel lands exactly on the panel's own rounded corner — and
+   this panel deliberately has no overflow:hidden (see above), so nothing else
+   clips it there. Same fix as the testimonial card ornament
+   (QA/qa-10092026/23.png): border-radius clips an element's own
+   background/mask paint even without overflow:hidden, so rounding this
+   element's corner to match the panel's curve stops the ink spilling past it.
+   Both --tr and --bl are, before their own transform, dense at their own
+   top-right corner (see gen-ornaments.mjs's lattice-corner comment; --bl gets
+   there via rotate(180deg), not a different asset), so one declaration
+   serves both. */
+.eqc-pricing-panel .eqc-corner-motif--sm.eqc-corner-motif--tr,
+.eqc-pricing-panel .eqc-corner-motif--sm.eqc-corner-motif--bl {
+	border-top-right-radius: var(--eqc-radius-panel);
+}
 
 /* ---------- Section heading block ---------- */
 
@@ -2018,7 +2051,13 @@ a.eqc-btn .eqc-icon, button.eqc-btn .eqc-icon,
 	mask-image: linear-gradient(90deg, #000 0%, #000 14%, transparent 52%), url('../svg/girih-lattice-fine.svg');
 	mask-size: 100% 100%, calc(30 * var(--eqc-u)) calc(30 * var(--eqc-u));
 	mask-repeat: no-repeat, repeat;
-	-webkit-mask-composite: source-in;
+	/* No -webkit-mask-composite pair here (unlike the -webkit-/unprefixed
+	   mask-image pairs elsewhere in this file): evergreen WebKit/Blink read
+	   the unprefixed `mask-composite` below directly and never consult the
+	   legacy keyword-based prefixed property once it's present, so a
+	   `-webkit-mask-composite: source-in;` line here was dead on every
+	   browser this project targets — removed rather than kept as inert
+	   cargo-culted compat. */
 	mask-composite: intersect;
 	pointer-events: none;
 }
@@ -2428,6 +2467,22 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 .eqc-grid--pricing { grid-template-columns: repeat(4, 1fr); gap: calc(31 * var(--eqc-u)); padding-block: 0; }
 @media (max-width: 61.25rem) { .eqc-grid--pricing { grid-template-columns: repeat(2, 1fr); } }
 @media (max-width: 36rem) { .eqc-grid--pricing { grid-template-columns: 1fr; } }
+/* Client review (round 10): stacked cards read "too close together" below
+   61.25rem. Root cause measured directly (not eyeballed): each card's
+   medallion badge (.eqc-pricing-icon, `top: -1.9rem`, plus its `::before`
+   shell's further `-0.42em` inset) overhangs ~36px above its own card's top
+   edge — but the row gap is `calc(31 * var(--eqc-u))`, and --eqc-u floors at
+   0.70px for any viewport narrower than ~915px (tokens.css), so the gap is
+   stuck at ~22px there regardless of how narrow the viewport gets. A ~36px
+   badge overhang inside a ~22px gap measures out to the next card's badge
+   overlapping the previous card's bottom edge by 13-14px, confirmed by
+   getBoundingClientRect at both the 2-column (tablet) and 1-column (phone)
+   widths this breakpoint covers. Fixed with a `rem`-based row-gap — not tied
+   to --eqc-u, so it never floors — sized to clear the measured overhang with
+   room to spare. Only row-gap needs it; the 2-column width's column-gap is
+   unaffected (badges don't overhang sideways) and keeps the `gap` shorthand
+   above. */
+@media (max-width: 61.25rem) { .eqc-grid--pricing { row-gap: 2.75rem; } }
 /* justify-content: center is what moves the banner, list, divider and price
    row down together to fill the card, instead of leaving the dead band the
    client marked in QA/qa-10092026/15.png. The gap rises with it so the block
@@ -2598,7 +2653,11 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
    tighter (card 343u against our 406u). */
 /* Client review (QA/qa-10092026/image2.png): the plan feature list read too
    small and low-contrast. Up one step to body size and full heading colour. */
-/* The bullets left-align to each other, but the BLOCK they form is centred in
+/* Refines .eqc-pricing-list / .eqc-pricing-price-divider, first declared
+   near .eqc-pricing-bullet above (search "No `margin-block-start: auto`") —
+   these apply by later source order, not by higher specificity; keep that in
+   mind before editing either block in isolation.
+   The bullets left-align to each other, but the BLOCK they form is centred in
    the card — that is how pricing.jpeg sets it, and what "the content is
    mispositioned" in QA/qa-10092026/13.png is about: with the list spanning the
    full content width, ragged line ends read as broken alignment against the
@@ -2895,13 +2954,43 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
    instead of stranding it. */
 .eqc-form-grid { align-items: flex-start; gap: calc(40 * var(--eqc-u)); }
 .eqc-form-grid > .eqc-form-wrap { flex: 1 1 58%; }
-.eqc-form-grid > .eqc-form-aside { flex: 1 1 34%; display: flex; flex-direction: column; gap: calc(24 * var(--eqc-u)); }
+.eqc-form-grid > .eqc-form-aside {
+	flex: 1 1 34%;
+	display: flex;
+	flex-direction: column;
+	gap: calc(24 * var(--eqc-u));
+	/* Elementor's own container default (see the near-identical note on
+	   .eqc-pricing-panel above) — left in, the column's content started 10px
+	   below the form's, a "slight difference" client review flagged (round
+	   10) on Contact, where the mismatch is most visible. */
+	padding-block-start: 0;
+}
 @media (min-width: 62rem) {
 	.eqc-form-grid > .eqc-form-aside { position: sticky; top: calc(var(--eqc-header-h, 96px) + 28px); }
 }
 @media (max-width: 61.99rem) {
 	.eqc-form-grid > .eqc-form-wrap,
 	.eqc-form-grid > .eqc-form-aside { flex-basis: 100%; }
+}
+/* Contact (round 10 client review): "the get in touch card, vertical size
+   and position should be aligned with the form properly". Measured, not
+   eyeballed: on Contact the aside column (invite panel + reassurance list)
+   is naturally ~640px tall against a ~564px form — TALLER than the form, the
+   opposite of Free Trial's much longer form (~1166px vs a ~632px aside),
+   which is what the shared .eqc-form-grid rule above was built for.
+   Sticky is right for Free Trial (it keeps a short aside beside a long,
+   scrolling form) but wrong for Contact: with the aside already at least as
+   tall as the form, sticky just detaches it from the form as the page
+   scrolls, which reads as exactly the misalignment reported. `stretch`
+   fixes both axes at once here — the row's cross-size already comes out to
+   the taller column's height, so the shorter one (the form) grows to match
+   it, giving equal tops (already true) and equal bottoms, with no extra
+   markup needed inside either column. Scoped to Contact only via this
+   modifier class (15-contact.php) rather than changing the shared rule,
+   since Free Trial still needs the sticky/flex-start behaviour. */
+.eqc-form-grid--balanced { align-items: stretch; }
+@media (min-width: 62rem) {
+	.eqc-form-grid--balanced > .eqc-form-aside { position: static; }
 }
 
 .eqc-card--step h3 {
@@ -2963,8 +3052,9 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
    so they were still a plain vertical stack on phones (measured at 390px: four
    cards at x=25, 464px apart). Same snap-scroll treatment, so both places
    behave like the reviews row the client asked them to match. The aside's
-   prev/next buttons page this container — see initTeachersNav() in eqc.js;
-   they had no handler at all until round 9. */
+   prev/next buttons page this container, and (round 10) so does a
+   .eqc-slider-dots row built right after it — see initTeacherRows() in
+   eqc.js. */
 @media (max-width: 61.25rem) {
 	.eqc-teachers-split > .eqc-teachers-cards {
 		grid-template-columns: none;
@@ -2974,8 +3064,11 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 		scroll-snap-type: x mandatory;
 		-webkit-overflow-scrolling: touch;
 		padding-bottom: 0.5rem;
-		scrollbar-width: thin;
+		/* Round 10: replaced by the dot strip below — see the comment on
+		   .eqc-grid--teachers above, same reasoning. */
+		scrollbar-width: none;
 	}
+	.eqc-teachers-split > .eqc-teachers-cards::-webkit-scrollbar { display: none; }
 	.eqc-teachers-split > .eqc-teachers-cards > * { scroll-snap-align: center; }
 }
 @media (max-width: 36rem) {
@@ -2986,32 +3079,70 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
    missed: the oval portrait rides ABOVE the card's top edge with the book
    badge centred on that overlap; the meta rows sit plain on the card, not in
    a tinted box; the name is bold sans, not the display serif; and the
-   "View Profile" pill stays inside the card. */
-.eqc-section--teachers .eqc-card--teacher {
-	overflow: visible;
-	margin-block-start: calc(142 * var(--eqc-u));
-	/* Measured, not derived: the portrait renders 163px tall on a 157px card
-	   and sits from -120 to +43 relative to the card's top edge, so it
-	   intrudes 43px — about 50u. The old 104u came from an assumed oval
-	   height and left ~46px of dead space inside every card. */
-	padding-block-start: calc(98 * var(--eqc-u));
-}
-.eqc-section--teachers .eqc-card--teacher .eqc-teacher-photo-widget {
-	position: absolute;
-	inset-block-start: calc(-142 * var(--eqc-u));
-	inset-inline: 0;
-	width: 98%;
-	margin-inline: auto;
-	z-index: 2;
-}
-.eqc-section--teachers .eqc-card--teacher .eqc-teacher-seal {
-	position: absolute;
-	inset-block-start: calc(30 * var(--eqc-u));
-	inset-inline: 0;
-	margin: 0 auto;
-	width: calc(44 * var(--eqc-u));
-	height: calc(44 * var(--eqc-u));
-	z-index: 3;
+   "View Profile" pill stays inside the card.
+   DESKTOP ONLY (≥61.3125rem, just past the snap-scroll breakpoint below).
+   Round 10 client review, in two parts:
+    1. (QA/qa-10092026/24.png) "too big images and totally messed up" on
+       phones — the portrait covered the card and the seal landed on the
+       teacher's chin. Root cause: the portrait's WIDTH was percentage-based
+       (98% of the card) but its vertical placement was --eqc-u-based (floors
+       at 0.70px below ~915px, tokens.css) — below that width the two
+       disagreed and the portrait swallowed the card's own content. First
+       fix: put every offset on the same percentage-of-card-width basis
+       (margin-block-start/padding-block-start already resolve percentages
+       against the containing block's WIDTH; `inset-block-start` does not —
+       it resolves against HEIGHT — so the photo/seal use `inset-block-start:
+       0` plus a `margin-block-start` percentage instead).
+    2. That fix was proportionally correct but still too heavy on phones —
+       "make it same [as] the Teachers page cards ... smaller teacher
+       picture and formatting matched". The /teachers/ page grid uses the
+       plainer BASE .eqc-card--teacher/.eqc-teacher-photo/.eqc-teacher-seal
+       rules further up this file — no top-edge overlap, no absolute
+       positioning, just a normal-flow circular photo and a seal pulled up
+       over its bottom edge with a negative margin. Rather than scale this
+       whole desktop treatment down to approximate that, this override now
+       stops applying below the breakpoint entirely, so mobile literally
+       renders the same rules the /teachers/ page card does — an exact match,
+       not an approximation of one.
+   The desktop constants themselves were measured (not guessed) against the
+   current, client-approved 1920/1440/1280/1024 rendering —
+   getBoundingClientRect() of the card vs. its portrait/seal — and came out
+   as clean, near-identical ratios of the card's own width at every one of
+   those sizes (e.g. marginBlockStart/cardWidth = 0.7749 at all four). */
+@media (min-width: 61.3125rem) {
+	.eqc-section--teachers .eqc-card--teacher {
+		overflow: visible;
+		margin-block-start: 77.49%;
+		padding-block-start: 53.48%;
+	}
+	.eqc-section--teachers .eqc-card--teacher .eqc-teacher-photo-widget {
+		position: absolute;
+		inset-block-start: 0;
+		margin-block-start: -77.49%;
+		inset-inline: 0;
+		width: 98%;
+		margin-inline: auto;
+		z-index: 2;
+	}
+	.eqc-section--teachers .eqc-card--teacher .eqc-teacher-seal {
+		position: absolute;
+		inset-block-start: 0;
+		margin-block-start: 16.9%;
+		inset-inline: 0;
+		margin-inline: auto;
+		width: 24%;
+		/* was a fixed calc(44*u) height — `height: %` resolves against the
+		   containing block's HEIGHT (the same trap as inset-block-start
+		   above), so aspect-ratio derives it from the width instead; the
+		   seal is a circle, 1:1. `height: auto` is required here, not just
+		   aspect-ratio — the base .eqc-teacher-seal rule sets an explicit
+		   `height: 2.4em`, and aspect-ratio only fills in a dimension
+		   that's actually auto; left unset, that 2.4em kept winning and the
+		   seal rendered as an oval. */
+		height: auto;
+		aspect-ratio: 1;
+		z-index: 3;
+	}
 }
 .eqc-section--teachers .eqc-card--teacher h3 {
 	font-family: var(--eqc-font-body);
