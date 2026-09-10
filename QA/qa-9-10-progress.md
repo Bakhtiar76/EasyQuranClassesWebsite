@@ -11,6 +11,104 @@ CSS, and three of those were measurably still broken. See "Round 5" below.
 
 ---
 
+## Round 11 — 2026-09-10 (`claude-opus-5`)
+
+Code-review follow-ups, a brutal dead-code/asset audit of the production
+theme, and a client-reported bug (reviews carousel doesn't swipe on mobile)
+caught mid-round. Evidence: `QA/after-r11/` — 11 routes x 8 viewports + the
+380-1900:40 scan, run twice (before and after the swipe fix). Final result:
+0 console errors, 0 page errors, 0 asset/blocked-request errors, 0
+horizontal overflow, one H1 per route, 0 images missing alt, across all 11
+routes both times.
+
+### Two open code-review findings (`eqc.js`, `setupTeacherRow()`)
+
+- [x] **R11-1** `syncDots()` ran `getBoundingClientRect()` on the row and
+  every card on every raw `scroll` event — layout thrash. Throttled to one
+  `syncAll()` per animation frame, reusing the exact `ticking` pattern
+  `initHeaderScrollState()` already established in this file. Verified live:
+  scrolling the teacher row to its end correctly moves the active dot from
+  0 to 3 of 4 through the throttled handler.
+- [x] **R11-2** A `window resize` listener and an `mq.addEventListener('change', ...)`
+  listener had byte-identical bodies; `buildDots()` already reads `mq.matches`
+  internally, so `resize` alone already covers every breakpoint crossing.
+  Deleted the redundant `change` listener.
+
+### Dead code and unused assets removed from the production theme
+
+A static-analysis pass (dead-code + asset scans, corrected once against a
+real generator run — see Lessons) found the production theme carrying real
+weight nothing consumes:
+
+- [x] **R11-3** Two dead PHP helpers in `inc/template-tags.php`:
+  `eqc_section_heading()` (zero call sites, superseded by
+  `eqc_section_heading_el()` in `tools/elementor-helpers.php`) and two dead
+  local variables in `eqc_render_blog_cards()` (`$cat_name`/`$ribbon`,
+  replaced by `$category` when the blog card design changed).
+- [x] **R11-4** ~20 dead/redundant CSS selectors: a rename leftover
+  (`.eqc-teacher-photo` vs the real `.eqc-teacher-photo-widget`), two
+  near-miss classes (`.eqc-display`, `.eqc-ornament`), an unused button
+  modifier (`.eqc-btn--block`), `.eqc-section--dark` and ~13 rules
+  depending on it (never emitted by any page builder — the site's one dark
+  panel, `.eqc-footer-cta`, has always had its own styling), a dead
+  `.eqc-path-line`/`.eqc-divider-flower` pair in `motion.css` (no emitting
+  SVG), and two exact-duplicate declarations.
+- [x] **R11-5** Reversed a round-8 decision: removed
+  `.eqc-arch-media--fourcentred`/`--horseshoe` (never emitted by any page
+  builder) and their SVG masks from the production theme. The underlying
+  geometry (`fourCentredArchPanel`/`horseshoeArchPanel`) stays in
+  `tools/graphics/lib/arches.mjs` — only the pre-baked, unconsumed output
+  stops shipping.
+- [x] **R11-6** 21 orphan SVGs deleted from `assets/svg/` (20 confirmed by
+  the original audit, plus `girih-lattice-dense.svg` — see Lessons) and
+  their generator `save()` calls removed from `gen-ornaments.mjs`, so a
+  future run can't silently restore them.
+- [x] **R11-7** The 58-file `assets/svg/icons/` designer-handoff folder and
+  the 2 unused logo lockups (`eqc-logo.svg`, `eqc-logo-horizontal.svg`)
+  moved out of the production theme to `tools/graphics/output/{icons,logo}/`
+  — redirected at the generator (`build-icon-sprite.mjs`, `build-logo.mjs`),
+  not just deleted, so they keep regenerating for designer/print/social use
+  without shipping to a visitor's browser. `inc/icon-sprite.php` (the real
+  consumer) verified **byte-identical** before/after.
+- [x] **R11-8** Theme version `1.10.0` -> `1.11.0`.
+
+Verified: every asset still shipped in `assets/svg/` checksums
+byte-identical before/after (proves the trim touched only unused output,
+never a shared shape function); `assets/svg/` file count 57 -> 39 loose
+files (`icons/` and the 2 logo files gone); `php -l` clean on both edited
+PHP files; the full sweep above.
+
+### R11-9 Reviews carousel didn't swipe on mobile (client-reported mid-round)
+
+Root cause: `.eqc-carousel-track` is positioned with `transform`, inside
+`overflow: hidden` — not a scrollable element — and `initCarousel()` only
+ever wired click/hover/focus handlers. A finger swipe had nothing to grab;
+only the dots and arrows worked. The teacher row (`setupTeacherRow()`) was
+never affected — it uses real native `scroll-snap`, which is exactly why the
+bug was specific to "the Review cards."
+
+Fixed with Pointer Events (touch + mouse + pen in one handler) on the shared
+`initCarousel()`: a move commits to a swipe only once it's clearly more
+horizontal than vertical past an 8px slop threshold (short of that, or if
+vertical, it's released back to the page — no scroll-fighting); while
+dragging the track tracks the pointer 1:1 (`.eqc-carousel--dragging` drops
+the CSS transition for that); releasing past ~18% of the viewport width (or
+40px, whichever is larger) commits to the next/previous card with the
+normal transition, otherwise it snaps back. `.eqc-carousel-viewport` gets
+`touch-action: pan-y` so vertical page scroll is left to the browser with no
+manual `preventDefault()` needed.
+
+Verified live via dispatched `PointerEvent`s in the browser (not just code
+review): swipe-left advances the active dot 0 -> 1 (touch, mobile viewport);
+swipe-right returns 1 -> 0; a sub-threshold drag snaps back without
+advancing; a vertical-dominant gesture releases correctly with zero effect
+on the carousel; a left-button mouse drag advances it identically at a
+tablet width where paging is real (`pageCount > 1`); 0 console errors in all
+of the above. Caught one real bug in the same pass — see Lessons #75 — fixed
+before commit.
+
+---
+
 ## Round 10 — 2026-09-10 (`claude-opus-5`)
 
 Client review of round 9's build, plus two items raised mid-round. Evidence:

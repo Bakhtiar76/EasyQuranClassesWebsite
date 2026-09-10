@@ -1,0 +1,85 @@
+{
+  "generatedAt": "2026-09-10T11:17:00.133Z",
+  "baseUrl": "http://localhost",
+  "widths": [
+    1920,
+    1440,
+    1280,
+    1024,
+    768,
+    430,
+    390,
+    360
+  ],
+  "scan": "380-1900:40",
+  "routes": [
+    {
+      "route": "/",
+      "dir": "home",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/about/",
+      "dir": "about",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/courses/",
+      "dir": "courses",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/teachers/",
+      "dir": "teachers",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/pricing/",
+      "dir": "pricing",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/contact/",
+      "dir": "contact",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/faq/",
+      "dir": "faq",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/blog/",
+      "dir": "blog",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/online-quran-classes-for-kids/",
+      "dir": "online-quran-classes-for-kids",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/free-trial/",
+      "dir": "free-trial",
+      "failures": 0,
+      "warnings": 0
+    },
+    {
+      "route": "/demo-starting-your-childs-quran-journey/",
+      "dir": "demo-starting-your-childs-quran-journey",
+      "failures": 0,
+      "warnings": 0
+    }
+  ],
+  "failures": 0,
+  "warnings": 0
+}
