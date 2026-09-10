@@ -1,7 +1,7 @@
 {
   "route": "/contact/",
   "url": "http://localhost/contact/",
-  "generatedAt": "2026-09-10T03:39:23.737Z",
+  "generatedAt": "2026-09-10T04:48:21.289Z",
   "viewports": [
     {
       "name": "desktop-1920x1080",
@@ -90,8 +90,12 @@
       "text": "We're here to help"
     },
     {
+      "level": 2,
+      "text": "Ask us anything"
+    },
+    {
       "level": 3,
-      "text": "Get in Touch"
+      "text": "Get in touch"
     },
     {
       "level": 2,

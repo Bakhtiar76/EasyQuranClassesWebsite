@@ -1,7 +1,7 @@
 {
   "route": "/free-trial/",
   "url": "http://localhost/free-trial/",
-  "generatedAt": "2026-09-10T03:39:57.120Z",
+  "generatedAt": "2026-09-10T04:48:55.603Z",
   "viewports": [
     {
       "name": "desktop-1920x1080",
@@ -110,8 +110,12 @@
       "text": "Meet Your Teacher"
     },
     {
+      "level": 2,
+      "text": "Tell us about the student"
+    },
+    {
       "level": 3,
-      "text": "Prefer to Talk First?"
+      "text": "Prefer to talk first?"
     },
     {
       "level": 2,
