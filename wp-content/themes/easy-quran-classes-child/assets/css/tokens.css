@@ -20,6 +20,21 @@
 	--eqc-gold-600: #A98235;
 	--eqc-gold-500: #B9974C;
 	--eqc-gold-300: #D9C48D;
+	/* Channel triples for the same three golds. Ornaments carry their tint in
+	   the paint's own alpha rather than element `opacity`, so a `drop-shadow`
+	   on them renders at full strength (QA/LESSONS.md #51) — and an alpha
+	   colour cannot be written as `var(--eqc-gold-500)`. Without these the
+	   alpha variants get hand-typed as literals, which is how two of them
+	   silently drifted off the ramp (gold-500 -> gold-600 on the pricing
+	   sparkle, gold-300 -> an untokened #D6B26E on the dark motifs). Keep each
+	   triple in step with the hex above it. */
+	--eqc-gold-600-rgb: 169 130 53;
+	--eqc-gold-500-rgb: 185 151 76;
+	--eqc-gold-300-rgb: 217 196 141;
+	/* Two creams the ornament/section work needs by name rather than as a
+	   literal: the pricing unit pill and the reviews band. */
+	--eqc-cream-200: #F0E7D3;
+	--eqc-cream-150: #F1EBDF;
 
 	--eqc-bronze-700: #7A432A;
 	--eqc-bronze-600: #925234;

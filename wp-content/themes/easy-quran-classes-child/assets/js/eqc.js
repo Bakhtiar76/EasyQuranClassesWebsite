@@ -423,8 +423,50 @@
 		} );
 	}
 
+	/**
+	 * Home teachers row: the aside's prev/next buttons.
+	 *
+	 * These two buttons shipped with an aria-label and a focus ring and no
+	 * handler at all — a keyboard user could tab into them and nothing
+	 * happened. Below 61.25rem the card row is a snap-scrolling overflow
+	 * container (components.css .eqc-teachers-cards), so paging it is just a
+	 * scrollBy; above that width every card is already visible, so the buttons
+	 * are hidden by CSS and this does nothing.
+	 */
+	function initTeachersNav() {
+		document.querySelectorAll( '.eqc-teachers-nav' ).forEach( function ( nav ) {
+			var split = nav.closest( '.eqc-teachers-split' );
+			var row = split ? split.querySelector( '.eqc-teachers-cards' ) : null;
+			var buttons = nav.querySelectorAll( '.eqc-nav-btn' );
+			if ( ! row || buttons.length < 2 ) {
+				return;
+			}
+
+			function page( direction ) {
+				var card = row.firstElementChild;
+				// One card plus its gap, so a press lands on the next snap point
+				// rather than an arbitrary offset; fall back to most of a screen.
+				var step = card ? card.getBoundingClientRect().width + 16 : row.clientWidth * 0.8;
+				row.scrollBy( { left: direction * step, behavior: 'smooth' } );
+			}
+
+			function syncDisabled() {
+				var max = row.scrollWidth - row.clientWidth;
+				buttons[ 0 ].disabled = row.scrollLeft <= 1;
+				buttons[ 1 ].disabled = row.scrollLeft >= max - 1;
+			}
+
+			buttons[ 0 ].addEventListener( 'click', function () { page( -1 ); } );
+			buttons[ 1 ].addEventListener( 'click', function () { page( 1 ); } );
+			row.addEventListener( 'scroll', syncDisabled, { passive: true } );
+			window.addEventListener( 'resize', syncDisabled );
+			syncDisabled();
+		} );
+	}
+
 	function init() {
 		initNavDrawer();
+		initTeachersNav();
 		initHeaderScrollState();
 		initScrollReveal();
 		initCountUp();

@@ -35,6 +35,7 @@ import {
 	mandorlaPanel,
 	multifoilArchPanel,
 	cuspedArchPanel,
+	CUSPED_SAGITTAE,
 } from './lib/arches.mjs';
 
 /** Read a build input that lives in the gitignored scratch/ directory.
@@ -531,9 +532,10 @@ function closedCartouche(w, h, capHeight, inset, stroke = false, opts = {}) {
 	// reference profile; the pricing banner asks for deeper, more sculpted
 	// lobes than the shared cartouche family, so it passes its own value
 	// rather than moving the contour everything else is calibrated against.
-	const lobe = opts.lobeDepth || 1;
-	const base = [0.0130, 0.0363, 0.0218];
-	const { d } = cuspedArchPanel(cw, cap, ch, { stops, sagittae: base.map((s) => s * lobe) });
+	// `?? 1` not `|| 1`: an explicit 0 (a flat, unbulged contour) is a valid
+	// request and must not silently become the measured profile.
+	const lobe = opts.lobeDepth ?? 1;
+	const { d } = cuspedArchPanel(cw, cap, ch, { stops, sagittae: CUSPED_SAGITTAE.map((s) => s * lobe) });
 	const id = `half-${inset}${lobe === 1 ? '' : `-l${String(lobe).replace('.', '_')}`}`;
 	const attrs = stroke ? 'fill="none" stroke="currentColor" stroke-width="1.2" stroke-linejoin="round"' : 'fill="#fff"';
 	// A one-unit overlap on each side avoids a raster seam at the shared

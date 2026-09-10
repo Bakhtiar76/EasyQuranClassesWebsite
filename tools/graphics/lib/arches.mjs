@@ -506,10 +506,16 @@ function bulgedArc(from, to, sag, outwardSign) {
  * existing `d.replace(/Z$/, '')` trick that derives the open-bottom frame
  * keeps working: dropping the close removes exactly the flat base and leaves
  * corner-arc + jambs + arch as one continuous stroked run. */
+/** The measured bulge of each cusp segment, as a fraction of w. Exported so
+ *  callers that need to SCALE the profile (closedCartouche's lobeDepth) derive
+ *  it from here instead of keeping their own copy that silently stops matching
+ *  the moment this profile is retuned. */
+export const CUSPED_SAGITTAE = [0.0130, 0.0363, 0.0218];
+
 export function cuspedArchPanel(w, jamb, baseH, {
 	// left-side cusps, base -> apex (x fraction of w, y fraction of baseH)
 	stops = [[0.0000, 0.4626], [0.0751, 0.3498], [0.2397, 0.1908], [0.4365, 0.0477]],
-	sagittae = [0.0130, 0.0363, 0.0218],
+	sagittae = CUSPED_SAGITTAE,
 	bottomRadius = 0,
 } = {}) {
 	const hw = w / 2, apex = [hw, 0];
