@@ -80,7 +80,9 @@ flower styles.
 - `QA/graphics-parity-final/home/report.json` — the accepted run's own result.
   Its screenshots were pruned in the 2026-09-10 cleanup (superseded by later
   rounds; ~100MB a round of regenerable images). Recapture that set with
-  `node tests/visual/sweep.mjs http://localhost / --out QA/after --widths 1440,768,390`.
+  `node tests/visual/sweep.mjs http://localhost / --out QA/graphics-parity-final --widths 1440,768,390`
+  (not `QA/after` — that writes a different, gitignored evidence set and
+  leaves this file's own citation above unregenerated).
 - `tools/graphics/scratch/shot-*-1600.png` — local ignored working captures
   for direct section comparison; regenerate rather than commit them.
 
