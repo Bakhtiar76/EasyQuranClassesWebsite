@@ -2911,7 +2911,10 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 	width: calc(100 * var(--eqc-u));
 	height: calc(108 * var(--eqc-u));
 	background: var(--eqc-gold-600);
-	opacity: 0.32;
+	/* Quieter than the section-level motifs: on a small card the lace sits
+	   right beside the avatar and the name, so it has to stay a texture
+	   rather than compete with them (client review, round 8). */
+	opacity: 0.2;
 	mask: url('../svg/corner-motif.svg') center / 100% 100% no-repeat;
 	pointer-events: none;
 	/* The card is `overflow: visible` — it has to be, the avatar overhangs its
