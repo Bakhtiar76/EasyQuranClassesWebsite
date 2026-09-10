@@ -248,6 +248,11 @@ function eqc_section_ornaments( $modifier = '', $corners = array( 'tr', 'bl' ) )
 	$html  = '';
 	foreach ( $corners as $corner ) {
 		if ( ! in_array( $corner, array( 'tl', 'tr', 'bl', 'br' ), true ) ) {
+			// Caller-error guard, not user input: every call site passes a
+			// hardcoded literal, so this only ever fires on a typo while
+			// editing a page builder — warn instead of silently dropping
+			// the corner, which previously looked identical to "on purpose".
+			WP_CLI::warning( "eqc_section_ornaments(): ignoring unknown corner '{$corner}'." );
 			continue;
 		}
 		$html .= '<span class="eqc-corner-motif eqc-corner-motif--' . esc_attr( $corner . $extra ) . '" aria-hidden="true"></span>';
