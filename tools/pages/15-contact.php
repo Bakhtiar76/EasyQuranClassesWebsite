@@ -64,7 +64,7 @@ $contact_section = eqc_section(
 					true
 				),
 				eqc_container(
-					array( 'css_classes' => 'eqc-form-grid', 'flex_direction' => 'row' ),
+					array( 'css_classes' => 'eqc-form-grid eqc-form-grid--balanced', 'flex_direction' => 'row' ),
 					array(
 						eqc_container(
 							array( 'css_classes' => 'eqc-form-wrap', 'flex_direction' => 'column' ),
