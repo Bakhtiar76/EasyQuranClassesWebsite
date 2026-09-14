@@ -48,10 +48,9 @@ $guide_rows = array(
 );
 $guide_html = '<div class="eqc-card eqc-course-guide" style="padding:0;overflow:hidden;">';
 foreach ( $guide_rows as $i => $row ) {
-	$border = $i < count( $guide_rows ) - 1 ? 'border-bottom:1px solid var(--eqc-border);' : '';
-	$guide_html .= '<a class="eqc-course-guide-row" href="#course-' . esc_attr( $row[2] ) . '" style="display:flex;flex-wrap:wrap;gap:0.75rem;justify-content:space-between;align-items:center;padding:1.1rem 1.5rem;text-decoration:none;' . $border . '">'
-		. '<span style="font-weight:600;color:var(--eqc-heading);">' . esc_html( $row[0] ) . '</span>'
-		. '<span style="color:var(--eqc-bronze-700);display:flex;align-items:center;gap:0.5em;font-weight:600;">' . esc_html( $row[1] ) . eqc_icon_str( 'arrow-right' ) . '</span>'
+	$guide_html .= '<a class="eqc-course-guide-row" href="#course-' . esc_attr( $row[2] ) . '">'
+		. '<span class="eqc-course-guide-q">' . esc_html( $row[0] ) . '</span>'
+		. '<span class="eqc-course-guide-a">' . esc_html( $row[1] ) . eqc_icon_str( 'arrow-right' ) . '</span>'
 		. '</a>';
 }
 $guide_html .= '</div>';

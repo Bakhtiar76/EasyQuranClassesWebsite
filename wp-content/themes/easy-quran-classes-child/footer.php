@@ -189,9 +189,6 @@ defined( 'ABSPATH' ) || exit;
 			</div>
 
 			<div class="eqc-footer-bottom">
-				<span class="eqc-footer-medallion" aria-hidden="true">
-					<?php echo eqc_logo_mark_svg(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped internally, static local SVG file. ?>
-				</span>
 				<p>&copy; <?php echo esc_html( gmdate( 'Y' ) ); ?> <?php bloginfo( 'name' ); ?>. <?php esc_html_e( 'All Rights Reserved.', 'easy-quran-classes' ); ?></p>
 			</div>
 		</div>

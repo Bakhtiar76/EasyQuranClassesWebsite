@@ -760,10 +760,15 @@ a.eqc-social-icon:hover { background: var(--eqc-green-800); color: var(--eqc-whi
 .eqc-footer-contact a:hover,
 .eqc-footer-links a:hover { color: var(--eqc-bronze-700); }
 
-/* ---------- Copyright bar + medallion ---------- */
+/* ---------- Copyright bar ---------- */
 
+/* BugDrop #5 (2026-09-14): the medallion that used to straddle this bar's
+   top edge is removed sitewide (client request — it overlapped the
+   copyright line on phones, e.g. the "USA 733898... All Rights Reserved"
+   text at 360px). Its markup is gone from footer.php; position:relative
+   dropped too since it existed only to anchor that absolutely-positioned
+   badge. */
 .eqc-footer-bottom {
-	position: relative;
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -778,27 +783,6 @@ a.eqc-social-icon:hover { background: var(--eqc-green-800); color: var(--eqc-whi
 	margin: 0;
 	color: var(--eqc-cream-100);
 	font-size: clamp(0.85rem, 0.8rem + 0.25vw, 1.15rem);
-}
-
-.eqc-footer-medallion {
-	--_medallion: clamp(52px, 30px + 2.7vw, 82px);
-	position: absolute;
-	left: 50%;
-	top: 0;
-	transform: translate(-50%, -55%);
-	width: var(--_medallion);
-	height: var(--_medallion);
-	border-radius: 50%;
-	border: 1px solid var(--eqc-gold-600);
-	background: var(--eqc-green-900);
-	display: inline-flex;
-	align-items: center;
-	justify-content: center;
-}
-.eqc-footer-medallion .eqc-logo-mark {
-	height: 58%;
-	width: auto;
-	color: var(--eqc-gold-300);
 }
 
 /* ---------- Footer responsive collapse ---------- */

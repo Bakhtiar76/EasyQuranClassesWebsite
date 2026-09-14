@@ -200,13 +200,20 @@ $about = eqc_section(
 								eqc_container(
 									array( 'css_classes' => 'eqc-btn-group eqc-align-start', 'flex_direction' => 'row' ),
 									array(
-										eqc_icon_button( 'arrow-right', __( 'More About Us', 'easy-quran-classes' ), home_url( '/about/' ), 'eqc-btn--green eqc-btn--icon-disc' ),
+										// Was an arrow-icon "More About Us" link to /about/; client
+										// asked for it to become a plain Free Trial CTA instead
+										// (BugDrop re-report, 2026-09-14) — no icon, matching the
+										// Book a Free Trial button on the About/Contact/Kids pages.
+										eqc_button( __( 'Book a Free Trial', 'easy-quran-classes' ), $trial_url, 'eqc-btn--green' ),
 										// Routed to WhatsApp on client instruction (round 6). The old
 										// `tel:` target was built from the eqc_phone_display theme mod,
 										// which is an unset placeholder on this install — so the link
-										// resolved to a bare "tel:" and went nowhere. Carries the
-										// --whatsapp hover so the destination is signalled before the click.
-										eqc_icon_button( 'phone', __( 'Call Any Time', 'easy-quran-classes' ), eqc_whatsapp_url(), 'eqc-btn--secondary eqc-btn--whatsapp' ),
+										// resolved to a bare "tel:" and went nowhere.
+										// Was --secondary + --whatsapp (green only on hover); client
+										// asked for it to read green at rest with a hover effect, so it
+										// now takes the same always-green --primary skin as the site's
+										// other default buttons (BugDrop re-report, 2026-09-14).
+										eqc_icon_button( 'phone', __( 'Call Any Time', 'easy-quran-classes' ), eqc_whatsapp_url(), 'eqc-btn--primary' ),
 									)
 								),
 							)

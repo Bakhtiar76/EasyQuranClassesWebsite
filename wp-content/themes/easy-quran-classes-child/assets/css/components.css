@@ -325,6 +325,32 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
 /* A lone CTA button inside a centred (narrow) column centres too — used by
    the home + courses "View All FAQs" buttons. */
 .eqc-container--narrow .eqc-btn-group { justify-content: center; }
+/* BugDrop #2 (2026-09-14, corrected 2026-09-14 x2): the hero's "Book Free
+   Trial" / "Chat on WhatsApp" pair, and the About section's "Book a Free
+   Trial" / "Call Any Time" pair, render at different widths because the
+   button box shrink-wraps its own (differently long) label + icon.
+   Both hero buttons are built with eqc_icon_button() (a plain `<a
+   class="eqc-btn">` inside an `.elementor-widget-html` wrapper), so a rule
+   scoped to that wrapper is enough there. The About pair mixes widget
+   types — "Book a Free Trial" is now eqc_button() (a real Elementor button
+   widget, class on the WRAPPER: `.elementor-widget-button.eqc-btn`, the
+   actual link is the wrapper's plain `.elementor-button` child) while
+   "Call Any Time" stayed eqc_icon_button() (`.elementor-widget-html`) — a
+   rule that only matched one wrapper type left them at 288px/566px
+   (measured @1920px). Both wrapper shapes are covered explicitly below. */
+.eqc-hero-text .eqc-btn-group > .elementor-widget-html,
+.eqc-about-text .eqc-btn-group > .elementor-widget-html,
+.eqc-about-text .eqc-btn-group > .elementor-widget-button.eqc-btn {
+	flex: 1 1 0;
+	min-width: 0;
+}
+.eqc-hero-text .eqc-btn-group > .elementor-widget-html a.eqc-btn,
+.eqc-about-text .eqc-btn-group > .elementor-widget-html a.eqc-btn {
+	width: 100%;
+}
+.eqc-about-text .eqc-btn-group > .elementor-widget-button.eqc-btn .elementor-button {
+	width: 100%;
+}
 
 /* ---------- Cards ---------- */
 
@@ -701,6 +727,14 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
    checklist that read as "too plain, no contrast" against the client's own
    scalloped/framed treatment. */
 .eqc-card--pricing { text-align: center; position: relative; padding-top: 3.4rem; overflow: visible; }
+/* BugDrop #9 (2026-09-14): the featured card's gold border+shadow, extended
+   to all four so they read as one matched set — content/badge/sparkle stay
+   featured-only, only the border colour/width and shadow are shared. */
+.eqc-card--pricing {
+	border-color: var(--eqc-gold-500);
+	border-width: 2px;
+	box-shadow: 0 18px 40px rgba(169, 130, 53, 0.26);
+}
 /* With the card no longer enlarged, the border and the sparkle field ARE the
    emphasis — so both carry more weight (client review, round 6). A 2px gold
    edge plus a soft outer gold ring reads as a deliberate double frame at any
@@ -1224,6 +1258,10 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
 .eqc-trust-panel {
 	background: var(--eqc-white);
 	border: 1px solid var(--eqc-border);
+	/* BugDrop #3 (2026-09-14): accent border on top+left, client-requested
+	   in the theme green, matching the hero quick-tag cards above it. */
+	border-top: 2px solid var(--eqc-green-800);
+	border-left: 2px solid var(--eqc-green-800);
 	border-radius: var(--eqc-radius-panel);
 	box-shadow: var(--eqc-shadow-card);
 	/* Client review (QA/qa-10092026/6.png): the panel read too tall with dead
@@ -1309,6 +1347,12 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
 	gap: calc(9 * var(--eqc-u));
 	align-items: center;
 	font-size: var(--eqc-fs-xsmall);
+}
+/* BugDrop #3 (2026-09-14): accent border on the hero's four quick-tag cards
+   and the trust strip beneath them, client-requested in the theme green. */
+.eqc-chip--card {
+	border-top: 2px solid var(--eqc-green-800);
+	border-left: 2px solid var(--eqc-green-800);
 }
 /* Icons here read as dark, near-filled marks in the reference. Only the
    COLOUR is matched — DESIGN.md §11 forbids mixing icon families, so the
@@ -1565,6 +1609,19 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
 	mask-image: url('../svg/keel-arch-frame-round.svg');
 }
 
+/* Hero photo framing (client request, 2026-09-14): hero-online-quran-class
+   is 1122x1402 (0.800) against this frame's 559/629 (0.889) aspect ratio, so
+   object-fit:cover (the generic .eqc-arch-media img rule) must crop ~10% of
+   the photo's height. Centred (the default) splits that evenly top/bottom,
+   which leaves only a thin margin below the open Quran on the stand — the
+   nearest thing in frame to being cropped. Nudging the focal point up trades
+   a bit more of the plain wall/curtain headroom (there is plenty above the
+   boy's cap) for a safer margin under the book, so neither the cap nor the
+   Quran ever sits on the crop line at any width — the frame's own
+   aspect-ratio is fixed, so this is the only lever that doesn't touch the
+   shared arch asset. */
+.eqc-hero-media .eqc-arch-media--keel img { object-position: 50% 30%; }
+
 .eqc-arch-media:not(.eqc-arch-media--masked):not(.eqc-arch-media--keel):not(.eqc-arch-media--cartouche)::before {
 	content: '';
 	position: absolute;
@@ -1637,8 +1694,24 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
 	font-weight: 700;
 	font-size: var(--eqc-fs-body);
 	color: var(--eqc-heading);
+	/* <button> carries `white-space: nowrap` in the browser's own UA
+	   stylesheet (confirmed via getComputedStyle — nothing in this file
+	   was setting it), inherited straight into the question span below.
+	   That is the actual, root-cause reason narrow-width text overflowed
+	   the +/x icon instead of wrapping: a previous pass fixed the flex
+	   sizing (span below) but never this, so the box could shrink while
+	   its text still physically could not wrap, and spilled over the icon
+	   at 360/390px on /faq/ (client re-report, 2026-09-14). */
+	white-space: normal;
 }
 .eqc-faq-question:focus-visible { outline: 3px solid var(--eqc-gold-500); outline-offset: -3px; }
+/* The question text is a flex item with no explicit min-width, so its
+   default min-width:auto stopped it shrinking below its own text's
+   intrinsic width — the classic flexbox overflow trap. flex:1 1 auto plus
+   min-width:0 lets the question column actually shrink and wrap within the
+   space left for it, on every FAQ list site-wide (home, /faq/, per-course,
+   pricing, kids) since they all render through eqc_faq_item_html(). */
+.eqc-faq-question > span:first-child { flex: 1 1 auto; min-width: 0; }
 .eqc-faq-icon {
 	flex: none;
 	width: 1.6em;
@@ -2225,6 +2298,14 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 }
 
 @media (max-width: 900px) {
+	/* BugDrop #8 (2026-09-14): flex-basis alone never stacked these — the
+	   container's flex-wrap stays the Elementor default (nowrap), so with
+	   text's flex-shrink:0 (unchanged by this query) demanding its full
+	   100% basis and media's flex-shrink:1 giving way, the two columns
+	   stayed on one row: media crushed to a sliver, text's heading drawn
+	   over it. Confirmed at 430x932 (QA/BugDrop #8). Wrap is what actually
+	   breaks them onto their own rows. */
+	.eqc-about-grid { flex-wrap: wrap; }
 	.eqc-about-grid > .eqc-about-media,
 	.eqc-about-grid > .eqc-about-text { flex-basis: 100%; }
 	.eqc-about-collage .eqc-about-collage__main { width: 76%; }
@@ -2250,9 +2331,29 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 /* "A quick way to choose the right course" rows link down to the matching
    course card (QA/qa-9-10.md task 16). scroll-margin keeps the jumped-to card
    clear of the sticky header. */
-.eqc-course-guide-row { transition: background-color var(--eqc-motion-base) var(--eqc-ease-standard); }
+.eqc-course-guide-row {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.75rem;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1.1rem 1.5rem;
+	text-decoration: none;
+	transition: background-color var(--eqc-motion-base) var(--eqc-ease-standard);
+}
 .eqc-course-guide-row:hover,
 .eqc-course-guide-row:focus-visible { background: var(--eqc-cream-100); }
+.eqc-course-guide-row + .eqc-course-guide-row { border-top: 1px solid var(--eqc-border); }
+.eqc-course-guide-q { font-weight: 600; color: var(--eqc-heading); }
+.eqc-course-guide-a { display: flex; align-items: center; gap: 0.5em; color: var(--eqc-bronze-700); font-weight: 600; }
+/* BugDrop #7 (2026-09-14): below ~560px the question and the answer no
+   longer both fit on one row — the answer text (a flex item next to the
+   fixed-size arrow icon) wraps mid-phrase instead of moving to its own
+   line, which strands the arrow on a visually orphaned third line. Stack
+   question above answer+arrow instead of forcing them side by side. */
+@media (max-width: 35rem) {
+	.eqc-course-guide-row { flex-direction: column; align-items: flex-start; gap: 0.35rem; }
+}
 .eqc-card--course { scroll-margin-top: calc(var(--eqc-header-h, 96px) + 24px); }
 .eqc-card--course {
 	min-height: calc(274 * var(--eqc-u));
@@ -2666,6 +2767,54 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
    enclosing panel frame is ours, not the design's. */
 .eqc-pricing-panel { background: none; border: 0; box-shadow: none; }
 
+/* BugDrop #6 (2026-09-14): below ~400px the single-column card is narrow
+   enough that the centred medallion's right edge and the corner
+   "Recommended" tab's left edge collide (measured overlap at 360px: icon
+   right=209, badge left=200 — a 9px intrusion, confirmed with
+   getBoundingClientRect). Both elements are fixed-size, not fluid, so
+   neither shrinks with the card on its own. Trim the tab down at this one
+   breakpoint — shorter padding/font, so its left edge moves right of the
+   medallion — rather than change the medallion or the desktop-approved
+   corner placement. */
+@media (max-width: 400px) {
+	.eqc-pricing-icon { width: 3.3em; height: 3.3em; }
+	.eqc-pricing-badge { font-size: 0.62rem; padding: 0.35em 0.55em; inset-inline-end: 0.3rem; }
+}
+
+/* BugDrop re-report (2026-09-14): the same collision reappears through the
+   ENTIRE 4-column desktop grid (>= 61.3125rem, same breakpoint the teacher
+   section uses further down this file) — measured with
+   getBoundingClientRect() on the live featured card:
+     1024px: icon right=129 vs badge left=64  (65px overlap)
+     1280px: icon right=154 vs badge left=107 (47px overlap)
+     1440px: icon right=170 vs badge left=134 (36px overlap)
+     1920px: icon right=221 vs badge left=208 (13px overlap)
+     2560px: icon right=240 vs badge left=240 (clears)
+   Neither element is fluid: the medallion is a fixed 3.8em and the badge's
+   --eqc-u-scaled padding/font grow with viewport, but each 4-up card is
+   only content-width/4 — genuinely narrow through this whole range, not
+   just at one breakpoint. Both trimmed together (not just the badge, as
+   the earlier <=400px fix did) because the medallion alone accounts for
+   most of the reach into the badge's corner. Sized to clear even at
+   1024px, and left untouched above 2000px where the pair already clears
+   on its own. */
+@media (min-width: 61.3125rem) and (max-width: 131.25rem) {
+	.eqc-pricing-icon { width: 2.6em; height: 2.6em; }
+	.eqc-pricing-badge { font-size: 0.6rem; padding: 0.32em 0.5em; inset-inline-end: 0.4rem; }
+}
+/* 1024px specifically still left 17px of overlap after the trim above (the
+   narrowest point of the whole 4-up range) — a second, tighter step right
+   at the grid's own breakpoint floor. Upper bound overlaps the tier above's
+   lower bound on purpose (both active 61.3125-78.125rem, later one wins) so
+   there is no gap where neither trim is enough — a plain adjoining
+   `74rem`/`74rem` boundary left 1185-1200px still colliding (verified by
+   scanning every width from 980-2560px with getBoundingClientRect after
+   the first attempt). */
+@media (min-width: 61.3125rem) and (max-width: 78.125rem) {
+	.eqc-pricing-icon { width: 1.95em; height: 1.95em; }
+	.eqc-pricing-badge { font-size: 0.48rem; padding: 0.26em 0.38em; inset-inline-end: 0.3rem; }
+}
+
 /* Client review (QA/qa-10092026/image2.png): the pricing cards should "pop out"
    more distinctly than the light lift the other cards get — a clean vertical
    rise, no sideways movement. */
@@ -2971,16 +3120,14 @@ a.eqc-btn--sm, button.eqc-btn--sm, .eqc-btn--sm { --_h: max(44px, calc(38 * var(
 .eqc-card--teacher .eqc-teacher-role { font-size: var(--eqc-fs-small); color: var(--eqc-gold-700); }
 .eqc-card--teacher .eqc-teacher-facts { gap: calc(8 * var(--eqc-u)); }
 .eqc-card--teacher .eqc-teacher-facts li { font-size: var(--eqc-fs-small); gap: calc(8 * var(--eqc-u)); }
-.eqc-teacher-profile { width: 100%; justify-content: space-between; }
+/* BugDrop #10 (2026-09-14): the trailing chevron span is gone from the
+   markup (eqc_teacher_card() in tools/elementor-helpers.php), so the pill
+   holds one child now — centre it like every other .eqc-btn instead of
+   space-between, which held the arrow apart from the label. */
+.eqc-teacher-profile { width: 100%; justify-content: center; }
 /* With the cards stretched to equal height, the pill has to be pushed to the
    bottom or a shorter card floats it mid-air. */
 .eqc-card--teacher .eqc-card__foot { margin-block-start: auto; width: 100%; }
-.eqc-teacher-profile .eqc-btn-chevron {
-	display: inline-flex; align-items: center; justify-content: center;
-	width: calc(24 * var(--eqc-u)); height: calc(24 * var(--eqc-u));
-	border-radius: 50%; border: 1px solid var(--eqc-border-strong);
-}
-.eqc-teacher-profile .eqc-icon { width: calc(13 * var(--eqc-u)); height: calc(13 * var(--eqc-u)); }
 a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); color: var(--eqc-heading); }
 
 @media (max-width: 61.25rem) {
@@ -3089,6 +3236,11 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 	font-weight: 700;
 	font-size: var(--eqc-fs-h4);
 	color: var(--eqc-heading);
+	/* BugDrop #10: trimmed from the shared 0.9em — the seal above already
+	   carries its own 0.7em bottom margin, and the two don't collapse
+	   (flex items), so the name sat a measured 60px below the seal at
+	   1920px. */
+	margin-block-start: 0.35em;
 }
 .eqc-section--teachers .eqc-teacher-facts {
 	background: none;
@@ -3097,6 +3249,12 @@ a.eqc-btn--outline { background: none; border-color: var(--eqc-border-strong); c
 	width: 100%;
 	text-align: start;
 }
+/* BugDrop #10: the card's own min-height (shared with the /teachers/ page
+   grid, further up this file) left a measured 96px of dead air between the
+   facts list and the bottom-pinned "View Profile" pill on this section's
+   4-across row. Scoped to the home section only — the full /teachers/ page
+   grid was not reported and keeps its own min-height. */
+.eqc-section--teachers .eqc-card--teacher { min-height: calc(345 * var(--eqc-u)); }
 .eqc-section--teachers .eqc-teacher-profile { width: 100%; box-sizing: border-box; }
 
 /* ---------- Testimonials section (Reviews.jpeg) ---------- */

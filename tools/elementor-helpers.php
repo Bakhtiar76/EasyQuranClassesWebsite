@@ -346,7 +346,7 @@ function eqc_teacher_card( $attachment_id, $name, $role, $facts ) {
 			eqc_html(
 				'<a class="eqc-btn eqc-btn--outline eqc-btn--sm eqc-teacher-profile" href="' . esc_url( home_url( '/teachers/' ) ) . '">'
 				. '<span>' . esc_html__( 'View Profile', 'easy-quran-classes' ) . '</span>'
-				. '<span class="eqc-btn-chevron" aria-hidden="true">' . eqc_icon_str( 'chevron-right' ) . '</span></a>',
+				. '</a>',
 				'eqc-card__foot'
 			),
 		)
