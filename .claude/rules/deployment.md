@@ -10,3 +10,4 @@
 - File Manager + phpMyAdmin are deployment tools, not source-editing workflow.
 - After deployment verify HTTPS, URLs, permalinks, Elementor CSS/data, forms, images, SEO/indexing and caches.
 - Remove public deployment archives/installers after successful release.
+- BugDrop is local-development-only. It belongs only in `local/mu-plugins/`; never copy it into the child theme, a production package, or `main`. Before any production `main` push, fail the release if `git grep -n -i bugdrop main -- wp-content/themes/easy-quran-classes-child` returns a match or if the packaged theme contains a BugDrop script/reference.

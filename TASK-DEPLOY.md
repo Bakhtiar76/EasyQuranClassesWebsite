@@ -418,6 +418,9 @@ git status
 git diff --check
 git diff
 
+# Must print nothing; any match blocks the production push.
+git grep -n -i bugdrop main -- wp-content/themes/easy-quran-classes-child
+
 Inspect tracked files carefully.
 
 Ensure there are no:

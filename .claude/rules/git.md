@@ -51,3 +51,18 @@ Commit messages must be short, clear and natural, usually one line:
 - `chore: configure local wordpress workflow`
 
 No long AI-style summaries. No Claude/AI attribution trailers. Do not blindly use `git add .`. Do not push/force-push/merge/change repository settings without authorization.
+
+## Local-only BugDrop gate
+
+BugDrop must never exist in production code. It belongs only in
+`local/mu-plugins/` on feature branches. Before copying production paths to
+`main`, committing on `main`, or pushing `main`, run:
+
+```text
+git grep -n -i bugdrop main -- wp-content/themes/easy-quran-classes-child
+```
+
+The command must return no matches. Also inspect the staged/packaged child
+theme for any BugDrop file, loader, worker URL, or script tag. Any match blocks
+the commit, push, and deployment until the local integration has been removed
+from the production tree.

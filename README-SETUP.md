@@ -404,6 +404,31 @@ codex "run: docker compose -f local/docker-compose.yml ps"     # approve the esc
 | 8 | Claude Code: Novamira ability discovery via `.mcp.json` | abilities list returns |
 | 9 | `.\local\bootstrap.ps1` / `./local/bootstrap.sh` on a fresh clone (empty `eqc_wp` volume) | exits 0; 10 pages + Privacy Policy, 15 attachments, both plugins/theme active, all `tests/visual/sweep.mjs` viewports pass |
 
+### BugDrop website reporting
+
+Docker mounts `local/mu-plugins/eqc-bugdrop.php` as a read-only must-use plugin. It loads the
+pinned BugDrop widget, sends reports to `Bakhtiar76/EasyQuranClassesWebsite`, and exits unless
+`WP_ENVIRONMENT_TYPE=local`. The production child theme contains no BugDrop code. Text inputs,
+textareas and editable fields are masked in supported BugDrop screenshot modes. The local helper
+warms and memoizes only BugDrop's read-only repository check for the current page, then falls back
+to BugDrop's normal request if warming fails; feedback submissions are never intercepted.
+
+To verify after a fresh setup or release:
+
+1. Confirm the BugDrop GitHub App is installed for **only** this repository with Issues and
+   Contents read/write access.
+2. Open the local site, wait for `window.BugDrop`, `#bugdrop-host`, and `.bd-trigger` inside its
+   shadow root (`cd tests/visual && npm run bugdrop` checks this), then submit one clearly titled
+   test report with a non-sensitive screenshot.
+3. Confirm the GitHub Issue and screenshot both open. The first screenshot creates the
+   `bugdrop-screenshots` branch automatically; treat that branch as untrusted user content and
+   never add it to a deploy workflow.
+4. Before every production `main` push, run
+   `git grep -n -i bugdrop main -- wp-content/themes/easy-quran-classes-child` and require no
+   output. Also inspect the packaged child theme for BugDrop files or URLs. `local/` is never
+   copied to `main`, and the current deploy workflow is `main`-only, so the local widget and
+   screenshot-branch pushes cannot deploy.
+
 ---
 
 ## 7. Known issues & fixes

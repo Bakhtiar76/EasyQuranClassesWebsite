@@ -71,6 +71,7 @@ Both are idempotent — safe to re-run after `docker compose down -v`, or any ti
 
 ## Volumes
 
+- `local/mu-plugins/` — read-only local development helpers, including BugDrop. This path is never copied to production or `main`.
 - `eqc_wp` (named volume) — WordPress core, plugins, uploads, DB-backed content. Not in Git; it's mutable local state.
 - `wp-content/themes/easy-quran-classes-child/` — bind-mounted from the repo. This is the only WordPress path Claude edits directly as source code.
 - `local/backups/` — bind-mounted for WP-CLI DB exports and backup archives. Gitignored (root `backups/` pattern).
@@ -80,7 +81,7 @@ Both are idempotent — safe to re-run after `docker compose down -v`, or any ti
 1. `docker compose -f local/docker-compose.yml up -d`
 2. Confirm `http://localhost/` and `/wp-admin/` load.
 3. Build/edit in Elementor via the browser, or through WP-CLI/Novamira where reliable.
-4. Visual QA: `node tests/visual/sweep.mjs http://localhost/` across the `DESIGN.md` viewports (project-local Playwright, not global), plus `chrome-devtools` MCP for interactive inspection and Lighthouse.
+4. Visual QA: `node tests/visual/sweep.mjs http://localhost/` across the `DESIGN.md` viewports (project-local Playwright, not global), `cd tests/visual && npm run bugdrop` for the local reporting widget, plus `chrome-devtools` MCP for interactive inspection and Lighthouse.
 5. Checkpoint before any risky change: `MSYS_NO_PATHCONV=1 ... wpcli db export /backups/<name>.sql` and an uploads copy as needed.
 
 See `../CPANEL-WORKFLOW.md` for the release/export process and `../.claude/skills/` for the guided workflows (`wp-cli-safe`, `wp-audit`, `release-check`, `backup-verify`, etc). Codex gets the same skills as `eqc-*` — see `../README-SETUP.md` §5.

@@ -44,6 +44,7 @@ services:
     volumes:
       - eqc_wp:/var/www/html
       - ../wp-content/themes/easy-quran-classes-child:/var/www/html/wp-content/themes/easy-quran-classes-child
+      - ./mu-plugins:/var/www/html/wp-content/mu-plugins:ro
     networks: [eqc]
 
   # One-shot WP-CLI runner sharing the WordPress volume. Use via
@@ -69,6 +70,7 @@ services:
     volumes:
       - eqc_wp:/var/www/html
       - ../wp-content/themes/easy-quran-classes-child:/var/www/html/wp-content/themes/easy-quran-classes-child
+      - ./mu-plugins:/var/www/html/wp-content/mu-plugins:ro
       - ./backups:/backups
       - ./media-staging:/media-staging:ro
       - ../tools:/tools:ro

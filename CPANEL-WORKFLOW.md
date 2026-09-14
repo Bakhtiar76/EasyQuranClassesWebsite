@@ -91,6 +91,12 @@ project's `feature/*` development branches (currently `feature/setup`).
 feature branch into `main`; copy only the production paths across instead
 (see `.claude/rules/git.md`).
 
+BugDrop is an explicit local-only exception: it lives under
+`local/mu-plugins/`, never in the production child theme. Before any `main`
+push, `git grep -n -i bugdrop main -- wp-content/themes/easy-quran-classes-child`
+must return no matches, and the packaged child theme must be inspected for the
+same absence. Any match blocks the release.
+
 Track only reproducible project assets such as:
 - child theme custom code;
 - site-specific plugin custom code;
