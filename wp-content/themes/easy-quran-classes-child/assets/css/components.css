@@ -291,30 +291,36 @@ a.eqc-btn--secondary:hover, button.eqc-btn--secondary:hover,
 .eqc-footer-cta a.eqc-btn--secondary:hover,
 .eqc-footer-cta .elementor-widget-button.eqc-btn--secondary .elementor-button:hover { background: rgba(255, 255, 255, 0.08); }
 
-/* WhatsApp buttons take the brand green on hover/focus/press (client request).
-   Selectors carry element+class weight to match the `a.eqc-btn--secondary`
-   rules they override, and the `.eqc-footer-cta` variant is listed
-   explicitly because it sets its own hover background at higher
-   specificity. #25D366 is WhatsApp's own green, kept because the point
-   is instant brand recognition — but the label on it is DARK, not white.
-   White on #25D366 measures 1.98:1, which fails WCAG 1.4.3 at any size, and
-   `font-weight` is not a contrast exemption. This state is also
-   `:focus-visible`, i.e. the keyboard focus state, so "hover is only a
-   reinforcement" would not have excused it. --eqc-heading on the same green
-   measures 8.23:1. */
-a.eqc-btn--whatsapp:hover,
-a.eqc-btn--whatsapp:focus-visible,
-a.eqc-btn--whatsapp:active,
-.eqc-footer-cta a.eqc-btn--whatsapp:hover,
-.eqc-footer-cta a.eqc-btn--whatsapp:focus-visible {
+/* WhatsApp buttons take the brand green ALL THE TIME (client request,
+   2026-09-14 — previously green only on hover/focus/press; the client asked
+   for the WhatsApp-green fill to be the button's permanent rest state, not
+   just a hover reinforcement, so this rule no longer needs the `:hover`/
+   `:focus-visible`/`:active` qualifiers to apply). Selectors carry
+   element+class weight to match the `a.eqc-btn--secondary` rules they
+   override, and the `.eqc-footer-cta` variant is listed explicitly because
+   it sets its own background at higher specificity. #25D366 is WhatsApp's
+   own green, kept because the point is instant brand recognition — but the
+   label on it is DARK, not white. White on #25D366 measures 1.98:1, which
+   fails WCAG 1.4.3 at any size, and `font-weight` is not a contrast
+   exemption. --eqc-heading on the same green measures 8.23:1. */
+a.eqc-btn--whatsapp,
+.eqc-footer-cta a.eqc-btn--whatsapp {
 	background: #25D366;
 	border-color: #1EBE5A;
 	color: var(--eqc-heading);
 	font-weight: 700;
 }
-a.eqc-btn--whatsapp:hover .eqc-icon,
-a.eqc-btn--whatsapp:focus-visible .eqc-icon,
-a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
+a.eqc-btn--whatsapp .eqc-icon { color: var(--eqc-heading); }
+/* A visible hover effect still applies on top of the permanent green — a
+   modest darken to the brand's own border shade, so the state change reads
+   as "pressed" without breaking brand recognition. */
+a.eqc-btn--whatsapp:hover,
+a.eqc-btn--whatsapp:focus-visible,
+a.eqc-btn--whatsapp:active,
+.eqc-footer-cta a.eqc-btn--whatsapp:hover,
+.eqc-footer-cta a.eqc-btn--whatsapp:focus-visible {
+	background: #1EBE5A;
+}
 
 .eqc-btn-group {
 	display: flex;
@@ -325,30 +331,20 @@ a.eqc-btn--whatsapp:active .eqc-icon { color: var(--eqc-heading); }
 /* A lone CTA button inside a centred (narrow) column centres too — used by
    the home + courses "View All FAQs" buttons. */
 .eqc-container--narrow .eqc-btn-group { justify-content: center; }
-/* BugDrop #2 (2026-09-14, corrected 2026-09-14 x2): the hero's "Book Free
+/* BugDrop #2 (2026-09-14, corrected 2026-09-14 x3): the hero's "Book Free
    Trial" / "Chat on WhatsApp" pair, and the About section's "Book a Free
    Trial" / "Call Any Time" pair, render at different widths because the
-   button box shrink-wraps its own (differently long) label + icon.
-   Both hero buttons are built with eqc_icon_button() (a plain `<a
-   class="eqc-btn">` inside an `.elementor-widget-html` wrapper), so a rule
-   scoped to that wrapper is enough there. The About pair mixes widget
-   types — "Book a Free Trial" is now eqc_button() (a real Elementor button
-   widget, class on the WRAPPER: `.elementor-widget-button.eqc-btn`, the
-   actual link is the wrapper's plain `.elementor-button` child) while
-   "Call Any Time" stayed eqc_icon_button() (`.elementor-widget-html`) — a
-   rule that only matched one wrapper type left them at 288px/566px
-   (measured @1920px). Both wrapper shapes are covered explicitly below. */
+   button box shrink-wraps its own (differently long) label + icon. Both
+   pairs are now built with eqc_icon_button() (a plain `<a class="eqc-btn">`
+   inside a plain `.elementor-widget-html` wrapper, no widget-specific
+   classes on the wrapper itself), so one rule covers both sections. */
 .eqc-hero-text .eqc-btn-group > .elementor-widget-html,
-.eqc-about-text .eqc-btn-group > .elementor-widget-html,
-.eqc-about-text .eqc-btn-group > .elementor-widget-button.eqc-btn {
+.eqc-about-text .eqc-btn-group > .elementor-widget-html {
 	flex: 1 1 0;
 	min-width: 0;
 }
 .eqc-hero-text .eqc-btn-group > .elementor-widget-html a.eqc-btn,
 .eqc-about-text .eqc-btn-group > .elementor-widget-html a.eqc-btn {
-	width: 100%;
-}
-.eqc-about-text .eqc-btn-group > .elementor-widget-button.eqc-btn .elementor-button {
 	width: 100%;
 }
 
@@ -2282,13 +2278,25 @@ h2.eqc-display-heading { font-size: var(--eqc-fs-display-xl); line-height: 1.12;
 }
 
 /* Dark-green CTA with its icon in a filled disc, as the reference draws
-   "More About Us". Reuses the shared .eqc-btn box; only the skin differs. */
-a.eqc-btn--green, .eqc-btn--green {
-	background: var(--eqc-green-800);
+   "More About Us" / "Book a Free Trial". Reuses the shared .eqc-btn box;
+   only the skin differs.
+   BugDrop re-report (2026-09-14): the bare `.eqc-btn--green` selector used
+   to ALSO match an Elementor button widget's wrapper div (which carries the
+   same class via eqc_button()'s `_css_classes`), painting a green
+   background/border onto that wrapper while the real `.elementor-button`
+   anchor inside kept Elementor's own default skin — the "green corner
+   border" visible around an otherwise gold/unstyled button. Element-
+   qualified like every other .eqc-btn variant above so only a real
+   `<a>`/`<button>` (or the compound Elementor-widget path) is ever
+   painted; a bare `<div>` wrapper can no longer match. */
+a.eqc-btn--green, button.eqc-btn--green,
+.elementor-widget-button.eqc-btn--green .elementor-button {
+	background: var(--eqc-bronze-700);
 	color: var(--eqc-white);
 	border-color: var(--eqc-green-800);
 }
-a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--eqc-green-900); }
+a.eqc-btn--green:hover, button.eqc-btn--green:hover,
+.elementor-widget-button.eqc-btn--green .elementor-button:hover { background: var(--eqc-bronze-700); border-color: var(--eqc-green-900); }
 .eqc-btn--icon-disc .eqc-icon {
 	box-sizing: content-box;
 	padding: calc(7 * var(--eqc-u));
@@ -2750,12 +2758,26 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
 	/* Tucked close to the card's right corner on purpose: the medallion is
 	   centred on the same edge, and any further inset walks the tab's left end
 	   into it. */
-	inset-inline-end: calc(6 * var(--eqc-u));
+	inset-inline-end: calc(4 * var(--eqc-u));
 	inset-inline-start: auto;
 	max-width: calc(100% - 12 * var(--eqc-u));
 	border-radius: var(--eqc-radius-pill);
-	padding: calc(6 * var(--eqc-u)) calc(14 * var(--eqc-u));
-	font-size: var(--eqc-fs-xsmall);
+	padding: calc(5.5 * var(--eqc-u)) calc(12.5 * var(--eqc-u));
+	/* BugDrop re-report (2026-09-14): this used to be the near-fixed
+	   `var(--eqc-fs-xsmall)` token (a clamp() floored/ceilinged to
+	   13-14px), plus three separate media-query "trim" tiers stacked on
+	   top of it to stop it colliding with the medallion icon through the
+	   4-up desktop grid (61.3125rem-131.25rem). Those tiers shrank the
+	   badge to the SAME small size at every desktop width from 1024px to
+	   2100px, so it read as "too small" at 1440/1920 even though there was
+	   plenty of room there — the tiers couldn't tell a cramped 1024px
+	   card from a roomy 1920px one. A plain --eqc-u multiple (like the
+	   padding above, and the icon's font-size below) scales with the same
+	   card width the icon does, so the two stay in the same size ratio to
+	   each other at every width in the fluid 980-2100px band, not just the
+	   one width they were tuned at — verified overlap-free from 980px up
+	   to 2560px+ with a Playwright sweep (no gaps to patch). */
+	font-size: calc(9.5 * var(--eqc-u));
 	letter-spacing: 0.06em;
 	white-space: nowrap;
 	/* Above the card's own border and the sparkle layer, below the card link. */
@@ -2767,52 +2789,37 @@ a.eqc-btn--green:hover { background: var(--eqc-green-900); border-color: var(--e
    enclosing panel frame is ours, not the design's. */
 .eqc-pricing-panel { background: none; border: 0; box-shadow: none; }
 
-/* BugDrop #6 (2026-09-14): below ~400px the single-column card is narrow
-   enough that the centred medallion's right edge and the corner
-   "Recommended" tab's left edge collide (measured overlap at 360px: icon
-   right=209, badge left=200 — a 9px intrusion, confirmed with
-   getBoundingClientRect). Both elements are fixed-size, not fluid, so
-   neither shrinks with the card on its own. Trim the tab down at this one
-   breakpoint — shorter padding/font, so its left edge moves right of the
-   medallion — rather than change the medallion or the desktop-approved
-   corner placement. */
+/* BugDrop re-report (2026-09-14): only the FEATURED card carries this badge,
+   so only its medallion needs to make room — the other three cards' icons,
+   and this same card's icon outside the ranges below, are untouched (still
+   the fixed 3.8em / ~61px). The medallion's `top: -1.9rem` is a fixed rem
+   offset regardless of viewport, while a 4-up card's own width shrinks/
+   grows with --eqc-u; a fixed-size icon on a fluid card collided with the
+   badge across the whole 1024-2100px desktop band (>=61.25rem, the grid's
+   own 4-up breakpoint below). Scoped to that band only — the 2-column
+   tablet range and most of the 1-column phone range already have enough
+   spare card width at the original fixed icon size, confirmed with the
+   same Playwright sweep; shrinking there too would only make the medallion
+   needlessly tiny with nothing to gain. Giving JUST this card's icon a
+   fluid font-size (every `em` dimension above — the box, the ::before/
+   ::after shell, the ring, the inner .eqc-icon — scales off font-size)
+   ties its growth to the same --eqc-u the card and badge use, so the ratio
+   between icon size and available width stays constant at every width in
+   the band instead of only "fitting" at one. */
+@media (min-width: 61.25rem) {
+	.eqc-card--pricing--featured .eqc-pricing-icon {
+		font-size: calc(6.3 * var(--eqc-u));
+	}
+}
+/* Below ~400px the single-column card is narrow enough that even the
+   original fixed-size medallion and this section's now-larger badge
+   collide (the same collision the 4-up band has, just at the opposite,
+   1-column end of the layout) — verified with the same sweep. */
 @media (max-width: 400px) {
-	.eqc-pricing-icon { width: 3.3em; height: 3.3em; }
-	.eqc-pricing-badge { font-size: 0.62rem; padding: 0.35em 0.55em; inset-inline-end: 0.3rem; }
-}
-
-/* BugDrop re-report (2026-09-14): the same collision reappears through the
-   ENTIRE 4-column desktop grid (>= 61.3125rem, same breakpoint the teacher
-   section uses further down this file) — measured with
-   getBoundingClientRect() on the live featured card:
-     1024px: icon right=129 vs badge left=64  (65px overlap)
-     1280px: icon right=154 vs badge left=107 (47px overlap)
-     1440px: icon right=170 vs badge left=134 (36px overlap)
-     1920px: icon right=221 vs badge left=208 (13px overlap)
-     2560px: icon right=240 vs badge left=240 (clears)
-   Neither element is fluid: the medallion is a fixed 3.8em and the badge's
-   --eqc-u-scaled padding/font grow with viewport, but each 4-up card is
-   only content-width/4 — genuinely narrow through this whole range, not
-   just at one breakpoint. Both trimmed together (not just the badge, as
-   the earlier <=400px fix did) because the medallion alone accounts for
-   most of the reach into the badge's corner. Sized to clear even at
-   1024px, and left untouched above 2000px where the pair already clears
-   on its own. */
-@media (min-width: 61.3125rem) and (max-width: 131.25rem) {
-	.eqc-pricing-icon { width: 2.6em; height: 2.6em; }
-	.eqc-pricing-badge { font-size: 0.6rem; padding: 0.32em 0.5em; inset-inline-end: 0.4rem; }
-}
-/* 1024px specifically still left 17px of overlap after the trim above (the
-   narrowest point of the whole 4-up range) — a second, tighter step right
-   at the grid's own breakpoint floor. Upper bound overlaps the tier above's
-   lower bound on purpose (both active 61.3125-78.125rem, later one wins) so
-   there is no gap where neither trim is enough — a plain adjoining
-   `74rem`/`74rem` boundary left 1185-1200px still colliding (verified by
-   scanning every width from 980-2560px with getBoundingClientRect after
-   the first attempt). */
-@media (min-width: 61.3125rem) and (max-width: 78.125rem) {
-	.eqc-pricing-icon { width: 1.95em; height: 1.95em; }
-	.eqc-pricing-badge { font-size: 0.48rem; padding: 0.26em 0.38em; inset-inline-end: 0.3rem; }
+	.eqc-card--pricing--featured .eqc-pricing-icon {
+		width: 3.3em;
+		height: 3.3em;
+	}
 }
 
 /* Client review (QA/qa-10092026/image2.png): the pricing cards should "pop out"

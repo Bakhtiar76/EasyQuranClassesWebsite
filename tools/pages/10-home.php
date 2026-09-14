@@ -201,19 +201,25 @@ $about = eqc_section(
 									array( 'css_classes' => 'eqc-btn-group eqc-align-start', 'flex_direction' => 'row' ),
 									array(
 										// Was an arrow-icon "More About Us" link to /about/; client
-										// asked for it to become a plain Free Trial CTA instead
-										// (BugDrop re-report, 2026-09-14) — no icon, matching the
-										// Book a Free Trial button on the About/Contact/Kids pages.
-										eqc_button( __( 'Book a Free Trial', 'easy-quran-classes' ), $trial_url, 'eqc-btn--green' ),
+										// asked for it to become a Free Trial CTA instead (BugDrop
+										// re-report, 2026-09-14). Built with eqc_icon_button() (not
+										// eqc_button()) so it shares the exact same widget shape as
+										// "Call Any Time" below — the client separately asked for a
+										// leading icon here to match that button, and matching
+										// wrapper shapes is what lets one CSS rule size both equally.
+										eqc_icon_button( 'gift-filled', __( 'Book a Free Trial', 'easy-quran-classes' ), $trial_url, 'eqc-btn--green' ),
 										// Routed to WhatsApp on client instruction (round 6). The old
 										// `tel:` target was built from the eqc_phone_display theme mod,
 										// which is an unset placeholder on this install — so the link
 										// resolved to a bare "tel:" and went nowhere.
-										// Was --secondary + --whatsapp (green only on hover); client
-										// asked for it to read green at rest with a hover effect, so it
-										// now takes the same always-green --primary skin as the site's
-										// other default buttons (BugDrop re-report, 2026-09-14).
-										eqc_icon_button( 'phone', __( 'Call Any Time', 'easy-quran-classes' ), eqc_whatsapp_url(), 'eqc-btn--primary' ),
+										// Client asked for this to read WhatsApp-brand green (#1EBE5A)
+										// at rest with a hover effect (BugDrop re-report, 2026-09-14) —
+										// --secondary + --whatsapp is the site's existing "always-on
+										// WhatsApp green" skin (also used by "Chat on WhatsApp"), and
+										// this button already links to WhatsApp, so it's the correct
+										// variant rather than --primary (which stays dark green for
+										// the site's other default buttons, e.g. "View All FAQs").
+										eqc_icon_button( 'phone', __( 'Call Any Time', 'easy-quran-classes' ), eqc_whatsapp_url(), 'eqc-btn--secondary eqc-btn--whatsapp' ),
 									)
 								),
 							)
